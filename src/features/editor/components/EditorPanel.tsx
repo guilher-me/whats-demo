@@ -38,8 +38,11 @@ export function EditorPanel(props: Props) {
       />
       <div className="timeline-heading">
         <h3>Sequência</h3>
-        <span>{props.project.steps.length} etapas</span>
+        <span>
+          {props.project.steps.length} {props.project.steps.length === 1 ? 'etapa' : 'etapas'}
+        </span>
       </div>
+      <AddStepButtons onAdd={props.onAdd} disabled={props.project.steps.length >= 200} />
       <div>
         {props.project.steps.map((step, index) => (
           <StepCard
@@ -54,7 +57,6 @@ export function EditorPanel(props: Props) {
           />
         ))}
       </div>
-      <AddStepButtons onAdd={props.onAdd} disabled={props.project.steps.length >= 200} />
       <p className="editor-hint">Os balões da conversa não mostram nomes de remetente.</p>
       {location.protocol === 'file:' && (
         <p className="editor-hint">
