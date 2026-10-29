@@ -130,42 +130,46 @@ export function App() {
               Só celular ↗
             </Button>
           </div>
-          <PlaybackControls
-            disabled={hasErrors || editor.loading || !editor.project.steps.length}
-            running={playback.running}
-            onManual={() => void run(editor.project, false)}
-            onAuto={() => void run(editor.project, true)}
-            onStop={playback.stop}
-            onReset={() => {
-              setSelectedId(null);
-              playback.reset();
-            }}
-          />
           <p className="play-status" role="status" aria-live="polite">
             {selectedStep ? 'Prévia da mensagem em edição' : playback.status}
           </p>
-          {selectedStep ? (
-            <>
-              <div className="draft-preview-toolbar">
-                <span>Editando etapa {editor.project.steps.indexOf(selectedStep) + 1}</span>
-                <Button variant="ghost" onClick={() => setSelectedId(null)}>
-                  Ver conversa
-                </Button>
-              </div>
-              <MessagePreview
-                key={`${selectedStep.id}:${selectedStep.type === 'business' ? (selectedStep.interactive?.kind ?? 'text') : selectedStep.type}`}
+          {selectedStep && (
+            <div className="draft-preview-toolbar">
+              <span>Editando etapa {editor.project.steps.indexOf(selectedStep) + 1}</span>
+              <Button variant="ghost" onClick={() => setSelectedId(null)}>
+                Ver conversa
+              </Button>
+            </div>
+          )}
+          <div className="phone-stage">
+            {selectedStep ? (
+              <>
+                <MessagePreview
+                  key={`${selectedStep.id}:${selectedStep.type === 'business' ? (selectedStep.interactive?.kind ?? 'text') : selectedStep.type}`}
+                  contact={editor.project.contact}
+                  step={selectedStep}
+                  phoneRef={phoneRef}
+                />
+              </>
+            ) : (
+              <PhonePreview
                 contact={editor.project.contact}
-                step={selectedStep}
+                playback={playback}
                 phoneRef={phoneRef}
               />
-            </>
-          ) : (
-            <PhonePreview
-              contact={editor.project.contact}
-              playback={playback}
-              phoneRef={phoneRef}
+            )}
+            <PlaybackControls
+              disabled={hasErrors || editor.loading || !editor.project.steps.length}
+              running={playback.running}
+              onManual={() => void run(editor.project, false)}
+              onAuto={() => void run(editor.project, true)}
+              onStop={playback.stop}
+              onReset={() => {
+                setSelectedId(null);
+                playback.reset();
+              }}
             />
-          )}
+          </div>
           <p className="preview-note">Simulação local · sem envio ao WhatsApp</p>
           {recording && (
             <Button variant="ghost" onClick={() => setRecording(false)}>

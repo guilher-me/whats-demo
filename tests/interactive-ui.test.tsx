@@ -101,7 +101,7 @@ it.each(['buttons', 'list'] as const)(
   'anima %s e usa a resposta automática configurada',
   async (kind) => {
     await start(kind);
-    fireEvent.click(screen.getByRole('button', { name: '▶ Automático' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
     for (let i = 0; i < 8; i++) await tick(1000);
     expect(document.querySelector('.play-status')).toHaveTextContent('Conversa concluída.');
     expect(document.querySelector('.bubble.user')).toHaveTextContent('Falar com atendente');
@@ -117,7 +117,7 @@ it('parar fecha a lista, cancela a espera e permite uma nova reprodução', asyn
   await tick(5000);
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   expect(document.querySelector('.messages')).not.toHaveTextContent('Resposta recebida.');
-  fireEvent.click(screen.getByRole('button', { name: '▶ Automático' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
   await tick(8000);
   expect(document.querySelector('.play-status')).toHaveTextContent('Conversa concluída.');
 });

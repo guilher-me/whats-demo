@@ -83,13 +83,17 @@ describe('editor e reprodução React', () => {
     expect(screen.getByRole('button', { name: 'Confirmar Dados' })).toBeDisabled();
   });
   it('cancela e reinicia sem mensagens atrasadas', async () => {
+    const project = createDefaultProject();
+    project.contact.avatar = '';
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
     await start();
-    fireEvent.click(screen.getByRole('button', { name: '▶ Automático' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
     await tick(100);
+    expect(window.whatsappFakeFlows!.getState().running).toBe(true);
     fireEvent.click(screen.getByRole('button', { name: 'Reiniciar prévia' }));
     await tick(20000);
     expect(document.querySelectorAll('.bubble')).toHaveLength(0);
-    expect(screen.getByRole('button', { name: '▶ Automático' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Reproduzir automaticamente' })).toBeEnabled();
   });
   it('executa a animação automática completa', async () => {
     const p = createDefaultProject();
@@ -97,7 +101,7 @@ describe('editor e reprodução React', () => {
     p.steps.forEach((s) => (s.delay = 0));
     localStorage.setItem(STORAGE_KEY, JSON.stringify(p));
     await start();
-    fireEvent.click(screen.getByRole('button', { name: '▶ Automático' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
     for (let i = 0; i < 45; i++) await tick(1000);
     expect(document.querySelector('.play-status')?.textContent).toBe('Conversa concluída.');
     expect(document.querySelector('.messages')?.textContent).toContain('Meu nome é Vanessa');

@@ -99,7 +99,9 @@ it('preserva a conversa executada, reinicia a prévia e limpa a seleção removi
   fireEvent.click(screen.getByRole('button', { name: 'Ver conversa' }));
   expect(document.querySelector('.messages')).toHaveTextContent('Mensagem original');
   fireEvent.click(card);
-  fireEvent.click(screen.getByRole('button', { name: 'Reiniciar prévia' }));
+  act(() => {
+    window.whatsappFakeFlows!.reset();
+  });
   expect(document.querySelectorAll('.bubble')).toHaveLength(0);
   fireEvent.click(card);
   fireEvent.click(within(card).getByRole('button', { name: 'Remover etapa' }));

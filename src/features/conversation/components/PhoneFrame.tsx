@@ -13,7 +13,13 @@ export function PhoneFrame({
   children: ReactNode;
 }) {
   return (
-    <div className="phone" ref={phoneRef}>
+    <div
+      className="phone"
+      id="phone-preview"
+      role="region"
+      aria-label="Celular de prévia"
+      ref={phoneRef}
+    >
       <ChatHeader contact={contact} typing={typing} />
       {children}
     </div>
