@@ -381,3 +381,16 @@
 .touch-cursor {
   z-index: 30;
 }
+.message-receipt {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  margin-left: 3px;
+  color: #8696a0;
+  line-height: 0;
+}
+.message-receipt svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}

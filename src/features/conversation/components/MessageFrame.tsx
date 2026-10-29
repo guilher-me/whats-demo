@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { DeliveredIcon } from '../../../components/icons/WhatsAppIcons';
 /** Composable bubble shell: content, metadata and actions remain independent. */
 export function MessageFrame({
   id,
@@ -25,9 +26,8 @@ export function MessageFrame({
       <time className="message-time" dateTime={time}>
         {time}
         {direction === 'user' && (
-          <span role="img" aria-label="Mensagem enviada">
-            {' '}
-            ✓✓
+          <span className="message-receipt" role="img" aria-label="Mensagem entregue">
+            <DeliveredIcon />
           </span>
         )}
       </time>
