@@ -13,6 +13,10 @@ it('gera um HTML com React, estilos, foto e licenças incorporados', async () =>
     await build({ output });
     const html = readFileSync(output, 'utf8');
     expect(html).toContain('data:image/png;base64,');
+    const wallpaper = readFileSync(
+      new URL('../assets/whatsapp-background.png', import.meta.url),
+    ).toString('base64');
+    expect(html.includes('data:image/png;base64,' + wallpaper)).toBe(true);
     expect(html).toContain('Copyright (c) 2026 Guilherme Cardoso');
     expect(html).toContain('Third-party notices');
     expect(html).toContain('react-dom@');
