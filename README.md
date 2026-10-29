@@ -81,3 +81,11 @@ Adicione uma mensagem da **Empresa** e escolha o **Formato da mensagem**:
 Configure cabeçalho, rodapé e a resposta usada no modo automático nas opções adicionais da mensagem. No modo manual, clique no botão ou abra a lista, selecione uma opção e confirme. A seleção aparece como resposta do cliente e libera a próxima etapa. O roteiro continua sendo linear: as respostas não criam ramificações entre etapas.
 
 Os componentes visuais usam composição: `MessageFrame` recebe conteúdo e ações; `MessageAction` é reutilizado em botões de resposta e convites para listas. Veja [como estender as mensagens](docs/messages.md).
+
+## Integração com ferramentas de IA
+
+O projeto inclui `llms.txt` e uma API pública em `window.whatsappFakeFlows` para consultar, validar e carregar jornadas, gerar links e executar a prévia. Veja [o contrato e os exemplos](docs/automation.md).
+
+`npm run build` também gera `dist/llms.txt`, o alias `dist/llm.txt`, `dist/llms-full.txt` e a documentação referenciada. Publique a pasta `dist/` para disponibilizá-los por URL. O HTML único continua independente: as instruções completas ficam embutidas nele e podem ser lidas por `getInstructions()` ou pelo elemento `#llms-txt`.
+
+O arquivo de instruções não conecta um LLM automaticamente. A ferramenta precisa conseguir ler a página e, para utilizar a API, executar JavaScript nela.

@@ -88,6 +88,11 @@ export function useProject() {
     setRevision((n) => n + 1);
     setError('');
   };
+  const replace = (project: Project) => {
+    update(() => project);
+    setRevision((n) => n + 1);
+    setError('');
+  };
   return {
     project,
     revision,
@@ -100,5 +105,6 @@ export function useProject() {
     action,
     add,
     restore,
+    replace,
   };
 }

@@ -9,6 +9,8 @@ import { PhonePreview } from '../features/conversation/components/PhonePreview';
 import { Button } from '../components/ui/Button';
 import { Dialog } from '../components/ui/Dialog';
 import { businessMessageError } from '../core/interactive';
+import { createDefaultProject } from '../core/defaults';
+import { useAutomationAPI } from '../features/automation/useAutomationAPI';
 export function App() {
   const editor = useProject(),
     phoneRef = useRef<HTMLDivElement>(null),
@@ -26,6 +28,29 @@ export function App() {
       ? !!businessMessageError(step)
       : step.type === 'flow' && invalid[step.id],
   );
+  useAutomationAPI({
+    project: () => editor.project,
+    state: () => ({
+      ready: !editor.loading,
+      running: playback.running,
+      status: playback.status,
+      activeStep: playback.activeStep,
+      flowScreen: playback.flow?.step.flow.screens[playback.flow.index]?.id ?? null,
+      pendingMessageId: playback.interaction.pendingId,
+      messages: playback.messages,
+    }),
+    hasErrors: () => hasErrors,
+    replace: (project) => {
+      playback.reset();
+      editor.replace(project);
+    },
+    run: playback.run,
+    stop: playback.stop,
+    reset: playback.reset,
+    example: createDefaultProject,
+    instructions: () => document.getElementById('llms-txt')?.textContent ?? '',
+    href: () => location.href,
+  });
   useEffect(() => {
     playback.stop();
     setInvalid({});

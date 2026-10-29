@@ -1,6 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const esbuild = require('esbuild');
+const { agentDocs } = require('./agent-docs.cjs');
 const ROOT = path.resolve(__dirname, '..');
 function dependencyNotices(root, inputs) {
   const packages = new Set();
@@ -56,7 +57,11 @@ async function build({
     fs.readFileSync(path.join(root, 'LICENSE'), 'utf8') +
     '\nThird-party notices\n' +
     dependencyNotices(root, result.metafile.inputs);
-  let html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  let html = agentDocs(
+    root,
+    path.dirname(output),
+    fs.readFileSync(path.join(root, 'index.html'), 'utf8'),
+  );
   html = html.replace(
     '<!-- APP_STYLES -->',
     () => '<style>\n' + css.replace(/<\/style/gi, '<\\/style') + '\n</style>',

@@ -290,16 +290,20 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
         }
       }
       if (controller.current === active) {
-        controller.current = null;
-        setRunning(false);
-        setActiveStep(null);
-        cursor.hide();
-        setStatus('Conversa concluída.');
+        flushSync(() => {
+          controller.current = null;
+          setRunning(false);
+          setActiveStep(null);
+          cursor.hide();
+          setStatus('Conversa concluída.');
+        });
       }
     } catch (error) {
       if (!signal.aborted && controller.current === active) {
-        stop();
-        setStatus('Reprodução interrompida: ' + (error as Error).message);
+        flushSync(() => {
+          stop();
+          setStatus('Reprodução interrompida: ' + (error as Error).message);
+        });
       }
     }
   };
