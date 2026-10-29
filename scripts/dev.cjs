@@ -2,6 +2,7 @@ const fs = require('node:fs'),
   path = require('node:path'),
   esbuild = require('esbuild');
 const { agentDocs } = require('./agent-docs.cjs');
+const { brandHtml } = require('./branding.cjs');
 async function start() {
   const root = path.resolve(__dirname, '..'),
     directory = path.join(root, '.dev');
@@ -11,8 +12,7 @@ async function start() {
     agentDocs(
       root,
       directory,
-      fs
-        .readFileSync(path.join(root, 'index.html'), 'utf8')
+      brandHtml(root, fs.readFileSync(path.join(root, 'index.html'), 'utf8'))
         .replace('<!-- APP_STYLES -->', '<link rel="stylesheet" href="app.css">')
         .replace('<!-- APP_SCRIPT -->', '<script defer src="app.js"></script>'),
     ),
@@ -27,7 +27,7 @@ async function start() {
     target: 'es2022',
     jsx: 'automatic',
     sourcemap: true,
-    loader: { '.png': 'dataurl' },
+    loader: { '.png': 'dataurl', '.svg': 'dataurl' },
     define: { 'process.env.NODE_ENV': '"development"' },
   });
   await context.watch();

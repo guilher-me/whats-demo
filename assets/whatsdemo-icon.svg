@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title">
+  <title id="title">WhatsDemo</title>
+  <path d="M16 5h19c7.18 0 13 5.82 13 13v7c0 7.18-5.82 13-13 13H20l-9 7V34.96A12.97 12.97 0 0 1 3 23v-5C3 10.82 8.82 5 16 5Z" fill="#64E3AC"/>
+  <path d="M29 18h19c7.18 0 13 5.82 13 13v9c0 7.18-5.82 13-13 13h-2l-10 7v-7h-7c-7.18 0-13-5.82-13-13v-9c0-7.18 5.82-13 13-13Z" fill="#123F3B"/>
+  <path d="M33 28.8c0-1.36 1.48-2.2 2.65-1.51l11.38 6.7a1.75 1.75 0 0 1 0 3.02l-11.38 6.7A1.75 1.75 0 0 1 33 42.2V28.8Z" fill="#FFF"/>
+</svg>

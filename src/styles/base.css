@@ -90,16 +90,21 @@ label select {
   width: 42px;
   height: 42px;
   border-radius: 13px;
-  background: #e4f1e8;
-  color: #008069;
+  background: transparent;
   display: grid;
   place-items: center;
-  font-size: 31px;
+}
+.brand-mark img {
+  display: block;
 }
 .brand h1 {
   margin: 0;
   font-size: 19px;
   letter-spacing: -0.5px;
+  color: #123f3b;
+}
+.brand h1 span {
+  color: #00816b;
 }
 .brand p {
   margin: 2px 0 0;

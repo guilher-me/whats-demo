@@ -12,6 +12,12 @@ it('gera um HTML com React, estilos, foto e licenças incorporados', async () =>
     const output = join(directory, 'app.html');
     await build({ output });
     const html = readFileSync(output, 'utf8');
+    expect(html).toContain('<title>WhatsDemo</title>');
+    expect(html).not.toContain('APP_FAVICON');
+    expect(html).toContain(
+      'data:image/svg+xml;base64,' +
+        readFileSync(new URL('../assets/whatsdemo-icon.svg', import.meta.url)).toString('base64'),
+    );
     expect(html).toContain('data:image/png;base64,');
     const wallpaper = readFileSync(
       new URL('../assets/whatsapp-background.png', import.meta.url),

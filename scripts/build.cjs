@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const esbuild = require('esbuild');
 const { agentDocs } = require('./agent-docs.cjs');
+const { brandHtml } = require('./branding.cjs');
 const ROOT = path.resolve(__dirname, '..');
 function dependencyNotices(root, inputs) {
   const packages = new Set();
@@ -46,7 +47,7 @@ async function build({
     jsx: 'automatic',
     minify: true,
     legalComments: 'inline',
-    loader: { '.png': 'dataurl' },
+    loader: { '.png': 'dataurl', '.svg': 'dataurl' },
     metafile: true,
     define: { 'process.env.NODE_ENV': '"production"' },
   });
@@ -60,7 +61,7 @@ async function build({
   let html = agentDocs(
     root,
     path.dirname(output),
-    fs.readFileSync(path.join(root, 'index.html'), 'utf8'),
+    brandHtml(root, fs.readFileSync(path.join(root, 'index.html'), 'utf8')),
   );
   html = html.replace(
     '<!-- APP_STYLES -->',

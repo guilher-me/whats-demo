@@ -1,4 +1,4 @@
-# WhatsApp Fake Flows
+# WhatsDemo
 
 Editor de conversas e WhatsApp Flows para demonstrações, protótipos e gravações. Monte a sequência à esquerda e experimente a conversa no celular à direita, manualmente ou com preenchimento automático e cursor animado.
 
