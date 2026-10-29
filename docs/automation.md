@@ -204,3 +204,7 @@ const shareURL = await api.createShareURL();
 The browser API version and the project version are independent. Preserve the semantics of API v1 methods; introduce a new API version for incompatible changes. New optional project fields can keep project version 1 when existing fields retain their meaning. Keep legacy v1z/v1j shared links readable.
 
 Implementation is in `src/features/automation`. The factory is independent of React; its hook connects validated actions to the editor. Do not expose the internal mutable store or add code evaluation endpoints. Add tests for new actions and keep this guide, the embedded instructions and the API contract consistent.
+
+## Durante uma gravação
+
+A gravação de vídeo é iniciada pelos controles da interface. Enquanto está ativa, `loadProject`, `play`, `stop` e `reset` rejeitam operações que poderiam interromper a captura. Consultas, validação e criação de links continuam disponíveis. Finalize ou cancele a gravação pela interface antes de alterar a jornada pela API. O vídeo não faz parte do projeto JSON nem do link compartilhável.

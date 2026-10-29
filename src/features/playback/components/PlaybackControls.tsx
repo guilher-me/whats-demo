@@ -3,6 +3,7 @@ import { ControlIcon } from '../../../components/icons/ControlIcon';
 export function PlaybackControls({
   disabled,
   running,
+  locked = false,
   onManual,
   onAuto,
   onStop,
@@ -10,6 +11,7 @@ export function PlaybackControls({
 }: {
   disabled: boolean;
   running: boolean;
+  locked?: boolean;
   onManual: () => void;
   onAuto: () => void;
   onStop: () => void;
@@ -24,7 +26,7 @@ export function PlaybackControls({
             ? 'Interrompe a conversa e mantém as mensagens exibidas.'
             : 'Preencha os campos e escolha as opções no celular.'
         }
-        disabled={!running && disabled}
+        disabled={locked || (!running && disabled)}
         aria-controls="phone-preview"
         onClick={running ? onStop : onManual}
       >
@@ -38,7 +40,7 @@ export function PlaybackControls({
             : 'Executa a jornada com cursor e respostas animados.'
         }
         className="playback-auto"
-        disabled={!running && disabled}
+        disabled={locked || (!running && disabled)}
         aria-controls="phone-preview"
         onClick={running ? onReset : onAuto}
       >

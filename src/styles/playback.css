@@ -87,14 +87,14 @@
   font-weight: 600;
   margin-bottom: 3px;
 }
-.recording .playback {
+.focus-mode .playback {
   display: none;
 }
-.recording .phone-stage {
+.focus-mode .phone-stage {
   width: 360px;
   max-width: 100%;
 }
-.recording .phone-stage .phone {
+.focus-mode .phone-stage .phone {
   width: 100%;
 }
 .upload-button {

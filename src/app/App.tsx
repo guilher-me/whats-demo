@@ -13,12 +13,15 @@ import { createDefaultProject } from '../core/defaults';
 import { useAutomationAPI } from '../features/automation/useAutomationAPI';
 import { MessagePreview } from '../features/conversation/components/MessagePreview';
 import { createStep } from '../core/project';
+import { flushSync } from 'react-dom';
+import { useRecording } from '../features/recording/useRecording';
+import { RecordingControls } from '../features/recording/components/RecordingControls';
 export function App() {
   const editor = useProject(),
     phoneRef = useRef<HTMLDivElement>(null),
     playback = usePlayback(phoneRef);
   const [invalid, setInvalid] = useState<Record<string, boolean>>({}),
-    [recording, setRecording] = useState(false),
+    [focusMode, setFocusMode] = useState(false),
     [selectedId, setSelectedId] = useState<string | null>(null),
     [restoreOpen, setRestoreOpen] = useState(false);
   const onValidity = useCallback(
@@ -34,7 +37,26 @@ export function App() {
   const selectedStep = !playback.running
     ? editor.project.steps.find((step) => step.id === selectedId)
     : undefined;
+  const recorder = useRecording({
+    phone: phoneRef,
+    prepare: () =>
+      flushSync(() => {
+        setSelectedId(null);
+        setFocusMode(false);
+        playback.reset();
+      }),
+    run: (automatic) => playback.run(editor.project, automatic),
+    stopPlayback: () => {
+      if (playback.running) playback.stop();
+    },
+    playbackStatus: () => playback.status,
+  });
+  const ensureAvailable = () => {
+    if (recorder.busy)
+      throw new Error('Finalize ou cancele a gravação antes de alterar a jornada.');
+  };
   const run = (project: typeof editor.project, automatic: boolean) => {
+    ensureAvailable();
     setSelectedId(null);
     return playback.run(project, automatic);
   };
@@ -51,13 +73,18 @@ export function App() {
     }),
     hasErrors: () => hasErrors,
     replace: (project) => {
+      ensureAvailable();
       setSelectedId(null);
       playback.reset();
       editor.replace(project);
     },
     run,
-    stop: playback.stop,
+    stop: () => {
+      ensureAvailable();
+      playback.stop();
+    },
     reset: () => {
+      ensureAvailable();
       setSelectedId(null);
       playback.reset();
     },
@@ -72,36 +99,45 @@ export function App() {
   }, [editor.revision, playback.stop]);
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setRecording(false);
+      if (event.key === 'Escape') setFocusMode(false);
     };
     window.addEventListener('keydown', key);
     return () => window.removeEventListener('keydown', key);
   }, []);
   const edit = (operation: () => void) => {
+    if (recorder.busy) return;
     if (playback.running) playback.stop();
     operation();
   };
   return (
-    <div className={recording ? 'recording' : undefined}>
+    <div
+      className={
+        [focusMode ? 'focus-mode' : '', recorder.busy ? 'is-capturing' : '']
+          .filter(Boolean)
+          .join(' ') || undefined
+      }
+    >
       <AppHeader status={hasErrors ? 'Há campos que precisam de correção' : editor.saveStatus}>
         <ShareButton
           project={editor.project}
-          disabled={hasErrors || editor.loading}
+          disabled={hasErrors || editor.loading || recorder.busy}
           onError={editor.setError}
         />
       </AppHeader>
       <main className="workspace">
         <EditorPanel
+          disabled={recorder.busy}
           project={editor.project}
           revision={editor.revision}
           activeStep={playback.activeStep}
           selectedStep={selectedStep?.id ?? null}
           onSelect={(id) => {
+            if (recorder.busy) return;
             if (playback.running) playback.stop();
             setSelectedId(id);
           }}
           error={editor.error}
-          onContact={(contact) => editor.update((p) => ({ ...p, contact }))}
+          onContact={(contact) => edit(() => editor.update((p) => ({ ...p, contact })))}
           onChange={(id, change) =>
             edit(() => {
               setSelectedId(id);
@@ -126,7 +162,7 @@ export function App() {
               <span className="eyebrow">02 / EXPERIMENTE</span>
               <h2>Prévia da conversa</h2>
             </div>
-            <Button variant="ghost" onClick={() => setRecording(true)}>
+            <Button variant="ghost" disabled={recorder.busy} onClick={() => setFocusMode(true)}>
               Só celular ↗
             </Button>
           </div>
@@ -158,21 +194,28 @@ export function App() {
                 phoneRef={phoneRef}
               />
             )}
-            <PlaybackControls
-              disabled={hasErrors || editor.loading || !editor.project.steps.length}
-              running={playback.running}
-              onManual={() => void run(editor.project, false)}
-              onAuto={() => void run(editor.project, true)}
-              onStop={playback.stop}
-              onReset={() => {
-                setSelectedId(null);
-                playback.reset();
-              }}
-            />
+            <div className="phone-tools">
+              <PlaybackControls
+                locked={recorder.busy}
+                disabled={hasErrors || editor.loading || !editor.project.steps.length}
+                running={playback.running}
+                onManual={() => void run(editor.project, false)}
+                onAuto={() => void run(editor.project, true)}
+                onStop={playback.stop}
+                onReset={() => {
+                  setSelectedId(null);
+                  playback.reset();
+                }}
+              />
+              <RecordingControls
+                controller={recorder}
+                disabled={hasErrors || editor.loading || !editor.project.steps.length}
+              />
+            </div>
           </div>
           <p className="preview-note">Simulação local · sem envio ao WhatsApp</p>
-          {recording && (
-            <Button variant="ghost" onClick={() => setRecording(false)}>
+          {focusMode && (
+            <Button variant="ghost" onClick={() => setFocusMode(false)}>
               Sair da visualização · Esc
             </Button>
           )}

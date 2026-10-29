@@ -16,6 +16,8 @@ it('gera um HTML com React, estilos, foto e licenças incorporados', async () =>
     expect(html).toContain('Copyright (c) 2026 Guilherme Cardoso');
     expect(html).toContain('Third-party notices');
     expect(html).toContain('react-dom@');
+    expect(html).toContain('dom-to-image-more@');
+    expect(html).toContain('fix-webm-duration@');
     expect(html).not.toMatch(/<script\b[^>]*src=/i);
     expect(html).not.toContain('APP_SCRIPT');
     expect(html).not.toContain('LLM_DOCS');

@@ -303,6 +303,6 @@
 .draft-chat {
   bottom: 43px;
 }
-.recording .draft-preview-toolbar {
+.focus-mode .draft-preview-toolbar {
   display: none;
 }

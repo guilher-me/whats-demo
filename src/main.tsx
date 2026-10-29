@@ -15,3 +15,5 @@ createRoot(document.getElementById('root')!).render(
 import './styles/controls.css';
 
 import './styles/playback.css';
+
+import './styles/recording.css';

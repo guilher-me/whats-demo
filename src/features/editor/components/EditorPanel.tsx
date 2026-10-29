@@ -10,6 +10,7 @@ interface Props {
   revision: number;
   activeStep: string | null;
   selectedStep: string | null;
+  disabled?: boolean;
   onSelect: (id: string) => void;
   error: string;
   onContact: (contact: Contact) => void;
@@ -22,7 +23,12 @@ interface Props {
 }
 export function EditorPanel(props: Props) {
   return (
-    <section className="editor" aria-label="Editor de conversa">
+    <section
+      className="editor"
+      aria-label="Editor de conversa"
+      inert={props.disabled || undefined}
+      aria-disabled={props.disabled || undefined}
+    >
       <div className="section-heading">
         <div>
           <span className="eyebrow">01 / CONFIGURE</span>

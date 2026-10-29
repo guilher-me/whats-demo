@@ -216,25 +216,25 @@ h3 {
 #exit-record {
   display: none;
 }
-.recording .app-header,
-.recording .editor,
-.recording .preview-heading,
-.recording .playback,
-.recording .play-status,
-.recording .preview-note {
+.focus-mode .app-header,
+.focus-mode .editor,
+.focus-mode .preview-heading,
+.focus-mode .playback,
+.focus-mode .play-status,
+.focus-mode .preview-note {
   display: none;
 }
-.recording .workspace {
+.focus-mode .workspace {
   display: block;
 }
-.recording .preview {
+.focus-mode .preview {
   height: auto;
   min-height: 100vh;
   justify-content: center;
   padding: 24px;
   background: #eef3ef;
 }
-.recording #exit-record {
+.focus-mode #exit-record {
   display: block;
   font-size: 11px;
   background: transparent;

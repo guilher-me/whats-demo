@@ -101,3 +101,11 @@ Use **Ver conversa** para retornar ao histórico da simulação. Iniciar a repro
 Os dois controles com ícones ficam à direita do celular: interação manual e reprodução automática. Durante a reprodução, passam a parar e reiniciar. Os tooltips funcionam por mouse e foco de teclado e podem ser fechados com Esc.
 
 A interface usa nomes acessíveis, regiões, labels de campos e mensagens de erro vinculadas. Veja [os recursos de acessibilidade e suas verificações](docs/accessibility.md).
+
+## Gravar vídeo
+
+Use o botão **Gravar celular** na lateral da prévia. Escolha o modo manual ou automático, aguarde os 3 segundos e acompanhe o contador. No modo manual, finalize pelo botão; no automático, o vídeo termina 2 segundos após a última mensagem.
+
+O resultado pode ser assistido e baixado como MP4 quando suportado, ou WebM. Apenas o celular é gravado, sem áudio, editor ou controles, em 720 × 1280. Tudo acontece localmente, com as bibliotecas incluídas no HTML único. Mantenha a aba visível durante a gravação.
+
+Veja [como funciona a gravação e seus limites](docs/recording.md).
