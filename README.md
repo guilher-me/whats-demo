@@ -95,3 +95,9 @@ O arquivo de instruções não conecta um LLM automaticamente. A ferramenta prec
 Clique em uma etapa ou foque um de seus campos para acompanhar a mensagem no celular enquanto edita. Texto, botões, listas e convites de Flow usam os mesmos componentes da conversa. Você pode experimentar as opções e abrir o formulário nessa prévia.
 
 Use **Ver conversa** para retornar ao histórico da simulação. Iniciar a reprodução também retorna à conversa completa. A prévia de edição não adiciona mensagens ao histórico nem executa a sequência.
+
+## Controles e acessibilidade
+
+Os dois controles com ícones ficam à direita do celular: interação manual e reprodução automática. Durante a reprodução, passam a parar e reiniciar. Os tooltips funcionam por mouse e foco de teclado e podem ser fechados com Esc.
+
+A interface usa nomes acessíveis, regiões, labels de campos e mensagens de erro vinculadas. Veja [os recursos de acessibilidade e suas verificações](docs/accessibility.md).

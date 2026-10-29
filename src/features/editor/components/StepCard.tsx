@@ -33,6 +33,8 @@ export function StepCard({
       className={`step-card ${step.type === 'flow' ? 'flow-type' : ''} ${active ? 'active-step' : ''} ${selected ? 'selected-step' : ''}`}
       tabIndex={0}
       aria-label={`Etapa ${index + 1}`}
+      data-step-id={step.id}
+      aria-current={selected ? 'step' : undefined}
       onFocusCapture={onSelect}
       onClick={onSelect}
     >

@@ -19,7 +19,7 @@ export function AddStepButtons({
         <span>ADICIONAR À CONVERSA</span>
         <small>Escolha um componente</small>
       </div>
-      <div className="add-row">
+      <div className="add-row" role="group" aria-label="Adicionar etapas à conversa">
         {entries.map((entry) => (
           <Button
             key={entry.type}

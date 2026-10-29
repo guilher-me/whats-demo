@@ -24,7 +24,14 @@ export function PhonePreview({
     <PhoneFrame contact={contact} typing={p.typing} phoneRef={phoneRef}>
       <div className="chat-body" ref={body}>
         <div className="day">Hoje</div>
-        <div className="messages" aria-live="polite">
+        <div
+          className="messages"
+          role="log"
+          aria-label="Histórico de mensagens"
+          aria-live="polite"
+          aria-relevant="additions text"
+          aria-atomic="false"
+        >
           {p.messages.map((message) => (
             <MessageBubble
               key={message.id}

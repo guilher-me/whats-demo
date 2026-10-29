@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import type { FlowStep, Values } from '../../../core/types';
 import { validateFlow } from '../../../core/engine';
 import { TextArea, TextField, FieldError } from '../../../components/ui/Field';
@@ -11,6 +11,7 @@ export function FlowStepEditor({
   onChange: (change: Partial<FlowStep>) => void;
   onValidity: (valid: boolean) => void;
 }) {
+  const errorId = useId();
   const [flow, setFlow] = useState(() => JSON.stringify(step.flow, null, 2)),
     [answers, setAnswers] = useState(() => JSON.stringify(step.answers, null, 2)),
     [errors, setErrors] = useState({ flow: '', answers: '' });
@@ -44,20 +45,24 @@ export function FlowStepEditor({
         <summary>JSON do Flow e respostas automáticas</summary>
         <TextArea
           label="Flow JSON"
+          aria-invalid={!!errors.flow}
+          aria-describedby={errors.flow ? `${errorId}-flow` : undefined}
           className="json-input"
           value={flow}
           onChange={(e) => edit('flow', e.target.value)}
           spellCheck={false}
         />
-        <FieldError>{errors.flow}</FieldError>
+        <FieldError id={`${errorId}-flow`}>{errors.flow}</FieldError>
         <TextArea
           label="Respostas automáticas (nome do campo → valor)"
+          aria-invalid={!!errors.answers}
+          aria-describedby={errors.answers ? `${errorId}-answers` : undefined}
           className="json-input answers-input"
           value={answers}
           onChange={(e) => edit('answers', e.target.value)}
           spellCheck={false}
         />
-        <FieldError>{errors.answers}</FieldError>
+        <FieldError id={`${errorId}-answers`}>{errors.answers}</FieldError>
         <TextField
           label="Mensagem do cliente ao concluir (opcional)"
           value={step.completion ?? ''}

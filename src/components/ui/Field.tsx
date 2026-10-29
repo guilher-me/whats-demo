@@ -13,7 +13,14 @@ export function TextField({
   return (
     <label className="field" htmlFor={id}>
       <span>{label}</span>
-      <input {...props} id={id} aria-describedby={hint ? `${id}-hint` : undefined} />
+      <input
+        {...props}
+        id={id}
+        aria-describedby={
+          [props['aria-describedby'], hint ? `${id}-hint` : ''].filter(Boolean).join(' ') ||
+          undefined
+        }
+      />
       {hint && <small id={`${id}-hint`}>{hint}</small>}
     </label>
   );
@@ -30,9 +37,9 @@ export function TextArea({
     </label>
   );
 }
-export function FieldError({ children }: { children?: ReactNode }) {
+export function FieldError({ children, id }: { children?: ReactNode; id?: string }) {
   return children ? (
-    <p className="field-error" role="alert">
+    <p className="field-error" role="alert" id={id}>
       {children}
     </p>
   ) : null;

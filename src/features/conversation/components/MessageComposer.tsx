@@ -9,7 +9,14 @@ export function MessageComposer({
   onSend: () => void;
 }) {
   return (
-    <div className="composer">
+    <form
+      className="composer"
+      aria-label="Enviar mensagem do cliente"
+      onSubmit={(event) => {
+        event.preventDefault();
+        onSend();
+      }}
+    >
       <div className="composer-icons" aria-hidden="true">
         <AddIcon />
         <SmileyIcon />
@@ -22,22 +29,10 @@ export function MessageComposer({
         autoComplete="off"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            onSend();
-          }
-        }}
       />
-      <button
-        type="button"
-        data-send
-        aria-label="Enviar mensagem"
-        disabled={!value.trim()}
-        onClick={onSend}
-      >
+      <button type="submit" data-send aria-label="Enviar mensagem" disabled={!value.trim()}>
         <SendIcon />
       </button>
-    </div>
+    </form>
   );
 }

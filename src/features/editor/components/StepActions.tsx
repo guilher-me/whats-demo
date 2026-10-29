@@ -10,7 +10,7 @@ export function StepActions({
   onAction: (action: StepAction) => void;
 }) {
   return (
-    <div className="step-actions">
+    <div className="step-actions" role="group" aria-label="Ações da etapa">
       <IconButton label="Mover para cima" disabled={first} onClick={() => onAction('up')}>
         ↑
       </IconButton>

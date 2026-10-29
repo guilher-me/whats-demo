@@ -4,6 +4,7 @@ export function OptionGroup({
   label,
   options,
   multiple,
+  required,
   value,
   onChange,
 }: {
@@ -11,13 +12,17 @@ export function OptionGroup({
   label: string;
   options: Option[];
   multiple: boolean;
+  required?: boolean;
   value: Value;
   onChange: (value: Value) => void;
 }) {
   const selected = Array.isArray(value) ? value : [];
   return (
     <fieldset>
-      <legend>{label}</legend>
+      <legend>
+        {label}
+        {required && <span className="visually-hidden"> (obrigatório)</span>}
+      </legend>
       {options.map((option) => (
         <label key={option.id} className="flow-option">
           <span>{option.title}</span>
@@ -25,6 +30,7 @@ export function OptionGroup({
             data-field={name}
             data-option={option.id}
             type={multiple ? 'checkbox' : 'radio'}
+            required={!multiple && required}
             name={name}
             value={option.id}
             checked={multiple ? selected.includes(option.id) : value === option.id}

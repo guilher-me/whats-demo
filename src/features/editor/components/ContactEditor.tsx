@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, useRef } from 'react';
 import type { Contact } from '../../../core/types';
 import { avatarSource, FALLBACK_AVATAR } from '../../../core/defaults';
 import { TextField } from '../../../components/ui/Field';
@@ -14,6 +14,7 @@ export function ContactEditor({
   onError: (message: string) => void;
 }) {
   const id = useId();
+  const fileInput = useRef<HTMLInputElement>(null);
   const upload = (file?: File) => {
     if (!file) return;
     if (!file.type.startsWith('image/') || file.size > 2 * 1024 * 1024) {
@@ -33,17 +34,24 @@ export function ContactEditor({
       <div className="contact-image">
         <img
           src={avatarSource(contact.avatar)}
-          alt="Imagem do contato"
+          alt={`Foto de ${contact.name.trim() || 'contato'}`}
           onError={(e) => {
             e.currentTarget.onerror = null;
             e.currentTarget.src = FALLBACK_AVATAR;
           }}
         />
-        <label htmlFor={id} className="upload-button">
+        <Button
+          variant="ghost"
+          className="upload-button"
+          aria-label="Trocar foto do contato"
+          onClick={() => fileInput.current?.click()}
+        >
           Trocar foto
-        </label>
+        </Button>
         <input
           id={id}
+          ref={fileInput}
+          aria-label="Selecionar imagem do contato"
           hidden
           type="file"
           accept="image/*"

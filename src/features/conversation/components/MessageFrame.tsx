@@ -16,16 +16,22 @@ export function MessageFrame({
   actions?: ReactNode;
 }) {
   return (
-    <div
+    <article
+      aria-label={direction === 'user' ? 'Mensagem do cliente' : 'Mensagem da empresa'}
       data-message-id={id}
       className={`bubble ${direction === 'user' ? 'user' : ''} ${interactive ? 'flow-card' : ''}`}
     >
       <div className="message-content">{children}</div>
-      <small className="message-time">
+      <time className="message-time" dateTime={time}>
         {time}
-        {direction === 'user' && '  ✓✓'}
-      </small>
+        {direction === 'user' && (
+          <span role="img" aria-label="Mensagem enviada">
+            {' '}
+            ✓✓
+          </span>
+        )}
+      </time>
       {actions}
-    </div>
+    </article>
   );
 }

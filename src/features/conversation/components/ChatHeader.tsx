@@ -6,7 +6,7 @@ export function ChatHeader({ contact, typing }: { contact: Contact; typing: bool
     <header className="chat-header">
       <img
         src={avatarSource(contact.avatar)}
-        alt=""
+        alt={`Foto de ${contact.name.trim() || 'contato'}`}
         onError={(e) => {
           e.currentTarget.onerror = null;
           e.currentTarget.src = FALLBACK_AVATAR;
@@ -15,7 +15,7 @@ export function ChatHeader({ contact, typing }: { contact: Contact; typing: bool
       <div>
         <strong title={contact.name}>{contact.name.trim() || 'Contato'}</strong>
         {contact.verified && (
-          <span className="verified" aria-label="Conta verificada">
+          <span className="verified" role="img" aria-label="Conta verificada">
             <VerifiedIcon />
           </span>
         )}

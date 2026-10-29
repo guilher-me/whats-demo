@@ -29,6 +29,7 @@ export function FlowField({ component: c, context, onChange }: Props) {
           <select
             id={id}
             data-field={name}
+            aria-required={c.required || undefined}
             value={String(value ?? '')}
             onChange={(e) => change(e.target.value)}
           >
@@ -47,6 +48,7 @@ export function FlowField({ component: c, context, onChange }: Props) {
         label={label}
         options={options}
         multiple={c.type === 'CheckboxGroup'}
+        required={c.required}
         value={value}
         onChange={change}
       />
@@ -58,6 +60,7 @@ export function FlowField({ component: c, context, onChange }: Props) {
         <span>{label}</span>
         <input
           data-field={name}
+          aria-required={c.required || undefined}
           type="checkbox"
           checked={Boolean(value)}
           onChange={(e) => change(e.target.checked)}
@@ -69,6 +72,7 @@ export function FlowField({ component: c, context, onChange }: Props) {
     const common = {
       id,
       'data-field': name,
+      'aria-required': c.required || undefined,
       value: String(value ?? ''),
       maxLength: c['max-chars'],
       autoComplete: 'off',
