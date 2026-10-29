@@ -63,3 +63,7 @@ Para compartilhar com outras pessoas, o app precisa estar disponível em um ende
 Imagens ficam dentro do link; fotos grandes deixam o endereço longo. Existe um limite de 4 MB para a configuração descomprimida. O navegador oferece compressão nativa; se indisponível, o botão usa JSON em Base64, que gera um link maior. Quem recebe o link pode ler a configuração; Base64 e compressão não são criptografia. Use dados fictícios na demonstração.
 
 Se o navegador impedir acesso à área de transferência, o botão abre uma caixa com o link selecionado para copiar com Ctrl+C.
+
+## Licença
+
+MIT © 2026 Guilherme Cardoso. Consulte [LICENSE](LICENSE).

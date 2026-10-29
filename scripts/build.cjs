@@ -25,6 +25,8 @@ function inlineAssets(source, root) {
 function build({ root = ROOT, output = path.join(root, 'dist', 'whatsapp-fake-flows.html') } = {}) {
   const sources = [];
   let html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const license = fs.readFileSync(path.join(root, 'LICENSE'), 'utf8').trim();
+  html = html.replace(/<!doctype html>/i, match => match + '\n<!--\n' + license + '\n-->');
   html = html.replace(/<link\s+rel="stylesheet"\s+href="([^"]+)"\s*>/g, (_, name) => {
     let css = fs.readFileSync(localFile(root, name), 'utf8');
     if (/<\/style/i.test(css)) throw new Error('Conteúdo CSS inválido para HTML independente.');
