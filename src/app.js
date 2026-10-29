@@ -1,20 +1,16 @@
 (() => {
  'use strict';
- const $=s=>document.querySelector(s),E=FlowEngine,storeKey='whatsapp-fake-flows-v1';
+ const { $, node, field, input, textArea } = FakeFlowsUI;
+ const E=FlowEngine,storeKey='whatsapp-fake-flows-v1';
  const clone=o=>JSON.parse(JSON.stringify(o));
  let project,runToken=0,running=false,mode='',activeFlow=null,waitingUser=null,shareBusy=true;
  const pending=new Set(),drafts=new Map(),errors=new Map();
  try{project=E.validateProject(JSON.parse(localStorage.getItem(storeKey)));}catch{project=clone(FakeFlowsDefault());}
- const node=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
  const status=t=>$('#play-status').textContent=t;
  const showError=t=>{const n=$('#editor-error');n.textContent=t||'';n.hidden=!t;};
- const defaultAvatar='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" fill="#dce8df"/><circle cx="40" cy="29" r="13" fill="#8da798"/><path d="M14 74a26 26 0 0 1 52 0" fill="#8da798"/></svg>');
  function save(){try{localStorage.setItem(storeKey,JSON.stringify(project));$('#save-status').textContent=errors.size?'JSON pendente de correção':'Salvo neste navegador';}catch{$('#save-status').textContent='Não foi possível salvar no navegador';showError('O armazenamento local está indisponível ou cheio. Use Copiar link para guardar o projeto.');}updateButtons();}
  function updateButtons(){$('#manual').disabled=running||!!errors.size||!project.steps.length;$('#auto').disabled=running||!!errors.size||!project.steps.length;$('#stop').disabled=!running;$('#share').disabled=shareBusy||!!errors.size;}
- function contact(){const name=project.contact.name.trim()||'Contato';$('#chat-name').textContent=name;$('#chat-name').title=name;$('#badge').hidden=!project.contact.verified;for(const selector of ['#chat-avatar','#editor-avatar']){const image=$(selector);image.onerror=()=>{image.onerror=null;image.src=defaultAvatar;};image.src=project.contact.avatar||defaultAvatar;}}
- function field(labelText,element){const label=node('label',labelText);label.append(element);return label;}
- function input(type,value,fieldName,id){const n=node('input');n.type=type;n.value=value;n.dataset.field=fieldName;n.dataset.id=id;return n;}
- function textArea(value,fieldName,id,cls){const n=node('textarea',undefined,cls);n.value=value;n.dataset.field=fieldName;n.dataset.id=id;return n;}
+ function contact(){FakeFlowsProfile.apply(project.contact);}
  function renderEditor(){const container=$('#steps');container.replaceChildren();$('#step-count').textContent=project.steps.length+' etapas';project.steps.forEach((step,index)=>{const card=node('article',undefined,'step-card '+(step.type==='flow'?'flow-type':''));card.dataset.step=step.id;
   const top=node('div',undefined,'step-top');top.append(node('span',String(index+1).padStart(2,'0'),'step-number'));const type=node('span',undefined,'step-type');type.append(node('i',undefined,'type-dot'),document.createTextNode(step.type==='flow'?'WhatsApp Flow':step.type==='user'?'Mensagem do cliente':'Mensagem da empresa'));top.append(type);const actions=node('div',undefined,'step-actions');for(const [action,label,symbol] of [['up','Mover para cima','↑'],['down','Mover para baixo','↓'],['copy','Duplicar etapa','⧉'],['delete','Remover etapa','×']]){const b=node('button',symbol);b.type='button';b.dataset.action=action;b.dataset.id=step.id;b.setAttribute('aria-label',label);b.title=label;b.disabled=(action==='up'&&index===0)||(action==='down'&&index===project.steps.length-1);actions.append(b);}top.append(actions);card.append(top);
   const body=node('div',undefined,'step-body');body.append(field(step.type==='flow'?'Mensagem com o convite ao Flow':'Texto da mensagem',textArea(step.text,'text',step.id)));if(step.type==='flow'){const labelInput=input('text',step.label||'Abrir Flow','label',step.id);body.append(field('Texto do botão',labelInput));}

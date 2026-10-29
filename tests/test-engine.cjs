@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
-const E=require('./engine.js');
+const E=require('../src/engine.js');
 const ctx={data:{main_option:'agendamento'},form:{canal:'aguardar'}};
 assert.equal(E.resolve('${data.main_option}',ctx),'agendamento');
 assert.equal(E.resolve('Canal: ${form.canal}',ctx),'Canal: aguardar');
@@ -14,7 +14,7 @@ assert(E.validateField({required:true,label:'Nome'},''));
 assert(E.validateField({required:true,label:'Termos'},[]));
 assert(E.validateField({'input-type':'number',label:'Matrícula'},'abcd'));
 assert.equal(E.validateField({'input-type':'number','min-chars':5},'12345'),'');
-const sandbox={window:{}};vm.runInNewContext(fs.readFileSync(__dirname+'/defaults.js','utf8'),sandbox);const p=JSON.parse(JSON.stringify(sandbox.window.FakeFlowsDefault()));
+const sandbox={window:{}};vm.runInNewContext(fs.readFileSync(__dirname+'/../src/defaults.js','utf8'),sandbox);const p=JSON.parse(JSON.stringify(sandbox.window.FakeFlowsDefault()));
 E.validateProject(p);
 for(const step of p.steps.filter(s=>s.type==='flow'))E.validateFlow(step.flow);
 const menus=p.steps.find(s=>s.id==='menu').flow;

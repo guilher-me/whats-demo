@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-const S=require('./share.js'),E=require('./engine.js');
-const sandbox={window:{}};vm.runInNewContext(fs.readFileSync(__dirname+'/defaults.js','utf8'),sandbox);
+const S=require('../src/share.js'),E=require('../src/engine.js');
+const sandbox={window:{}};vm.runInNewContext(fs.readFileSync(__dirname+'/../src/defaults.js','utf8'),sandbox);
 (async()=>{
  const project=JSON.parse(JSON.stringify(sandbox.window.FakeFlowsDefault()));
  project.contact.name='Clínica São João 🩺';project.steps[0].text='Olá! Ação, informação e café ☕';project.contact.avatar='data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==';
