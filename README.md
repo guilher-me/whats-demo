@@ -119,3 +119,7 @@ Os corpos das mensagens de cliente, empresa e convites de Flow aceitam a sintaxe
 - `~texto~` para tachado.
 
 Os estilos podem ser combinados, por exemplo `*_negrito e itálico_*`. A prévia, a reprodução e os vídeos usam a mesma renderização. Os marcadores ficam preservados no editor, no projeto e no link compartilhado. Textos sem fechamento válido permanecem literais; HTML não é interpretado.
+
+## Adicionar etapas
+
+A área **Adicionar à conversa** permanece no rodapé do editor enquanto a lista rola. Novas etapas entram no final; o campo de texto recebe foco e o editor rola suavemente até a etapa quando necessário. A preferência de movimento reduzido do sistema é respeitada.

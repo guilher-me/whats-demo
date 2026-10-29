@@ -262,12 +262,19 @@
   .editor {
     height: auto;
     overflow: visible;
-    padding: 24px 20px;
+    padding: 0;
     border-right: 0;
   }
   .preview {
     height: auto;
     overflow: visible;
+  }
+  .editor-scroll {
+    overflow: visible;
+    padding: 24px 20px;
+  }
+  .editor-footer {
+    padding: 12px 20px;
   }
 }
 .selected-step {

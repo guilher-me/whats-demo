@@ -145,13 +145,16 @@ export function App() {
             })
           }
           onAction={(id, action) => edit(() => editor.action(id, action))}
-          onAdd={(type) =>
+          onAdd={(type) => {
+            let addedId: string | undefined;
             edit(() => {
               const step = createStep(type);
               editor.update((project) => ({ ...project, steps: [...project.steps, step] }));
               setSelectedId(step.id);
-            })
-          }
+              addedId = step.id;
+            });
+            return addedId;
+          }}
           onRestore={() => setRestoreOpen(true)}
           onError={editor.setError}
           onValidity={onValidity}
