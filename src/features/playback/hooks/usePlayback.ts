@@ -1,12 +1,20 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { flushSync } from 'react-dom';
-import type { ChatMessage, FlowStep, Project, Value } from '../../../core/types';
+import type {
+  BusinessInteractive,
+  ChatMessage,
+  FlowStep,
+  Project,
+  Value,
+} from '../../../core/types';
 import { clone, uid } from '../../../core/project';
-import { resolve } from '../../../core/engine';
+import { resolve, validateProject } from '../../../core/engine';
 import { deferred, delay } from '../../../core/async';
 import { advance, createSession, getComponents, goBack, validation } from '../../flows/model';
 import { useFlowSession } from '../../flows/hooks/useFlowSession';
 import { useCursor } from './useCursor';
+import { useMessageInteraction } from './useMessageInteraction';
+import { animateMessage } from '../animateMessage';
 
 export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
   const [messages, setMessages] = useState<ChatMessage[]>([]),
@@ -26,7 +34,12 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     draftRef.current = value;
     setDraftState(value);
   };
-  const append = (text: string, direction: ChatMessage['direction'], step?: FlowStep) => {
+  const append = (
+    text: string,
+    direction: ChatMessage['direction'],
+    step?: FlowStep,
+    interactive?: BusinessInteractive,
+  ) => {
     const message: ChatMessage = {
       id: uid(),
       direction,
@@ -35,10 +48,19 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
         new Date(),
       ),
       flowStep: step,
+      interactive,
     };
     setMessages((current) => [...current, message]);
     return message;
   };
+  const interaction = useMessageInteraction((id, option) => {
+    append(option.title, 'user');
+    setMessages((current) =>
+      current.map((message) =>
+        message.id === id ? { ...message, selection: option.id } : message,
+      ),
+    );
+  });
   const stop = useCallback(() => {
     controller.current?.abort();
     controller.current = null;
@@ -48,9 +70,10 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     setTyping(false);
     setActiveStep(null);
     flow.set(null);
+    interaction.reset();
     cursor.hide();
     setStatus('Reprodução parada.');
-  }, [flow.set]);
+  }, [flow.set, interaction.reset]);
   const reset = () => {
     stop();
     setMessages([]);
@@ -187,7 +210,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     const signal = active.signal;
     setRunning(true);
     try {
-      const steps = clone(project.steps);
+      const steps = clone(validateProject(project).steps);
       for (let index = 0; index < steps.length; index++) {
         const step = steps[index];
         if (signal.aborted) return;
@@ -220,7 +243,33 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
           await delay(step.delay * 1000, signal);
           setTyping(false);
           // Cursor targets must exist before the next animation; commit this message synchronously.
-          flushSync(() => append(step.text, 'business', step.type === 'flow' ? step : undefined));
+          let messageId = '';
+          flushSync(() => {
+            const message = append(
+              step.text,
+              'business',
+              step.type === 'flow' ? step : undefined,
+              step.type === 'business' ? step.interactive : undefined,
+            );
+            messageId = message.id;
+          });
+          if (step.type === 'business' && step.interactive) {
+            const answered = interaction.wait(messageId, step.interactive, signal);
+            setStatus('Escolha uma opção na mensagem para continuar.');
+            if (automatic)
+              await animateMessage({
+                id: messageId,
+                message: step.interactive,
+                phone,
+                signal,
+                touch: cursor.touch,
+                open: interaction.open,
+                reply: interaction.reply,
+                select: interaction.select,
+                confirm: interaction.confirm,
+              });
+            await answered;
+          }
           if (step.type === 'flow') {
             const completed = deferred(signal);
             waitingFlow.current = completed.finish;
@@ -269,6 +318,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     run,
     stop,
     reset,
+    interaction,
     openFlow: (step: FlowStep) => {
       try {
         openFlow(step);

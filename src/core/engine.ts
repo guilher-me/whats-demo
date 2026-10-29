@@ -1,3 +1,4 @@
+import { interactiveError } from './interactive';
 import type {
   ExpressionContext,
   FlowComponent,
@@ -174,7 +175,7 @@ export function validateField(c: FlowComponent, value: Value): string {
     return `Selecione pelo menos ${c['min-selected-items']} opções.`;
   return '';
 }
-export function validateProject(input: unknown): Project {
+export function validateProject(input: unknown, { allowDrafts = false } = {}): Project {
   if (
     !isObject(input) ||
     input.version !== 1 ||
@@ -205,6 +206,14 @@ export function validateProject(input: unknown): Project {
       validateFlow(step.flow);
       if (!isObject(step.answers))
         throw new Error('As respostas automáticas precisam ser um objeto JSON.');
+    }
+    if (step.interactive !== undefined) {
+      if (step.type !== 'business')
+        throw new Error('Somente mensagens da empresa aceitam botões e listas.');
+      const error = interactiveError(step.interactive, { allowDrafts });
+      if (error) throw new Error(error);
+      if ((!allowDrafts && !step.text.trim()) || [...step.text].length > 1024)
+        throw new Error('Mensagens interativas precisam de um texto de até 1024 caracteres.');
     }
   }
   return input as unknown as Project;

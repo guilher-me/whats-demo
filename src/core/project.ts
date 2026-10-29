@@ -4,8 +4,8 @@ export const STORAGE_KEY = 'whatsapp-fake-flows-v1';
 export const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 export const uid = () =>
   `step-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
-export function normalizeProject(input: unknown): Project {
-  const project = clone(validateProject(input));
+export function normalizeProject(input: unknown, options?: { allowDrafts?: boolean }): Project {
+  const project = clone(validateProject(input, options));
   const used = new Set<string>();
   project.contact.avatar ||= '';
   project.contact.verified = Boolean(project.contact.verified);

@@ -12,7 +12,7 @@ Simulação independente: não envia mensagens nem publica Flows na Meta. O inte
 
 ## Desenvolvimento
 
-Requer Node.js 22 ou superior e npm.
+Requer Node.js 22.12+, 24 ou 26+ e npm.
 
 ```sh
 npm ci
@@ -69,3 +69,15 @@ Consulte [a arquitetura](docs/architecture.md) e [o guia de contribuição](CONT
 ## Licença
 
 MIT © 2026 Guilherme Cardoso. Veja [LICENSE](LICENSE). O HTML inclui os avisos de licença das dependências incorporadas. As marcas e imagens demonstrativas pertencem aos respectivos titulares.
+
+## Mensagens com botões e listas
+
+Adicione uma mensagem da **Empresa** e escolha o **Formato da mensagem**:
+
+- **Texto simples**: mantém a mensagem tradicional.
+- **Botões de resposta**: de 1 a 3 botões, com até 20 caracteres por título.
+- **Lista de opções**: até 10 opções distribuídas em seções, com título e descrição.
+
+Configure cabeçalho, rodapé e a resposta usada no modo automático nas opções adicionais da mensagem. No modo manual, clique no botão ou abra a lista, selecione uma opção e confirme. A seleção aparece como resposta do cliente e libera a próxima etapa. O roteiro continua sendo linear: as respostas não criam ramificações entre etapas.
+
+Os componentes visuais usam composição: `MessageFrame` recebe conteúdo e ações; `MessageAction` é reutilizado em botões de resposta e convites para listas. Veja [como estender as mensagens](docs/messages.md).

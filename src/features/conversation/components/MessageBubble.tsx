@@ -1,31 +1,45 @@
 import type { ChatMessage, FlowStep } from '../../../core/types';
-import { FlowInvitation } from './FlowInvitation';
+import { MessageFrame } from './MessageFrame';
+import { BusinessMessageActions } from './BusinessMessageActions';
 export function MessageBubble({
   message,
   running,
+  pendingId,
   onOpen,
+  onReply,
+  onList,
 }: {
   message: ChatMessage;
   running: boolean;
+  pendingId: string | null;
   onOpen: (step: FlowStep) => void;
+  onReply: (messageId: string, optionId: string) => void;
+  onList: (messageId: string) => void;
 }) {
   return (
-    <div
-      className={`bubble ${message.direction === 'user' ? 'user' : ''} ${message.flowStep ? 'flow-card' : ''}`}
-    >
-      <p>{message.text}</p>
-      <small className="message-time">
-        {message.time}
-        {message.direction === 'user' && '  ✓✓'}
-      </small>
-      {message.flowStep && (
-        <FlowInvitation
-          step={message.flowStep}
-          completed={!!message.completed}
-          disabled={!running}
+    <MessageFrame
+      id={message.id}
+      direction={message.direction}
+      time={message.time}
+      interactive={!!message.flowStep || !!message.interactive}
+      actions={
+        <BusinessMessageActions
+          message={message}
+          running={running}
+          pendingId={pendingId}
           onOpen={onOpen}
+          onReply={onReply}
+          onList={onList}
         />
+      }
+    >
+      {message.interactive?.header && (
+        <div className="message-header">{message.interactive.header}</div>
       )}
-    </div>
+      <p>{message.text}</p>
+      {message.interactive?.footer && (
+        <div className="message-footer">{message.interactive.footer}</div>
+      )}
+    </MessageFrame>
   );
 }

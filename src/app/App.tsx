@@ -8,6 +8,7 @@ import { PlaybackControls } from '../features/playback/components/PlaybackContro
 import { PhonePreview } from '../features/conversation/components/PhonePreview';
 import { Button } from '../components/ui/Button';
 import { Dialog } from '../components/ui/Dialog';
+import { businessMessageError } from '../core/interactive';
 export function App() {
   const editor = useProject(),
     phoneRef = useRef<HTMLDivElement>(null),
@@ -20,7 +21,11 @@ export function App() {
       setInvalid((current) => (current[id] === !valid ? current : { ...current, [id]: !valid })),
     [],
   );
-  const hasErrors = editor.project.steps.some((step) => invalid[step.id]);
+  const hasErrors = editor.project.steps.some((step) =>
+    step.type === 'business'
+      ? !!businessMessageError(step)
+      : step.type === 'flow' && invalid[step.id],
+  );
   useEffect(() => {
     playback.stop();
     setInvalid({});
@@ -38,7 +43,7 @@ export function App() {
   };
   return (
     <div className={recording ? 'recording' : undefined}>
-      <AppHeader status={hasErrors ? 'JSON pendente de correção' : editor.saveStatus}>
+      <AppHeader status={hasErrors ? 'Há campos que precisam de correção' : editor.saveStatus}>
         <ShareButton
           project={editor.project}
           disabled={hasErrors || editor.loading}

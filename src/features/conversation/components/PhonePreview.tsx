@@ -6,6 +6,7 @@ import { MessageBubble } from './MessageBubble';
 import { TypingIndicator } from './TypingIndicator';
 import { MessageComposer } from './MessageComposer';
 import { FlowSheet } from '../../flows/components/FlowSheet';
+import { ListPicker } from './ListPicker';
 export function PhonePreview({
   contact,
   playback: p,
@@ -31,6 +32,9 @@ export function PhonePreview({
               message={message}
               running={p.running}
               onOpen={p.openFlow}
+              pendingId={p.interaction.pendingId}
+              onReply={p.interaction.reply}
+              onList={p.interaction.open}
             />
           ))}
           {p.typing && <TypingIndicator />}
@@ -45,6 +49,16 @@ export function PhonePreview({
           onBack={p.backFlow}
           onClose={p.closeFlow}
           onNext={p.nextFlow}
+        />
+      )}
+      {p.interaction.list && (
+        <ListPicker
+          message={p.interaction.list.message}
+          selected={p.interaction.selection}
+          container={phoneRef.current}
+          onSelect={p.interaction.select}
+          onConfirm={p.interaction.confirm}
+          onClose={p.interaction.close}
         />
       )}
       <div

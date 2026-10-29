@@ -7,7 +7,9 @@ export function useProject() {
   const edited = useRef(false);
   const [project, setProject] = useState<Project>(() => {
     try {
-      return normalizeProject(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null'));
+      return normalizeProject(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null'), {
+        allowDrafts: true,
+      });
     } catch {
       return createDefaultProject();
     }

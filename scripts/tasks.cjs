@@ -21,6 +21,8 @@ async function run(task) {
       'src',
       'tests',
       'scripts',
+      'docs',
+      '.github',
       'index.html',
       '*.json',
       '*.md',

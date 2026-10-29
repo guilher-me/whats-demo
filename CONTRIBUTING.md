@@ -4,7 +4,7 @@ Contribuições para interface, novos componentes de Flows, acessibilidade e doc
 
 ## Preparação
 
-Use Node.js 22+ e execute `npm ci`, seguido de `npm run dev`. A implementação está em `src/`; o HTML de `dist/` é gerado e não deve ser editado nem versionado.
+Use Node.js 22.12+, 24 ou 26+ e execute `npm ci`, seguido de `npm run dev`. A implementação está em `src/`; o HTML de `dist/` é gerado e não deve ser editado nem versionado.
 
 ## Componentes
 

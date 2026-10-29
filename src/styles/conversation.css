@@ -245,3 +245,139 @@
   vertical-align: middle;
   fill: currentColor;
 }
+.message-header {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 7px;
+  white-space: pre-wrap;
+}
+.message-footer {
+  color: #8696a0;
+  font-size: 11px;
+  margin-top: 7px;
+  white-space: pre-wrap;
+}
+.message-actions {
+  margin: 7px -11px 0;
+}
+.message-action {
+  display: block;
+  border: 0;
+  border-top: 1px solid #e9edef;
+  border-radius: 0;
+  background: #fff;
+  width: 100%;
+  padding: 11px 10px;
+  text-align: center;
+  color: #008069;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: normal;
+}
+.message-action:last-child {
+  border-radius: 0 0 8px 8px;
+}
+.message-action:hover {
+  background: #f3faf6;
+}
+.message-action[aria-pressed='true'] {
+  background: #f0f8f3;
+}
+.message-action:disabled {
+  opacity: 0.65;
+}
+.phone-sheet-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: #0b141a88;
+}
+.phone-sheet {
+  position: absolute;
+  inset: auto 0 0;
+  max-height: 86%;
+  display: flex;
+  flex-direction: column;
+  z-index: 21;
+  background: #fff;
+  border-radius: 14px 14px 0 0;
+  box-shadow: 0 -8px 25px #0001;
+  animation: flow-in 0.2s ease-out;
+  outline: none;
+}
+.phone-sheet > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 16px;
+  border-bottom: 1px solid #edf1ef;
+}
+.phone-sheet h2 {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+}
+.phone-sheet > header button {
+  border: none;
+  padding: 0 5px;
+  background: transparent;
+  font-size: 24px;
+  color: #667781;
+}
+.list-picker-content {
+  overflow-y: auto;
+  min-height: 0;
+}
+.list-picker-section {
+  border: none;
+  margin: 0;
+  padding: 0 16px;
+  min-width: 0;
+}
+.list-picker-section legend {
+  font-size: 12px;
+  font-weight: 600;
+  color: #008069;
+  padding: 16px 0 3px;
+}
+.list-picker-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 0;
+  border-bottom: 1px solid #eef1ef;
+  color: #111b21;
+  cursor: pointer;
+}
+.list-row-title {
+  display: block;
+  font-size: 14px;
+  font-weight: 400;
+}
+.list-picker-row small {
+  display: block;
+  color: #667781;
+  font-size: 11px;
+  font-weight: 400;
+  margin-top: 4px;
+}
+.list-picker-row input[type='radio'] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex-shrink: 0;
+}
+.phone-sheet footer {
+  padding: 14px 16px;
+  border-top: 1px solid #edf1ef;
+}
+.phone-sheet footer button {
+  width: 100%;
+  border-radius: 22px;
+}
+
+.touch-cursor {
+  z-index: 30;
+}

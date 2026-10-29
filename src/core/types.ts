@@ -53,7 +53,30 @@ export interface MessageStep {
   text: string;
   delay: number;
   typing?: boolean;
+  interactive?: BusinessInteractive;
 }
+export interface MessageOption extends Option {
+  description?: string;
+}
+export interface ListSection {
+  title: string;
+  rows: MessageOption[];
+}
+interface InteractiveBase {
+  header?: string;
+  footer?: string;
+  autoReplyId?: string;
+}
+export interface ReplyButtonsMessage extends InteractiveBase {
+  kind: 'buttons';
+  buttons: MessageOption[];
+}
+export interface ListMessage extends InteractiveBase {
+  kind: 'list';
+  button: string;
+  sections: ListSection[];
+}
+export type BusinessInteractive = ReplyButtonsMessage | ListMessage;
 export interface FlowStep {
   id: string;
   type: 'flow';
@@ -82,6 +105,8 @@ export interface ChatMessage {
   time: string;
   flowStep?: FlowStep;
   completed?: boolean;
+  interactive?: BusinessInteractive;
+  selection?: string;
 }
 export interface FlowHistory {
   index: number;
