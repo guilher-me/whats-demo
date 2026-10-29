@@ -2,6 +2,20 @@
 
 Editor local de roteiros de WhatsApp com mensagens e WhatsApp Flows. HTML, CSS e JavaScript sem framework ou dependências de execução. Não envia mensagens à Meta.
 
+## Gerar um único HTML
+
+Requer Node.js 18+ e npm apenas no computador de quem gera o arquivo. Execute na raiz:
+
+```sh
+npm run build
+```
+
+O resultado é `dist/whatsapp-fake-flows.html`. Envie somente esse arquivo para seus pares: eles abrem com dois cliques no navegador, sem Node, npm, instalação ou servidor. CSS, JavaScript e imagem inicial estão incorporados. Não é necessário executar `npm install`: o build não tem dependências externas.
+
+O build contém o editor completo e o roteiro de exemplo definido em `src/defaults.js`. As configurações que alguém editou no navegador continuam no salvamento local ou no link compartilhado; não são lidas pelo comando de build.
+
+Para desenvolvimento, continue usando `index.html`, que carrega os arquivos separados de `src/`. Após alterar os fontes, execute o build novamente para atualizar o HTML de distribuição.
+
 ## Usar
 
 Abra `index.html` no navegador. Também é possível servir a pasta com `python3 -m http.server 8080` e abrir `http://localhost:8080`.
@@ -24,17 +38,21 @@ Suporta `TextHeading`, `TextSubheading`, `TextBody`, `TextCaption`, `TextInput`,
 
 ## Arquivos
 
-- `index.html`: estrutura do editor e do celular.
-- `styles.css`: visual e layout responsivo.
-- `app.js`: edição, armazenamento, conversa e reprodução.
-- `engine.js`: referências, condições, validações e leitura de Flow JSON.
-- `defaults.js`: sequência inicial e os dois Flows de exemplo.
-- `share.js`: codificação e leitura dos links de experiência.
-- `assets/prevent-senior.png`: imagem inicial do contato, substituível pelo editor.
-
+- `index.html`: estrutura do editor e do celular, usada também como template do build.
+- `src/styles.css`: visual e layout responsivo.
+- `src/ui.js`: criação de campos e elementos da interface.
+- `src/profile.js`: nome, selo, foto e compatibilidade da imagem em links antigos.
+- `src/app.js`: coordenação do editor, armazenamento, conversa e reprodução dos Flows.
+- `src/engine.js`: referências, condições e validações de Flow JSON.
+- `src/defaults.js`: sequência inicial e Flows de exemplo.
+- `src/share.js`: codificação e leitura dos links de experiência.
+- `scripts/build.cjs`: gera o HTML independente sem dependências de terceiros.
+- `tests/`: testes do motor, links e build portátil.
+- `assets/prevent-senior.png`: imagem inicial, incorporada automaticamente no build.
+- `dist/whatsapp-fake-flows.html`: resultado gerado, ignorado pelo Git.
 ## Verificação
 
-Com Node.js instalado: `node test-engine.cjs` e `node test-share.cjs`.
+Execute `npm test`. A suíte cobre o motor, a restauração dos links e o HTML independente (scripts válidos, CSS/JS incorporados e imagem sem dependência de arquivo externo).
 
 ## Compartilhar experiências
 

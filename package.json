@@ -1,0 +1,13 @@
+{
+  "name": "whatsapp-fake-flows",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Editor local de conversas e WhatsApp Flows com exportação HTML independente",
+  "scripts": {
+    "build": "node -e \"require(require('path').join(require('path').dirname(process.env.npm_package_json),'scripts','build.cjs')).cli()\"",
+    "test": "node -e \"require(require('path').join(require('path').dirname(process.env.npm_package_json),'scripts','test.cjs'))\""
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
