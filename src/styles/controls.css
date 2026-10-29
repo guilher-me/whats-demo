@@ -254,6 +254,11 @@
 .option-drag-handle:hover {
   background: #edf4ef;
 }
+.option-editor-actions .icon-button:not(:disabled):hover,
+.option-editor-actions .icon-button:not(:disabled):focus-visible {
+  background: #edf4ef;
+  color: #008069;
+}
 .option-drag-handle:focus-visible {
   outline: 2px solid #16865e;
   outline-offset: 2px;
