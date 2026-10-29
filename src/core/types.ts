@@ -107,6 +107,7 @@ export interface ChatMessage {
   completed?: boolean;
   interactive?: BusinessInteractive;
   selection?: string;
+  receipt?: 'delivered' | 'read';
 }
 export interface FlowHistory {
   index: number;

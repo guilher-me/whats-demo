@@ -394,3 +394,7 @@
   width: 16px;
   height: 16px;
 }
+
+.message-receipt--read {
+  color: #53bdeb;
+}

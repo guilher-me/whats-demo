@@ -22,6 +22,7 @@ export function MessageBubble({
       id={message.id}
       direction={message.direction}
       time={message.time}
+      receipt={message.receipt}
       interactive={!!message.flowStep || !!message.interactive}
       actions={
         <BusinessMessageActions

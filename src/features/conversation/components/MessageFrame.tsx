@@ -1,10 +1,11 @@
 import type { ReactNode } from 'react';
-import { DeliveredIcon } from '../../../components/icons/WhatsAppIcons';
+import { MessageReceipt } from './MessageReceipt';
 /** Composable bubble shell: content, metadata and actions remain independent. */
 export function MessageFrame({
   id,
   direction,
   time,
+  receipt,
   interactive,
   children,
   actions,
@@ -12,6 +13,7 @@ export function MessageFrame({
   id: string;
   direction: 'user' | 'business';
   time: string;
+  receipt?: 'delivered' | 'read';
   interactive?: boolean;
   children: ReactNode;
   actions?: ReactNode;
@@ -25,11 +27,7 @@ export function MessageFrame({
       <div className="message-content">{children}</div>
       <time className="message-time" dateTime={time}>
         {time}
-        {direction === 'user' && (
-          <span className="message-receipt" role="img" aria-label="Mensagem entregue">
-            <DeliveredIcon />
-          </span>
-        )}
+        {direction === 'user' && <MessageReceipt status={receipt} />}
       </time>
       {actions}
     </article>

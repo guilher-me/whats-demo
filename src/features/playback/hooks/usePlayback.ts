@@ -49,8 +49,16 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
       ),
       flowStep: step,
       interactive,
+      receipt: direction === 'user' ? 'delivered' : undefined,
     };
-    setMessages((current) => [...current, message]);
+    setMessages((current) => [
+      ...current.map((previous) =>
+        direction === 'business' && previous.direction === 'user' && previous.receipt !== 'read'
+          ? { ...previous, receipt: 'read' as const }
+          : previous,
+      ),
+      message,
+    ]);
     return message;
   };
   const interaction = useMessageInteraction((id, option) => {

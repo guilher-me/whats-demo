@@ -62,3 +62,5 @@ O texto persistido não é convertido para HTML e não requer nova versão de pr
 Esta implementação cobre esses três estilos de mensagem; não é um interpretador Markdown genérico. Cabeçalhos, rótulos de botões, opções de lista e o JSON interno do Flow continuam usando suas regras próprias.
 
 [Referência oficial de formatação do WhatsApp](https://faq.whatsapp.com/539178204879377/)
+
+Os indicadores de entrega usam o mesmo SVG de dois sinais: cinza para entregue, azul para visualizada. Na simulação, as mensagens do cliente passam a visualizadas quando a empresa responde. O estado é temporário, exposto em receipt no histórico, e não altera o formato do projeto salvo.
