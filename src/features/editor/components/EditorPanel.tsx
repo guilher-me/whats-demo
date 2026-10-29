@@ -9,6 +9,8 @@ interface Props {
   project: Project;
   revision: number;
   activeStep: string | null;
+  selectedStep: string | null;
+  onSelect: (id: string) => void;
   error: string;
   onContact: (contact: Contact) => void;
   onChange: (id: string, change: Partial<Step>) => void;
@@ -51,6 +53,8 @@ export function EditorPanel(props: Props) {
             index={index}
             total={props.project.steps.length}
             active={props.activeStep === step.id}
+            selected={props.selectedStep === step.id}
+            onSelect={() => props.onSelect(step.id)}
             onChange={(change) => props.onChange(step.id, change)}
             onAction={(action) => props.onAction(step.id, action)}
             onValidity={props.onValidity}

@@ -1,7 +1,7 @@
 import { useEffect, useRef, type RefObject } from 'react';
 import type { Contact } from '../../../core/types';
 import type { Playback } from '../../playback/hooks/usePlayback';
-import { ChatHeader } from './ChatHeader';
+import { PhoneFrame } from './PhoneFrame';
 import { MessageBubble } from './MessageBubble';
 import { TypingIndicator } from './TypingIndicator';
 import { MessageComposer } from './MessageComposer';
@@ -21,8 +21,7 @@ export function PhonePreview({
     if (body.current) body.current.scrollTop = body.current.scrollHeight;
   }, [p.messages, p.typing]);
   return (
-    <div className="phone" ref={phoneRef}>
-      <ChatHeader contact={contact} typing={p.typing} />
+    <PhoneFrame contact={contact} typing={p.typing} phoneRef={phoneRef}>
       <div className="chat-body" ref={body}>
         <div className="day">Hoje</div>
         <div className="messages" aria-live="polite">
@@ -66,6 +65,6 @@ export function PhonePreview({
         style={{ left: p.cursor.x, top: p.cursor.y, opacity: p.cursor.visible ? 1 : 0 }}
         aria-hidden="true"
       />
-    </div>
+    </PhoneFrame>
   );
 }

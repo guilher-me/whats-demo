@@ -89,3 +89,9 @@ O projeto inclui `llms.txt` e uma API pública em `window.whatsappFakeFlows` par
 `npm run build` também gera `dist/llms.txt`, o alias `dist/llm.txt`, `dist/llms-full.txt` e a documentação referenciada. Publique a pasta `dist/` para disponibilizá-los por URL. O HTML único continua independente: as instruções completas ficam embutidas nele e podem ser lidas por `getInstructions()` ou pelo elemento `#llms-txt`.
 
 O arquivo de instruções não conecta um LLM automaticamente. A ferramenta precisa conseguir ler a página e, para utilizar a API, executar JavaScript nela.
+
+## Prévia durante a edição
+
+Clique em uma etapa ou foque um de seus campos para acompanhar a mensagem no celular enquanto edita. Texto, botões, listas e convites de Flow usam os mesmos componentes da conversa. Você pode experimentar as opções e abrir o formulário nessa prévia.
+
+Use **Ver conversa** para retornar ao histórico da simulação. Iniciar a reprodução também retorna à conversa completa. A prévia de edição não adiciona mensagens ao histórico nem executa a sequência.

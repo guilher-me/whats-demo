@@ -1,0 +1,107 @@
+// @vitest-environment jsdom
+import '@testing-library/jest-dom/vitest';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { App } from '../src/app/App';
+import { createDefaultProject } from '../src/core/defaults';
+import { createInteractive } from '../src/core/interactive';
+import { createStep, STORAGE_KEY } from '../src/core/project';
+import type { Step } from '../src/core/types';
+beforeEach(() => {
+  localStorage.clear();
+  history.replaceState(null, '', '/');
+  vi.useFakeTimers();
+});
+afterEach(() => {
+  cleanup();
+  vi.useRealTimers();
+});
+async function start(steps?: Step[]) {
+  const project = createDefaultProject();
+  project.contact.avatar = '';
+  if (steps) project.steps = steps;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
+  render(<App />);
+  await act(async () => {});
+}
+const draft = () =>
+  screen.getByLabelText('Prévia da mensagem em edição', { selector: '.draft-chat' });
+it('seleciona pelo teclado e atualiza o texto sem enviar mensagens', async () => {
+  await start();
+  const card = screen.getByRole('article', { name: 'Etapa 1' });
+  fireEvent.focus(within(card).getByLabelText('Texto da mensagem'));
+  expect(draft()).toHaveTextContent('oi');
+  expect(draft().querySelector('.bubble')).toHaveClass('user');
+  fireEvent.change(within(card).getByLabelText('Texto da mensagem'), {
+    target: { value: 'Olá, quero agendar' },
+  });
+  expect(draft()).toHaveTextContent('Olá, quero agendar');
+  expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(0);
+  fireEvent.click(screen.getByRole('button', { name: 'Ver conversa' }));
+  expect(
+    screen.queryByLabelText('Prévia da mensagem em edição', { selector: '.draft-chat' }),
+  ).toBeNull();
+});
+it('mostra uma nova etapa e reflete textos e botões em tempo real', async () => {
+  await start();
+  fireEvent.click(screen.getByRole('button', { name: '＋ Empresa' }));
+  expect(draft()).toHaveTextContent('Nova mensagem');
+  const card = screen.getByRole('article', { name: 'Etapa 6' });
+  fireEvent.change(within(card).getByLabelText('Formato da mensagem'), {
+    target: { value: 'buttons' },
+  });
+  fireEvent.change(within(card).getAllByLabelText('Texto do botão')[0], {
+    target: { value: 'Fazer agendamento' },
+  });
+  expect(within(draft()).getByRole('button', { name: 'Fazer agendamento' })).toBeEnabled();
+  fireEvent.click(within(draft()).getByRole('button', { name: 'Fazer agendamento' }));
+  expect(within(draft()).getByRole('button', { name: 'Fazer agendamento' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(0);
+});
+it('permite abrir uma lista em edição sem avançar nem enviar respostas na jornada', async () => {
+  const step = createStep('business');
+  if (step.type === 'flow') throw new Error('fixture');
+  step.interactive = createInteractive('list');
+  await start([step]);
+  fireEvent.click(screen.getByRole('article', { name: 'Etapa 1' }));
+  fireEvent.click(within(draft()).getByRole('button', { name: /Ver opções/ }));
+  const picker = screen.getByRole('dialog', { name: 'Ver opções' });
+  fireEvent.click(within(picker).getByRole('radio', { name: 'Agendamento' }));
+  fireEvent.click(within(picker).getByRole('button', { name: 'Enviar' }));
+  expect(screen.queryByRole('dialog')).toBeNull();
+  expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(0);
+  expect(window.whatsappFakeFlows!.getState().running).toBe(false);
+});
+it('abre o formulário do Flow a partir da prévia da mensagem', async () => {
+  await start([createStep('flow')]);
+  fireEvent.click(screen.getByRole('article', { name: 'Etapa 1' }));
+  fireEvent.click(within(draft()).getByRole('button', { name: 'Abrir formulário' }));
+  const sheet = screen.getByRole('region', { name: 'Flow' });
+  fireEvent.change(within(sheet).getByLabelText('Nome'), { target: { value: 'Cliente exemplo' } });
+  fireEvent.click(within(sheet).getByRole('button', { name: 'Confirmar' }));
+  expect(screen.queryByRole('region', { name: 'Flow' })).toBeNull();
+  expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(0);
+});
+it('preserva a conversa executada, reinicia a prévia e limpa a seleção removida', async () => {
+  await start([{ id: 'a', type: 'business', text: 'Mensagem original', delay: 0 }]);
+  fireEvent.click(screen.getByRole('button', { name: 'Iniciar manual' }));
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(1);
+  });
+  const card = screen.getByRole('article', { name: 'Etapa 1' });
+  fireEvent.change(within(card).getByLabelText('Texto da mensagem'), {
+    target: { value: 'Novo texto' },
+  });
+  expect(draft()).toHaveTextContent('Novo texto');
+  fireEvent.click(screen.getByRole('button', { name: 'Ver conversa' }));
+  expect(document.querySelector('.messages')).toHaveTextContent('Mensagem original');
+  fireEvent.click(card);
+  fireEvent.click(screen.getByRole('button', { name: 'Reiniciar prévia' }));
+  expect(document.querySelectorAll('.bubble')).toHaveLength(0);
+  fireEvent.click(card);
+  fireEvent.click(within(card).getByRole('button', { name: 'Remover etapa' }));
+  expect(screen.queryByRole('button', { name: 'Ver conversa' })).toBeNull();
+});

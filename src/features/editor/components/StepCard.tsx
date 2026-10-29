@@ -11,6 +11,8 @@ export function StepCard({
   index,
   total,
   active,
+  selected,
+  onSelect,
   onChange,
   onAction,
   onValidity,
@@ -19,6 +21,8 @@ export function StepCard({
   index: number;
   total: number;
   active: boolean;
+  selected: boolean;
+  onSelect: () => void;
   onChange: (change: Partial<Step>) => void;
   onAction: (action: StepAction) => void;
   onValidity: (id: string, valid: boolean) => void;
@@ -26,7 +30,11 @@ export function StepCard({
   const valid = useCallback((value: boolean) => onValidity(step.id, value), [onValidity, step.id]);
   return (
     <article
-      className={`step-card ${step.type === 'flow' ? 'flow-type' : ''} ${active ? 'active-step' : ''}`}
+      className={`step-card ${step.type === 'flow' ? 'flow-type' : ''} ${active ? 'active-step' : ''} ${selected ? 'selected-step' : ''}`}
+      tabIndex={0}
+      aria-label={`Etapa ${index + 1}`}
+      onFocusCapture={onSelect}
+      onClick={onSelect}
     >
       <div className="step-top">
         <span className="step-number">{String(index + 1).padStart(2, '0')}</span>
