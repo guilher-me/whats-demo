@@ -165,7 +165,21 @@ export function App() {
               <span className="eyebrow">02 / EXPERIMENTE</span>
               <h2>Prévia da conversa</h2>
             </div>
-            <Button variant="ghost" disabled={recorder.busy} onClick={() => setFocusMode(true)}>
+            <Button
+              variant="ghost"
+              disabled={
+                recorder.busy || hasErrors || editor.loading || !editor.project.steps.length
+              }
+              title={
+                playback.running
+                  ? 'Ampliar a conversa em andamento'
+                  : 'Iniciar conversa manual em tela de celular'
+              }
+              onClick={() => {
+                if (!playback.running) void run(editor.project, false);
+                setFocusMode(true);
+              }}
+            >
               Só celular ↗
             </Button>
           </div>

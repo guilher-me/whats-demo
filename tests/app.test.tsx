@@ -24,6 +24,52 @@ async function tick(ms: number) {
   });
 }
 describe('editor e reprodução React', () => {
+  it('Só celular inicia o modo manual a partir da prévia de edição e permite responder', async () => {
+    const project = createDefaultProject();
+    project.contact.avatar = '';
+    project.steps = [
+      { id: 'user', type: 'user', text: 'oi', delay: 0 },
+      { id: 'reply', type: 'business', text: 'Olá, podemos ajudar?', delay: 0 },
+    ];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
+    await start();
+    fireEvent.click(screen.getByRole('article', { name: 'Etapa 1' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Só celular ↗' }));
+    await tick(1);
+    expect(document.querySelector('.focus-mode')).toBeInTheDocument();
+    expect(window.whatsappFakeFlows!.getState().running).toBe(true);
+    expect(document.querySelector('.bubble.user')).toBeNull();
+    fireEvent.change(screen.getByLabelText('Mensagem'), { target: { value: 'oi' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensagem' }));
+    await tick(1);
+    expect(document.querySelector('.messages')).toHaveTextContent('Olá, podemos ajudar?');
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(document.querySelector('.focus-mode')).toBeNull();
+  });
+  it.each(['Iniciar manual', 'Reproduzir automaticamente'])(
+    'Só celular preserva a jornada em andamento: %s',
+    async (mode) => {
+      const project = createDefaultProject();
+      project.contact.avatar = '';
+      project.steps = [
+        { id: 'hello', type: 'business', text: 'Mensagem inicial', delay: 0 },
+        { id: 'user', type: 'user', text: 'oi', delay: 30 },
+      ];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
+      await start();
+      fireEvent.click(screen.getByRole('button', { name: mode }));
+      await tick(1);
+      const messages = window.whatsappFakeFlows!.getState().messages;
+      expect(messages).toHaveLength(1);
+      fireEvent.click(screen.getByRole('button', { name: 'Só celular ↗' }));
+      await tick(1);
+      expect(document.querySelector('.focus-mode')).toBeInTheDocument();
+      expect(window.whatsappFakeFlows!.getState().messages).toEqual(messages);
+      expect(window.whatsappFakeFlows!.getState().running).toBe(true);
+      fireEvent.click(screen.getByRole('button', { name: 'Sair da visualização · Esc' }));
+      expect(window.whatsappFakeFlows!.getState().running).toBe(true);
+    },
+  );
   it('edita contato e adiciona mensagem', async () => {
     await start();
     fireEvent.change(screen.getByLabelText('Nome do contato'), {
