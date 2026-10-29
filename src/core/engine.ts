@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { interactiveError } from './interactive';
 import type {
   ExpressionContext,
@@ -107,31 +108,31 @@ export function resolveOptions(
   context: ExpressionContext,
 ): Option[] {
   const value = resolve(source as Value, context);
-  if (!Array.isArray(value)) throw new Error('data-source precisa ser uma lista de opções.');
+  if (!Array.isArray(value)) throw new Error(t('errors.sourceArray'));
   return value.map((option) => {
     if (!isObject(option) || typeof option.id !== 'string' || typeof option.title !== 'string')
-      throw new Error('Opção inválida no data-source.');
+      throw new Error(t('errors.sourceOption'));
     return { id: option.id, title: option.title };
   });
 }
 export function validateFlow(value: unknown): FlowDefinition {
   if (!isObject(value) || !Array.isArray(value.screens) || !value.screens.length)
-    throw new Error('O Flow precisa de uma lista screens com pelo menos uma tela.');
+    throw new Error(t('errors.screens'));
   const ids = new Set<string>();
   for (const screen of value.screens) {
     if (!isObject(screen) || typeof screen.id !== 'string' || !screen.id || ids.has(screen.id))
-      throw new Error('Cada tela precisa de um id único.');
+      throw new Error(t('errors.screenId'));
     ids.add(screen.id);
     if (!isObject(screen.layout) || !Array.isArray(screen.layout.children))
-      throw new Error(`A tela ${screen.id} precisa de layout.children.`);
+      throw new Error(t('errors.layout', { v0: screen.id }));
   }
   function walk(children: unknown[], depth = 0) {
-    if (depth > 50) throw new Error('O Flow excede o limite de aninhamento.');
+    if (depth > 50) throw new Error(t('errors.nesting'));
     for (const c of children) {
-      if (!isObject(c) || typeof c.type !== 'string') throw new Error('Componente sem type.');
+      if (!isObject(c) || typeof c.type !== 'string') throw new Error(t('errors.missingType'));
       for (const key of ['children', 'then', 'else'])
         if (c[key] !== undefined) {
-          if (!Array.isArray(c[key])) throw new Error(`Lista ${key} inválida.`);
+          if (!Array.isArray(c[key])) throw new Error(t('errors.invalidList', { v0: key }));
           walk(c[key], depth + 1);
         }
       const action = c['on-click-action'];
@@ -140,39 +141,38 @@ export function validateFlow(value: unknown): FlowDefinition {
         action.name === 'navigate' &&
         (!isObject(action.next) || !ids.has(String(action.next.name)))
       )
-        throw new Error('Tela de destino inexistente.');
+        throw new Error(t('errors.destination'));
     }
   }
   for (const screen of value.screens) walk((screen as FlowScreen).layout.children);
   return value as unknown as FlowDefinition;
 }
 export function validateField(c: FlowComponent, value: Value): string {
-  const label = c.label || c.name || 'campo';
+  const label = c.label || c.name || t('common.field');
   if (
     c.required &&
     (value == null || value === '' || value === false || (Array.isArray(value) && !value.length))
   )
-    return `Preencha ${label}.`;
+    return t('errors.requiredField', { v0: label });
   if (value == null || value === '') return '';
   if (typeof value === 'string') {
     if (c['min-chars'] && value.length < c['min-chars'])
-      return `${label} precisa de pelo menos ${c['min-chars']} caracteres.`;
-    if (c['max-chars'] && value.length > c['max-chars'])
-      return `${label} excedeu o limite de caracteres.`;
+      return t('errors.minChars', { v0: label, v1: c['min-chars'] });
+    if (c['max-chars'] && value.length > c['max-chars']) return t('errors.maxChars', { v0: label });
     if (c['input-type'] === 'number' && !/^\d+$/.test(value))
-      return `Use apenas números em ${label}.`;
+      return t('errors.numbers', { v0: label });
     if (c['input-type'] === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-      return 'Informe um e-mail válido.';
+      return t('errors.email');
     if (c.pattern) {
       try {
-        if (!new RegExp(c.pattern).test(value)) return `Confira o formato de ${label}.`;
+        if (!new RegExp(c.pattern).test(value)) return t('errors.fieldFormat', { v0: label });
       } catch {
-        return `Expressão pattern inválida em ${label}.`;
+        return t('errors.pattern', { v0: label });
       }
     }
   }
   if (Array.isArray(value) && c['min-selected-items'] && value.length < c['min-selected-items'])
-    return `Selecione pelo menos ${c['min-selected-items']} opções.`;
+    return t('errors.minSelected', { v0: c['min-selected-items'] });
   return '';
 }
 export function validateProject(input: unknown, { allowDrafts = false } = {}): Project {
@@ -183,14 +183,14 @@ export function validateProject(input: unknown, { allowDrafts = false } = {}): P
     typeof input.contact.name !== 'string' ||
     !Array.isArray(input.steps)
   )
-    throw new Error('Arquivo de projeto inválido.');
-  if (input.steps.length > 200) throw new Error('O limite é de 200 etapas.');
+    throw new Error(t('errors.project'));
+  if (input.steps.length > 200) throw new Error(t('errors.stepLimit'));
   if (
     input.contact.avatar &&
     (typeof input.contact.avatar !== 'string' ||
       !/^(data:image\/|assets\/)/.test(input.contact.avatar))
   )
-    throw new Error('Use uma foto enviada pelo editor.');
+    throw new Error(t('errors.photo'));
   for (const step of input.steps) {
     if (
       !isObject(step) ||
@@ -201,19 +201,17 @@ export function validateProject(input: unknown, { allowDrafts = false } = {}): P
       step.delay < 0 ||
       step.delay > 120
     )
-      throw new Error('Etapa inválida. Use delays entre 0 e 120 segundos.');
+      throw new Error(t('errors.invalidStep'));
     if (step.type === 'flow') {
       validateFlow(step.flow);
-      if (!isObject(step.answers))
-        throw new Error('As respostas automáticas precisam ser um objeto JSON.');
+      if (!isObject(step.answers)) throw new Error(t('errors.answers'));
     }
     if (step.interactive !== undefined) {
-      if (step.type !== 'business')
-        throw new Error('Somente mensagens da empresa aceitam botões e listas.');
+      if (step.type !== 'business') throw new Error(t('errors.onlyBusiness'));
       const error = interactiveError(step.interactive, { allowDrafts });
       if (error) throw new Error(error);
       if ((!allowDrafts && !step.text.trim()) || [...step.text].length > 1024)
-        throw new Error('Mensagens interativas precisam de um texto de até 1024 caracteres.');
+        throw new Error(t('errors.messageLength'));
     }
   }
   return input as unknown as Project;
@@ -239,7 +237,7 @@ export function visibleComponents(screen: FlowScreen, context: ExpressionContext
 }
 export function screenError(components: FlowComponent[]): string {
   const unknown = components.find((c) => !SUPPORTED_COMPONENTS.has(c.type));
-  if (unknown) return `Componente ainda não suportado: ${unknown.type}.`;
-  if (!components.some((c) => c.type === 'Footer')) return 'Adicione um Footer à tela.';
+  if (unknown) return t('errors.unsupported', { v0: unknown.type });
+  if (!components.some((c) => c.type === 'Footer')) return t('errors.missingFooter');
   return '';
 }

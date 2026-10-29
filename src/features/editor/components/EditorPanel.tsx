@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import type { Contact, Project, Step } from '../../../core/types';
 import { useRef } from 'react';
 import { useAddedStepFocus } from '../hooks/useAddedStepFocus';
@@ -24,24 +25,26 @@ interface Props {
   onValidity: (id: string, valid: boolean) => void;
 }
 export function EditorPanel(props: Props) {
+  const t = useT();
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const focusAdded = useAddedStepFocus(props.project.steps, scrollRef);
   return (
     <section
       className="editor"
-      aria-label="Editor de conversa"
+      aria-label={t('editor.region')}
       inert={props.disabled || undefined}
       aria-disabled={props.disabled || undefined}
     >
       <div className="editor-scroll" ref={scrollRef}>
         <div className="section-heading">
           <div>
-            <span className="eyebrow">01 / CONFIGURE</span>
-            <h2>Monte a conversa</h2>
-            <p>As etapas são executadas na ordem abaixo.</p>
+            <span className="eyebrow">{t('editor.configure')}</span>
+            <h2>{t('editor.title')}</h2>
+            <p>{t('editor.orderHint')}</p>
           </div>
           <Button variant="ghost" onClick={props.onRestore}>
-            Restaurar exemplo
+            {t('editor.restore')}
           </Button>
         </div>
         <ContactEditor
@@ -50,10 +53,8 @@ export function EditorPanel(props: Props) {
           onError={props.onError}
         />
         <div className="timeline-heading">
-          <h3>Sequência</h3>
-          <span>
-            {props.project.steps.length} {props.project.steps.length === 1 ? 'etapa' : 'etapas'}
-          </span>
+          <h3>{t('editor.sequence')}</h3>
+          <span>{t('editor.stepCount', { count: props.project.steps.length })}</span>
         </div>
         <div>
           {props.project.steps.map((step, index) => (
@@ -71,13 +72,8 @@ export function EditorPanel(props: Props) {
             />
           ))}
         </div>
-        <p className="editor-hint">Os balões da conversa não mostram nomes de remetente.</p>
-        {location.protocol === 'file:' && (
-          <p className="editor-hint">
-            Links de arquivos locais funcionam apenas onde o arquivo existe. Para compartilhar entre
-            computadores, disponibilize o app em um endereço web.
-          </p>
-        )}
+        <p className="editor-hint">{t('editor.noNames')}</p>
+        {location.protocol === 'file:' && <p className="editor-hint">{t('editor.localLink')}</p>}
         <FieldError>{props.error}</FieldError>
       </div>
       <footer className="editor-footer">

@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import type { BusinessInteractive, MessageStep } from '../../../core/types';
 import { createInteractive, businessMessageError, messageOptions } from '../../../core/interactive';
 import { TextField, FieldError } from '../../../components/ui/Field';
@@ -12,6 +13,8 @@ export function BusinessMessageEditor({
   step: MessageStep;
   onChange: (change: Partial<MessageStep>) => void;
 }) {
+  const t = useT();
+
   const value = step.interactive;
   const error = businessMessageError(step);
   const update = (next: BusinessInteractive) => {
@@ -22,7 +25,7 @@ export function BusinessMessageEditor({
   return (
     <>
       <SelectField
-        label="Formato da mensagem"
+        label={t('editor.format')}
         value={value?.kind ?? 'text'}
         onChange={(e) =>
           onChange({
@@ -33,12 +36,12 @@ export function BusinessMessageEditor({
           })
         }
       >
-        <option value="text">Texto simples</option>
-        <option value="buttons">Botões de resposta</option>
-        <option value="list">Lista de opções</option>
+        <option value="text">{t('editor.plainText')}</option>
+        <option value="buttons">{t('editor.buttons')}</option>
+        <option value="list">{t('editor.list')}</option>
       </SelectField>
       <MessageTextEditor
-        label="Texto da mensagem"
+        label={t('editor.messageText')}
         value={step.text}
         maxLength={value ? 1024 : undefined}
         onChange={(text) => onChange({ text })}
@@ -51,28 +54,28 @@ export function BusinessMessageEditor({
             <ListMessageEditor value={value} onChange={update} />
           )}
           <details className="message-settings">
-            <summary>Cabeçalho, rodapé e resposta automática</summary>
+            <summary>{t('editor.advanced')}</summary>
             <TextField
-              label="Cabeçalho (opcional)"
+              label={t('editor.header')}
               value={value.header ?? ''}
               maxLength={60}
               onChange={(e) => update({ ...value, header: e.target.value })}
             />
             <TextField
-              label="Rodapé (opcional)"
+              label={t('editor.footer')}
               value={value.footer ?? ''}
               maxLength={60}
               onChange={(e) => update({ ...value, footer: e.target.value })}
             />
             <SelectField
-              label="Resposta no modo automático"
+              label={t('editor.autoReply')}
               value={value.autoReplyId ?? ''}
               onChange={(e) => update({ ...value, autoReplyId: e.target.value })}
             >
-              <option value="">Primeira opção</option>
+              <option value="">{t('editor.firstOption')}</option>
               {messageOptions(value).map((o) => (
                 <option key={o.id} value={o.id}>
-                  {o.title || 'Sem título'}
+                  {o.title || t('common.untitled')}
                 </option>
               ))}
             </SelectField>

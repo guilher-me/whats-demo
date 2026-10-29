@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import { useId } from 'react';
 import { TextArea } from '../../../components/ui/Field';
 export function MessageTextEditor({
@@ -11,6 +12,8 @@ export function MessageTextEditor({
   onChange: (text: string) => void;
   maxLength?: number;
 }) {
+  const t = useT();
+
   const hint = useId();
   return (
     <div className="message-text-editor">
@@ -22,7 +25,7 @@ export function MessageTextEditor({
         onChange={(event) => onChange(event.target.value)}
       />
       <p className="formatting-hint" id={hint}>
-        Formatação: *negrito* · _itálico_ · ~tachado~
+        {t('editor.formatHint')}
       </p>
     </div>
   );

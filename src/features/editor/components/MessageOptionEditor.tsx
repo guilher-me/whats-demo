@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import type { ReactNode } from 'react';
 import type { MessageOption } from '../../../core/types';
 import { TextField } from '../../../components/ui/Field';
@@ -19,28 +20,34 @@ export function MessageOptionEditor({
   onChange: (option: MessageOption) => void;
   onRemove: () => void;
 }) {
+  const t = useT();
+
   return (
     <div className="option-editor">
       <div className="option-editor-heading">
         <span className="option-index">
-          {description ? 'Opção' : 'Botão'} {index + 1}
+          {description ? t('editor.option') : t('editor.button')} {index + 1}
         </span>
         <div className="option-editor-actions">
-          <IconButton label={`Remover opção ${index + 1}`} disabled={!removable} onClick={onRemove}>
+          <IconButton
+            label={t('editor.removeOption', { v0: index + 1 })}
+            disabled={!removable}
+            onClick={onRemove}
+          >
             ×
           </IconButton>
           {dragHandle}
         </div>
       </div>
       <TextField
-        label={description ? 'Título da opção' : 'Texto do botão'}
+        label={description ? t('editor.optionTitle') : t('editor.buttonText')}
         value={option.title}
         maxLength={description ? 24 : 20}
         onChange={(e) => onChange({ ...option, title: e.target.value })}
       />
       {description && (
         <TextField
-          label="Descrição da opção (opcional)"
+          label={t('editor.optionDescription')}
           value={option.description ?? ''}
           maxLength={72}
           onChange={(e) => onChange({ ...option, description: e.target.value })}

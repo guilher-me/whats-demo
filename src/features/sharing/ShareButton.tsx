@@ -1,3 +1,4 @@
+import { useT } from '../../i18n';
 import { useState } from 'react';
 import type { Project } from '../../core/types';
 import { createURL } from '../../core/codec';
@@ -14,6 +15,8 @@ export function ShareButton({
   disabled?: boolean;
   onError: (message: string) => void;
 }) {
+  const t = useT();
+
   const [busy, setBusy] = useState(false),
     [copied, setCopied] = useState(false),
     [link, setLink] = useState(''),
@@ -48,25 +51,21 @@ export function ShareButton({
   return (
     <>
       <Button variant="primary" disabled={disabled || busy} onClick={() => void share()}>
-        {busy ? 'Gerando link…' : copied ? 'Link copiado ✓' : 'Copiar link'}
+        {busy ? t('sharing.generating') : copied ? t('sharing.copied') : t('sharing.copy')}
       </Button>
       <Dialog
         open={open}
         onOpenChange={setOpen}
-        title="Link da experiência"
-        description="Copie o endereço abaixo com Ctrl+C."
+        title={t('sharing.title')}
+        description={t('sharing.copyHint')}
       >
         <TextArea
-          label="Link da experiência"
+          label={t('sharing.title')}
           value={link}
           readOnly
           onFocus={(e) => e.target.select()}
         />
-        {location.protocol === 'file:' && (
-          <p>
-            Para compartilhar entre computadores, disponibilize o app em um endereço web acessível.
-          </p>
-        )}
+        {location.protocol === 'file:' && <p>{t('sharing.hostHint')}</p>}
       </Dialog>
     </>
   );

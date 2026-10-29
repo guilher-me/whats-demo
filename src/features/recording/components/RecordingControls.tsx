@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import { useState } from 'react';
 import { TooltipIconButton } from '../../../components/ui/TooltipIconButton';
 import { ControlIcon } from '../../../components/icons/ControlIcon';
@@ -11,32 +12,34 @@ export function RecordingControls({
   controller: RecordingController;
   disabled: boolean;
 }) {
+  const t = useT();
+
   const [open, setOpen] = useState(false);
   const readyToStop = recording.phase === 'recording';
   const label =
     recording.phase === 'finishing'
-      ? 'Finalizando gravação'
+      ? t('recording.finishing')
       : readyToStop
-        ? 'Finalizar gravação'
+        ? t('recording.finish')
         : recording.busy
-          ? 'Cancelar gravação'
-          : 'Gravar celular';
+          ? t('recording.cancel')
+          : t('recording.record');
   return (
     <>
       <div
         className={`record-control ${recording.busy ? 'recording-active' : ''}`}
         role="group"
-        aria-label="Gravação do celular"
+        aria-label={t('recording.region')}
         data-recording-exclude
       >
         <TooltipIconButton
           label={label}
           description={
             readyToStop
-              ? 'Finaliza o vídeo e abre a prévia para baixar.'
+              ? t('recording.finishHint')
               : recording.busy
-                ? 'Cancela a preparação e descarta esta gravação.'
-                : 'Gera um vídeo apenas do celular, em modo manual ou automático.'
+                ? t('recording.cancelHint')
+                : t('recording.hint')
           }
           disabled={recording.phase === 'finishing' || (!recording.busy && disabled)}
           aria-controls="phone-preview"
@@ -49,7 +52,7 @@ export function RecordingControls({
           <ControlIcon name={readyToStop ? 'stop' : 'record'} />
         </TooltipIconButton>
         {recording.busy && (
-          <output className="record-clock" aria-label="Tempo de gravação" aria-live="off">
+          <output className="record-clock" aria-label={t('recording.elapsed')} aria-live="off">
             {recording.phase === 'countdown'
               ? String(recording.countdown)
               : recording.phase === 'preparing' || recording.phase === 'finishing'
@@ -60,11 +63,11 @@ export function RecordingControls({
       </div>
       <span className="visually-hidden" role="status">
         {recording.phase === 'countdown'
-          ? `Gravação começa em ${recording.countdown}`
+          ? t('recording.countdown', { v0: recording.countdown })
           : recording.phase === 'recording'
-            ? 'Gravação em andamento'
+            ? t('recording.active')
             : recording.phase === 'finishing'
-              ? 'Finalizando gravação'
+              ? t('recording.finishing')
               : ''}
       </span>
       <RecordingDialogs open={open} onOpenChange={setOpen} controller={recording} />

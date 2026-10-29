@@ -1,11 +1,7 @@
+import { useT } from '../../../i18n';
 import type { Step } from '../../../core/types';
 import { Button } from '../../../components/ui/Button';
 import { ControlIcon } from '../../../components/icons/ControlIcon';
-const entries = [
-  { type: 'user', name: 'Cliente', detail: 'Mensagem recebida', icon: 'user' },
-  { type: 'business', name: 'Empresa', detail: 'Texto, botões ou lista', icon: 'message' },
-  { type: 'flow', name: 'Flow', detail: 'Formulário interativo', icon: 'flow' },
-] as const;
 export function AddStepButtons({
   onAdd,
   disabled,
@@ -13,13 +9,25 @@ export function AddStepButtons({
   onAdd: (type: Step['type']) => void;
   disabled?: boolean;
 }) {
+  const t = useT();
+  const entries = [
+    { type: 'user', name: t('editor.customer'), detail: t('editor.incoming'), icon: 'user' },
+    {
+      type: 'business',
+      name: t('editor.business'),
+      detail: t('editor.businessDetail'),
+      icon: 'message',
+    },
+    { type: 'flow', name: 'Flow', detail: t('editor.formDetail'), icon: 'flow' },
+  ] as const;
+
   return (
     <div className="component-palette">
       <div className="control-caption">
-        <span>ADICIONAR À CONVERSA</span>
-        <small>Escolha um componente</small>
+        <span>{t('editor.addHeading')}</span>
+        <small>{t('editor.chooseComponent')}</small>
       </div>
-      <div className="add-row" role="group" aria-label="Adicionar etapas à conversa">
+      <div className="add-row" role="group" aria-label={t('editor.addRegion')}>
         {entries.map((entry) => (
           <Button
             key={entry.type}

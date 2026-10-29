@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import { TooltipIconButton } from '../../../components/ui/TooltipIconButton';
 import { ControlIcon } from '../../../components/icons/ControlIcon';
 export function PlaybackControls({
@@ -17,15 +18,13 @@ export function PlaybackControls({
   onStop: () => void;
   onReset: () => void;
 }) {
+  const t = useT();
+
   return (
-    <div className="playback" role="group" aria-label="Controles de reprodução">
+    <div className="playback" role="group" aria-label={t('playback.controls')}>
       <TooltipIconButton
-        label={running ? 'Parar reprodução' : 'Iniciar manual'}
-        description={
-          running
-            ? 'Interrompe a conversa e mantém as mensagens exibidas.'
-            : 'Preencha os campos e escolha as opções no celular.'
-        }
+        label={running ? t('playback.stop') : t('playback.manual')}
+        description={running ? t('playback.stopHint') : t('playback.manualHint')}
         disabled={locked || (!running && disabled)}
         aria-controls="phone-preview"
         onClick={running ? onStop : onManual}
@@ -33,12 +32,8 @@ export function PlaybackControls({
         <ControlIcon name={running ? 'pause' : 'manual'} />
       </TooltipIconButton>
       <TooltipIconButton
-        label={running ? 'Reiniciar prévia' : 'Reproduzir automaticamente'}
-        description={
-          running
-            ? 'Interrompe a reprodução e limpa o histórico da prévia.'
-            : 'Executa a jornada com cursor e respostas animados.'
-        }
+        label={running ? t('playback.reset') : t('playback.automatic')}
+        description={running ? t('playback.resetHint') : t('playback.autoHint')}
         className="playback-auto"
         disabled={locked || (!running && disabled)}
         aria-controls="phone-preview"

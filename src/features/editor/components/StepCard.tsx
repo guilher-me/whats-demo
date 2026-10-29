@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import { useCallback } from 'react';
 import type { Step } from '../../../core/types';
 import { MessageTextEditor } from './MessageTextEditor';
@@ -27,12 +28,14 @@ export function StepCard({
   onAction: (action: StepAction) => void;
   onValidity: (id: string, valid: boolean) => void;
 }) {
+  const t = useT();
+
   const valid = useCallback((value: boolean) => onValidity(step.id, value), [onValidity, step.id]);
   return (
     <article
       className={`step-card ${step.type === 'flow' ? 'flow-type' : ''} ${active ? 'active-step' : ''} ${selected ? 'selected-step' : ''}`}
       tabIndex={0}
-      aria-label={`Etapa ${index + 1}`}
+      aria-label={t('editor.stepLabel', { v0: index + 1 })}
       data-step-id={step.id}
       aria-current={selected ? 'step' : undefined}
       onFocusCapture={onSelect}
@@ -47,8 +50,8 @@ export function StepCard({
           {step.type === 'flow'
             ? 'WhatsApp Flow'
             : step.type === 'user'
-              ? 'Mensagem do cliente'
-              : 'Mensagem da empresa'}
+              ? t('editor.customerMessage')
+              : t('editor.businessMessage')}
         </span>
         <StepActions first={!index} last={index === total - 1} onAction={onAction} />
       </div>
@@ -57,7 +60,7 @@ export function StepCard({
           <BusinessMessageEditor step={step} onChange={onChange} />
         ) : (
           <MessageTextEditor
-            label={step.type === 'flow' ? 'Mensagem com o convite ao Flow' : 'Texto da mensagem'}
+            label={step.type === 'flow' ? t('editor.flowInvitation') : t('editor.messageText')}
             value={step.text}
             onChange={(text) => onChange({ text })}
           />

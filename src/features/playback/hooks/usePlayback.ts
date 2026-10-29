@@ -1,3 +1,4 @@
+import { t, useT, type MessageKey } from '../../../i18n';
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { flushSync } from 'react-dom';
 import type {
@@ -17,13 +18,22 @@ import { useMessageInteraction } from './useMessageInteraction';
 import { animateMessage } from '../animateMessage';
 
 export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
+  useT();
+
   const [messages, setMessages] = useState<ChatMessage[]>([]),
     [typing, setTyping] = useState(false),
     [draft, setDraftState] = useState(''),
     [running, setRunning] = useState(false),
     [activeStep, setActiveStep] = useState<string | null>(null),
-    [status, setStatus] = useState('Escolha um modo para começar.'),
+    [statusMessage, setStatusMessage] = useState<{
+      key: MessageKey;
+      values?: Record<string, unknown>;
+    }>({ key: 'playback.choose' }),
     [flowError, setFlowError] = useState('');
+  const setStatus = useCallback(
+    (key: MessageKey, values?: Record<string, unknown>) => setStatusMessage({ key, values }),
+    [],
+  );
   const flow = useFlowSession(),
     cursor = useCursor(phone),
     controller = useRef<AbortController | null>(null),
@@ -80,14 +90,14 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     flow.set(null);
     interaction.reset();
     cursor.hide();
-    setStatus('Reprodução parada.');
+    setStatus('playback.stopped');
   }, [flow.set, interaction.reset]);
   const reset = () => {
     stop();
     setMessages([]);
     setDraft('');
     setFlowError('');
-    setStatus('Escolha um modo para começar.');
+    setStatus('playback.choose');
   };
   useEffect(
     () => () => {
@@ -114,7 +124,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
         ),
       );
     } catch (error) {
-      setStatus('Flow inválido: ' + (error as Error).message);
+      setStatus('playback.invalidFlow', { v0: (error as Error).message });
       throw error;
     }
   };
@@ -158,12 +168,12 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
             form: flow.current.current?.form ?? {},
           });
         if (value === undefined) {
-          if (c.required) throw new Error(`Defina uma resposta automática para “${name}”.`);
+          if (c.required) throw new Error(t('errors.autoAnswer', { v0: name }));
           continue;
         }
         if (c.type === 'RadioButtonsGroup') {
           const target = find(name, String(value));
-          if (!target) throw new Error(`Resposta inexistente em ${name}.`);
+          if (!target) throw new Error(t('errors.missingAnswer', { v0: name }));
           await cursor.touch(target, signal, () => flow.update(name, value));
         } else if (c.type === 'CheckboxGroup') {
           const values = Array.isArray(value) ? value : [value];
@@ -171,7 +181,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
             data: session.data,
             form: session.form,
           });
-          if (!Array.isArray(source)) throw new Error('data-source inválido.');
+          if (!Array.isArray(source)) throw new Error(t('errors.source'));
           for (const option of source as { id: string }[]) {
             if (values.includes(option.id)) {
               const previous = flow.current.current?.form[name];
@@ -205,8 +215,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
       await next();
       await delay(200, signal);
     }
-    if (flow.current.current)
-      throw new Error('O Flow excedeu 30 navegações. Confira possíveis ciclos.');
+    if (flow.current.current) throw new Error(t('errors.cycles'));
   };
   const run = async (project: Project, automatic: boolean) => {
     stop();
@@ -223,7 +232,11 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
         const step = steps[index];
         if (signal.aborted) return;
         setActiveStep(step.id);
-        setStatus(`${automatic ? 'Automático' : 'Manual'} · etapa ${index + 1} de ${steps.length}`);
+        setStatus('playback.progress', {
+          v0: automatic ? 'playback.autoMode' : 'playback.manualMode',
+          v1: index + 1,
+          v2: steps.length,
+        });
         if (step.type === 'user') {
           // Install the listener immediately: a manual send during the configured delay must not be lost.
           const received = deferred(signal);
@@ -242,7 +255,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
               send,
             );
           } else {
-            setStatus('Digite a mensagem do cliente e envie para continuar.');
+            setStatus('playback.typeMessage');
             phone.current?.querySelector<HTMLInputElement>('[data-composer-input]')?.focus();
           }
           await received.promise;
@@ -263,7 +276,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
           });
           if (step.type === 'business' && step.interactive) {
             const answered = interaction.wait(messageId, step.interactive, signal);
-            setStatus('Escolha uma opção na mensagem para continuar.');
+            setStatus('playback.chooseOption');
             if (automatic)
               await animateMessage({
                 id: messageId,
@@ -281,9 +294,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
           if (step.type === 'flow') {
             const completed = deferred(signal);
             waitingFlow.current = completed.finish;
-            setStatus(
-              automatic ? 'Abrindo Flow…' : 'Abra o Flow e preencha os campos para continuar.',
-            );
+            setStatus(automatic ? 'playback.openingFlow' : 'playback.openFlow');
             if (automatic) {
               await delay(100, signal);
               const target =
@@ -303,14 +314,14 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
           setRunning(false);
           setActiveStep(null);
           cursor.hide();
-          setStatus('Conversa concluída.');
+          setStatus('playback.completed');
         });
       }
     } catch (error) {
       if (!signal.aborted && controller.current === active) {
         flushSync(() => {
           stop();
-          setStatus('Reprodução interrompida: ' + (error as Error).message);
+          setStatus('playback.interrupted', { v0: (error as Error).message });
         });
       }
     }
@@ -323,7 +334,12 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     send,
     running,
     activeStep,
-    status,
+    status: t(
+      statusMessage.key,
+      statusMessage.key === 'playback.progress'
+        ? { ...statusMessage.values, v0: t(statusMessage.values!.v0 as MessageKey) }
+        : statusMessage.values,
+    ),
     flow: flow.session,
     flowError,
     cursor: cursor.cursor,
@@ -355,7 +371,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     },
     closeFlow: () => {
       if (flow.current.current) flow.set({ ...flow.current.current, visible: false });
-      setStatus('Flow fechado. Clique no convite para abrir novamente.');
+      setStatus('playback.flowClosed');
     },
   };
 }

@@ -1,3 +1,4 @@
+import { t } from '../../../i18n';
 import { useState, type RefObject } from 'react';
 import { delay } from '../../../core/async';
 export interface CursorState {
@@ -10,7 +11,7 @@ export function useCursor(phone: RefObject<HTMLDivElement | null>) {
   const [cursor, setCursor] = useState<CursorState>({ x: 0, y: 0, visible: false, pressed: false });
   const hide = () => setCursor((c) => ({ ...c, visible: false, pressed: false }));
   const touch = async (element: HTMLElement | null, signal: AbortSignal, action?: () => void) => {
-    if (!element || !phone.current) throw new Error('Controle de reprodução não encontrado.');
+    if (!element || !phone.current) throw new Error(t('errors.cursor'));
     element.scrollIntoView?.({ block: 'nearest' });
     const bounds = phone.current.getBoundingClientRect(),
       target = element.getBoundingClientRect();

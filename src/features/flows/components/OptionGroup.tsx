@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import type { Option, Value } from '../../../core/types';
 export function OptionGroup({
   name,
@@ -16,12 +17,14 @@ export function OptionGroup({
   value: Value;
   onChange: (value: Value) => void;
 }) {
+  const t = useT();
+
   const selected = Array.isArray(value) ? value : [];
   return (
     <fieldset>
       <legend>
         {label}
-        {required && <span className="visually-hidden"> (obrigatório)</span>}
+        {required && <span className="visually-hidden"> {t('common.required')}</span>}
       </legend>
       {options.map((option) => (
         <label key={option.id} className="flow-option">

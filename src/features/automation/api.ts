@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { clone, normalizeProject } from '../../core/project';
 import { createURL } from '../../core/codec';
 import type { ChatMessage, Project } from '../../core/types';
@@ -29,7 +30,7 @@ export type ValidationResult =
 /** Versioned public contract; never exposes mutable application state or executes supplied code. */
 export function createAutomationAPI(bindings: AutomationBindings) {
   const requireReady = () => {
-    if (!bindings.state().ready) throw new Error('Aguarde o carregamento da experiência.');
+    if (!bindings.state().ready) throw new Error(t('errors.loading'));
   };
   return Object.freeze({
     apiVersion: 1 as const,
@@ -60,10 +61,9 @@ export function createAutomationAPI(bindings: AutomationBindings) {
     },
     async play(mode: 'automatic' | 'manual' = 'automatic'): Promise<AutomationState> {
       requireReady();
-      if (mode !== 'automatic' && mode !== 'manual')
-        throw new Error('Modo inválido: use automatic ou manual.');
-      if (bindings.state().running) throw new Error('Já existe uma reprodução em andamento.');
-      if (bindings.hasErrors()) throw new Error('Corrija os campos pendentes antes de reproduzir.');
+      if (mode !== 'automatic' && mode !== 'manual') throw new Error(t('errors.mode'));
+      if (bindings.state().running) throw new Error(t('errors.running'));
+      if (bindings.hasErrors()) throw new Error(t('errors.pendingFields'));
       const project = normalizeProject(bindings.project());
       await bindings.run(project, mode === 'automatic');
       return clone(bindings.state());

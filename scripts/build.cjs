@@ -56,6 +56,8 @@ async function build({
   if (!js || !css) throw new Error('O build precisa gerar JavaScript e CSS.');
   const notices =
     fs.readFileSync(path.join(root, 'LICENSE'), 'utf8') +
+    '\nCircle Flags\n' +
+    fs.readFileSync(path.join(root, 'assets/flags/LICENSE.md'), 'utf8') +
     '\nThird-party notices\n' +
     dependencyNotices(root, result.metafile.inputs);
   let html = agentDocs(

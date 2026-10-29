@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import { useEffect, useRef, type RefObject } from 'react';
 import type { Contact } from '../../../core/types';
 import type { Playback } from '../../playback/hooks/usePlayback';
@@ -16,6 +17,8 @@ export function PhonePreview({
   playback: Playback;
   phoneRef: RefObject<HTMLDivElement | null>;
 }) {
+  const t = useT();
+
   const body = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (body.current) body.current.scrollTop = body.current.scrollHeight;
@@ -23,11 +26,11 @@ export function PhonePreview({
   return (
     <PhoneFrame contact={contact} typing={p.typing} phoneRef={phoneRef}>
       <div className="chat-body" ref={body}>
-        <div className="day">Hoje</div>
+        <div className="day">{t('phone.today')}</div>
         <div
           className="messages"
           role="log"
-          aria-label="Histórico de mensagens"
+          aria-label={t('phone.log')}
           aria-live="polite"
           aria-relevant="additions text"
           aria-atomic="false"

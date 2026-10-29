@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import type { ReactNode } from 'react';
 import { MessageReceipt } from './MessageReceipt';
 /** Composable bubble shell: content, metadata and actions remain independent. */
@@ -18,9 +19,11 @@ export function MessageFrame({
   children: ReactNode;
   actions?: ReactNode;
 }) {
+  const t = useT();
+
   return (
     <article
-      aria-label={direction === 'user' ? 'Mensagem do cliente' : 'Mensagem da empresa'}
+      aria-label={direction === 'user' ? t('editor.customerMessage') : t('editor.businessMessage')}
       data-message-id={id}
       className={`bubble ${direction === 'user' ? 'user' : ''} ${interactive ? 'flow-card' : ''}`}
     >

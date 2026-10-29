@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import type { ListMessage } from '../../../core/types';
 import { uid } from '../../../core/project';
 import { messageOptions } from '../../../core/interactive';
@@ -11,18 +12,23 @@ export function ListMessageEditor({
   value: ListMessage;
   onChange: (value: ListMessage) => void;
 }) {
+  const t = useT();
+
   const count = messageOptions(value).length;
   return (
     <div className="options-editor">
       <TextField
-        label="Texto do botão da lista"
+        label={t('editor.listButton')}
         value={value.button}
         maxLength={20}
         onChange={(e) => onChange({ ...value, button: e.target.value })}
       />
       <div className="control-caption">
-        <span>Seções e opções</span>
-        <small>{count}/10 opções</small>
+        <span>{t('editor.sections')}</span>
+        <small>
+          {count}
+          {t('editor.optionCount')}
+        </small>
       </div>
       {value.sections.map((section, i) => (
         <ListSectionEditor
@@ -48,14 +54,14 @@ export function ListMessageEditor({
             sections: [
               ...value.sections,
               {
-                title: `Seção ${value.sections.length + 1}`,
-                rows: [{ id: uid(), title: 'Nova opção' }],
+                title: t('editor.sectionNumber', { v0: value.sections.length + 1 }),
+                rows: [{ id: uid(), title: t('editor.newOption') }],
               },
             ],
           })
         }
       >
-        ＋ Adicionar seção
+        {t('editor.addSection')}
       </Button>
     </div>
   );

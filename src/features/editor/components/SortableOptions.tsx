@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import { useId, type ReactNode } from 'react';
 import {
   DndContext,
@@ -27,6 +28,8 @@ function SortableOption({
   index: number;
   children: (handle: ReactNode) => ReactNode;
 }) {
+  const t = useT();
+
   const {
     attributes,
     listeners,
@@ -36,7 +39,7 @@ function SortableOption({
     transition,
     isDragging,
   } = useSortable({ id: option.id });
-  const label = `Reordenar opção ${index + 1}: ${option.title || 'Sem título'}`;
+  const label = t('dnd.handle', { v0: index + 1, v1: option.title || t('common.untitled') });
   return (
     <div
       ref={setNodeRef}
@@ -51,7 +54,7 @@ function SortableOption({
           {...listeners}
           className="option-drag-handle"
           aria-label={label}
-          title="Arraste para reordenar. Pelo teclado: espaço e setas."
+          title={t('dnd.hint')}
         >
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
             {[6, 12, 18].flatMap((y) =>
@@ -74,6 +77,8 @@ export function SortableOptions({
   onChange: (options: MessageOption[]) => void;
   children: (option: MessageOption, index: number, handle: ReactNode) => ReactNode;
 }) {
+  const t = useT();
+
   const id = useId();
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -88,16 +93,17 @@ export function SortableOptions({
       modifiers={[restrictToVerticalAxis, restrictToParentElement]}
       accessibility={{
         screenReaderInstructions: {
-          draggable:
-            'Pressione espaço para pegar a opção. Use as setas para mudar a posição, espaço para soltar ou Escape para cancelar.',
+          draggable: t('dnd.instructions'),
         },
         announcements: {
-          onDragStart: ({ active }) => `Opção ${position(active.id)} selecionada para mover.`,
+          onDragStart: ({ active }) => t('dnd.start', { v0: position(active.id) }),
           onDragOver: ({ over }) =>
-            over ? `Posição ${position(over.id)} de ${options.length}.` : 'Fora da lista.',
+            over
+              ? t('dnd.position', { v0: position(over.id), v1: options.length })
+              : t('dnd.outside'),
           onDragEnd: ({ over }) =>
-            over ? `Opção movida para a posição ${position(over.id)}.` : 'Ordem mantida.',
-          onDragCancel: () => 'Movimento cancelado. Ordem mantida.',
+            over ? t('dnd.end', { v0: position(over.id) }) : t('dnd.unchanged'),
+          onDragCancel: () => t('dnd.cancel'),
         },
       }}
       onDragEnd={({ active, over }) => {

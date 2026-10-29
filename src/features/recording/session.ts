@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import fixWebmDuration from 'fix-webm-duration';
 import { capturePhone } from './capture';
 import type { PhoneRecording, RecordedClip } from './types';
@@ -8,7 +9,7 @@ export function recordingSupport(): string {
     typeof HTMLCanvasElement === 'undefined' ||
     typeof HTMLCanvasElement.prototype.captureStream !== 'function'
   )
-    return 'Este navegador não permite gravar o celular. Abra o HTML no Chrome ou Edge atualizado.';
+    return t('errors.recordUnsupported');
   return '';
 }
 export function recordingMimeTypes(): string[] {
@@ -25,13 +26,13 @@ export async function preparePhoneRecording(
   if (unsupported) throw new Error(unsupported);
   const width = node.offsetWidth,
     height = node.offsetHeight;
-  if (!width || !height) throw new Error('O celular precisa estar visível antes de gravar.');
+  if (!width || !height) throw new Error(t('errors.phoneVisible'));
   const first = await capturePhone(node, width, height);
   const canvas = document.createElement('canvas');
   canvas.width = width * 2;
   canvas.height = height * 2;
   const context = canvas.getContext('2d');
-  if (!context) throw new Error('Não foi possível preparar a imagem do celular.');
+  if (!context) throw new Error(t('errors.prepareImage'));
   const paint = (frame: HTMLCanvasElement) => {
     context.fillStyle = '#fff';
     context.fillRect(0, 0, canvas.width, canvas.height);
@@ -52,7 +53,7 @@ export async function preparePhoneRecording(
   }
   if (!media) {
     stream.getTracks().forEach((track) => track.stop());
-    throw new Error('Nenhum formato de vídeo compatível foi encontrado.');
+    throw new Error(t('errors.videoFormat'));
   }
   const recorder = media;
   const chunks: Blob[] = [];
@@ -77,21 +78,20 @@ export async function preparePhoneRecording(
     ended = true;
     release();
     if (recorder.state !== 'inactive') recorder.stop();
-    const reason =
-      error instanceof Error ? error : new Error('Não foi possível capturar o celular.');
+    const reason = error instanceof Error ? error : new Error(t('errors.capture'));
     reject(reason);
     onError(reason);
   };
   recorder.ondataavailable = (event) => {
     if (event.data.size && !discarded) chunks.push(event.data);
   };
-  recorder.onerror = () => fail(new Error('O navegador não conseguiu codificar o vídeo.'));
+  recorder.onerror = () => fail(new Error(t('errors.encode')));
   recorder.onstop = async () => {
     release();
     if (discarded) return;
     try {
       let blob = new Blob(chunks, { type: recorder.mimeType });
-      if (!blob.size) throw new Error('A gravação ficou vazia. Tente gravar novamente.');
+      if (!blob.size) throw new Error(t('errors.recordEmpty'));
       const durationMs = Math.max(1, performance.now() - startedAt);
       const extension = recorder.mimeType.startsWith('video/mp4') ? 'mp4' : 'webm';
       if (extension === 'webm') blob = await fixWebmDuration(blob, durationMs, { logger: false });
@@ -117,7 +117,7 @@ export async function preparePhoneRecording(
   return {
     start() {
       if (ended || recorder.state !== 'inactive' || startedAt)
-        throw new Error('A gravação já foi iniciada ou cancelada.');
+        throw new Error(t('errors.recordAlreadyStarted'));
       startedAt = performance.now();
       recorder.start(1000);
       pump();
@@ -129,7 +129,7 @@ export async function preparePhoneRecording(
         clearTimeout(timer);
         await inFlight;
         if (discarded) return result;
-        if (recorder.state === 'inactive') throw new Error('A gravação ainda não começou.');
+        if (recorder.state === 'inactive') throw new Error(t('errors.recordNotStarted'));
         await draw();
         recorder.stop();
         return result;
@@ -145,7 +145,7 @@ export async function preparePhoneRecording(
       ended = true;
       release();
       if (recorder.state !== 'inactive') recorder.stop();
-      reject(new DOMException('Gravação cancelada.', 'AbortError'));
+      reject(new DOMException(t('errors.recordCancelled'), 'AbortError'));
     },
   };
 }

@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import { Button } from '../../../components/ui/Button';
 import { useId } from 'react';
 export function FlowFooter({
@@ -11,6 +12,8 @@ export function FlowFooter({
   error?: string;
   onNext: () => void;
 }) {
+  const t = useT();
+
   const errorId = useId();
   return (
     <footer>
@@ -29,7 +32,8 @@ export function FlowFooter({
         {label}
       </Button>
       <small>
-        Gerenciada pela empresa. <span>Saiba mais</span>
+        {t('flow.managed')}
+        <span>{t('flow.learnMore')}</span>
       </small>
     </footer>
   );

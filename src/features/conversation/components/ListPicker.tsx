@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import type { ListMessage } from '../../../core/types';
 import { PhoneSheet } from '../../../components/ui/PhoneSheet';
 import { Button } from '../../../components/ui/Button';
@@ -16,11 +17,13 @@ export function ListPicker({
   onConfirm: () => void;
   onClose: () => void;
 }) {
+  const t = useT();
+
   return (
     <PhoneSheet
       container={container}
       title={message.button}
-      description="Escolha uma opção e envie sua resposta."
+      description={t('phone.listHint')}
       onClose={onClose}
     >
       <div className="list-picker-content">
@@ -48,7 +51,7 @@ export function ListPicker({
       </div>
       <footer>
         <Button variant="primary" data-confirm-list disabled={!selected} onClick={onConfirm}>
-          Enviar
+          {t('common.send')}
         </Button>
       </footer>
     </PhoneSheet>

@@ -13,6 +13,8 @@ O build incorpora o símbolo e o favicon no HTML portátil. A mudança de identi
 
 ## Imagens da conversa de exemplo
 
+As bandeiras redondas em `flags/` são do [Circle Flags / HatScripts](https://github.com/HatScripts/circle-flags), sob MIT. A licença original está em `flags/LICENSE.md`. São SVGs locais incorporados ao HTML para o seletor de idiomas (inglês, espanhol e português do Brasil).
+
 | Arquivo | Uso | Origem |
 | --- | --- | --- |
 | `prevent-senior.png` | Foto padrão da conversa de exemplo | Imagem fornecida pelo usuário |

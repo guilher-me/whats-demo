@@ -1,3 +1,4 @@
+import { useT } from '../i18n';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppHeader } from './AppHeader';
 import { useProject } from '../features/editor/hooks/useProject';
@@ -17,6 +18,8 @@ import { flushSync } from 'react-dom';
 import { useRecording } from '../features/recording/useRecording';
 import { RecordingControls } from '../features/recording/components/RecordingControls';
 export function App() {
+  const t = useT();
+
   const editor = useProject(),
     phoneRef = useRef<HTMLDivElement>(null),
     playback = usePlayback(phoneRef);
@@ -52,8 +55,7 @@ export function App() {
     playbackStatus: () => playback.status,
   });
   const ensureAvailable = () => {
-    if (recorder.busy)
-      throw new Error('Finalize ou cancele a gravação antes de alterar a jornada.');
+    if (recorder.busy) throw new Error(t('app.recordingLocked'));
   };
   const run = (project: typeof editor.project, automatic: boolean) => {
     ensureAvailable();
@@ -117,7 +119,10 @@ export function App() {
           .join(' ') || undefined
       }
     >
-      <AppHeader status={hasErrors ? 'Há campos que precisam de correção' : editor.saveStatus}>
+      <AppHeader
+        disabled={recorder.busy}
+        status={hasErrors ? t('app.corrections') : editor.saveStatus}
+      >
         <ShareButton
           project={editor.project}
           disabled={hasErrors || editor.loading || recorder.busy}
@@ -159,38 +164,36 @@ export function App() {
           onError={editor.setError}
           onValidity={onValidity}
         />
-        <section className="preview" aria-label="Prévia da conversa">
+        <section className="preview" aria-label={t('app.preview')}>
           <div className="preview-heading">
             <div>
-              <span className="eyebrow">02 / EXPERIMENTE</span>
-              <h2>Prévia da conversa</h2>
+              <span className="eyebrow">{t('app.try')}</span>
+              <h2>{t('app.preview')}</h2>
             </div>
             <Button
               variant="ghost"
               disabled={
                 recorder.busy || hasErrors || editor.loading || !editor.project.steps.length
               }
-              title={
-                playback.running
-                  ? 'Ampliar a conversa em andamento'
-                  : 'Iniciar conversa manual em tela de celular'
-              }
+              title={playback.running ? t('app.expand') : t('app.startPhone')}
               onClick={() => {
                 if (!playback.running) void run(editor.project, false);
                 setFocusMode(true);
               }}
             >
-              Só celular ↗
+              {t('app.phoneOnly')}
             </Button>
           </div>
           <p className="play-status" role="status" aria-live="polite">
-            {selectedStep ? 'Prévia da mensagem em edição' : playback.status}
+            {selectedStep ? t('app.draft') : playback.status}
           </p>
           {selectedStep && (
             <div className="draft-preview-toolbar">
-              <span>Editando etapa {editor.project.steps.indexOf(selectedStep) + 1}</span>
+              <span>
+                {t('app.editing')} {editor.project.steps.indexOf(selectedStep) + 1}
+              </span>
               <Button variant="ghost" onClick={() => setSelectedId(null)}>
-                Ver conversa
+                {t('app.viewConversation')}
               </Button>
             </div>
           )}
@@ -230,10 +233,10 @@ export function App() {
               />
             </div>
           </div>
-          <p className="preview-note">Simulação local · sem envio ao WhatsApp</p>
+          <p className="preview-note">{t('app.local')}</p>
           {focusMode && (
             <Button variant="ghost" onClick={() => setFocusMode(false)}>
-              Sair da visualização · Esc
+              {t('app.exit')}
             </Button>
           )}
         </section>
@@ -241,11 +244,11 @@ export function App() {
       <Dialog
         open={restoreOpen}
         onOpenChange={setRestoreOpen}
-        title="Restaurar exemplo?"
-        description="Copie o link antes se quiser guardar a sequência atual."
+        title={t('app.restoreTitle')}
+        description={t('app.restoreHint')}
       >
         <div className="dialog-actions">
-          <Button onClick={() => setRestoreOpen(false)}>Cancelar</Button>
+          <Button onClick={() => setRestoreOpen(false)}>{t('common.cancel')}</Button>
           <Button
             variant="primary"
             onClick={() => {
@@ -253,7 +256,7 @@ export function App() {
               setRestoreOpen(false);
             }}
           >
-            Restaurar exemplo
+            {t('editor.restore')}
           </Button>
         </div>
       </Dialog>

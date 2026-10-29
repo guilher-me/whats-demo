@@ -1,3 +1,4 @@
+import { t, type MessageKey } from '../../../i18n';
 import { useCallback, useEffect, useState, useRef } from 'react';
 import type { Project, Step } from '../../../core/types';
 import { createDefaultProject } from '../../../core/defaults';
@@ -17,7 +18,7 @@ export function useProject() {
   const [revision, setRevision] = useState(0),
     [loading, setLoading] = useState(true),
     [error, setError] = useState(''),
-    [saveStatus, setSaveStatus] = useState('Salvo neste navegador');
+    [saveStatus, setSaveStatus] = useState<MessageKey>('sharing.saved');
   useEffect(() => {
     let generation = 0;
     let disposed = false;
@@ -30,13 +31,13 @@ export function useProject() {
           if (!disposed && id === generation) {
             setProject(shared);
             setRevision((n) => n + 1);
-            setSaveStatus('Experiência carregada do link');
+            setSaveStatus('sharing.loaded');
             setError('');
           }
         }
       } catch (e) {
         if (!disposed && id === generation)
-          setError('Não foi possível abrir o link: ' + (e as Error).message);
+          setError(t('sharing.openFailed') + (e as Error).message);
       } finally {
         if (!disposed && id === generation) setLoading(false);
       }
@@ -53,9 +54,9 @@ export function useProject() {
     if (!edited.current) return;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
-      setSaveStatus('Salvo neste navegador');
+      setSaveStatus('sharing.saved');
     } catch {
-      setSaveStatus('Não foi possível salvar neste navegador');
+      setSaveStatus('sharing.saveFailed');
     }
     edited.current = false;
   }, [project]);
@@ -99,7 +100,7 @@ export function useProject() {
     loading,
     error,
     setError,
-    saveStatus,
+    saveStatus: t(saveStatus),
     update,
     updateStep,
     action,

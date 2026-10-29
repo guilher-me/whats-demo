@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import type { ListSection } from '../../../core/types';
 import { uid } from '../../../core/project';
 import { Button } from '../../../components/ui/Button';
@@ -20,17 +21,25 @@ export function ListSectionEditor({
   onChange: (section: ListSection) => void;
   onRemove: () => void;
 }) {
+  const t = useT();
+
   return (
     <fieldset className="list-section-editor">
-      <legend>Seção {index + 1}</legend>
+      <legend>
+        {t('editor.section')} {index + 1}
+      </legend>
       <div className="option-editor-top">
         <TextField
-          label="Título da seção"
+          label={t('editor.sectionTitle')}
           value={section.title}
           maxLength={24}
           onChange={(e) => onChange({ ...section, title: e.target.value })}
         />
-        <IconButton label={`Remover seção ${index + 1}`} disabled={!removable} onClick={onRemove}>
+        <IconButton
+          label={t('editor.removeSection', { v0: index + 1 })}
+          disabled={!removable}
+          onClick={onRemove}
+        >
           ×
         </IconButton>
       </div>
@@ -56,11 +65,14 @@ export function ListSectionEditor({
         onClick={() =>
           onChange({
             ...section,
-            rows: [...section.rows, { id: uid(), title: `Opção ${section.rows.length + 1}` }],
+            rows: [
+              ...section.rows,
+              { id: uid(), title: t('editor.optionNumber', { v0: section.rows.length + 1 }) },
+            ],
           })
         }
       >
-        ＋ Adicionar opção
+        {t('editor.addOption')}
       </Button>
     </fieldset>
   );

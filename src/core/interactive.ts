@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import type { BusinessInteractive, MessageOption, MessageStep } from './types';
 
 export function businessMessageError(step: Pick<MessageStep, 'text' | 'interactive'>): string {
@@ -5,9 +6,9 @@ export function businessMessageError(step: Pick<MessageStep, 'text' | 'interacti
   return (
     interactiveError(step.interactive) ||
     (!step.text.trim()
-      ? 'Escreva o texto da mensagem.'
+      ? t('errors.messageRequired')
       : [...step.text].length > 1024
-        ? 'Use até 1024 caracteres no texto.'
+        ? t('errors.textLength')
         : '')
   );
 }
@@ -30,12 +31,16 @@ export function messageOptions(message: BusinessInteractive): MessageOption[] {
 
 export function createInteractive(kind: BusinessInteractive['kind']): BusinessInteractive {
   const options = [
-    { id: 'option-1', title: 'Agendamento' },
-    { id: 'option-2', title: 'Falar com atendente' },
+    { id: 'option-1', title: t('seed.appointment') },
+    { id: 'option-2', title: t('seed.agent') },
   ];
   return kind === 'buttons'
     ? { kind, buttons: options }
-    : { kind, button: 'Ver opções', sections: [{ title: 'Atendimento', rows: options }] };
+    : {
+        kind,
+        button: t('seed.viewOptions'),
+        sections: [{ title: t('seed.service'), rows: options }],
+      };
 }
 
 const object = (value: unknown): value is Record<string, unknown> =>
@@ -46,21 +51,18 @@ const text = (value: unknown, max: number, required = false) =>
 /** Validate untrusted saved projects as well as current editor drafts. */
 export function interactiveError(input: unknown, { allowDrafts = false } = {}): string {
   if (!object(input) || !['buttons', 'list'].includes(String(input.kind)))
-    return 'Formato de mensagem interativa inválido.';
-  if (input.header !== undefined && !text(input.header, 60))
-    return 'O cabeçalho aceita até 60 caracteres.';
-  if (input.footer !== undefined && !text(input.footer, 60))
-    return 'O rodapé aceita até 60 caracteres.';
+    return t('errors.interactiveFormat');
+  if (input.header !== undefined && !text(input.header, 60)) return t('errors.headerLength');
+  if (input.footer !== undefined && !text(input.footer, 60)) return t('errors.footerLength');
   let options: unknown[];
   if (input.kind === 'buttons') {
     if (!Array.isArray(input.buttons) || input.buttons.length < 1 || input.buttons.length > 3)
-      return 'Use de 1 a 3 botões de resposta.';
+      return t('errors.buttonsCount');
     options = input.buttons;
   } else {
-    if (!text(input.button, 20, !allowDrafts))
-      return 'O botão da lista deve ter de 1 a 20 caracteres.';
+    if (!text(input.button, 20, !allowDrafts)) return t('errors.listButton');
     if (!Array.isArray(input.sections) || !input.sections.length || input.sections.length > 10)
-      return 'Use de 1 a 10 seções na lista.';
+      return t('errors.sectionsCount');
     options = [];
     for (const section of input.sections) {
       if (
@@ -69,10 +71,10 @@ export function interactiveError(input: unknown, { allowDrafts = false } = {}): 
         !Array.isArray(section.rows) ||
         !section.rows.length
       )
-        return 'Cada seção precisa de opções e, quando há várias seções, de um título de até 24 caracteres.';
+        return t('errors.section');
       options.push(...section.rows);
     }
-    if (options.length > 10) return 'A lista aceita até 10 opções no total.';
+    if (options.length > 10) return t('errors.listCount');
   }
   const ids = new Set<string>(),
     titles = new Set<string>();
@@ -82,12 +84,12 @@ export function interactiveError(input: unknown, { allowDrafts = false } = {}): 
       !text(option.id, input.kind === 'buttons' ? 256 : 200, true) ||
       !text(option.title, input.kind === 'buttons' ? 20 : 24, !allowDrafts)
     )
-      return 'Confira o identificador e o título das opções.';
-    if (ids.has(option.id as string)) return 'Cada opção precisa de um identificador único.';
+      return t('errors.optionIds');
+    if (ids.has(option.id as string)) return t('errors.uniqueId');
     if (!allowDrafts && input.kind === 'buttons' && titles.has(option.title as string))
-      return 'Os títulos dos botões devem ser diferentes.';
+      return t('errors.uniqueTitles');
     if (option.description !== undefined && !text(option.description, 72))
-      return 'A descrição aceita até 72 caracteres.';
+      return t('errors.descriptionLength');
     ids.add(option.id as string);
     titles.add(option.title as string);
   }
@@ -95,6 +97,6 @@ export function interactiveError(input: unknown, { allowDrafts = false } = {}): 
     input.autoReplyId !== undefined &&
     (typeof input.autoReplyId !== 'string' || (input.autoReplyId && !ids.has(input.autoReplyId)))
   )
-    return 'Escolha uma resposta automática existente.';
+    return t('errors.autoReply');
   return '';
 }

@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { validateProject } from './engine';
 import type { Project, Step } from './types';
 export const STORAGE_KEY = 'whatsapp-fake-flows-v1';
@@ -12,7 +13,7 @@ export function normalizeProject(input: unknown, options?: { allowDrafts?: boole
   for (const step of project.steps) {
     if (!step.id || used.has(step.id)) step.id = uid();
     used.add(step.id);
-    if (step.type === 'flow') step.label ||= 'Abrir Flow';
+    if (step.type === 'flow') step.label ||= t('seed.openFlow');
   }
   return project;
 }
@@ -21,10 +22,10 @@ export function createStep(type: Step['type']): Step {
     id: uid(),
     text:
       type === 'user'
-        ? 'oi'
+        ? t('seed.hello')
         : type === 'flow'
-          ? 'Preencha o formulário para continuar.'
-          : 'Nova mensagem',
+          ? t('seed.formHint')
+          : t('seed.newMessage'),
     delay: type === 'user' ? 0.4 : 1,
     typing: true,
   };
@@ -32,23 +33,23 @@ export function createStep(type: Step['type']): Step {
   return {
     ...base,
     type,
-    label: 'Abrir formulário',
-    completion: 'Dados enviados',
-    answers: { name: 'Cliente exemplo' },
+    label: t('seed.openForm'),
+    completion: t('seed.sent'),
+    answers: { name: t('seed.customer') },
     flow: {
       version: '7.3',
       screens: [
         {
           id: 'FORM_SCREEN',
-          title: 'Formulário',
+          title: t('seed.form'),
           terminal: true,
           layout: {
             type: 'SingleColumnLayout',
             children: [
-              { type: 'TextInput', name: 'name', label: 'Nome', required: true },
+              { type: 'TextInput', name: 'name', label: t('seed.name'), required: true },
               {
                 type: 'Footer',
-                label: 'Confirmar',
+                label: t('seed.confirm'),
                 'on-click-action': { name: 'complete', payload: { name: '${form.name}' } },
               },
             ],

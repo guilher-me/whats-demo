@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import type { ReplyButtonsMessage } from '../../../core/types';
 import { uid } from '../../../core/project';
 import { Button } from '../../../components/ui/Button';
@@ -10,10 +11,12 @@ export function ReplyButtonsEditor({
   value: ReplyButtonsMessage;
   onChange: (value: ReplyButtonsMessage) => void;
 }) {
+  const t = useT();
+
   return (
     <div className="options-editor">
       <div className="control-caption">
-        <span>Botões de resposta</span>
+        <span>{t('editor.buttons')}</span>
         <small>{value.buttons.length}/3</small>
       </div>
       <SortableOptions
@@ -42,11 +45,14 @@ export function ReplyButtonsEditor({
         onClick={() =>
           onChange({
             ...value,
-            buttons: [...value.buttons, { id: uid(), title: `Opção ${value.buttons.length + 1}` }],
+            buttons: [
+              ...value.buttons,
+              { id: uid(), title: t('editor.optionNumber', { v0: value.buttons.length + 1 }) },
+            ],
           })
         }
       >
-        ＋ Adicionar botão
+        {t('editor.addButton')}
       </Button>
     </div>
   );

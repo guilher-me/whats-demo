@@ -1,5 +1,7 @@
 # WhatsDemo
 
+Interface em inglês (padrão), espanhol e português do Brasil, com seletor de bandeiras no cabeçalho e preferência salva no navegador. As mensagens e Flows mantêm o idioma em que foram criados. Para contribuir com traduções e componentes, consulte [localização](docs/localization.md).
+
 Editor de conversas e WhatsApp Flows para demonstrações, protótipos e gravações. Monte a sequência à esquerda e experimente a conversa no celular à direita, manualmente ou com preenchimento automático e cursor animado.
 
 - Mensagens do usuário, mensagens da empresa e convites para Flows.

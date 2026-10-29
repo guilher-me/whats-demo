@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import { useEffect, useId, useState } from 'react';
 import type { FlowStep, Values } from '../../../core/types';
 import { validateFlow } from '../../../core/engine';
@@ -11,6 +12,8 @@ export function FlowStepEditor({
   onChange: (change: Partial<FlowStep>) => void;
   onValidity: (valid: boolean) => void;
 }) {
+  const t = useT();
+
   const errorId = useId();
   const [flow, setFlow] = useState(() => JSON.stringify(step.flow, null, 2)),
     [answers, setAnswers] = useState(() => JSON.stringify(step.answers, null, 2)),
@@ -26,7 +29,7 @@ export function FlowStepEditor({
       if (key === 'flow') onChange({ flow: validateFlow(value) });
       else {
         if (!value || typeof value !== 'object' || Array.isArray(value))
-          throw new Error('Use um objeto JSON de respostas.');
+          throw new Error(t('errors.answerObject'));
         onChange({ answers: value as Values });
       }
       setErrors((current) => ({ ...current, [key]: '' }));
@@ -37,12 +40,12 @@ export function FlowStepEditor({
   return (
     <>
       <TextField
-        label="Texto do botão"
+        label={t('editor.buttonText')}
         value={step.label}
         onChange={(e) => onChange({ label: e.target.value })}
       />
       <details className="flow-json">
-        <summary>JSON do Flow e respostas automáticas</summary>
+        <summary>{t('editor.flowJson')}</summary>
         <TextArea
           label="Flow JSON"
           aria-invalid={!!errors.flow}
@@ -54,7 +57,7 @@ export function FlowStepEditor({
         />
         <FieldError id={`${errorId}-flow`}>{errors.flow}</FieldError>
         <TextArea
-          label="Respostas automáticas (nome do campo → valor)"
+          label={t('editor.answers')}
           aria-invalid={!!errors.answers}
           aria-describedby={errors.answers ? `${errorId}-answers` : undefined}
           className="json-input answers-input"
@@ -64,7 +67,7 @@ export function FlowStepEditor({
         />
         <FieldError id={`${errorId}-answers`}>{errors.answers}</FieldError>
         <TextField
-          label="Mensagem do cliente ao concluir (opcional)"
+          label={t('editor.completion')}
           value={step.completion ?? ''}
           onChange={(e) => onChange({ completion: e.target.value })}
         />

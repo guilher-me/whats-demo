@@ -31,3 +31,7 @@ npm run build
 ```
 
 Confira a interação manual, a reprodução automática e a abertura direta do HTML gerado. Descreva o que mudou, como foi validado e eventuais limitações. Para mudanças visuais, inclua uma captura; use dados fictícios.
+
+## Traduções da interface
+
+Componentes reutilizáveis usam `useT()` e chaves semânticas dos catálogos em `src/i18n/locales/`. Novos textos precisam de versões em inglês, espanhol e português do Brasil. Veja [a estratégia de localização](docs/localization.md); mensagens e JSONs criados pelo usuário não devem ser traduzidos automaticamente.

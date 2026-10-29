@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import type { FlowStep } from '../../../core/types';
 export function FlowInvitation({
   step,
@@ -10,6 +11,8 @@ export function FlowInvitation({
   disabled: boolean;
   onOpen: (step: FlowStep) => void;
 }) {
+  const t = useT();
+
   return (
     <button
       type="button"
@@ -18,7 +21,7 @@ export function FlowInvitation({
       disabled={completed || disabled}
       onClick={() => onOpen(step)}
     >
-      {completed ? 'Concluído' : step.label || 'Abrir Flow'}
+      {completed ? t('phone.done') : step.label || t('seed.openFlow')}
     </button>
   );
 }

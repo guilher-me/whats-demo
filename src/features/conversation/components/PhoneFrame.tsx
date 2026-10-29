@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import type { ReactNode, RefObject } from 'react';
 import type { Contact } from '../../../core/types';
 import { ChatHeader } from './ChatHeader';
@@ -12,12 +13,14 @@ export function PhoneFrame({
   phoneRef: RefObject<HTMLDivElement | null>;
   children: ReactNode;
 }) {
+  const t = useT();
+
   return (
     <div
       className="phone"
       id="phone-preview"
       role="region"
-      aria-label="Celular de prévia"
+      aria-label={t('phone.region')}
       ref={phoneRef}
     >
       <ChatHeader contact={contact} typing={typing} />

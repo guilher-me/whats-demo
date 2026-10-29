@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import type { MessageOption } from '../../../core/types';
 import { MessageAction } from './MessageAction';
 export function ReplyButtons({
@@ -11,8 +12,10 @@ export function ReplyButtons({
   disabled: boolean;
   onSelect: (id: string) => void;
 }) {
+  const t = useT();
+
   return (
-    <div className="message-actions" aria-label="Botões de resposta">
+    <div className="message-actions" aria-label={t('editor.buttons')}>
       {options.map((o) => (
         <MessageAction
           key={o.id}

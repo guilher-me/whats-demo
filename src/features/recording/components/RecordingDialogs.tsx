@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import { Dialog } from '../../../components/ui/Dialog';
 import { Button } from '../../../components/ui/Button';
 import { ControlIcon } from '../../../components/icons/ControlIcon';
@@ -13,6 +14,8 @@ export function RecordingDialogs({
   onOpenChange: (open: boolean) => void;
   controller: RecordingController;
 }) {
+  const t = useT();
+
   const unsupported = recordingSupport();
   const choose = (mode: 'manual' | 'automatic') => {
     onOpenChange(false);
@@ -23,13 +26,10 @@ export function RecordingDialogs({
       <Dialog
         open={open}
         onOpenChange={onOpenChange}
-        title="Gravar o celular"
-        description="A jornada será reiniciada. Após uma contagem de 3 segundos, apenas o celular será gravado, sem áudio ou controles."
+        title={t('recording.title')}
+        description={t('recording.description')}
       >
-        <p className="record-format-note">
-          MP4 quando disponível; WebM como alternativa. O vídeo é gerado localmente. Mantenha a aba
-          visível durante a gravação.
-        </p>
+        <p className="record-format-note">{t('recording.formatHint')}</p>
         {unsupported ? (
           <p role="alert">{unsupported}</p>
         ) : (
@@ -37,17 +37,15 @@ export function RecordingDialogs({
             <Button onClick={() => choose('manual')}>
               <ControlIcon name="manual" />
               <span>
-                Gravar manualmente
-                <small>Interaja com a conversa e finalize pelo botão de gravação.</small>
+                {t('recording.manual')}
+                <small>{t('recording.manualHint')}</small>
               </span>
             </Button>
             <Button variant="primary" onClick={() => choose('automatic')}>
               <ControlIcon name="play" />
               <span>
-                Gravar automaticamente
-                <small>
-                  O cursor percorre a jornada. A gravação termina 2 segundos após a última mensagem.
-                </small>
+                {t('recording.automatic')}
+                <small>{t('recording.autoHint')}</small>
               </span>
             </Button>
           </div>
@@ -58,10 +56,15 @@ export function RecordingDialogs({
         onOpenChange={(value) => {
           if (!value) recording.discard();
         }}
-        title="Gravação pronta"
+        title={t('recording.ready')}
         description={
           recording.result
-            ? `${recording.result.extension.toUpperCase()} · ${formatElapsed(recording.result.durationMs / 1000)} · ${recording.result.width} × ${recording.result.height} · sem áudio`
+            ? t('recording.resultInfo', {
+                v0: recording.result.extension.toUpperCase(),
+                v1: formatElapsed(recording.result.durationMs / 1000),
+                v2: recording.result.width,
+                v3: recording.result.height,
+              })
             : ''
         }
       >
@@ -74,24 +77,24 @@ export function RecordingDialogs({
               playsInline
               preload="metadata"
               src={recording.result.url}
-              aria-label="Vídeo da jornada gravada"
+              aria-label={t('recording.videoLabel')}
             />
             <div className="dialog-actions">
-              <Button onClick={recording.discard}>Descartar</Button>
+              <Button onClick={recording.discard}>{t('recording.discard')}</Button>
               <Button
                 onClick={() => {
                   recording.discard();
                   onOpenChange(true);
                 }}
               >
-                Gravar novamente
+                {t('recording.again')}
               </Button>
               <a
                 className="download-recording"
                 href={recording.result.url}
                 download={`whatsapp-fake-flows-${new Date().toISOString().replace(/[:.]/g, '-')}.${recording.result.extension}`}
               >
-                Baixar vídeo
+                {t('recording.download')}
               </a>
             </div>
           </>
@@ -102,11 +105,11 @@ export function RecordingDialogs({
         onOpenChange={(value) => {
           if (!value) recording.clearError();
         }}
-        title="Não foi possível gravar"
+        title={t('recording.failedTitle')}
         description={recording.error}
       >
         <div className="dialog-actions">
-          <Button onClick={recording.clearError}>Fechar</Button>
+          <Button onClick={recording.clearError}>{t('common.close')}</Button>
         </div>
       </Dialog>
     </>

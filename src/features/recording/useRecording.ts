@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import { delay } from '../../core/async';
 import { preparePhoneRecording } from './session';
@@ -50,10 +51,10 @@ export function useRecording(options: Options) {
     cancel();
     setError(
       reason instanceof DOMException && reason.name === 'SecurityError'
-        ? 'O navegador bloqueou a captura do celular. Tente abrir o HTML no Chrome ou Edge atualizado.'
+        ? t('errors.captureBlocked')
         : reason instanceof Error
           ? reason.message
-          : 'Não foi possível gravar. Tente novamente.',
+          : t('errors.record'),
     );
   };
   const finish = async () => {
@@ -97,7 +98,7 @@ export function useRecording(options: Options) {
       latest.current.prepare();
       await delay(0, active.signal);
       const node = latest.current.phone.current;
-      if (!node) throw new Error('O celular ainda não está disponível.');
+      if (!node) throw new Error(t('errors.phoneUnavailable'));
       const recorder = await preparePhoneRecording(node, (reason) => fail(active, reason));
       if (active.signal.aborted || operation.current !== active) {
         recorder.cancel();
@@ -121,7 +122,7 @@ export function useRecording(options: Options) {
       if (mode === 'automatic') {
         await playback;
         if (active.signal.aborted || operation.current !== active) return;
-        if (latest.current.playbackStatus() === 'Conversa concluída.')
+        if (latest.current.playbackStatus() === t('playback.completed'))
           await delay(2000, active.signal);
         await finish();
       } else {

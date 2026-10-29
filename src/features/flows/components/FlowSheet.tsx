@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import { useEffect, useRef } from 'react';
 import type { FlowSession, Value, FlowComponent } from '../../../core/types';
 import { getComponents, validation } from '../model';
@@ -20,6 +21,8 @@ export function FlowSheet({
   onClose: () => void;
   onNext: () => void;
 }) {
+  const t = useT();
+
   const content = useRef<HTMLDivElement>(null);
   const screen = session.step.flow.screens[session.index];
   let components: FlowComponent[];
@@ -43,11 +46,11 @@ export function FlowSheet({
       <section className="flow-sheet" aria-label="Flow">
         <header className="flow-header">
           {session.history.length > 0 && (
-            <IconButton label="Voltar" onClick={onBack}>
+            <IconButton label={t('common.back')} onClick={onBack}>
               ‹
             </IconButton>
           )}
-          <IconButton label="Fechar Flow" onClick={onClose}>
+          <IconButton label={t('common.closeFlow')} onClick={onClose}>
             ×
           </IconButton>
           <strong>{screen.title || screen.id}</strong>
@@ -67,7 +70,7 @@ export function FlowSheet({
         </div>
         <FlowFooter
           label={String(
-            resolve(footer?.label, { data: session.data, form: session.form }) ?? 'Avançar',
+            resolve(footer?.label, { data: session.data, form: session.form }) ?? t('common.next'),
           )}
           disabled={!!invalid.length || session.closing}
           error={displayError}

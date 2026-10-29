@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import { useId } from 'react';
 import type { ExpressionContext, FlowComponent, Option, Value } from '../../../core/types';
 import { resolve, resolveOptions } from '../../../core/engine';
@@ -8,6 +9,8 @@ interface Props {
   onChange: (name: string, value: Value) => void;
 }
 export function FlowField({ component: c, context, onChange }: Props) {
+  const t = useT();
+
   const id = useId(),
     name = c.name ?? '',
     label = String(resolve(c.label, context) ?? name),
@@ -21,7 +24,12 @@ export function FlowField({ component: c, context, onChange }: Props) {
   }
   if (['RadioButtonsGroup', 'CheckboxGroup', 'Dropdown'].includes(c.type)) {
     const options = resolveOptions(c['data-source'], context);
-    if (!Array.isArray(options)) return <p role="alert">data-source inválido em {label}.</p>;
+    if (!Array.isArray(options))
+      return (
+        <p role="alert">
+          {t('flow.invalidSourcePrefix')} {label}.
+        </p>
+      );
     if (c.type === 'Dropdown')
       return (
         <label className="flow-field" htmlFor={id}>
@@ -33,7 +41,7 @@ export function FlowField({ component: c, context, onChange }: Props) {
             value={String(value ?? '')}
             onChange={(e) => change(e.target.value)}
           >
-            <option value="">Selecione uma opção</option>
+            <option value="">{t('flow.select')}</option>
             {options.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.title}
@@ -95,5 +103,9 @@ export function FlowField({ component: c, context, onChange }: Props) {
       </label>
     );
   }
-  return c.type === 'Footer' ? null : <p role="alert">Componente ainda não suportado: {c.type}.</p>;
+  return c.type === 'Footer' ? null : (
+    <p role="alert">
+      {t('flow.unsupportedPrefix')} {c.type}.
+    </p>
+  );
 }

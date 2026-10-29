@@ -1,3 +1,4 @@
+import { useT } from '../../i18n';
 import * as Primitive from '@radix-ui/react-dialog';
 import type { ReactNode } from 'react';
 import { IconButton } from './IconButton';
@@ -14,6 +15,8 @@ export function Dialog({
   description?: string;
   children: ReactNode;
 }) {
+  const t = useT();
+
   return (
     <Primitive.Root open={open} onOpenChange={onOpenChange}>
       <Primitive.Portal>
@@ -22,7 +25,7 @@ export function Dialog({
           <Primitive.Title>{title}</Primitive.Title>
           <Primitive.Description>{description ?? ' '}</Primitive.Description>
           <Primitive.Close asChild>
-            <IconButton label="Fechar diálogo" className="dialog-close">
+            <IconButton label={t('common.closeDialog')} className="dialog-close">
               ×
             </IconButton>
           </Primitive.Close>

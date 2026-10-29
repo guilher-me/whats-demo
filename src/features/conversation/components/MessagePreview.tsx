@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import { useEffect, useState, type RefObject } from 'react';
 import type { ChatMessage, Contact, Step } from '../../../core/types';
 import { messageOptions } from '../../../core/interactive';
@@ -18,6 +19,8 @@ export function MessagePreview({
   step: Step;
   phoneRef: RefObject<HTMLDivElement | null>;
 }) {
+  const t = useT();
+
   const [listOpen, setListOpen] = useState(false),
     [selected, setSelected] = useState(''),
     [flowError, setFlowError] = useState('');
@@ -41,8 +44,8 @@ export function MessagePreview({
   };
   return (
     <PhoneFrame contact={contact} phoneRef={phoneRef}>
-      <div className="chat-body draft-chat" aria-label="Prévia da mensagem em edição">
-        <div className="day">Hoje</div>
+      <div className="chat-body draft-chat" aria-label={t('app.draft')}>
+        <div className="day">{t('phone.today')}</div>
         <div className="messages">
           <MessageBubble
             message={message}
@@ -57,7 +60,7 @@ export function MessagePreview({
           />
         </div>
       </div>
-      <div className="draft-preview-note">Prévia da mensagem · alterações em tempo real</div>
+      <div className="draft-preview-note">{t('phone.draftNote')}</div>
       {listOpen && interactive?.kind === 'list' && (
         <ListPicker
           message={interactive}

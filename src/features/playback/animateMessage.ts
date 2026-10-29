@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import type { RefObject } from 'react';
 import type { BusinessInteractive } from '../../core/types';
 import { messageOptions } from '../../core/interactive';
@@ -26,7 +27,7 @@ export async function animateMessage({
 }) {
   const option =
     messageOptions(message).find((o) => o.id === message.autoReplyId) ?? messageOptions(message)[0];
-  if (!option) throw new Error('Adicione uma opção à mensagem.');
+  if (!option) throw new Error(t('errors.missingOption'));
   const bubble = [
     ...(phone.current?.querySelectorAll<HTMLElement>('[data-message-id]') ?? []),
   ].find((n) => n.dataset.messageId === id);

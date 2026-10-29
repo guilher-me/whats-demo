@@ -1,5 +1,6 @@
+import { t } from '../i18n';
 export function abortError() {
-  return new DOMException('Reprodução cancelada.', 'AbortError');
+  return new DOMException(t('playback.cancelled'), 'AbortError');
 }
 export function delay(milliseconds: number, signal: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {

@@ -1,3 +1,4 @@
+import { useT } from '../../../i18n';
 import type { Step } from '../../../core/types';
 import { TextField } from '../../../components/ui/Field';
 import { Checkbox } from '../../../components/ui/Checkbox';
@@ -9,14 +10,14 @@ export function StepTiming({
   step: Step;
   onChange: (change: Partial<Step>) => void;
 }) {
+  const t = useT();
+
   return (
     <div className="step-timing">
       <div className="timing-delay">
         <ControlIcon name="clock" />
         <TextField
-          label={
-            step.type === 'user' ? 'Pausa antes de digitar (s)' : 'Delay antes da resposta (s)'
-          }
+          label={step.type === 'user' ? t('editor.typingDelay') : t('editor.replyDelay')}
           type="number"
           min={0}
           max={120}
@@ -29,7 +30,7 @@ export function StepTiming({
       </div>
       {step.type !== 'user' && (
         <Checkbox
-          label="Exibir “digitando”"
+          label={t('editor.showTyping')}
           checked={step.typing !== false}
           onChange={(e) => onChange({ typing: e.target.checked })}
         />

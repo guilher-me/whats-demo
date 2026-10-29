@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import {
   initialData,
   resolve,
@@ -47,9 +48,9 @@ export function advance(
       complete: resolve(action.payload ?? {}, { data: session.data, form: session.form }) as Values,
     };
   if (action?.name !== 'navigate')
-    throw new Error(`Ação não suportada: ${action?.name ?? 'ausente'}. Use navigate ou complete.`);
+    throw new Error(t('errors.unsupportedAction', { v0: action?.name ?? 'ausente' }));
   const index = session.step.flow.screens.findIndex((screen) => screen.id === action.next?.name);
-  if (index < 0) throw new Error('Tela de destino não encontrada.');
+  if (index < 0) throw new Error(t('errors.destinationNotFound'));
   const payload = resolve(action.payload ?? {}, {
     data: session.data,
     form: session.form,
