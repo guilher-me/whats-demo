@@ -1,0 +1,22 @@
+:root {
+  color-scheme: only light;
+  --green: #008069;
+  --ink: #172a28;
+  --muted: #71807b;
+  --line: #dfe6e2;
+  --soft: #f3f6f3;
+  --radius-sm: 7px;
+  --radius-md: 11px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  font:
+    14px/1.5 Inter,
+    'Segoe UI',
+    Arial,
+    sans-serif;
+  background: #f8faf8;
+  color: var(--ink);
+}

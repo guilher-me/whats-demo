@@ -7,3 +7,7 @@ Thumbs.db
 !.env.example
 
 dist/
+
+.dev/
+.build/
+coverage/

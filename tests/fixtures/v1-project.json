@@ -1,0 +1,316 @@
+{
+  "version": 1,
+  "contact": {
+    "name": "Prevent Senior",
+    "avatar": "assets/prevent-senior.png",
+    "verified": true
+  },
+  "steps": [
+    {
+      "id": "hello",
+      "type": "user",
+      "text": "oi",
+      "delay": 0.4
+    },
+    {
+      "id": "identity",
+      "type": "flow",
+      "text": "Olá! Para iniciar seu atendimento, confirme seus dados e o aceite dos termos.",
+      "delay": 1,
+      "typing": true,
+      "label": "Confirmar meus dados",
+      "completion": "Identificação confirmada",
+      "flow": {
+        "version": "7.3",
+        "screens": [
+          {
+            "id": "IDENTIFICATION_SCREEN",
+            "title": "Prevent Senior",
+            "terminal": true,
+            "data": {},
+            "layout": {
+              "type": "SingleColumnLayout",
+              "children": [
+                {
+                  "type": "TextHeading",
+                  "text": "Identificação"
+                },
+                {
+                  "type": "TextBody",
+                  "text": "Para iniciar, confirme seus dados e o aceite da nossa Política de Privacidade."
+                },
+                {
+                  "type": "CheckboxGroup",
+                  "name": "terms",
+                  "label": "Termos de Uso",
+                  "required": true,
+                  "data-source": [
+                    {
+                      "id": "accepted",
+                      "title": "Li e aceito os termos."
+                    }
+                  ]
+                },
+                {
+                  "type": "TextInput",
+                  "name": "document",
+                  "label": "CPF ou Matrícula",
+                  "required": true,
+                  "input-type": "number",
+                  "min-chars": 5,
+                  "max-chars": 11,
+                  "helper-text": "Digite apenas números, entre 5 e 11 dígitos."
+                },
+                {
+                  "type": "DatePicker",
+                  "name": "birth",
+                  "label": "Data de Nascimento",
+                  "required": true,
+                  "helper-text": "Informe sua data de nascimento."
+                },
+                {
+                  "type": "Footer",
+                  "label": "Confirmar Dados",
+                  "on-click-action": {
+                    "name": "complete",
+                    "payload": {
+                      "document": "${form.document}",
+                      "birth": "${form.birth}",
+                      "terms": "${form.terms}"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "answers": {
+        "terms": ["accepted"],
+        "document": "12345",
+        "birth": "1980-01-01"
+      }
+    },
+    {
+      "id": "menu",
+      "type": "flow",
+      "text": "Obrigada por confirmar seus dados. Como podemos ajudar?",
+      "delay": 1,
+      "typing": true,
+      "label": "Iniciar atendimento",
+      "completion": "Solicitação enviada",
+      "flow": {
+        "version": "7.3",
+        "routing_model": {
+          "MENU_SCREEN": ["AGENDAMENTO_SCREEN"],
+          "AGENDAMENTO_SCREEN": ["CANAL_SCREEN"]
+        },
+        "screens": [
+          {
+            "id": "MENU_SCREEN",
+            "title": "Atendimento",
+            "terminal": false,
+            "data": {},
+            "layout": {
+              "type": "SingleColumnLayout",
+              "children": [
+                {
+                  "type": "RadioButtonsGroup",
+                  "name": "main_option",
+                  "label": "Como posso te ajudar?",
+                  "required": true,
+                  "data-source": [
+                    {
+                      "id": "financeiro",
+                      "title": "Assuntos Financeiros"
+                    },
+                    {
+                      "id": "agendamento",
+                      "title": "Agendamento"
+                    },
+                    {
+                      "id": "documentos",
+                      "title": "Envio de documentos"
+                    },
+                    {
+                      "id": "fale_conosco",
+                      "title": "Fale conosco"
+                    },
+                    {
+                      "id": "urgencia",
+                      "title": "Urgência/Emergência"
+                    }
+                  ]
+                },
+                {
+                  "type": "Footer",
+                  "label": "Avançar",
+                  "on-click-action": {
+                    "name": "navigate",
+                    "next": {
+                      "type": "screen",
+                      "name": "AGENDAMENTO_SCREEN"
+                    },
+                    "payload": {
+                      "main_option": "${form.main_option}"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "id": "AGENDAMENTO_SCREEN",
+            "title": "Agendamento",
+            "terminal": false,
+            "data": {
+              "main_option": {
+                "type": "string",
+                "_example_": "agendamento"
+              }
+            },
+            "layout": {
+              "type": "SingleColumnLayout",
+              "children": [
+                {
+                  "type": "If",
+                  "condition": "${data.main_option} == 'agendamento'",
+                  "then": [
+                    {
+                      "type": "RadioButtonsGroup",
+                      "name": "agendamento_option",
+                      "label": "Qual agendamento deseja?",
+                      "required": true,
+                      "data-source": [
+                        {
+                          "id": "consultas",
+                          "title": "Agendar Consultas"
+                        },
+                        {
+                          "id": "exames",
+                          "title": "Exames ou Procedimentos"
+                        },
+                        {
+                          "id": "credenciada",
+                          "title": "Rede Credenciada"
+                        },
+                        {
+                          "id": "confirmar",
+                          "title": "Confirmar Agendamento"
+                        },
+                        {
+                          "id": "cancelar",
+                          "title": "Cancelar Consulta/Exame"
+                        }
+                      ]
+                    }
+                  ],
+                  "else": [
+                    {
+                      "type": "TextHeading",
+                      "text": "Informações Recebidas"
+                    },
+                    {
+                      "type": "TextBody",
+                      "text": "Clique em avançar para definir o canal de atendimento da sua solicitação."
+                    }
+                  ]
+                },
+                {
+                  "type": "Footer",
+                  "label": "Avançar",
+                  "on-click-action": {
+                    "name": "navigate",
+                    "next": {
+                      "type": "screen",
+                      "name": "CANAL_SCREEN"
+                    },
+                    "payload": {
+                      "main_option": "${data.main_option}",
+                      "agendamento_option": "${form.agendamento_option}"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "id": "CANAL_SCREEN",
+            "title": "Finalização",
+            "terminal": true,
+            "data": {
+              "main_option": {
+                "type": "string",
+                "_example_": "agendamento"
+              },
+              "agendamento_option": {
+                "type": "string",
+                "_example_": "consultas"
+              }
+            },
+            "layout": {
+              "type": "SingleColumnLayout",
+              "children": [
+                {
+                  "type": "TextHeading",
+                  "text": "Canal de Atendimento"
+                },
+                {
+                  "type": "TextBody",
+                  "text": "Como você prefere seguir com o seu atendimento?"
+                },
+                {
+                  "type": "RadioButtonsGroup",
+                  "name": "canal_option",
+                  "label": "Escolha uma opção:",
+                  "required": true,
+                  "data-source": [
+                    {
+                      "id": "portal",
+                      "title": "Autoatendimento no Portal"
+                    },
+                    {
+                      "id": "aguardar",
+                      "title": "Aguardar Atendente"
+                    }
+                  ]
+                },
+                {
+                  "type": "Footer",
+                  "label": "Enviar Solicitação",
+                  "on-click-action": {
+                    "name": "complete",
+                    "payload": {
+                      "assunto_principal": "${data.main_option}",
+                      "tipo_agendamento": "${data.agendamento_option}",
+                      "preferencia_canal": "${form.canal_option}"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "answers": {
+        "main_option": "agendamento",
+        "agendamento_option": "consultas",
+        "canal_option": "aguardar"
+      }
+    },
+    {
+      "id": "protocol",
+      "type": "business",
+      "text": "Seu protocolo de atendimento é 202610290001.\nAguarde um instante. Vamos conectar você a uma atendente.",
+      "delay": 1.5,
+      "typing": true
+    },
+    {
+      "id": "agent",
+      "type": "business",
+      "text": "Olá! Seja bem-vindo ao WhatsApp da Prevent Senior.\nMeu nome é Vanessa e vou realizar o seu atendimento.",
+      "delay": 6.5,
+      "typing": true
+    }
+  ]
+}

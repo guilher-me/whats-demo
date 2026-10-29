@@ -1,64 +1,91 @@
 const fs = require('node:fs');
 const path = require('node:path');
-
+const esbuild = require('esbuild');
 const ROOT = path.resolve(__dirname, '..');
-const MIME = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.gif': 'image/gif' };
-
-function localFile(root, name) {
-  const resolved = path.resolve(root, name);
-  const relative = path.relative(root, resolved);
-  if (relative.startsWith('..') || path.isAbsolute(relative)) {
-    throw new Error('O build só aceita arquivos dentro do projeto: ' + name);
+function dependencyNotices(root, inputs) {
+  const packages = new Set();
+  for (const input of Object.keys(inputs)) {
+    if (!input.includes('node_modules')) continue;
+    let directory = path.dirname(path.resolve(root, input));
+    while (directory.includes('node_modules')) {
+      if (fs.existsSync(path.join(directory, 'package.json'))) {
+        packages.add(directory);
+        break;
+      }
+      const parent = path.dirname(directory);
+      if (parent === directory) break;
+      directory = parent;
+    }
   }
-  return resolved;
+  return [...packages]
+    .sort()
+    .map((directory) => {
+      const pkg = JSON.parse(fs.readFileSync(path.join(directory, 'package.json'), 'utf8'));
+      const filename = ['LICENSE', 'LICENSE.md', 'LICENSE.txt', 'license', 'license.md'].find(
+        (name) => fs.existsSync(path.join(directory, name)),
+      );
+      return `\n${pkg.name}@${pkg.version}\n${filename ? fs.readFileSync(path.join(directory, filename), 'utf8') : 'License: ' + pkg.license}\n`;
+    })
+    .join('\n');
 }
-
-function inlineAssets(source, root) {
-  return source.replace(/(['"])(assets\/[^'"]+)\1/g, (_, quote, name) => {
-    const filename = localFile(root, name);
-    const mime = MIME[path.extname(filename).toLowerCase()];
-    if (!mime) throw new Error('Tipo de imagem não suportado: ' + name);
-    return JSON.stringify('data:' + mime + ';base64,' + fs.readFileSync(filename).toString('base64'));
+async function build({
+  root = ROOT,
+  output = path.join(root, 'dist', 'whatsapp-fake-flows.html'),
+} = {}) {
+  const result = await esbuild.build({
+    absWorkingDir: root,
+    entryPoints: ['src/main.tsx'],
+    bundle: true,
+    write: false,
+    outdir: path.join(root, '.build'),
+    entryNames: 'app',
+    platform: 'browser',
+    format: 'iife',
+    target: 'es2022',
+    jsx: 'automatic',
+    minify: true,
+    legalComments: 'inline',
+    loader: { '.png': 'dataurl' },
+    metafile: true,
+    define: { 'process.env.NODE_ENV': '"production"' },
   });
-}
-
-function build({ root = ROOT, output = path.join(root, 'dist', 'whatsapp-fake-flows.html') } = {}) {
-  const sources = [];
+  const js = result.outputFiles.find((file) => file.path.endsWith('.js'))?.text,
+    css = result.outputFiles.find((file) => file.path.endsWith('.css'))?.text;
+  if (!js || !css) throw new Error('O build precisa gerar JavaScript e CSS.');
+  const notices =
+    fs.readFileSync(path.join(root, 'LICENSE'), 'utf8') +
+    '\nThird-party notices\n' +
+    dependencyNotices(root, result.metafile.inputs);
   let html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-  const license = fs.readFileSync(path.join(root, 'LICENSE'), 'utf8').trim();
-  html = html.replace(/<!doctype html>/i, match => match + '\n<!--\n' + license + '\n-->');
-  html = html.replace(/<link\s+rel="stylesheet"\s+href="([^"]+)"\s*>/g, (_, name) => {
-    let css = fs.readFileSync(localFile(root, name), 'utf8');
-    if (/<\/style/i.test(css)) throw new Error('Conteúdo CSS inválido para HTML independente.');
-    sources.push(name);
-    return '<style>\n' + css + '\n</style>';
-  });
-  html = html.replace(/<script\s+src="([^"]+)"\s*><\/script>/g, (_, name) => {
-    const js = inlineAssets(fs.readFileSync(localFile(root, name), 'utf8'), root);
-    sources.push(name);
-    // Prevent source strings from terminating the inline script element.
-    return '<script>\n// Source: ' + name + '\n' + js.replace(/<\/script/gi, '<\\/script') + '\n</script>';
-  });
-  if (/<script\b[^>]*\bsrc\s*=/i.test(html) || /<link\b[^>]*\brel="stylesheet"/i.test(html)) {
-    throw new Error('Ainda existem dependências de CSS/JS externas ao HTML.');
-  }
-  html = html.replace(/\r\n/g, '\n');
+  html = html.replace(
+    '<!-- APP_STYLES -->',
+    () => '<style>\n' + css.replace(/<\/style/gi, '<\\/style') + '\n</style>',
+  );
+  html = html.replace(
+    '<!-- APP_SCRIPT -->',
+    () => '<script>\n' + js.replace(/<\/script/gi, '<\\/script') + '\n</script>',
+  );
+  html = html.replace(
+    /<!doctype html>/i,
+    (match) => match + '\n<!--\n' + notices.replace(/--/g, '- -') + '\n-->',
+  );
+  if (/<script\b[^>]*\bsrc\s*=/i.test(html) || /<link\b[^>]*rel="stylesheet"/i.test(html))
+    throw new Error('O HTML não pode depender de arquivos externos.');
   fs.mkdirSync(path.dirname(output), { recursive: true });
-  fs.writeFileSync(output, html, 'utf8');
-  return { output, bytes: Buffer.byteLength(html), sources };
+  fs.writeFileSync(output, html.replace(/\r\n/g, '\n'));
+  return { output, bytes: Buffer.byteLength(html) };
 }
-
-function cli() {
-  try {
-    const result = build();
-    console.log('HTML independente gerado: ' + result.output);
-    console.log(Math.ceil(result.bytes / 1024) + ' KB · CSS, JavaScript e imagem incorporados · sem dependências externas');
-  } catch (error) {
-    console.error('Falha no build: ' + error.message);
+async function cli() {
+  const result = await build();
+  console.log('HTML independente gerado: ' + result.output);
+  console.log(
+    Math.ceil(result.bytes / 1024) +
+      ' KB · React, CSS, JavaScript, imagens e licenças incorporados',
+  );
+}
+module.exports = { build, cli };
+if (require.main === module)
+  cli().catch((error) => {
+    console.error(error);
     process.exitCode = 1;
-  }
-}
-
-if (require.main === module) cli();
-
-module.exports = { build, inlineAssets, localFile, cli };
+  });
