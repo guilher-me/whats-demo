@@ -306,3 +306,19 @@
 .focus-mode .draft-preview-toolbar {
   display: none;
 }
+.message-text-editor {
+  margin-bottom: 12px;
+}
+.message-text-editor .field > span {
+  font-size: 11px;
+}
+.message-text-editor textarea {
+  min-height: 85px;
+  background: #fcfdfc;
+  border-color: #e0e7e2;
+}
+.formatting-hint {
+  margin: -5px 0 12px;
+  color: #64776c;
+  font-size: 10px;
+}

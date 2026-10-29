@@ -1,6 +1,7 @@
 import type { ChatMessage, FlowStep } from '../../../core/types';
 import { MessageFrame } from './MessageFrame';
 import { BusinessMessageActions } from './BusinessMessageActions';
+import { FormattedMessageText } from './FormattedMessageText';
 export function MessageBubble({
   message,
   running,
@@ -36,7 +37,9 @@ export function MessageBubble({
       {message.interactive?.header && (
         <div className="message-header">{message.interactive.header}</div>
       )}
-      <p>{message.text}</p>
+      <p>
+        <FormattedMessageText text={message.text} />
+      </p>
       {message.interactive?.footer && (
         <div className="message-footer">{message.interactive.footer}</div>
       )}

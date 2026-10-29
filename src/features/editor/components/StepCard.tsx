@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import type { Step } from '../../../core/types';
-import { TextArea } from '../../../components/ui/Field';
+import { MessageTextEditor } from './MessageTextEditor';
 import { StepTiming } from './StepTiming';
 import { ControlIcon } from '../../../components/icons/ControlIcon';
 import { StepActions, type StepAction } from './StepActions';
@@ -56,10 +56,10 @@ export function StepCard({
         {step.type === 'business' ? (
           <BusinessMessageEditor step={step} onChange={onChange} />
         ) : (
-          <TextArea
+          <MessageTextEditor
             label={step.type === 'flow' ? 'Mensagem com o convite ao Flow' : 'Texto da mensagem'}
             value={step.text}
-            onChange={(e) => onChange({ text: e.target.value })}
+            onChange={(text) => onChange({ text })}
           />
         )}
         <StepTiming step={step} onChange={onChange} />

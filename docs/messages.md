@@ -52,3 +52,13 @@ Consulta realizada em 29/10/2026. As páginas atuais da Meta retornaram HTTP 429
 - [Ações e limites de botões — SDK oficial](https://whatsapp.github.io/WhatsApp-Nodejs-SDK/api-reference/types/ActionObject/)
 - [Títulos e identificadores dos botões — SDK oficial](https://whatsapp.github.io/WhatsApp-Nodejs-SDK/api-reference/types/ButtonObject/)
 - [Títulos e descrições das opções — SDK oficial](https://whatsapp.github.io/WhatsApp-Nodejs-SDK/api-reference/types/RowObject/)
+
+## Formatação do corpo da mensagem
+
+`FormattedMessageText` renderiza `*negrito*`, `_itálico_` e `~tachado~` usando elementos semânticos `strong`, `em` e `s`. A interpretação fica em `core/message-formatting.ts`, sem React, e permite combinações como `*_texto_*`. O componente é reutilizado pelo balão de cliente, empresa e convite de Flow, tanto na simulação quanto na prévia de edição. A gravação captura o resultado já renderizado.
+
+O texto persistido não é convertido para HTML e não requer nova versão de projeto ou link. A renderização não usa innerHTML: tags digitadas são texto. Pares incompletos, marcadores encostados em espaços e nomes como `nome_do_campo` ficam literais. Quebras de linha são preservadas.
+
+Esta implementação cobre esses três estilos de mensagem; não é um interpretador Markdown genérico. Cabeçalhos, rótulos de botões, opções de lista e o JSON interno do Flow continuam usando suas regras próprias.
+
+[Referência oficial de formatação do WhatsApp](https://faq.whatsapp.com/539178204879377/)

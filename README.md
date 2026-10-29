@@ -109,3 +109,13 @@ Use o botão **Gravar celular** na lateral da prévia. Escolha o modo manual ou 
 O resultado pode ser assistido e baixado como MP4 quando suportado, ou WebM. Apenas o celular é gravado, sem áudio, editor ou controles, em 720 × 1280. Tudo acontece localmente, com as bibliotecas incluídas no HTML único. Mantenha a aba visível durante a gravação.
 
 Veja [como funciona a gravação e seus limites](docs/recording.md).
+
+## Formatação das mensagens
+
+Os corpos das mensagens de cliente, empresa e convites de Flow aceitam a sintaxe do WhatsApp:
+
+- `*texto*` para **negrito**.
+- `_texto_` para _itálico_.
+- `~texto~` para tachado.
+
+Os estilos podem ser combinados, por exemplo `*_negrito e itálico_*`. A prévia, a reprodução e os vídeos usam a mesma renderização. Os marcadores ficam preservados no editor, no projeto e no link compartilhado. Textos sem fechamento válido permanecem literais; HTML não é interpretado.

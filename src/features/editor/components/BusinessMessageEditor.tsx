@@ -1,6 +1,7 @@
 import type { BusinessInteractive, MessageStep } from '../../../core/types';
 import { createInteractive, businessMessageError, messageOptions } from '../../../core/interactive';
-import { TextArea, TextField, FieldError } from '../../../components/ui/Field';
+import { TextField, FieldError } from '../../../components/ui/Field';
+import { MessageTextEditor } from './MessageTextEditor';
 import { SelectField } from '../../../components/ui/SelectField';
 import { ReplyButtonsEditor } from './ReplyButtonsEditor';
 import { ListMessageEditor } from './ListMessageEditor';
@@ -36,11 +37,11 @@ export function BusinessMessageEditor({
         <option value="buttons">Botões de resposta</option>
         <option value="list">Lista de opções</option>
       </SelectField>
-      <TextArea
+      <MessageTextEditor
         label="Texto da mensagem"
         value={step.text}
         maxLength={value ? 1024 : undefined}
-        onChange={(e) => onChange({ text: e.target.value })}
+        onChange={(text) => onChange({ text })}
       />
       {value && (
         <>

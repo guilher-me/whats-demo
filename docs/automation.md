@@ -208,3 +208,7 @@ Implementation is in `src/features/automation`. The factory is independent of Re
 ## Durante uma gravação
 
 A gravação de vídeo é iniciada pelos controles da interface. Enquanto está ativa, `loadProject`, `play`, `stop` e `reset` rejeitam operações que poderiam interromper a captura. Consultas, validação e criação de links continuam disponíveis. Finalize ou cancele a gravação pela interface antes de alterar a jornada pela API. O vídeo não faz parte do projeto JSON nem do link compartilhável.
+
+## Formatação do texto
+
+O campo `text` das etapas aceita `*negrito*`, `_itálico_` e `~tachado~`, inclusive combinados, por exemplo `*_texto_*`. Envie e preserve os marcadores no JSON; o aplicativo os interpreta apenas na apresentação do corpo da mensagem. Não envie HTML para obter estilos. Rótulos de botões e definições de campos do Flow não passam por esse interpretador.
