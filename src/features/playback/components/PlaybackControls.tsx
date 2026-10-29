@@ -28,7 +28,7 @@ export function PlaybackControls({
         aria-controls="phone-preview"
         onClick={running ? onStop : onManual}
       >
-        <ControlIcon name={running ? 'stop' : 'manual'} />
+        <ControlIcon name={running ? 'pause' : 'manual'} />
       </TooltipIconButton>
       <TooltipIconButton
         label={running ? 'Reiniciar prévia' : 'Reproduzir automaticamente'}
