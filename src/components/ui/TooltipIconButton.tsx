@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { IconButton } from './IconButton';
 import type { ButtonProps } from './Button';
 export function TooltipIconButton({
@@ -7,6 +7,7 @@ export function TooltipIconButton({
   ...props
 }: ButtonProps & { label: string; description: string }) {
   const id = useId();
+  const pointerFocus = useRef(false);
   const [hovered, setHovered] = useState(false),
     [focused, setFocused] = useState(false),
     [dismissed, setDismissed] = useState(false);
@@ -19,11 +20,19 @@ export function TooltipIconButton({
         setDismissed(false);
       }}
       onMouseLeave={() => setHovered(false)}
+      onPointerDownCapture={() => {
+        pointerFocus.current = true;
+        setDismissed(true);
+      }}
+      onClickCapture={() => setDismissed(true)}
       onFocusCapture={() => {
         setFocused(true);
-        setDismissed(false);
+        if (!pointerFocus.current) setDismissed(false);
       }}
-      onBlurCapture={() => setFocused(false)}
+      onBlurCapture={() => {
+        pointerFocus.current = false;
+        setFocused(false);
+      }}
       onKeyDown={(event) => {
         if (event.key === 'Escape') {
           event.stopPropagation();

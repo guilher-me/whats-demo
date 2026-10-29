@@ -6,6 +6,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import axe from 'axe-core';
 import { App } from '../src/app/App';
 import { PlaybackControls } from '../src/features/playback/components/PlaybackControls';
+import { TooltipIconButton } from '../src/components/ui/TooltipIconButton';
 import { createStep } from '../src/core/project';
 import { createInteractive } from '../src/core/interactive';
 beforeEach(() => {
@@ -63,6 +64,32 @@ it('mostra tooltips por mouse e teclado, permite Tab e fecha com Escape sem perd
   const automatic = screen.getByRole('button', { name: 'Reproduzir automaticamente' });
   expect(automatic).toHaveFocus();
   expect(screen.getByRole('tooltip')).toHaveTextContent('cursor');
+});
+
+it('fecha o tooltip ao pressionar/clicar e só reabre em uma nova entrada ou foco pelo teclado', async () => {
+  const user = userEvent.setup();
+  const onClick = vi.fn();
+  render(<TooltipIconButton label="Executar" description="Ajuda da ação" onClick={onClick} />);
+  const button = screen.getByRole('button', { name: 'Executar' });
+  await user.hover(button);
+  expect(screen.getByRole('tooltip')).toBeInTheDocument();
+  await user.pointer({ target: button, keys: '[MouseLeft>]' });
+  expect(screen.queryByRole('tooltip')).toBeNull();
+  await user.pointer({ keys: '[/MouseLeft]' });
+  expect(onClick).toHaveBeenCalledOnce();
+  expect(button).toHaveFocus();
+  expect(screen.queryByRole('tooltip')).toBeNull();
+  await user.unhover(button);
+  await user.hover(button);
+  expect(screen.getByRole('tooltip')).toBeInTheDocument();
+  await user.unhover(button);
+  act(() => button.blur());
+  await user.tab();
+  expect(button).toHaveFocus();
+  expect(screen.getByRole('tooltip')).toBeInTheDocument();
+  await user.keyboard('{Enter}');
+  expect(onClick).toHaveBeenCalledTimes(2);
+  expect(screen.queryByRole('tooltip')).toBeNull();
 });
 
 it.each(['editor', 'flow', 'list'] as const)(
