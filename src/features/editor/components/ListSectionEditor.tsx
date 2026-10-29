@@ -4,6 +4,7 @@ import { Button } from '../../../components/ui/Button';
 import { IconButton } from '../../../components/ui/IconButton';
 import { TextField } from '../../../components/ui/Field';
 import { MessageOptionEditor } from './MessageOptionEditor';
+import { SortableOptions } from './SortableOptions';
 export function ListSectionEditor({
   section,
   index,
@@ -33,19 +34,22 @@ export function ListSectionEditor({
           ×
         </IconButton>
       </div>
-      {section.rows.map((option, i) => (
-        <MessageOptionEditor
-          key={option.id}
-          description
-          option={option}
-          index={i}
-          removable={section.rows.length > 1}
-          onChange={(next) =>
-            onChange({ ...section, rows: section.rows.map((r, n) => (n === i ? next : r)) })
-          }
-          onRemove={() => onChange({ ...section, rows: section.rows.filter((_, n) => n !== i) })}
-        />
-      ))}
+      <SortableOptions options={section.rows} onChange={(rows) => onChange({ ...section, rows })}>
+        {(option, i, dragHandle) => (
+          <MessageOptionEditor
+            key={option.id}
+            description
+            option={option}
+            index={i}
+            dragHandle={dragHandle}
+            removable={section.rows.length > 1}
+            onChange={(next) =>
+              onChange({ ...section, rows: section.rows.map((r, n) => (n === i ? next : r)) })
+            }
+            onRemove={() => onChange({ ...section, rows: section.rows.filter((_, n) => n !== i) })}
+          />
+        )}
+      </SortableOptions>
       <Button
         variant="ghost"
         disabled={!canAdd}

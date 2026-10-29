@@ -218,6 +218,60 @@
   align-self: flex-end;
   padding-bottom: 9px;
 }
+.option-editor-heading,
+.option-editor-actions {
+  display: flex;
+  align-items: center;
+}
+.option-editor-heading {
+  justify-content: space-between;
+  gap: 8px;
+}
+.option-editor-heading .option-index {
+  align-self: auto;
+  padding: 0;
+}
+.option-editor-actions {
+  gap: 4px;
+}
+.option-editor-actions .icon-button,
+.option-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 4px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #64776c;
+}
+.option-drag-handle {
+  cursor: grab;
+  touch-action: none;
+}
+.option-drag-handle:hover {
+  background: #edf4ef;
+}
+.option-drag-handle:focus-visible {
+  outline: 2px solid #16865e;
+  outline-offset: 2px;
+}
+.sortable-option {
+  position: relative;
+  display: flow-root;
+}
+.sortable-option.is-dragging {
+  z-index: 2;
+}
+.sortable-option.is-dragging .option-editor {
+  border-color: #16865e;
+  box-shadow: 0 5px 16px #163e2626;
+}
+.sortable-option.is-dragging .option-drag-handle {
+  cursor: grabbing;
+}
 .list-section-editor {
   border: 1px solid #dce7e0;
   border-radius: 10px;
