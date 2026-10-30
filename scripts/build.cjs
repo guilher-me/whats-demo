@@ -30,10 +30,7 @@ function dependencyNotices(root, inputs) {
     })
     .join('\n');
 }
-async function build({
-  root = ROOT,
-  output = path.join(root, 'dist', 'whatsapp-fake-flows.html'),
-} = {}) {
+async function build({ root = ROOT, output = path.join(root, 'dist', 'whats-demo.html') } = {}) {
   const result = await esbuild.build({
     absWorkingDir: root,
     entryPoints: ['src/main.tsx'],
@@ -81,6 +78,8 @@ async function build({
     throw new Error('O HTML não pode depender de arquivos externos.');
   fs.mkdirSync(path.dirname(output), { recursive: true });
   fs.writeFileSync(output, html.replace(/\r\n/g, '\n'));
+  if (path.resolve(output) === path.join(root, 'dist', 'whats-demo.html'))
+    fs.rmSync(path.join(root, 'dist', 'whatsapp-fake-flows.html'), { force: true });
   return { output, bytes: Buffer.byteLength(html) };
 }
 async function cli() {

@@ -78,7 +78,7 @@ it('grava manualmente, bloqueia alterações e oferece download acessível com e
   const result = screen.getByRole('dialog', { name: 'Gravação pronta' });
   expect(within(result).getByRole('link', { name: 'Baixar vídeo' })).toHaveAttribute(
     'download',
-    expect.stringMatching(/\.webm$/),
+    expect.stringMatching(/^whats-demo-[\dTZ-]+\.webm$/),
   );
   expect(within(result).getByLabelText('Vídeo da jornada gravada')).toHaveAttribute(
     'src',

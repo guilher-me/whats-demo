@@ -21,6 +21,7 @@ it('isolates development drafts while preserving production and portable storage
   for (const pathname of [
     '/whats-demo/development/',
     '/whats-demo/development/index.html',
+    '/whats-demo/development/whats-demo.html',
     '/whats-demo/development/whatsapp-fake-flows.html',
   ])
     expect(projectStorageKey({ protocol: 'https:', pathname })).toBe(`${STORAGE_KEY}:development`);
@@ -56,7 +57,7 @@ function fixture() {
   git(['remote', 'add', 'origin', remote], source);
   git(['push', 'origin', 'main', 'development'], source);
   const sha = git(['rev-parse', 'HEAD'], source);
-  writeFileSync(join(artifact, 'whatsapp-fake-flows.html'), 'PRODUCTION 1');
+  writeFileSync(join(artifact, 'whats-demo.html'), 'PRODUCTION 1');
   writeFileSync(join(artifact, 'llms.txt'), 'guide');
   mkdirSync(join(artifact, 'docs'));
   writeFileSync(join(artifact, 'docs', 'guide.md'), 'documentation');
@@ -73,11 +74,11 @@ function fixture() {
 it('keeps both environments across independent updates and skips stale source builds', () => {
   const { root, remote, artifact, sha, update } = fixture();
   expect(publish({ remote, source: artifact, target: 'production', sha })).toBe(true);
-  writeFileSync(join(artifact, 'whatsapp-fake-flows.html'), 'DEVELOPMENT 1');
+  writeFileSync(join(artifact, 'whats-demo.html'), 'DEVELOPMENT 1');
   expect(publish({ remote, source: artifact, target: 'development', sha })).toBe(true);
   const prod2 = update('main', 'release 2');
   rmSync(join(artifact, 'docs', 'guide.md'));
-  writeFileSync(join(artifact, 'whatsapp-fake-flows.html'), 'PRODUCTION 2');
+  writeFileSync(join(artifact, 'whats-demo.html'), 'PRODUCTION 2');
   expect(publish({ remote, source: artifact, target: 'production', sha: prod2 })).toBe(true);
   const destination = join(root, 'combined');
   compose({ remote, destination });
@@ -90,7 +91,7 @@ it('keeps both environments across independent updates and skips stale source bu
   expect(existsSync(join(destination, 'development', 'docs', 'guide.md'))).toBe(true);
   expect(existsSync(join(destination, '.git'))).toBe(false);
   const dev2 = update('development', 'staging 2');
-  writeFileSync(join(artifact, 'whatsapp-fake-flows.html'), 'DEVELOPMENT 2');
+  writeFileSync(join(artifact, 'whats-demo.html'), 'DEVELOPMENT 2');
   publish({ remote, source: artifact, target: 'development', sha: dev2 });
   expect(publish({ remote, source: artifact, target: 'production', sha })).toBe(false);
   const newer = join(root, 'newer');
@@ -122,6 +123,7 @@ it('preserves the portable filename and rejects reserved paths, dotfiles and sym
   expect(readFileSync(join(destination, 'index.html'), 'utf8')).toBe(
     readFileSync(join(destination, 'whatsapp-fake-flows.html'), 'utf8'),
   );
+  expect(readFileSync(join(destination, 'whats-demo.html'), 'utf8')).toBe('PRODUCTION 1');
   expect(JSON.parse(readFileSync(join(destination, 'deployment.json'), 'utf8')).sourceBranch).toBe(
     'main',
   );
@@ -135,6 +137,15 @@ it('preserves the portable filename and rejects reserved paths, dotfiles and sym
   mkdirSync(outside);
   symlinkSync(outside, join(artifact, 'escape'), 'junction');
   expect(() => prepare(artifact, join(root, 'links'), 'production', sha)).toThrow('Unsupported');
+});
+it('accepts a legacy build while publishing the branded filename and hosted alias', () => {
+  const { root, artifact, sha } = fixture();
+  rmSync(join(artifact, 'whats-demo.html'));
+  writeFileSync(join(artifact, 'whatsapp-fake-flows.html'), 'LEGACY');
+  const destination = join(root, 'legacy');
+  prepare(artifact, destination, 'production', sha);
+  for (const name of ['index.html', 'whats-demo.html', 'whatsapp-fake-flows.html'])
+    expect(readFileSync(join(destination, name), 'utf8')).toBe('LEGACY');
 });
 it.each([
   ['development', 'codex/new-feature', 'owner/repo', true],
