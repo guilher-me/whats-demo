@@ -61,7 +61,7 @@ The example uses fictional customer details. Replace its messages, business iden
 
 **Open the live demo.** Visit [WhatsDemo](https://guilher-me.github.io/whats-demo/) in your browser. No installation is required.
 
-**Use a portable copy.** Ask a teammate to share the generated `whatsapp-fake-flows.html` file. Open it in a modern desktop browser; you do not need to install Node.js. Start with the built-in example and follow the [user guide](docs/user-guide.md).
+**Use a portable copy.** Ask a teammate to share the generated `whats-demo.html` file. Open it in a modern desktop browser; you do not need to install Node.js. Start with the built-in example and follow the [user guide](docs/user-guide.md).
 
 **Run it locally.** With a supported Node.js version and npm installed:
 
@@ -78,7 +78,7 @@ To generate the portable app:
 npm run build
 ```
 
-The result is `dist/whatsapp-fake-flows.html`. See [requirements, installation and distribution](docs/getting-started.md) for details.
+The result is `dist/whats-demo.html`. See [requirements, installation and distribution](docs/getting-started.md) for details.
 
 ## Your demo stays in your browser
 

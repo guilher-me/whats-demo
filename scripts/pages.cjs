@@ -26,13 +26,15 @@ function prepare(source, destination, target, sha) {
   if (!/^[a-f0-9]{40}$/.test(sha)) throw new Error('Invalid source revision.');
   if (fs.existsSync(path.join(source, 'development')))
     throw new Error('The development namespace is reserved.');
-  if (!fs.existsSync(path.join(source, 'whatsapp-fake-flows.html')))
-    throw new Error('Portable HTML is missing.');
-  copyTree(source, destination);
-  fs.copyFileSync(
-    path.join(destination, 'whatsapp-fake-flows.html'),
-    path.join(destination, 'index.html'),
+  const portable = ['whats-demo.html', 'whatsapp-fake-flows.html'].find((name) =>
+    fs.existsSync(path.join(source, name)),
   );
+  if (!portable) throw new Error('Portable HTML is missing.');
+  copyTree(source, destination);
+  // Keep previously shared hosted URLs working, including their project fragments.
+  for (const name of ['index.html', 'whats-demo.html', 'whatsapp-fake-flows.html'])
+    if (name !== portable)
+      fs.copyFileSync(path.join(destination, portable), path.join(destination, name));
   fs.writeFileSync(
     path.join(destination, 'deployment.json'),
     JSON.stringify(
