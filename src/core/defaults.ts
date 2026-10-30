@@ -1,5 +1,6 @@
 import data from './default-project.json';
-import logo from '../../assets/prevent-senior.png';
+import logo from '../../assets/luma-home.svg';
+import legacyLogo from '../../assets/prevent-senior.png';
 import type { Project } from './types';
 import { clone } from './project';
 export const DEFAULT_AVATAR = logo;
@@ -14,5 +15,6 @@ export function createDefaultProject(): Project {
   return project;
 }
 export function avatarSource(value: string) {
-  return value === 'assets/prevent-senior.png' ? logo : value || FALLBACK_AVATAR;
+  if (value === 'assets/prevent-senior.png') return legacyLogo;
+  return value === 'assets/luma-home.svg' ? logo : value || FALLBACK_AVATAR;
 }

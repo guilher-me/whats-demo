@@ -30,7 +30,7 @@ it('seleciona pelo teclado e atualiza o texto sem enviar mensagens', async () =>
   await start();
   const card = screen.getByRole('article', { name: 'Etapa 1' });
   fireEvent.focus(within(card).getByLabelText('Texto da mensagem'));
-  expect(draft()).toHaveTextContent('oi');
+  expect(draft()).toHaveTextContent('Hi! I’m looking for a new lamp.');
   expect(draft().querySelector('.bubble')).toHaveClass('user');
   fireEvent.change(within(card).getByLabelText('Texto da mensagem'), {
     target: { value: 'Olá, quero agendar' },

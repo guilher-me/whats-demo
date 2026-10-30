@@ -1,158 +1,166 @@
 {
   "version": 1,
   "contact": {
-    "name": "Prevent Senior",
-    "avatar": "assets/prevent-senior.png",
+    "name": "Luma Home",
+    "avatar": "assets/luma-home.svg",
     "verified": true
   },
   "steps": [
     {
       "id": "hello",
       "type": "user",
-      "text": "oi",
+      "text": "Hi! I’m looking for a new lamp.",
       "delay": 0.4
     },
     {
-      "id": "identity",
-      "type": "flow",
-      "text": "Olá! Para iniciar seu atendimento, confirme seus dados e o aceite dos termos.",
+      "id": "welcome",
+      "type": "business",
+      "text": "Welcome to *Luma Home*! ✨\nThoughtful lighting for a place that feels like you. Where would you like to start?",
       "delay": 1,
       "typing": true,
-      "label": "Confirmar meus dados",
-      "completion": "Identificação confirmada",
+      "interactive": {
+        "kind": "buttons",
+        "footer": "A fictional store. A real feel for the experience.",
+        "buttons": [
+          {
+            "id": "collection",
+            "title": "Browse collection"
+          },
+          {
+            "id": "bestsellers",
+            "title": "See bestsellers"
+          }
+        ],
+        "autoReplyId": "collection"
+      }
+    },
+    {
+      "id": "collection",
+      "type": "business",
+      "text": "Meet our favorites. Tap below to explore a piece for your home.",
+      "delay": 0.8,
+      "typing": true,
+      "interactive": {
+        "kind": "list",
+        "button": "Explore lamps",
+        "sections": [
+          {
+            "title": "Table lamps",
+            "rows": [
+              {
+                "id": "beam",
+                "title": "Beam table lamp",
+                "description": "Warm light, sculpted ceramic · $49"
+              },
+              {
+                "id": "arc",
+                "title": "Arc desk lamp",
+                "description": "An adjustable everyday favorite · $65"
+              }
+            ]
+          },
+          {
+            "title": "Floor lamps",
+            "rows": [
+              {
+                "id": "halo",
+                "title": "Halo floor lamp",
+                "description": "A soft glow for your reading corner · $119"
+              }
+            ]
+          }
+        ],
+        "autoReplyId": "beam"
+      }
+    },
+    {
+      "id": "request",
+      "type": "flow",
+      "text": "Found your favorite? Tell us the details in this short form.\n_No payment is required._",
+      "delay": 0.8,
+      "typing": true,
+      "label": "Create a request",
+      "completion": "Product request sent",
+      "answers": {
+        "product": "beam",
+        "color": "sand",
+        "quantity": "1",
+        "name": "Alex Taylor",
+        "email": "alex@example.com",
+        "fulfillment": "pickup"
+      },
       "flow": {
         "version": "7.3",
+        "routing_model": {
+          "PRODUCT": ["CONTACT"]
+        },
         "screens": [
           {
-            "id": "IDENTIFICATION_SCREEN",
-            "title": "Prevent Senior",
-            "terminal": true,
-            "data": {},
+            "id": "PRODUCT",
+            "title": "Your piece",
             "layout": {
               "type": "SingleColumnLayout",
               "children": [
                 {
                   "type": "TextHeading",
-                  "text": "Identificação"
+                  "text": "Make it yours"
                 },
                 {
-                  "type": "TextBody",
-                  "text": "Para iniciar, confirme seus dados e o aceite da nossa Política de Privacidade."
-                },
-                {
-                  "type": "CheckboxGroup",
-                  "name": "terms",
-                  "label": "Termos de Uso",
+                  "type": "RadioButtonsGroup",
+                  "name": "product",
+                  "label": "Choose your lamp",
                   "required": true,
                   "data-source": [
                     {
-                      "id": "accepted",
-                      "title": "Li e aceito os termos."
+                      "id": "beam",
+                      "title": "Beam table lamp · $49"
+                    },
+                    {
+                      "id": "arc",
+                      "title": "Arc desk lamp · $65"
+                    },
+                    {
+                      "id": "halo",
+                      "title": "Halo floor lamp · $119"
+                    }
+                  ]
+                },
+                {
+                  "type": "RadioButtonsGroup",
+                  "name": "color",
+                  "label": "Choose a finish",
+                  "required": true,
+                  "data-source": [
+                    {
+                      "id": "sand",
+                      "title": "Warm sand"
+                    },
+                    {
+                      "id": "forest",
+                      "title": "Forest green"
                     }
                   ]
                 },
                 {
                   "type": "TextInput",
-                  "name": "document",
-                  "label": "CPF ou Matrícula",
+                  "name": "quantity",
+                  "label": "Quantity",
                   "required": true,
-                  "input-type": "number",
-                  "min-chars": 5,
-                  "max-chars": 11,
-                  "helper-text": "Digite apenas números, entre 5 e 11 dígitos."
-                },
-                {
-                  "type": "DatePicker",
-                  "name": "birth",
-                  "label": "Data de Nascimento",
-                  "required": true,
-                  "helper-text": "Informe sua data de nascimento."
+                  "input-type": "number"
                 },
                 {
                   "type": "Footer",
-                  "label": "Confirmar Dados",
-                  "on-click-action": {
-                    "name": "complete",
-                    "payload": {
-                      "document": "${form.document}",
-                      "birth": "${form.birth}",
-                      "terms": "${form.terms}"
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      },
-      "answers": {
-        "terms": ["accepted"],
-        "document": "12345",
-        "birth": "1980-01-01"
-      }
-    },
-    {
-      "id": "menu",
-      "type": "flow",
-      "text": "Obrigada por confirmar seus dados. Como podemos ajudar?",
-      "delay": 1,
-      "typing": true,
-      "label": "Iniciar atendimento",
-      "completion": "Solicitação enviada",
-      "flow": {
-        "version": "7.3",
-        "routing_model": {
-          "MENU_SCREEN": ["AGENDAMENTO_SCREEN"],
-          "AGENDAMENTO_SCREEN": ["CANAL_SCREEN"]
-        },
-        "screens": [
-          {
-            "id": "MENU_SCREEN",
-            "title": "Atendimento",
-            "terminal": false,
-            "data": {},
-            "layout": {
-              "type": "SingleColumnLayout",
-              "children": [
-                {
-                  "type": "RadioButtonsGroup",
-                  "name": "main_option",
-                  "label": "Como posso te ajudar?",
-                  "required": true,
-                  "data-source": [
-                    {
-                      "id": "financeiro",
-                      "title": "Assuntos Financeiros"
-                    },
-                    {
-                      "id": "agendamento",
-                      "title": "Agendamento"
-                    },
-                    {
-                      "id": "documentos",
-                      "title": "Envio de documentos"
-                    },
-                    {
-                      "id": "fale_conosco",
-                      "title": "Fale conosco"
-                    },
-                    {
-                      "id": "urgencia",
-                      "title": "Urgência/Emergência"
-                    }
-                  ]
-                },
-                {
-                  "type": "Footer",
-                  "label": "Avançar",
+                  "label": "Continue",
                   "on-click-action": {
                     "name": "navigate",
                     "next": {
                       "type": "screen",
-                      "name": "AGENDAMENTO_SCREEN"
+                      "name": "CONTACT"
                     },
                     "payload": {
-                      "main_option": "${form.main_option}"
+                      "product": "${form.product}",
+                      "color": "${form.color}",
+                      "quantity": "${form.quantity}"
                     }
                   }
                 }
@@ -160,130 +168,72 @@
             }
           },
           {
-            "id": "AGENDAMENTO_SCREEN",
-            "title": "Agendamento",
-            "terminal": false,
-            "data": {
-              "main_option": {
-                "type": "string",
-                "_example_": "agendamento"
-              }
-            },
-            "layout": {
-              "type": "SingleColumnLayout",
-              "children": [
-                {
-                  "type": "If",
-                  "condition": "${data.main_option} == 'agendamento'",
-                  "then": [
-                    {
-                      "type": "RadioButtonsGroup",
-                      "name": "agendamento_option",
-                      "label": "Qual agendamento deseja?",
-                      "required": true,
-                      "data-source": [
-                        {
-                          "id": "consultas",
-                          "title": "Agendar Consultas"
-                        },
-                        {
-                          "id": "exames",
-                          "title": "Exames ou Procedimentos"
-                        },
-                        {
-                          "id": "credenciada",
-                          "title": "Rede Credenciada"
-                        },
-                        {
-                          "id": "confirmar",
-                          "title": "Confirmar Agendamento"
-                        },
-                        {
-                          "id": "cancelar",
-                          "title": "Cancelar Consulta/Exame"
-                        }
-                      ]
-                    }
-                  ],
-                  "else": [
-                    {
-                      "type": "TextHeading",
-                      "text": "Informações Recebidas"
-                    },
-                    {
-                      "type": "TextBody",
-                      "text": "Clique em avançar para definir o canal de atendimento da sua solicitação."
-                    }
-                  ]
-                },
-                {
-                  "type": "Footer",
-                  "label": "Avançar",
-                  "on-click-action": {
-                    "name": "navigate",
-                    "next": {
-                      "type": "screen",
-                      "name": "CANAL_SCREEN"
-                    },
-                    "payload": {
-                      "main_option": "${data.main_option}",
-                      "agendamento_option": "${form.agendamento_option}"
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "id": "CANAL_SCREEN",
-            "title": "Finalização",
+            "id": "CONTACT",
+            "title": "Your details",
             "terminal": true,
             "data": {
-              "main_option": {
+              "product": {
                 "type": "string",
-                "_example_": "agendamento"
+                "__example__": "beam"
               },
-              "agendamento_option": {
+              "color": {
                 "type": "string",
-                "_example_": "consultas"
+                "__example__": "sand"
+              },
+              "quantity": {
+                "type": "string",
+                "__example__": "1"
               }
             },
             "layout": {
               "type": "SingleColumnLayout",
               "children": [
                 {
-                  "type": "TextHeading",
-                  "text": "Canal de Atendimento"
+                  "type": "TextBody",
+                  "text": "This is a demo request. Please use fictional contact details."
                 },
                 {
-                  "type": "TextBody",
-                  "text": "Como você prefere seguir com o seu atendimento?"
+                  "type": "TextInput",
+                  "name": "name",
+                  "label": "Your name",
+                  "required": true,
+                  "input-type": "text"
+                },
+                {
+                  "type": "TextInput",
+                  "name": "email",
+                  "label": "Email address",
+                  "required": true,
+                  "input-type": "email"
                 },
                 {
                   "type": "RadioButtonsGroup",
-                  "name": "canal_option",
-                  "label": "Escolha uma opção:",
+                  "name": "fulfillment",
+                  "label": "How would you like to receive it?",
                   "required": true,
                   "data-source": [
                     {
-                      "id": "portal",
-                      "title": "Autoatendimento no Portal"
+                      "id": "pickup",
+                      "title": "Collect in store"
                     },
                     {
-                      "id": "aguardar",
-                      "title": "Aguardar Atendente"
+                      "id": "delivery",
+                      "title": "Home delivery"
                     }
                   ]
                 },
                 {
                   "type": "Footer",
-                  "label": "Enviar Solicitação",
+                  "label": "Send request",
                   "on-click-action": {
                     "name": "complete",
                     "payload": {
-                      "assunto_principal": "${data.main_option}",
-                      "tipo_agendamento": "${data.agendamento_option}",
-                      "preferencia_canal": "${form.canal_option}"
+                      "product": "${data.product}",
+                      "color": "${data.color}",
+                      "quantity": "${data.quantity}",
+                      "name": "${form.name}",
+                      "email": "${form.email}",
+                      "fulfillment": "${form.fulfillment}"
                     }
                   }
                 }
@@ -291,25 +241,13 @@
             }
           }
         ]
-      },
-      "answers": {
-        "main_option": "agendamento",
-        "agendamento_option": "consultas",
-        "canal_option": "aguardar"
       }
     },
     {
-      "id": "protocol",
+      "id": "confirmation",
       "type": "business",
-      "text": "Seu protocolo de atendimento é 202610290001.\nAguarde um instante. Vamos conectar você a uma atendente.",
-      "delay": 1.5,
-      "typing": true
-    },
-    {
-      "id": "agent",
-      "type": "business",
-      "text": "Olá! Seja bem-vindo ao WhatsApp da Prevent Senior.\nMeu nome é Vanessa e vou realizar o seu atendimento.",
-      "delay": 6.5,
+      "text": "Thanks! Your request is *LH-1042*.\nI’m Emma from Luma Home. I’ll help you check availability and the next steps.\n\n_This demo does not place an order or collect payment._",
+      "delay": 2.5,
       "typing": true
     }
   ]

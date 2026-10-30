@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { resolve, condition, flatten, validateField, validateFlow } from '../src/core/engine';
-import { createDefaultProject } from '../src/core/defaults';
+import { createLegacyProject as createDefaultProject } from './fixtures/legacy-project';
 import { createSession, advance } from '../src/features/flows/model';
 import type { FlowStep } from '../src/core/types';
 describe('motor e navegação', () => {

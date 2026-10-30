@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { createDefaultProject } from '../src/core/defaults';
+import { createLegacyProject as createDefaultProject } from './fixtures/legacy-project';
 import { createStep } from '../src/core/project';
 import { createInteractive } from '../src/core/interactive';
 import {

@@ -3,8 +3,9 @@ import '@testing-library/jest-dom/vitest';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
-import { createDefaultProject } from '../src/core/defaults';
+import { createLegacyProject as createDefaultProject } from './fixtures/legacy-project';
 import { STORAGE_KEY } from '../src/core/project';
+import { createDefaultProject as createLumaProject } from '../src/core/defaults';
 beforeEach(() => {
   localStorage.clear();
   history.replaceState(null, '', '/');
@@ -24,6 +25,27 @@ async function tick(ms: number) {
   });
 }
 describe('editor e reprodução React', () => {
+  it('completes the Luma Home showcase with buttons, a list and the two-screen Flow', async () => {
+    const project = createLumaProject();
+    project.contact.avatar = '';
+    project.steps.forEach((step) => (step.delay = 0));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
+    await start();
+    fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
+    for (let i = 0; i < 60; i++) await tick(1000);
+    const messages = window.whatsappFakeFlows!.getState().messages;
+    expect(window.whatsappFakeFlows!.getState().running).toBe(false);
+    expect(document.querySelector('.play-status')).toHaveTextContent('Conversa concluída.');
+    expect(messages.some((m) => m.direction === 'user' && m.text === 'Browse collection')).toBe(
+      true,
+    );
+    expect(messages.some((m) => m.direction === 'user' && m.text === 'Beam table lamp')).toBe(true);
+    expect(
+      messages.some((m) => m.direction === 'user' && m.text.includes('Product request sent')),
+    ).toBe(true);
+    expect(messages.at(-1)?.text).toContain('LH-1042');
+    expect(document.querySelector('.bubble strong')).toBeInTheDocument();
+  });
   it('Só celular inicia o modo manual a partir da prévia de edição e permite responder', async () => {
     const project = createDefaultProject();
     project.contact.avatar = '';

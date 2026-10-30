@@ -32,7 +32,7 @@ Prefer semantic roles and labels over CSS selectors or generated IDs. Do not byp
 | `projectVersion`         | Persisted JSON version, currently 1                                                                                                   |
 | `getInstructions()`      | Embedded index and this guide as text                                                                                                 |
 | `getProject()`           | Independent copy of the current project, including local drafts                                                                       |
-| `getExample()`           | Independent copy of the default journey with both Flows                                                                               |
+| `getExample()`           | Independent copy of the Luma Home showcase (buttons, product list and two-screen Flow)                                                |
 | `getState()`             | Independent snapshot of readiness, playback status and rendered messages                                                              |
 | `validateProject(input)` | Returns `{valid:true, project}` or `{valid:false, errors:string[]}` without editing anything                                          |
 | `loadProject(input)`     | Validates and replaces the entire journey, stops playback, clears the preview and saves locally; returns the normalized project       |

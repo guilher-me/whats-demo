@@ -1,5 +1,7 @@
 # WhatsDemo
 
+O exemplo padrão é a **Luma Home**, uma loja fictícia de iluminação com identidade própria. A jornada curta em inglês demonstra botões de resposta, catálogo em lista, um Flow de duas telas para escolher produto e informar contato, e confirmação de solicitação. As respostas automáticas usam dados fictícios. Rascunhos existentes e links compartilhados são preservados; use **Restore example / Restaurar exemplo** para carregar a nova demonstração.
+
 O link **Privacidade**, no cabeçalho, explica o armazenamento local, como limpar os dados e o conteúdo dos links compartilhados. O aviso é informativo, está disponível nos três idiomas e não altera os dados salvos ao abrir ou fechar.
 
 Interface em inglês (padrão), espanhol e português do Brasil, com seletor de bandeiras no cabeçalho e preferência salva no navegador. As mensagens e Flows mantêm o idioma em que foram criados. Para contribuir com traduções e componentes, consulte [localização](docs/localization.md).
