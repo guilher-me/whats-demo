@@ -76,7 +76,12 @@ it('Ver conversa mostra todas as mensagens configuradas em ordem sem executar a 
   const overview = document.querySelector('.overview-chat')!;
   expect(
     Array.from(overview.querySelectorAll('.message-content p')).map((el) => el.textContent),
-  ).toEqual(['oi', 'Mensagem da empresa', 'Convite do formulário']);
+  ).toEqual([
+    'oi',
+    'Mensagem da empresa',
+    'Convite do formulário',
+    'Dados enviados\nNome: Cliente exemplo',
+  ]);
   expect(screen.queryByRole('button', { name: 'Enviar mensagem' })).toBeNull();
   expect(screen.getByRole('button', { name: 'Abrir formulário' })).toBeDisabled();
   expect(window.whatsappFakeFlows!.getState().running).toBe(false);

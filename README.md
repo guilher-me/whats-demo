@@ -98,6 +98,8 @@ Clique em uma etapa ou foque um de seus campos para acompanhar a mensagem no cel
 
 Use **Ver conversa** para exibir todas as mensagens configuradas, na ordem, em uma visão estática e rolável do celular. Isso não inicia a reprodução, não espera os delays nem exige preencher formulários. O histórico de uma simulação anterior é preservado separadamente. Selecione uma etapa para voltar à edição ou use os controles de reprodução para executar a jornada.
 
+A visão inclui as respostas automáticas do usuário após cada Flow, com os títulos das opções escolhidas e a mensagem de conclusão configurada. Ela segue o caminho dos valores em `answers` e omite campos ocultos. Respostas automáticas de botões e listas também aparecem após suas mensagens.
+
 ## Controles e acessibilidade
 
 Os dois controles com ícones ficam à direita do celular: interação manual e reprodução automática. Durante a reprodução, passam a parar e reiniciar. Os tooltips funcionam por mouse e foco de teclado e podem ser fechados com Esc.

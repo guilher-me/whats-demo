@@ -21,6 +21,8 @@
   "common.back": "Back",
   "common.next": "Next",
   "common.send": "Send",
+  "common.yes": "Yes",
+  "common.no": "No",
   "common.untitled": "Untitled",
   "common.contact": "Contact",
   "common.contactLower": "contact",
