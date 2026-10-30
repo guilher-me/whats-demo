@@ -12,8 +12,10 @@
   --line: #dfe4eb;
   --soft: #f1f3f6;
   --surface: #ffffff;
-  --surface-editor: #f7f8fa;
-  --surface-preview: #e9edf3;
+  --surface-editor: #f3f8f5;
+  --surface-preview: #f3f8f5;
+  --background-editor: linear-gradient(160deg, #ffffff 0%, #fbfdfc 45%, #f3f8f5 100%);
+  --background-preview: linear-gradient(160deg, #f3f8f5 0%, #fbfdfc 55%, #ffffff 100%);
   --surface-subtle: #f5f7fa;
   --surface-hover: #edf1f5;
   --text-secondary: #475467;

@@ -325,7 +325,7 @@ h3 {
   gap: 12px;
   height: calc(100vh - 88px);
   overflow-y: auto;
-  background: var(--surface-preview);
+  background: var(--background-preview);
 }
 .preview-heading {
   width: 100%;
@@ -382,7 +382,7 @@ h3 {
   min-height: 100vh;
   justify-content: center;
   padding: 24px;
-  background: var(--surface-preview);
+  background: var(--background-preview);
 }
 .focus-mode #exit-record {
   display: block;

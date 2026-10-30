@@ -1,6 +1,6 @@
 /* Editor controls: scoped separately so conversation visuals remain reusable. */
 .editor {
-  background: var(--surface-editor);
+  background: var(--background-editor);
 }
 .section-heading h2,
 .preview-heading h2 {
