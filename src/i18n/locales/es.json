@@ -304,5 +304,5 @@
   "privacy.deleteBody": "Usa los ajustes de privacidad o almacenamiento del navegador para borrar los datos guardados de esta página. Esto elimina el borrador local y la preferencia de idioma. Restaurar el ejemplo reemplaza el recorrido; no borra todos los datos guardados. Los archivos descargados y los enlaces copiados anteriormente no se eliminan.",
   "privacy.connectionsTitle": "Cookies y conexiones",
   "privacy.connectionsBody": "WhatsDemo no establece cookies ni incluye publicidad, analítica o rastreadores. La aplicación no sube recorridos a un servidor; los enlaces y vídeos se generan en tu navegador. Si se aloja en línea, el proveedor de alojamiento puede procesar registros de acceso según su propia política de privacidad.",
-  "automation.guideLink": "Guía de interacción para IA (llm.txt)"
+  "automation.guideLink": "Guía de interacción para IA (llms.txt)"
 }

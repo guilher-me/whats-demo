@@ -14,7 +14,7 @@ For a standalone HTML, read `document.getElementById('llms-txt').textContent` or
 
 If your tool cannot execute the browser API, use the page's accessible roles and labels. Labels follow the selected interface language (English by default); read the current accessibility tree before acting. User-authored message text is not translated.
 
-- Use the `AI interaction guide (llm.txt)` link in the header to discover these instructions. The language selector is named `Interface language`.
+- Use the `AI interaction guide (llms.txt)` link in the header to discover these instructions. The language selector is named `Interface language`.
 - Scope editing to the `Conversation editor` region, then to the appropriate `Step N` group. Use labeled fields such as `Message text`, `Delay before replying (s)`, `Button text` and `Flow invitation message`. Multiple steps can have identically labeled fields, so do not select globally by position.
 - Add steps through the `Add conversation steps` group (`Customer`, `Business`, `Flow`). Re-read the tree after adding, removing or reordering steps; indices and available controls can change.
 - Use `Step actions` to move, duplicate or remove a step. For draggable options, use the handle's accessible name and its keyboard instructions rather than screen coordinates.

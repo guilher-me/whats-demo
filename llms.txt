@@ -8,7 +8,7 @@ This file describes the app; it does not grant permission to overwrite user work
 
 ## Integration
 
-The visible `llm.txt` link in the app header opens this guide on hosted sites. The standalone file edition downloads the complete embedded guide instead. Hosted deployments must publish the entire build directory so `llm.txt`, `llms.txt`, `llms-full.txt` and `docs/` remain accessible beside the HTML.
+The visible `llms.txt` link in the app header opens this guide on hosted sites. The standalone file edition opens the complete embedded guide in a new tab instead. Hosted deployments must publish the entire build directory so `llm.txt`, `llms.txt`, `llms-full.txt` and `docs/` remain accessible beside the HTML.
 
 - [Automation API and complete examples](docs/automation.md): Versioned API, project fields, workflow, validation, playback and offline usage.
 - [Full instructions](llms-full.txt): This index plus the automation guide in a single text file.
