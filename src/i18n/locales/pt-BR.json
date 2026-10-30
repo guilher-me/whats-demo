@@ -328,5 +328,10 @@
   "editor.dragPosition": "Posição {{v0}}.",
   "editor.dragPlaced": "Etapa colocada na posição {{v0}}.",
   "editor.dragCancelled": "Reordenação cancelada.",
-  "editor.needsAttention": "Revisar"
+  "editor.needsAttention": "Revisar",
+  "playback.pause": "Pausar reprodução",
+  "playback.resume": "Continuar reprodução",
+  "playback.pauseHint": "Pausa a conversa sem perder o progresso.",
+  "playback.resumeHint": "Continua exatamente de onde você pausou.",
+  "playback.paused": "Reprodução pausada."
 }

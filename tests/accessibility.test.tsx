@@ -20,8 +20,16 @@ afterEach(() => {
 });
 
 it('exibe somente dois controles nomeados, sem texto visível, e adapta as ações durante a reprodução', () => {
-  const actions = { onManual: vi.fn(), onAuto: vi.fn(), onStop: vi.fn(), onReset: vi.fn() };
-  const { rerender } = render(<PlaybackControls {...actions} disabled={false} running={false} />);
+  const actions = {
+    onManual: vi.fn(),
+    onAuto: vi.fn(),
+    onPause: vi.fn(),
+    onResume: vi.fn(),
+    onReset: vi.fn(),
+  };
+  const { rerender } = render(
+    <PlaybackControls {...actions} disabled={false} paused={false} running={false} />,
+  );
   const group = screen.getByRole('group', { name: 'Controles de reprodução' });
   expect(within(group).getAllByRole('button')).toHaveLength(2);
   const manual = screen.getByRole('button', { name: 'Iniciar manual' });
@@ -30,11 +38,15 @@ it('exibe somente dois controles nomeados, sem texto visível, e adapta as açõ
   expect(actions.onManual).toHaveBeenCalledOnce();
   fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
   expect(actions.onAuto).toHaveBeenCalledOnce();
-  rerender(<PlaybackControls {...actions} disabled={false} running />);
+  rerender(<PlaybackControls {...actions} disabled={false} paused={false} running />);
   expect(within(group).getAllByRole('button')).toHaveLength(2);
-  fireEvent.click(screen.getByRole('button', { name: 'Parar reprodução' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Pausar reprodução' }));
   fireEvent.click(screen.getByRole('button', { name: 'Reiniciar prévia' }));
-  expect(actions.onStop).toHaveBeenCalledOnce();
+  expect(actions.onPause).toHaveBeenCalledOnce();
+  rerender(<PlaybackControls {...actions} disabled={false} running paused />);
+  const resume = screen.getByRole('button', { name: 'Continuar reprodução' });
+  fireEvent.click(resume);
+  expect(actions.onResume).toHaveBeenCalledOnce();
   expect(actions.onReset).toHaveBeenCalledOnce();
 });
 
@@ -44,9 +56,11 @@ it('mostra tooltips por mouse e teclado, permite Tab e fecha com Escape sem perd
     <PlaybackControls
       disabled={false}
       running={false}
+      paused={false}
       onManual={() => {}}
       onAuto={() => {}}
-      onStop={() => {}}
+      onPause={() => {}}
+      onResume={() => {}}
       onReset={() => {}}
     />,
   );

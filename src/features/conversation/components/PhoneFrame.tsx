@@ -5,11 +5,13 @@ import { ChatHeader } from './ChatHeader';
 export function PhoneFrame({
   contact,
   typing = false,
+  paused = false,
   phoneRef,
   children,
 }: {
   contact: Contact;
   typing?: boolean;
+  paused?: boolean;
   phoneRef: RefObject<HTMLDivElement | null>;
   children: ReactNode;
 }) {
@@ -18,6 +20,8 @@ export function PhoneFrame({
   return (
     <div
       className="phone"
+      inert={paused}
+      data-paused={paused || undefined}
       id="phone-preview"
       role="region"
       aria-label={t('phone.region')}

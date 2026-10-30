@@ -18,23 +18,33 @@ import { useMessageInteraction } from './useMessageInteraction';
 import { animateMessage } from '../animateMessage';
 import { messageOptions } from '../../../core/interactive';
 import { usePlaybackSpeed } from './usePlaybackSpeed';
+import { PlaybackClock } from '../playbackClock';
 import { flowReadingText } from '../../flows/reading';
 
 export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
   useT();
   const { speed, current: speedRef, setSpeed } = usePlaybackSpeed();
   const automaticMode = useRef(false);
+  const clock = useRef<PlaybackClock | null>(null);
+  const sleep = useCallback(
+    (milliseconds: number, signal: AbortSignal) =>
+      clock.current?.signal === signal
+        ? clock.current.delay(milliseconds)
+        : delay(milliseconds, signal),
+    [],
+  );
   // Read the current preference at each animation boundary, including during a run.
   const wait = useCallback(
     (milliseconds: number, signal: AbortSignal) =>
-      delay(milliseconds / (automaticMode.current ? speedRef.current : 1), signal),
-    [],
+      sleep(milliseconds / (automaticMode.current ? speedRef.current : 1), signal),
+    [sleep],
   );
 
   const [messages, setMessages] = useState<ChatMessage[]>([]),
     [typing, setTyping] = useState(false),
     [draft, setDraftState] = useState(''),
     [running, setRunning] = useState(false),
+    [paused, setPaused] = useState(false),
     [activeStep, setActiveStep] = useState<string | null>(null),
     [statusMessage, setStatusMessage] = useState<{
       key: MessageKey;
@@ -93,6 +103,8 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
   const stop = useCallback(() => {
     controller.current?.abort();
     controller.current = null;
+    clock.current = null;
+    setPaused(false);
     automaticMode.current = false;
     waitingUser.current = null;
     waitingFlow.current = null;
@@ -104,6 +116,16 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     cursor.hide();
     setStatus('playback.stopped');
   }, [flow.set, interaction.reset]);
+  const pause = () => {
+    if (!controller.current || clock.current?.paused) return;
+    clock.current?.pause();
+    setPaused(true);
+  };
+  const resume = () => {
+    if (!controller.current || !clock.current?.paused) return;
+    clock.current.resume();
+    setPaused(false);
+  };
   const reset = () => {
     stop();
     setMessages([]);
@@ -119,7 +141,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
   );
   const send = () => {
     const text = draftRef.current.trim();
-    if (!text) return;
+    if (!text || clock.current?.paused) return;
     append(text, 'user');
     setDraft('');
     const done = waitingUser.current;
@@ -143,7 +165,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
   const next = async () => {
     const session = flow.current.current,
       active = controller.current;
-    if (!session || !active || session.closing) return;
+    if (!session || !active || session.closing || clock.current?.paused) return;
     const result = advance(session);
     setFlowError('');
     if (result.session) {
@@ -151,7 +173,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
       return;
     }
     flow.set({ ...session, closing: true });
-    await delay(220, active.signal);
+    await sleep(220, active.signal);
     if (controller.current !== active) return;
     flow.set(null);
     if (session.step.completion) append(session.step.completion, 'user');
@@ -171,7 +193,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
   const animateFlow = async (signal: AbortSignal) => {
     for (let turn = 0; flow.current.current && turn < 30; turn++) {
       const session = flow.current.current;
-      await delay(250, signal);
+      await sleep(250, signal);
       const components = getComponents(session);
       await cursor.read(session.step.flow.screens[session.index].title, signal);
       for (const c of components.filter((component) => component.type !== 'Footer')) {
@@ -236,7 +258,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
         signal,
       );
       await next();
-      await delay(200, signal);
+      await sleep(200, signal);
     }
     if (flow.current.current) throw new Error(t('errors.cycles'));
   };
@@ -248,6 +270,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     const active = new AbortController();
     automaticMode.current = automatic;
     controller.current = active;
+    clock.current = new PlaybackClock(active.signal);
     const signal = active.signal;
     setRunning(true);
     try {
@@ -287,9 +310,10 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
             phone.current?.querySelector<HTMLInputElement>('[data-composer-input]')?.focus();
           }
           await received.promise;
+          await clock.current?.checkpoint();
         } else {
           setTyping(step.typing !== false);
-          await delay(step.delay * 1000, signal);
+          await sleep(step.delay * 1000, signal);
           setTyping(false);
           // Cursor targets must exist before the next animation; commit this message synchronously.
           let messageId = '';
@@ -328,13 +352,14 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
                 confirm: interaction.confirm,
               });
             await answered;
+            await clock.current?.checkpoint();
           }
           if (step.type === 'flow') {
             const completed = deferred(signal);
             waitingFlow.current = completed.finish;
             setStatus(automatic ? 'playback.openingFlow' : 'playback.openFlow');
             if (automatic) {
-              await delay(100, signal);
+              await sleep(100, signal);
               const target =
                 [...(phone.current?.querySelectorAll<HTMLElement>('[data-open-step]') ?? [])].find(
                   (n) => n.dataset.openStep === step.id,
@@ -343,12 +368,16 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
               await animateFlow(signal);
             }
             await completed.promise;
+            await clock.current?.checkpoint();
           }
         }
       }
       if (controller.current === active) {
         flushSync(() => {
           controller.current = null;
+          clock.current?.dispose();
+          clock.current = null;
+          setPaused(false);
           automaticMode.current = false;
           setRunning(false);
           setActiveStep(null);
@@ -375,10 +404,13 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     setDraft,
     send,
     running,
+    paused,
+    pause,
+    resume,
     automatic: running && automaticMode.current,
     activeStep,
     status: t(
-      statusMessage.key,
+      paused ? 'playback.paused' : statusMessage.key,
       statusMessage.key === 'playback.progress'
         ? { ...statusMessage.values, v0: t(statusMessage.values!.v0 as MessageKey) }
         : statusMessage.values,
@@ -388,7 +420,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     cursor: cursor.cursor,
     run,
     sendOrStart: (project: Project) => {
-      if (automaticMode.current) return;
+      if (automaticMode.current || clock.current?.paused) return;
       if (controller.current) {
         send();
         return;

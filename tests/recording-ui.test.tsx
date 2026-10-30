@@ -67,7 +67,7 @@ it('grava manualmente, bloqueia alterações e oferece download acessível com e
   expect(session.start).toHaveBeenCalledOnce();
   expect(document.querySelector('.editor')).toHaveAttribute('inert');
   expect(() => window.whatsappFakeFlows!.loadProject(project)).toThrow('gravação');
-  expect(screen.getByRole('button', { name: 'Parar reprodução' })).toBeDisabled();
+  expect(screen.getByRole('button', { name: 'Pausar reprodução' })).toBeDisabled();
   fireEvent.change(screen.getByLabelText('Mensagem'), { target: { value: 'oi' } });
   fireEvent.click(screen.getByRole('button', { name: 'Enviar mensagem' }));
   await tick(2000);
