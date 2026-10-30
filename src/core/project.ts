@@ -6,7 +6,9 @@ export const STORAGE_KEY = 'whatsapp-fake-flows-v1';
 export function projectStorageKey(url: { protocol: string; pathname: string }): string {
   const development =
     /^https?:$/.test(url.protocol) &&
-    /\/development(?:\/(?:index\.html|whatsapp-fake-flows\.html)?)?$/.test(url.pathname);
+    /\/development(?:\/(?:index\.html|whats-demo\.html|whatsapp-fake-flows\.html)?)?$/.test(
+      url.pathname,
+    );
   return development ? `${STORAGE_KEY}:development` : STORAGE_KEY;
 }
 export const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;

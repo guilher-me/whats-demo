@@ -92,7 +92,7 @@ export function RecordingDialogs({
               <a
                 className="download-recording"
                 href={recording.result.url}
-                download={`whatsapp-fake-flows-${new Date().toISOString().replace(/[:.]/g, '-')}.${recording.result.extension}`}
+                download={`whats-demo-${new Date().toISOString().replace(/[:.]/g, '-')}.${recording.result.extension}`}
               >
                 {t('recording.download')}
               </a>
