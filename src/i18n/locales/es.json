@@ -2,6 +2,7 @@
   "app.tagline": "Crea conversaciones. Muestra experiencias.",
   "app.corrections": "Hay campos que necesitan corrección",
   "app.preview": "Vista previa de la conversación",
+  "app.previewHint": "Prueba el recorrido manual o automáticamente.",
   "app.try": "02 / PRUEBA",
   "app.phoneOnly": "Solo teléfono ↗",
   "app.expand": "Ampliar la conversación en curso",

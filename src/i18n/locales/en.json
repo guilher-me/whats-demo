@@ -2,6 +2,7 @@
   "app.tagline": "Build conversations. Show experiences.",
   "app.corrections": "Some fields need attention",
   "app.preview": "Conversation preview",
+  "app.previewHint": "Try the journey manually or automatically.",
   "app.try": "02 / TRY IT",
   "app.phoneOnly": "Phone only ↗",
   "app.expand": "Expand the current conversation",

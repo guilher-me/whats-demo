@@ -168,6 +168,7 @@ export function App() {
           <div className="preview-heading">
             <div>
               <h2>{t('app.preview')}</h2>
+              <p>{t('app.previewHint')}</p>
             </div>
             <Button
               variant="ghost"

@@ -12,6 +12,28 @@
   height: auto;
   aspect-ratio: 9 / 16;
 }
+/* The remaining grid row sets the phone budget, including translated headings. */
+@media (min-width: 901px) {
+  .preview {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    justify-items: center;
+    align-items: start;
+  }
+  .phone-stage {
+    width: min(428px, 100%);
+    height: 100%;
+    container-type: size;
+    justify-content: center;
+  }
+  .phone-stage .phone {
+    width: min(360px, calc(100cqh * 0.5625), calc(100cqw - 68px));
+  }
+  .focus-mode .preview {
+    display: flex;
+    align-items: center;
+  }
+}
 .playback {
   display: flex;
   flex-direction: column;
@@ -102,6 +124,8 @@
 .focus-mode .phone-stage {
   width: min(360px, calc(max(320px, 100dvh - 104px) * 0.5625));
   max-width: 100%;
+  height: auto;
+  container-type: normal;
 }
 .focus-mode .phone-stage .phone {
   width: 100%;

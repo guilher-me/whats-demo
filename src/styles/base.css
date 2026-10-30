@@ -199,7 +199,8 @@ h3 {
   margin: 0;
   font-size: 14px;
 }
-.section-heading p {
+.section-heading p,
+.preview-heading p {
   color: var(--muted);
   margin: 4px 0 0;
   font-size: 12px;
@@ -236,7 +237,7 @@ h3 {
   display: flex;
   align-items: center;
   flex-direction: column;
-  padding: 16px 20px;
+  padding: 28px 20px 16px;
   gap: 12px;
   height: calc(100vh - 88px);
   overflow-y: auto;
@@ -245,9 +246,6 @@ h3 {
 .preview-heading {
   width: 100%;
   max-width: 500px;
-}
-.preview-heading h2 {
-  margin: 0;
 }
 .button--primary {
   background: #008069;
@@ -301,10 +299,6 @@ h3 {
   justify-content: center;
   padding: 24px;
   background: #eef3ef;
-}
-.preview-heading > .button {
-  padding: 6px;
-  font-size: 11px;
 }
 .focus-mode #exit-record {
   display: block;
