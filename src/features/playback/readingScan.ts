@@ -37,7 +37,9 @@ export function readingLines(element: HTMLElement, phone: HTMLElement): ReadingL
     if (
       !node.textContent?.trim() ||
       !parent ||
-      parent.closest('time,svg,script,style,select,textarea,[aria-hidden="true"],.visually-hidden')
+      parent.closest(
+        'time,svg,script,style,select,textarea,small,h3,[aria-hidden="true"],.visually-hidden,.message-footer,.flow-caption',
+      )
     )
       continue;
     const style = getComputedStyle(parent);

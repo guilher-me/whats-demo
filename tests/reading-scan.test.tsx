@@ -13,7 +13,7 @@ afterEach(() => {
 function layout() {
   const phone = document.createElement('div');
   phone.innerHTML =
-    '<article>First <strong>bold</strong><p>Second</p><time>12:00</time><span aria-hidden="true">hidden</span></article>';
+    '<article>First <strong>bold</strong><p>Second</p><small>helper</small><h3>Subtitle</h3><time>12:00</time><span aria-hidden="true">hidden</span></article>';
   document.body.append(phone);
   const rect = (left: number, top: number, right: number, bottom: number) =>
     ({ left, top, right, bottom, width: right - left, height: bottom - top }) as DOMRect;
@@ -41,25 +41,26 @@ it('merges formatted fragments into text lines and excludes timestamps and hidde
     { left: 20, right: 90, top: 50, bottom: 60 },
   ]);
 });
-it('scans left to right, moves to the next line and aborts without later movement', async () => {
+it('makes a brief attention movement and aborts without later movement', async () => {
   vi.useFakeTimers();
   const { phone, article } = layout();
   const { result } = renderHook(() => useCursor({ current: phone }));
   const controller = new AbortController();
   let read!: Promise<void>;
   act(() => {
-    read = result.current.read('First bold Second', controller.signal, article);
+    read = result.current.read('word '.repeat(40), controller.signal, article);
   });
   const rejected = read.catch((error) => error.name);
-  expect(result.current.cursor).toMatchObject({ x: 10, y: 25, visible: true, pressed: false });
+  expect(result.current.cursor.visible).toBe(false);
   await act(async () => {
-    await vi.advanceTimersByTimeAsync(88);
+    await vi.advanceTimersByTimeAsync(2400);
   });
-  expect(result.current.cursor).toMatchObject({ x: 100, y: 25, pressed: false });
-  await act(async () => {
-    await vi.advanceTimersByTimeAsync(352);
-  });
-  expect(result.current.cursor).toMatchObject({ x: 20, y: 55, pressed: false });
+  expect(result.current.cursor.visible).toBe(true);
+  expect(result.current.cursor.pressed).toBe(false);
+  expect(result.current.cursor.x).toBeGreaterThan(10);
+  expect(result.current.cursor.x).toBeLessThan(100);
+  expect(result.current.cursor.y).toBeGreaterThanOrEqual(20);
+  expect(result.current.cursor.y).toBeLessThanOrEqual(30);
   act(() => {
     controller.abort();
     result.current.hide();

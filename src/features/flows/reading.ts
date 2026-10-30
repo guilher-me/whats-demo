@@ -9,7 +9,8 @@ export function flowReadingText(component: FlowComponent, context: ExpressionCon
         option && typeof option === 'object' && !Array.isArray(option) ? option.title : '',
       )
     : [];
-  return [component.text, component.label, component['helper-text'], ...choices]
+  if (['TextSubheading', 'TextCaption'].includes(component.type)) return '';
+  return [component.text, component.label, ...choices]
     .map((text) => resolve(text, context))
     .filter((text) => typeof text === 'string' || typeof text === 'number')
     .join(' ');

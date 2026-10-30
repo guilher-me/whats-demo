@@ -101,7 +101,7 @@ it('reads and fills each field in order instead of reading the entire Flow first
   expect(window.whatsappFakeFlows!.getState().running).toBe(false);
 });
 
-it('includes only the current field and its resolved choices and helper text', () => {
+it('includes only the current field and its resolved choices and excludes helper text', () => {
   expect(
     flowReadingText(
       {
@@ -121,5 +121,5 @@ it('includes only the current field and its resolved choices and helper text', (
         form: {},
       },
     ),
-  ).toBe('Color Select one finish. Warm sand Forest green');
+  ).toBe('Color Warm sand Forest green');
 });
