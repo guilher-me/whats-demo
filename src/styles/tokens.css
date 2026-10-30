@@ -1,5 +1,7 @@
 :root {
   color-scheme: only light;
+  --brand-whats: #123f3b;
+  --brand-demo: #00816b;
   --accent: #007f68;
   --accent-hover: #006653;
   --accent-soft: #eaf5f1;
