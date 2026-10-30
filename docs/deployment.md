@@ -40,7 +40,7 @@ The reusable workflow stores validated static snapshots in the generated **`page
 
 Publishing is serialized per environment. The final Pages job uses one shared concurrency group and reads the latest pair of stored snapshots, then places production at the root and development under `development/`. A pending GitHub concurrency job may be superseded; the surviving job still includes both persisted environments. Production updates therefore preserve development and vice versa. Repository/authentication failures stop composition rather than treating an existing environment as empty.
 
-Every environment includes `index.html`, the original `whatsapp-fake-flows.html`, the AI guides and documentation. `deployment.json` identifies its environment and source commit. The single-file app can still be downloaded and opened independently.
+Every environment includes `index.html`, `whats-demo.html` (with `whatsapp-fake-flows.html` retained as a hosted alias for existing links), the AI guides and documentation. `deployment.json` identifies its environment and source commit. The single-file app can still be downloaded and opened independently.
 
 The snapshot is pushed before the Pages deployment. If the deployment fails, the previous live site remains; retry the workflow to compose and publish the stored pair. Snapshots are retained in Git rather than relying on expiring Actions artifacts.
 
