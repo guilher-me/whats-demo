@@ -1,6 +1,6 @@
 import { t } from '../../i18n';
 import { clone, normalizeProject } from '../../core/project';
-import { createURL } from '../../core/codec';
+import { exportDocument, importDocument, SCHEMA_VERSION } from '../../core/document';
 import type { ChatMessage, Project } from '../../core/types';
 
 export interface AutomationState {
@@ -52,12 +52,13 @@ export function createAutomationAPI(bindings: AutomationBindings) {
       bindings.replace(project);
       return clone(project);
     },
-    async createShareURL(input?: unknown): Promise<string> {
-      if (input === undefined) requireReady();
-      return createURL(
-        normalizeProject(input === undefined ? bindings.project() : input),
-        bindings.href(),
-      );
+    schemaVersion: SCHEMA_VERSION,
+    getDocument: () => clone(exportDocument(bindings.project())),
+    loadDocument: (input: unknown) => {
+      requireReady();
+      const project = importDocument(input);
+      bindings.replace(project);
+      return exportDocument(project);
     },
     async play(mode: 'automatic' | 'manual' = 'automatic'): Promise<AutomationState> {
       requireReady();

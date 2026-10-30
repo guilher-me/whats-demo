@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState, useRef } from 'react';
 import type { Project, Step } from '../../../core/types';
 import { createDefaultProject } from '../../../core/defaults';
 import { clone, createStep, normalizeProject, projectStorageKey, uid } from '../../../core/project';
-import { useSharedLink } from '../../sharing/useSharedLink';
 import { prepareProjectImages } from '../../../core/images/sanitize';
 export type SaveState = 'example' | 'recovered' | 'saving' | 'saved' | 'failed' | 'shared';
 export function useProject() {
@@ -26,17 +25,6 @@ export function useProject() {
     [error, setError] = useState(''),
     [saveState, setSaveState] = useState<SaveState>(initial.state);
   const hasWork = useRef(initial.state === 'recovered');
-  const link = useSharedLink({
-    current: () => ({ project, hasWork: hasWork.current }),
-    accept: (shared, persist) => {
-      hasWork.current = true;
-      edited.current = persist;
-      setProject(shared);
-      setRevision((n) => n + 1);
-      setSaveState(persist ? 'saving' : 'shared');
-      setError('');
-    },
-  });
   // Also rewrite recovered drafts and synchronous automation loads. Preserve concurrent edits.
   useEffect(() => {
     let current = true;
@@ -103,9 +91,8 @@ export function useProject() {
   return {
     project,
     revision,
-    loading: link.loading,
+    loading: false,
     hasDraft: hasWork.current,
-    link,
     error,
     setError,
     saveState,

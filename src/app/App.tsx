@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from 're
 import { AppHeader } from './AppHeader';
 import { useProject } from '../features/editor/hooks/useProject';
 import { EditorPanel } from '../features/editor/components/EditorPanel';
-import { ShareButton } from '../features/sharing/ShareButton';
+import { FileControls } from '../features/sharing/FileControls';
 import { usePlayback } from '../features/playback/hooks/usePlayback';
 import { PlaybackControls } from '../features/playback/components/PlaybackControls';
 import { PlaybackSpeedControl } from '../features/playback/components/PlaybackSpeedControl';
@@ -21,8 +21,6 @@ import { RecordingControls } from '../features/recording/components/RecordingCon
 import { TooltipIconButton } from '../components/ui/TooltipIconButton';
 import { ControlIcon } from '../components/icons/ControlIcon';
 import { ConversationOverview } from '../features/conversation/components/ConversationOverview';
-import { LinkRecovery } from '../features/sharing/LinkRecovery';
-import { ReplaceDraftDialog } from '../features/sharing/ReplaceDraftDialog';
 export function App() {
   const t = useT();
 
@@ -67,7 +65,6 @@ export function App() {
   });
   const ensureAvailable = () => {
     if (recorder.busy) throw new Error(t('app.recordingLocked'));
-    if (editor.link.blocked) throw new Error(t('link.resolveFirst'));
   };
   const run = (project: typeof editor.project, automatic: boolean) => {
     ensureAvailable();
@@ -77,7 +74,7 @@ export function App() {
   useAutomationAPI({
     project: () => editor.project,
     state: () => ({
-      ready: !editor.link.blocked,
+      ready: true,
       running: playback.running,
       status: playback.status,
       activeStep: playback.activeStep,
@@ -112,13 +109,6 @@ export function App() {
     selectStep(null);
   }, [editor.revision, playback.stop]);
   useEffect(() => {
-    if (editor.link.blocked) {
-      playback.stop();
-      setFocusMode(false);
-      if (recorder.busy) recorder.cancel();
-    }
-  }, [editor.link.blocked, playback.stop]);
-  useEffect(() => {
     const key = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setFocusMode(false);
     };
@@ -149,16 +139,30 @@ export function App() {
       }
     >
       <AppHeader disabled={recorder.busy} saveState={editor.saveState}>
-        <ShareButton
-          project={editor.project}
-          disabled={hasErrors || editor.link.blocked || recorder.busy}
-          onError={editor.setError}
+        <FileControls
+          project={{
+            ...editor.project,
+            document: {
+              metadata: editor.project.document?.metadata ?? {
+                id: 'experience',
+                title: editor.project.contact.name,
+                contentLocale: 'en-US',
+              },
+              customer: editor.project.document?.customer ?? { type: 'customer', name: 'Customer' },
+              ...editor.project.document,
+              playback: { userPace: playback.speed },
+            },
+          }}
+          disabled={recorder.busy || playback.running}
+          onImport={(project) => {
+            selectStep(null);
+            playback.reset();
+            playback.setSpeed(project.document?.playback.userPace ?? 1);
+            editor.replace(project);
+          }}
         />
       </AppHeader>
-      {(editor.link.error || editor.link.loading) && (
-        <LinkRecovery link={editor.link} hasDraft={editor.hasDraft} />
-      )}
-      <main className="workspace" hidden={!!(editor.link.error || editor.link.loading)}>
+      <main className="workspace">
         <EditorPanel
           saveState={editor.saveState}
           disabled={recorder.busy}
@@ -297,15 +301,6 @@ export function App() {
           )}
         </section>
       </main>
-      {editor.link.pending && (
-        <ReplaceDraftDialog
-          key={editor.link.pending.hash}
-          current={editor.project}
-          incoming={editor.link.pending.project}
-          onCancel={editor.link.dismiss}
-          onConfirm={editor.link.confirm}
-        />
-      )}
       <Dialog
         open={restoreOpen}
         onOpenChange={setRestoreOpen}
