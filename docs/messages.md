@@ -1,0 +1,72 @@
+# Mensagens da empresa
+
+## Formatos implementados
+
+| Formato            | Editor                                               | Prévia                              |
+| ------------------ | ---------------------------------------------------- | ----------------------------------- |
+| Texto              | Texto da mensagem                                    | Balão comum                         |
+| Botões de resposta | Até 3 títulos, cabeçalho e rodapé opcionais          | Botões abaixo do texto              |
+| Lista              | Seções, títulos e descrições; até 10 opções no total | Convite que abre a lista no celular |
+| Flow               | Definição JSON e respostas automáticas               | Formulário com navegação            |
+
+Uma mensagem interativa espera uma resposta antes de liberar a próxima etapa. Essa seleção gera um balão do cliente. No modo automático, a opção configurada é utilizada; quando não há configuração, é escolhida a primeira opção. O roteiro é linear, sem ramificações por resposta.
+
+O simulador usa cabeçalho de texto e rodapé de até 60 caracteres e corpo de até 1024 caracteres nas mensagens interativas. Vídeo, áudio, documentos, catálogo, carrosséis e botões de URL ficam para futuras contribuições.
+
+## Composição e responsabilidades
+
+| Componente / módulo                        | Responsabilidade                                                |
+| ------------------------------------------ | --------------------------------------------------------------- |
+| `MessageFrame`                             | Balão, horário e slots de conteúdo e ações                      |
+| `MessageBubble`                            | Composição do conteúdo com os metadados da mensagem             |
+| `MessageAction`                            | Aparência e comportamento nativo de uma ação                    |
+| `ReplyButtons`                             | Conjunto de respostas rápidas                                   |
+| `ListInvitation`                           | Botão que abre a lista                                          |
+| `PhoneSheet`                               | Sobreposição dentro do celular, foco e teclado com Radix UI     |
+| `ListPicker`                               | Seções, opções e confirmação da lista                           |
+| `BusinessMessageActions`                   | Seleção do renderizador de ações por formato                    |
+| `BusinessMessageEditor`                    | Formato, texto e metadados opcionais                            |
+| `MessageOptionEditor`                      | Campo de título e descrição reutilizado em botões e listas      |
+| `ReplyButtonsEditor` / `ListMessageEditor` | Configuração específica de cada formato                         |
+| `useMessageInteraction`                    | Espera, seleção e cancelamento de uma resposta                  |
+| `animateMessage`                           | Cursor automático sobre os mesmos callbacks da interação manual |
+| `core/interactive.ts`                      | Valores iniciais, opções e validação sem React                  |
+
+## Adicionar um formato
+
+1. Adicione uma variante à união `BusinessInteractive`, em `core/types.ts`, com campos próprios. Preserve `interactive` como opcional: sua ausência representa o texto simples dos projetos antigos.
+2. Defina valores iniciais e validação em `core/interactive.ts`. Dados vindos do link também passam pela validação; não dependa apenas dos limites dos campos HTML.
+3. Crie um editor específico e componha-o em `BusinessMessageEditor`.
+4. Crie a prévia utilizando os slots de `MessageFrame` e a ação básica `MessageAction`. Conecte o renderizador em `BusinessMessageActions`.
+5. Se houver resposta, reutilize a espera de `useMessageInteraction` e acrescente a interação em `animateMessage`.
+6. Teste limites, persistência no link, interação manual, modo automático e cancelamento.
+
+Nenhum novo formato deve quebrar a leitura de projetos sem o campo opcional. As fixtures antigas continuam congeladas e cobertas por testes.
+
+## Referências oficiais
+
+Consulta realizada em 29/10/2026. As páginas atuais da Meta retornaram HTTP 429 nesta consulta; os campos básicos também foram conferidos no site oficial do SDK da Meta, que está arquivado. As referências são a base dos formatos implementados, sem pretensão de reproduzir toda a Cloud API.
+
+- [Mensagens com botões de resposta — Meta](https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/interactive-reply-buttons-messages)
+- [Mensagens de lista — Meta](https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/interactive-list-messages)
+- [Ações e limites de botões — SDK oficial](https://whatsapp.github.io/WhatsApp-Nodejs-SDK/api-reference/types/ActionObject/)
+- [Títulos e identificadores dos botões — SDK oficial](https://whatsapp.github.io/WhatsApp-Nodejs-SDK/api-reference/types/ButtonObject/)
+- [Títulos e descrições das opções — SDK oficial](https://whatsapp.github.io/WhatsApp-Nodejs-SDK/api-reference/types/RowObject/)
+
+## Ordem das opções no editor
+
+Arraste a alça de seis pontos no canto superior direito de um botão ou item de lista para trocar sua posição. As opções de lista são reordenadas dentro da própria seção. Também é possível focar a alça e pressionar Espaço, usar as setas e pressionar Espaço novamente para confirmar; Escape cancela.
+
+`SortableOptions` concentra os sensores, anúncios acessíveis e ordenação com dnd-kit. `MessageOptionEditor` recebe a alça por composição. A alteração preserva identificadores, descrições e a resposta automática escolhida; somente a ordem do array muda. Prévia, reprodução e links compartilhados usam essa mesma ordem, sem mudança no formato dos links.
+
+## Formatação do corpo da mensagem
+
+`FormattedMessageText` renderiza `*negrito*`, `_itálico_` e `~tachado~` usando elementos semânticos `strong`, `em` e `s`. A interpretação fica em `core/message-formatting.ts`, sem React, e permite combinações como `*_texto_*`. O componente é reutilizado pelo balão de cliente, empresa e convite de Flow, tanto na simulação quanto na prévia de edição. A gravação captura o resultado já renderizado.
+
+O texto persistido não é convertido para HTML e não requer nova versão de projeto ou link. A renderização não usa innerHTML: tags digitadas são texto. Pares incompletos, marcadores encostados em espaços e nomes como `nome_do_campo` ficam literais. Quebras de linha são preservadas.
+
+Esta implementação cobre esses três estilos de mensagem; não é um interpretador Markdown genérico. Cabeçalhos, rótulos de botões, opções de lista e o JSON interno do Flow continuam usando suas regras próprias.
+
+[Referência oficial de formatação do WhatsApp](https://faq.whatsapp.com/539178204879377/)
+
+Os indicadores de entrega usam o mesmo SVG de dois sinais: cinza para entregue, azul para visualizada. Na simulação, as mensagens do cliente passam a visualizadas quando a empresa responde. O estado é temporário, exposto em receipt no histórico, e não altera o formato do projeto salvo.
