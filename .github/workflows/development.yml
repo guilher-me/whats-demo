@@ -1,0 +1,14 @@
+name: Development
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  publish:
+    uses: ./.github/workflows/publish-pages.yml
+    with:
+      environment: development
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
