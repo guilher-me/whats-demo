@@ -32,7 +32,7 @@ export function AppHeader({ children, disabled }: { children: ReactNode; disable
         <AgentGuideLink />
         <a
           className="privacy-link agent-guide-link"
-          href="https://github.com/guiIher-me/whats-demo"
+          href="https://github.com/guilher-me/whats-demo"
           target="_blank"
           rel="noopener noreferrer"
           aria-label={t('app.githubLink')}
