@@ -5,6 +5,7 @@ import { LanguageSwitcher } from '../i18n/LanguageSwitcher';
 import { PrivacyNotice } from '../features/privacy/PrivacyNotice';
 import { AgentGuideLink } from '../features/automation/AgentGuideLink';
 import { ControlIcon } from '../components/icons/ControlIcon';
+import { version } from '../../package.json';
 export function AppHeader({ children, disabled }: { children: ReactNode; disabled?: boolean }) {
   const t = useT();
 
@@ -15,9 +16,12 @@ export function AppHeader({ children, disabled }: { children: ReactNode; disable
           <img src={brandIcon} alt="" width="42" height="42" />
         </span>
         <div>
-          <h1>
-            Whats<span>Demo</span>
-          </h1>
+          <div className="brand-title">
+            <h1>
+              Whats<span>Demo</span>
+            </h1>
+            <span className="app-version">v{version}</span>
+          </div>
           <div className="brand-meta">
             <p>{t('app.tagline')}</p>
           </div>
