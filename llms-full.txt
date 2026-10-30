@@ -40,7 +40,7 @@ If your tool cannot execute the browser API, use the page's accessible roles and
 
 - Use the `AI interaction guide (llms.txt)` link in the header to discover these instructions. The language selector is named `Interface language`.
 - Scope editing to the `Conversation editor` region, then to the `Step N` article. Use `Edit step N` to expand it before interacting with fields. Only one step is expanded at a time; collapsed fields stay mounted to preserve drafts, but must not be edited while hidden. Multiple steps have identically labeled fields, so do not select globally by position.
-- Message format is a native radio group (`Plain text`, `Reply buttons`, `Options list`). Open `Behavior` to change response delays and the typing indicator. Flows separate `Form structure` (advanced JSON) from `Automatic answers`. Custom selects expose the `combobox` role and support keyboard navigation.
+- Message format is a native radio group (`Plain text`, `Buttons`, `Options list`). Open `Behavior` to change response delays and the typing indicator. Flows separate `Form structure` (advanced JSON) from `Automatic answers`. Custom selects expose the `combobox` role and support keyboard navigation.
 - Add steps through the `Add conversation steps` group (`Customer`, `Business`, `Flow`). Re-read the tree after adding, removing or reordering steps; indices and available controls can change.
 - Open the `Step actions` menu to move, duplicate or remove a step; removal is a destructive-styled menu item. `Option N actions` contains option removal. `Reorder step N` and the option drag handles support Space to pick up, arrow keys to move, Space to drop and Escape to cancel. Use accessible names and keyboard instructions rather than screen coordinates. Escape closes menus and returns focus to the trigger.
 - Scope preview actions to `Conversation preview`. `Start manually` waits for input; use the `Message` textbox and `Send message` button, or choose the currently visible interactive option. `Play automatically` uses configured answers. These actions run the simulation only.
@@ -251,3 +251,7 @@ A gravação de vídeo é iniciada pelos controles da interface. Enquanto está 
 ## Formatação do texto
 
 O campo `text` das etapas aceita `*negrito*`, `_itálico_` e `~tachado~`, inclusive combinados, por exemplo `*_texto_*`. Envie e preserve os marcadores no JSON; o aplicativo os interpreta apenas na apresentação do corpo da mensagem. Não envie HTML para obter estilos. Rótulos de botões e definições de campos do Flow não passam por esse interpretador.
+
+## Typed message buttons
+
+For `interactive.kind: "buttons"`, set optional `context` to `"interactive"` (default) or `"template"`. Each button has `id`, `title` and optional `type`: `"quick_reply"` (default), `"url"` with `url`, `"phone_number"` with `phoneNumber`, `"copy_code"` with `code`, or `"voice_call"` with optional integer `ttlMinutes`. See [message rules](messages.md#button-types-and-contexts) before combining types. In mixed templates, `autoReplyId` must target a quick reply; action-only messages may target an action. Action buttons open a phone-contained simulation, not an external site/call/clipboard operation. UI selects are labeled `Message context` and `Button type`; URL, phone, code and TTL fields appear for the chosen type. More than three template buttons use `See all options`.
