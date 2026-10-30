@@ -1,29 +1,46 @@
-# Contribuindo
+# Contributing to WhatsDemo
 
-Contribuições para interface, novos componentes de Flows, acessibilidade e documentação são bem-vindas. Descreva o problema e o comportamento esperado em uma issue ou pull request; inclua uma sequência pequena para reproduzir alterações no motor.
+[← Project overview](README.md) · [Install & run](docs/getting-started.md) · [Architecture](docs/architecture.md)
 
-## Preparação
+Contributions to the editor, message components, Flows, accessibility, translations and documentation are welcome. Start with a specific problem and the behavior you want to improve. For a substantial change, open an issue to discuss the scope before implementing it.
 
-Use Node.js 22.12+, 24 ou 26+ e execute `npm ci`, seguido de `npm run dev`. A implementação está em `src/`; o HTML de `dist/` é gerado e não deve ser editado nem versionado.
+## Set up the project
 
-## Componentes
+Follow the [requirements and installation guide](docs/getting-started.md), then run:
 
-Use os tokens semânticos de `src/styles/tokens.css` para cores de interface. A [paleta e seus usos](docs/design.md) documentam fundos, superfícies, textos e estados; o visual da conversa simulada tem cores próprias.
+```sh
+npm ci
+npm run dev
+```
 
-- Coloque elementos genéricos em `src/components/ui`. Reutilize os componentes existentes antes de criar variações.
-- Coloque comportamentos de uma funcionalidade em `src/features/<funcionalidade>`, com componentes e hooks próximos uns dos outros.
-- Mantenha regras do motor e o formato persistido em `src/core`, sem dependência de React ou do DOM.
-- Componentes recebem dados e callbacks por props. Hooks coordenam estado e efeitos; a busca no DOM fica restrita ao cursor de reprodução.
-- Use tipos nas fronteiras, nomes acessíveis, botões nativos e os tokens de `src/styles/tokens.css`.
-- Evite misturar uma funcionalidade com uma reorganização ampla de arquivos.
+Edit files in `src/`. The HTML in `dist/` is generated; do not edit or commit it. The build must continue to produce a single portable HTML file for people who do not use development tools.
 
-Para adicionar um campo de Flow, atualize a validação em `core/engine.ts`, o renderizador em `features/flows/components/FlowField.tsx` e o preenchimento automático em `features/playback/hooks/usePlayback.ts`. Inclua testes de validação, navegação e reprodução quando o comportamento mudar.
+## Keep components focused
 
-## Links salvos
+- Put reusable UI primitives in `src/components/ui` and shared SVG icons in `src/components/icons`.
+- Keep feature-specific components and hooks together under `src/features/<feature>`.
+- Keep the persisted model and engine rules in `src/core`, independent of React. Isolate browser-specific image decoding and rewriting in `core/images`.
+- Pass data and callbacks through props. Hooks coordinate state and effects; avoid coupling generic components to the editor's global state.
+- Use semantic tokens from `src/styles/tokens.css`, native controls where appropriate, accessible names, keyboard interaction and linked error messages.
+- Keep a functional change separate from unrelated file reorganizations.
 
-Não altere o significado dos prefixos `v1z` e `v1j`. Preserve as fixtures antigas e seus testes. Uma alteração incompatível deve criar uma nova versão, com migração explícita. Consulte [a arquitetura](docs/architecture.md).
+The [architecture](docs/architecture.md), [design reference](docs/design.md) and [accessibility reference](docs/accessibility.md) explain the existing patterns. These reference guides are currently in Brazilian Portuguese; English documentation improvements are welcome.
 
-## Antes de abrir uma pull request
+To add a Flow field, update validation in `core/engine.ts`, rendering in `features/flows/components/FlowField.tsx` and automatic filling in `features/playback/hooks/usePlayback.ts`. Cover meaningful validation, navigation and playback behavior. For business message extensions, see [message components](docs/messages.md).
+
+## Preserve saved links and automation
+
+Do not change the meaning of the `v1z` and `v1j` link prefixes or reuse existing fields for incompatible behavior. Keep the legacy fixtures and compatibility tests. An incompatible schema change needs an explicit new version and migration.
+
+The public browser API uses `window.whatsappFakeFlows` with `apiVersion: 1`. Preserve that contract, including synchronous methods. Update [automation documentation](docs/automation.md) and the `llms.txt` index when tool-facing behavior changes.
+
+Untrusted photos must pass through the shared validation and rewriting pipeline before rendering or sharing. Do not add a raw `img.src` bypass. Read the [image security policy](docs/IMAGE-SECURITY.md) before changing that boundary.
+
+## Translate interface text
+
+Use `useT()` and semantic keys from `src/i18n/locales/`. Add each new interface string in **English**, **Spanish** and **Brazilian Portuguese**. Do not automatically translate user-authored messages or Flow JSON. See the [localization reference](docs/localization.md).
+
+## Validate your change
 
 ```sh
 npm run format
@@ -32,8 +49,14 @@ npm test
 npm run build
 ```
 
-Confira a interação manual, a reprodução automática e a abertura direta do HTML gerado. Descreva o que mudou, como foi validado e eventuais limitações. Para mudanças visuais, inclua uma captura; use dados fictícios.
+Run checks appropriate to the change. Exercise manual playback, automatic playback and the generated portable HTML when their behavior is affected. Include small fictional journeys for engine or playback regressions. For documentation-only changes, check formatting, links and referenced media; add no tests that merely duplicate prose.
 
-## Traduções da interface
+## Open a pull request
 
-Componentes reutilizáveis usam `useT()` e chaves semânticas dos catálogos em `src/i18n/locales/`. Novos textos precisam de versões em inglês, espanhol e português do Brasil. Veja [a estratégia de localização](docs/localization.md); mensagens e JSONs criados pelo usuário não devem ser traduzidos automaticamente.
+Explain the problem, the resulting behavior and how you validated it. Mention material limitations. Include before/after screenshots for visual changes and use fictional data throughout. Keep component changes concise enough for another contributor to extend them.
+
+Documentation media lives in `docs/media/`. Capture the actual application, keep files reasonably small and describe how to reproduce the captured scenario. Do not change production behavior just to produce a screenshot.
+
+## License
+
+WhatsDemo is released under the [MIT license](LICENSE), © 2026 Guilherme Cardoso. Preserve dependency notices and record sources and licenses when adding third-party assets.

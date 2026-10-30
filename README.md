@@ -1,138 +1,105 @@
 # WhatsDemo
 
-O exemplo padrão é a **Luma Home**, uma loja fictícia de iluminação com identidade própria. A jornada curta em inglês demonstra botões de resposta, catálogo em lista, um Flow de duas telas para escolher produto e informar contato, e confirmação de solicitação. As respostas automáticas usam dados fictícios. Rascunhos existentes e links compartilhados são preservados; use **Restore example / Restaurar exemplo** para carregar a nova demonstração.
+<p align="center">
+  <img src="assets/whatsdemo-logo.svg" alt="WhatsDemo" width="320" />
+</p>
 
-O link **Privacidade**, no cabeçalho, explica o armazenamento local, como limpar os dados e o conteúdo dos links compartilhados. O aviso é informativo, está disponível nos três idiomas e não altera os dados salvos ao abrir ou fechar.
+<p align="center"><strong>Build the conversation. Show the experience.</strong><br />Create interactive WhatsApp demos before building the real integration.</p>
 
-Interface em inglês (padrão), espanhol e português do Brasil, com seletor de bandeiras no cabeçalho e preferência salva no navegador. As mensagens e Flows mantêm o idioma em que foram criados. Para contribuir com traduções e componentes, consulte [localização](docs/localization.md).
+<p align="center">
+  <a href="https://github.com/guilher-me/whats-demo/actions/workflows/ci.yml"><img src="https://github.com/guilher-me/whats-demo/actions/workflows/ci.yml/badge.svg" alt="CI build and tests" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-00816b" alt="License: MIT" /></a>
+  <a href="package.json"><img src="https://img.shields.io/github/package-json/v/guilher-me/whats-demo?color=123f3b" alt="Project version" /></a>
+  <a href="docs/getting-started.md"><img src="https://img.shields.io/badge/backend-not%20required-00816b" alt="No backend required" /></a>
+  <a href="docs/user-guide.md#interface-languages"><img src="https://img.shields.io/badge/languages-EN%20%7C%20ES%20%7C%20PT--BR-123f3b" alt="Interface languages: English, Spanish and Brazilian Portuguese" /></a>
+</p>
 
-Editor de conversas e WhatsApp Flows para demonstrações, protótipos e gravações. Monte a sequência à esquerda e experimente a conversa no celular à direita, manualmente ou com preenchimento automático e cursor animado.
+<p align="center">
+  <a href="#see-it-in-action">See it in action</a> ·
+  <a href="docs/getting-started.md">Install & run</a> ·
+  <a href="docs/user-guide.md">User guide</a> ·
+  <a href="docs/ai-guide.md">Build with an LLM</a> ·
+  <a href="CONTRIBUTING.md">Contribute</a> ·
+  <a href="LICENSE">License</a>
+</p>
 
-- Mensagens do usuário, mensagens da empresa e convites para Flows.
-- Enviar a primeira mensagem pelo celular inicia o modo manual automaticamente. O texto digitado substitui somente a etapa inicial do cliente; se a jornada começar pela empresa, a mensagem é acrescentada antes dela. A configuração original permanece intacta. Durante a reprodução automática, o campo e o botão de envio ficam desabilitados.
-- Editor com etapas recolhíveis, resumo de conteúdo, reordenação por mouse/teclado, menus de ações e seleção visual de formato. Comportamento, estrutura do Flow e respostas automáticas ficam em seções próprias.
-- Textos, atrasos, indicador de digitação, nome, foto e selo configuráveis.
-- Ritmo do usuário simulado de 0,5× a 3×, salvo no navegador: tartaruga para mais tempo de leitura e cliques, lebre para interações rápidas. Ajusta somente leitura, digitação e ações do cursor. Delays de resposta da empresa, loading, transições do sistema e modo manual mantêm seus tempos.
-- Em Flows, a leitura ocorre campo a campo: rótulo e opções são lidos antes de preencher cada campo, seguindo a ordem da tela. O botão de avançar/enviar é lido por último. Durante a leitura, o cursor permanece parado. Ele se desloca uma única vez até o próximo campo ou botão, com aceleração e desaceleração suaves, sem pontos intermediários ou correções aleatórias. Helpers, subtítulos e metadados são ignorados; a preferência por movimento reduzido é respeitada.
-- Flows em JSON, navegação entre telas e respostas automáticas.
-- Links que carregam a experiência no fragmento da URL, sem banco de dados.
-- Fotos com validação em camadas usando `file-type` e `image-dimensions`, limites antes da decodificação e recriação em PNG. A proteção vale também para links e automação; veja [segurança de imagens](docs/IMAGE-SECURITY.md).
-- Build portátil em um único HTML, com JavaScript, CSS e imagem padrão incorporados.
+## Make the experience tangible before you build it
 
-Simulação independente: não envia mensagens nem publica Flows na Meta. O interpretador implementa um subconjunto dos componentes de Flows; componentes não suportados exibem um erro na prévia.
+You have an idea for a WhatsApp customer journey. Explaining it with slides loses the interaction. Building a real integration just to demonstrate it takes engineering work. Previewing a form alone leaves out the conversation around it.
 
-## Desenvolvimento
+**WhatsDemo gives you a place to build and demonstrate the whole sequence:** customer messages, business replies, buttons, lists and WhatsApp Flows in a familiar phone preview. Configure the journey on the left, then let someone try it or play it automatically on the right.
 
-Requer Node.js 22.12+, 24 ou 26+ e npm.
+Use it for sales demos, product reviews, workshops, usability discussions and training. No WhatsApp account setup, backend or database is required to run a demo.
+
+![WhatsDemo editor and phone preview showing an interactive retail conversation](docs/media/workbench.png)
+
+## See it in action
+
+Meet **Luma Home**, the fictional lighting store included with the app. A customer explores a collection, picks a lamp from a list, completes a two-screen Flow and receives a request confirmation.
+
+![Animated walkthrough of the Luma Home demo: messages, reply buttons, an options list and a WhatsApp Flow](docs/media/luma-home-demo.gif)
+
+The example uses fictional customer details. Replace its messages, business identity and forms with your own scenario.
+
+## From an idea to a demo people can try
+
+1. **Build the journey.** Add customer messages, business replies or Flows. Edit text, choices, delays and automatic answers.
+2. **Try the conversation.** Send a message to start manual playback, or use automatic playback with an animated cursor.
+3. **Share the experience.** Copy a link from a hosted installation, record a phone-only video, or hand a teammate the portable HTML app.
+
+| What you need to show                           | What WhatsDemo provides                                                                                                |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| A conversation that feels like messaging        | Editable customer and business messages, typing indicators, delivery/read receipts and WhatsApp-style text formatting. |
+| More than plain text                            | Reply buttons, sectioned lists and interactive WhatsApp Flow forms.                                                    |
+| A branded scenario                              | Contact name, uploaded profile photo and an optional blue verified badge.                                              |
+| A live walkthrough or a repeatable presentation | Manual interaction and automatic playback, with adjustable simulated-user pace.                                        |
+| Something stakeholders can take away            | Experience links, phone-only MP4/WebM recording where supported, and a single-file HTML build.                         |
+| Help creating journeys with AI tools            | Accessible UI controls, an `llms.txt` guide and a versioned browser automation API.                                    |
+
+![A WhatsApp Flow in the phone preview, with product choices and form fields](docs/media/flow-preview.png)
+
+## Get started
+
+**Use a portable copy.** Ask a teammate to share the generated `whatsapp-fake-flows.html` file. Open it in a modern desktop browser; you do not need to install Node.js. Start with the built-in example and follow the [user guide](docs/user-guide.md).
+
+**Run it locally.** With a supported Node.js version and npm installed:
 
 ```sh
+git clone https://github.com/guilher-me/whats-demo.git
+cd whats-demo
 npm ci
 npm run dev
 ```
 
-Abra o endereço exibido no terminal, normalmente `http://127.0.0.1:5173`. O servidor recompila ao salvar os arquivos; atualize a página para carregar as mudanças.
-
-## Entregar para pessoas não técnicas
+To generate the portable app:
 
 ```sh
 npm run build
 ```
 
-Distribua `dist/whatsapp-fake-flows.html`. A pessoa abre o arquivo no navegador sem instalar Node.js e sem servidor. Recursos principais e fotos incorporadas funcionam offline. Fotos externas não são aceitas; envie um PNG, JPEG ou WebP pelo editor para incorporá-lo com validação e recriação local.
+The result is `dist/whatsapp-fake-flows.html`. See [requirements, installation and distribution](docs/getting-started.md) for details.
 
-O botão **Copiar link** inclui o projeto na URL. Em uma instalação hospedada, qualquer pessoa com acesso ao endereço pode abrir a experiência. Um link `file://` depende de o HTML estar disponível no mesmo caminho; para compartilhar entre computadores, envie o HTML ou hospede o build em um endereço estável. O conteúdo dos links pode ser lido por quem os recebe; use dados fictícios nas demonstrações.
+## Your demo stays in your browser
 
-## Comandos
+Edits are saved locally in the current browser. **Copy Link** encodes the journey in the URL fragment, including the contact photo; there is no project database. Anyone with the complete link can read its content, so use fictional data.
 
-| Comando                | Função                                    |
-| ---------------------- | ----------------------------------------- |
-| `npm run dev`          | Servidor local e recompilação             |
-| `npm run build`        | Tipos e geração do HTML único             |
-| `npm test`             | Testes do motor, links, interface e build |
-| `npm run typecheck`    | Verificação de tipos                      |
-| `npm run format`       | Formatação com Prettier                   |
-| `npm run format:check` | Verificação de formatação                 |
+A shared link needs a reachable copy of the app. Links from a hosted installation can be opened by people who can access that address. A `file://` link depends on the recipient having the HTML at the same path; distribute the HTML or host the build when sharing between computers. [Read the sharing guide](docs/user-guide.md#share-a-demo).
 
-## Organização
+WhatsDemo is an independent simulator. It does not send real WhatsApp messages or publish Flows to Meta. Conversation steps run in sequence; button and list choices do not create branching journeys. The Flow renderer supports a subset of Meta's components. See [scope and limitations](docs/user-guide.md#scope-and-limitations).
 
-Interface em React e TypeScript, diálogos com Radix UI e build com esbuild. O motor e o formato dos projetos não dependem de React.
+## Explore the project
 
-```text
-src/
-  app/                 composição da aplicação
-  components/
-    ui/                botões, campos, checkbox e diálogo
-    icons/             SVGs compartilhados
-  core/                tipos, validação, expressões, codec e exemplo
-  features/
-    editor/            perfil e sequência
-    conversation/      celular, mensagens e campo de envio
-    flows/             sessões, campos e navegação
-    playback/          reprodução e cursor automático
-    sharing/           geração e cópia do link
-  styles/              tokens e estilos por área
-scripts/               desenvolvimento, build e comandos
-tests/                 testes e fixtures de compatibilidade
-```
+| Guide                                       | What you will find                                                                                        |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| [Install & run](docs/getting-started.md)    | Requirements, local development, portable builds and hosting.                                             |
+| [User guide](docs/user-guide.md)            | Messages, Flows, manual/automatic playback, sharing and recording.                                        |
+| [Build with an LLM](docs/ai-guide.md)       | Give an AI tool the right context and let it help construct a journey.                                    |
+| [Automation API](docs/automation.md)        | The browser API contract, validation rules and complete examples.                                         |
+| [Contributing](CONTRIBUTING.md)             | Setup, component conventions, compatibility and validation.                                               |
+| [Image security](docs/IMAGE-SECURITY.md)    | Validation, image rewriting, limits and fallback behavior.                                                |
+| [Developer reference](docs/architecture.md) | Architecture and extension points; some developer reference guides are currently in Brazilian Portuguese. |
+| [MIT license](LICENSE)                      | License terms for the project.                                                                            |
 
-Consulte [a arquitetura](docs/architecture.md) e [o guia de contribuição](CONTRIBUTING.md). Os projetos continuam na versão 1 e os links anteriores `v1z` e `v1j` permanecem suportados.
+Have an idea or found a problem? [Open an issue](https://github.com/guilher-me/whats-demo/issues). Contributions to components, accessibility, translations and documentation are welcome.
 
-## Licença
-
-MIT © 2026 Guilherme Cardoso. Veja [LICENSE](LICENSE). O HTML inclui os avisos de licença das dependências incorporadas. As marcas e imagens demonstrativas pertencem aos respectivos titulares.
-
-## Mensagens com botões e listas
-
-Adicione uma mensagem da **Empresa** e escolha o **Formato da mensagem**:
-
-- **Texto simples**: mantém a mensagem tradicional.
-- **Botões de resposta**: de 1 a 3 botões, com até 20 caracteres por título.
-- **Lista de opções**: até 10 opções distribuídas em seções, com título e descrição.
-
-Configure cabeçalho, rodapé e a resposta usada no modo automático nas opções adicionais da mensagem. No modo manual, clique no botão ou abra a lista, selecione uma opção e confirme. A seleção aparece como resposta do cliente e libera a próxima etapa. O roteiro continua sendo linear: as respostas não criam ramificações entre etapas.
-
-Os componentes visuais usam composição: `MessageFrame` recebe conteúdo e ações; `MessageAction` é reutilizado em botões de resposta e convites para listas. Veja [como estender as mensagens](docs/messages.md).
-
-## Integração com ferramentas de IA
-
-O projeto inclui `llms.txt` e uma API pública em `window.whatsappFakeFlows` para consultar, validar e carregar jornadas, gerar links e executar a prévia. Veja [o contrato e os exemplos](docs/automation.md).
-
-`npm run build` também gera `dist/llms.txt`, o alias `dist/llm.txt`, `dist/llms-full.txt` e a documentação referenciada. Publique a pasta `dist/` para disponibilizá-los por URL. O HTML único continua independente: as instruções completas ficam embutidas nele e podem ser lidas por `getInstructions()` ou pelo elemento `#llms-txt`.
-
-O arquivo de instruções não conecta um LLM automaticamente. A ferramenta precisa conseguir ler a página e, para utilizar a API, executar JavaScript nela.
-
-## Prévia durante a edição
-
-Clique em uma etapa ou foque um de seus campos para acompanhar a mensagem no celular enquanto edita. Texto, botões, listas e convites de Flow usam os mesmos componentes da conversa. Você pode experimentar as opções e abrir o formulário nessa prévia.
-
-Use **Ver conversa** para exibir todas as mensagens configuradas, na ordem, em uma visão estática e rolável do celular. Isso não inicia a reprodução, não espera os delays nem exige preencher formulários. O histórico de uma simulação anterior é preservado separadamente. Selecione uma etapa para voltar à edição ou use os controles de reprodução para executar a jornada.
-
-A visão inclui as respostas automáticas do usuário após cada Flow, com os títulos das opções escolhidas e a mensagem de conclusão configurada. Ela segue o caminho dos valores em `answers` e omite campos ocultos. Respostas automáticas de botões e listas também aparecem após suas mensagens.
-
-## Controles e acessibilidade
-
-Os dois controles com ícones ficam à direita do celular: interação manual e reprodução automática. Durante a reprodução, passam a parar e reiniciar. Os tooltips funcionam por mouse e foco de teclado e podem ser fechados com Esc.
-
-A interface usa nomes acessíveis, regiões, labels de campos e mensagens de erro vinculadas. Veja [os recursos de acessibilidade e suas verificações](docs/accessibility.md).
-
-## Gravar vídeo
-
-Use o botão **Gravar celular** na lateral da prévia. Escolha o modo manual ou automático, aguarde os 3 segundos e acompanhe o contador. No modo manual, finalize pelo botão; no automático, o vídeo termina 2 segundos após a última mensagem.
-
-O resultado pode ser assistido e baixado como MP4 quando suportado, ou WebM. Apenas o celular é gravado, sem áudio, editor ou controles, em 720 × 1280. Tudo acontece localmente, com as bibliotecas incluídas no HTML único. Mantenha a aba visível durante a gravação.
-
-Veja [como funciona a gravação e seus limites](docs/recording.md).
-
-## Formatação das mensagens
-
-Os corpos das mensagens de cliente, empresa e convites de Flow aceitam a sintaxe do WhatsApp:
-
-- `*texto*` para **negrito**.
-- `_texto_` para _itálico_.
-- `~texto~` para tachado.
-
-Os estilos podem ser combinados, por exemplo `*_negrito e itálico_*`. A prévia, a reprodução e os vídeos usam a mesma renderização. Os marcadores ficam preservados no editor, no projeto e no link compartilhado. Textos sem fechamento válido permanecem literais; HTML não é interpretado.
-
-## Adicionar etapas
-
-A área **Adicionar à conversa** permanece no rodapé do editor enquanto a lista rola. Novas etapas entram no final; o campo de texto recebe foco e o editor rola suavemente até a etapa quando necessário. A preferência de movimento reduzido do sistema é respeitada.
+MIT © 2026 **Guilherme Cardoso**. Third-party notices are included in the generated HTML. Demonstration assets and their sources are documented in [assets/README.md](assets/README.md).
