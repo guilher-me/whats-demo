@@ -64,7 +64,7 @@ You can also select **Start manually**. Later customer steps wait for a reply; b
 
 Select **Play automatically** to run the configured journey with an animated cursor and automatic form answers. The simulated-user pace control runs from 0.5× to 3×: it adjusts reading, typing and clicks, while preserving configured business delays and system transitions. Flows are read and filled field by field.
 
-The composer is disabled during automatic playback. Stop playback to take over. After it finishes, sending a message can start a new manual conversation. Controls beside the phone let you stop and reset the preview; resetting playback does not delete the configured journey.
+The composer is disabled during automatic playback. Use the pause button to suspend the journey; it becomes Resume and continues from the same point. After it finishes, sending a message can start a new manual conversation. Controls beside the phone let you pause, resume and reset the preview; resetting playback does not delete the configured journey.
 
 ## Share a demo
 

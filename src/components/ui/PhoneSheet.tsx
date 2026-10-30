@@ -20,13 +20,17 @@ export function PhoneSheet({
   return (
     <Dialog.Root
       open
+      modal={false}
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
     >
       <Dialog.Portal container={container}>
         <Dialog.Overlay className="phone-sheet-overlay" />
-        <Dialog.Content className="phone-sheet">
+        <Dialog.Content
+          className="phone-sheet"
+          onInteractOutside={(event) => event.preventDefault()}
+        >
           <header>
             <Dialog.Title>{title}</Dialog.Title>
             <Dialog.Close asChild>

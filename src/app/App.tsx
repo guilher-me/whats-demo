@@ -238,9 +238,11 @@ export function App() {
                 locked={recorder.busy}
                 disabled={hasErrors || editor.loading || !editor.project.steps.length}
                 running={playback.running}
+                paused={playback.paused}
                 onManual={() => void run(editor.project, false)}
                 onAuto={() => void run(editor.project, true)}
-                onStop={playback.stop}
+                onPause={playback.pause}
+                onResume={playback.resume}
                 onReset={() => {
                   selectStep(null);
                   playback.reset();
@@ -249,7 +251,7 @@ export function App() {
               <PlaybackSpeedControl
                 speed={playback.speed}
                 onChange={playback.setSpeed}
-                disabled={recorder.busy}
+                disabled={recorder.busy || playback.paused}
               />
               <RecordingControls
                 controller={recorder}

@@ -1,6 +1,6 @@
 # Acessibilidade e controles
 
-Os controles de reprodução ficam em um grupo de dois botões na lateral direita do celular. Em repouso: **Iniciar manual** e **Reproduzir automaticamente**. Durante uma execução: **Parar reprodução** e **Reiniciar prévia**. O modo de gravação oculta os controles.
+Os controles de reprodução ficam em um grupo de dois botões na lateral direita do celular. Em repouso: **Iniciar manual** e **Reproduzir automaticamente**. Durante uma execução: **Pausar reprodução** (alterna para **Continuar reprodução** durante a pausa) e **Reiniciar prévia**. A pausa mantém o estado da jornada, dos campos e dos tempos restantes. O modo de gravação oculta os controles.
 
 - Botões são elementos nativos, com nomes acessíveis via `aria-label` e relação `aria-controls` com o celular. Tab e Shift+Tab navegam entre eles; Enter e Espaço ativam as ações.
 - Tooltips aparecem por hover ou foco, usam `role="tooltip"` e `aria-describedby` e fecham com Esc sem tirar o foco do botão. O componente reutilizável é `TooltipIconButton`.
