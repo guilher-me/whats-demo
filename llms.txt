@@ -20,3 +20,6 @@ The visible `llms.txt` link in the app header opens this guide on hosted sites. 
 - [Architecture](docs/architecture.md): State, Flow engine, persistence and compatibility rules.
 
 The single HTML embeds this index and the automation guide in `script#llms-txt` (type text/plain), also returned by `window.whatsappFakeFlows.getInstructions()`. A link with rel=describedby identifies the instructions. Standalone users do not need the sidecar text files.
+
+
+JSON files now replace experience links. Use **Import JSON** and **Export JSON** in the header. See [file format](docs/file-format.md) for the versioned contract. Automation tools use getDocument() and loadDocument(document); createShareURL is removed.

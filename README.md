@@ -105,3 +105,5 @@ WhatsDemo is an independent simulator. It does not send real WhatsApp messages o
 Have an idea or found a problem? [Open an issue](https://github.com/guilher-me/whats-demo/issues). Contributions to components, accessibility, translations and documentation are welcome.
 
 MIT © 2026 **Guilherme Cardoso**. Third-party notices are included in the generated HTML. Demonstration assets and their sources are documented in [assets/README.md](assets/README.md).
+
+JSON files now replace experience links. Use **Import JSON** and **Export JSON** in the header. See [file format](docs/file-format.md) for the versioned contract. Automation tools use getDocument() and loadDocument(document); createShareURL is removed.
