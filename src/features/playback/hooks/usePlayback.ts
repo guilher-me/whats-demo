@@ -92,8 +92,8 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     ]);
     return message;
   };
-  const interaction = useMessageInteraction((id, option) => {
-    append(option.title, 'user');
+  const interaction = useMessageInteraction((id, option, isResponse) => {
+    if (isResponse) append(option.title, 'user');
     setMessages((current) =>
       current.map((message) =>
         message.id === id ? { ...message, selection: option.id } : message,

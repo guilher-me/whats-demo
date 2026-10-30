@@ -58,6 +58,15 @@ export interface MessageStep {
 export interface MessageOption extends Option {
   description?: string;
 }
+export type MessageButtonType = 'quick_reply' | 'url' | 'phone_number' | 'copy_code' | 'voice_call';
+export interface MessageButton extends MessageOption {
+  /** Omitted in existing v1 links: quick reply. */
+  type?: MessageButtonType;
+  url?: string;
+  phoneNumber?: string;
+  code?: string;
+  ttlMinutes?: number;
+}
 export interface ListSection {
   title: string;
   rows: MessageOption[];
@@ -69,7 +78,8 @@ interface InteractiveBase {
 }
 export interface ReplyButtonsMessage extends InteractiveBase {
   kind: 'buttons';
-  buttons: MessageOption[];
+  context?: 'interactive' | 'template';
+  buttons: MessageButton[];
 }
 export interface ListMessage extends InteractiveBase {
   kind: 'list';

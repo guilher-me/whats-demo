@@ -407,3 +407,42 @@
   opacity: 1;
   color: #008069;
 }
+
+.message-button-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+.message-button-content svg {
+  flex: 0 0 18px;
+}
+.message-button-content span {
+  overflow-wrap: anywhere;
+}
+.button-sheet-options {
+  overflow-y: auto;
+}
+.button-action-preview {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 24px 20px;
+  overflow-y: auto;
+}
+.button-action-preview > svg {
+  width: 28px;
+  height: 28px;
+  color: #008069;
+}
+.button-action-preview p {
+  margin: 0;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  white-space: pre-wrap;
+}
+.button-action-preview small {
+  color: #667781;
+  line-height: 1.5;
+  text-align: center;
+}

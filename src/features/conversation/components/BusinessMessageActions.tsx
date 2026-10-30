@@ -32,6 +32,7 @@ export function BusinessMessageActions({
     return (
       <ReplyButtons
         options={value.buttons}
+        groupId={message.id}
         selected={message.selection}
         disabled={disabled}
         onSelect={(id) => onReply(message.id, id)}

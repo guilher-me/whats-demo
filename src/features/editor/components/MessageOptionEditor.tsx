@@ -11,6 +11,9 @@ export function MessageOptionEditor({
   dragHandle,
   onChange,
   onRemove,
+  titleLimit,
+  titleDisabled = false,
+  children,
 }: {
   option: MessageOption;
   index: number;
@@ -19,6 +22,9 @@ export function MessageOptionEditor({
   dragHandle: ReactNode;
   onChange: (option: MessageOption) => void;
   onRemove: () => void;
+  titleLimit?: number;
+  titleDisabled?: boolean;
+  children?: ReactNode;
 }) {
   const t = useT();
 
@@ -30,7 +36,8 @@ export function MessageOptionEditor({
           <TextField
             label={description ? t('editor.optionTitle') : t('editor.buttonText')}
             value={option.title}
-            maxLength={description ? 24 : 20}
+            maxLength={titleLimit ?? (description ? 24 : 20)}
+            disabled={titleDisabled}
             onChange={(e) => onChange({ ...option, title: e.target.value })}
           />
         </div>
@@ -50,6 +57,7 @@ export function MessageOptionEditor({
           {dragHandle}
         </div>
       </div>
+      {children}
       {description && (
         <details className="option-details">
           <summary>

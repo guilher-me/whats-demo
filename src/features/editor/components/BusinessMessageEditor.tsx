@@ -1,3 +1,4 @@
+import { buttonLabel, isReplyButton } from '../../../core/message-buttons';
 import { useT } from '../../../i18n';
 import type { BusinessInteractive, MessageStep } from '../../../core/types';
 import { createInteractive, businessMessageError, messageOptions } from '../../../core/interactive';
@@ -20,7 +21,14 @@ export function BusinessMessageEditor({
   const value = step.interactive;
   const error = businessMessageError(step);
   const update = (next: BusinessInteractive) => {
-    if (next.autoReplyId && !messageOptions(next).some((o) => o.id === next.autoReplyId))
+    if (
+      next.autoReplyId &&
+      !messageOptions(next).some(
+        (o) =>
+          o.id === next.autoReplyId &&
+          (next.kind !== 'buttons' || !next.buttons.some(isReplyButton) || isReplyButton(o)),
+      )
+    )
       next = { ...next, autoReplyId: undefined };
     onChange({ interactive: next });
   };
@@ -66,10 +74,17 @@ export function BusinessMessageEditor({
               onValueChange={(autoReplyId) => update({ ...value, autoReplyId })}
               options={[
                 { value: '', label: t('editor.firstOption') },
-                ...messageOptions(value).map((option) => ({
-                  value: option.id,
-                  label: option.title || t('common.untitled'),
-                })),
+                ...messageOptions(value)
+                  .filter(
+                    (option) =>
+                      value.kind !== 'buttons' ||
+                      !value.buttons.some(isReplyButton) ||
+                      isReplyButton(option),
+                  )
+                  .map((option) => ({
+                    value: option.id,
+                    label: buttonLabel(option) || t('common.untitled'),
+                  })),
               ]}
             />
           </FormSection>
