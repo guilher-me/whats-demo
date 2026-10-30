@@ -74,7 +74,8 @@ label select {
 .app-header {
   height: 88px;
   padding: 0 32px;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--line);
@@ -153,6 +154,13 @@ label select {
   display: flex;
   align-items: center;
   gap: 8px;
+  justify-self: end;
+}
+.header-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
 }
 .share-button {
   display: inline-flex;
@@ -394,10 +402,15 @@ h3 {
     padding-bottom: 30px;
   }
   .app-header {
+    grid-template-columns: minmax(0, 1fr) auto;
     height: auto;
     min-height: 88px;
     flex-wrap: wrap;
     padding: 16px 20px;
+  }
+  .header-links {
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
   .header-actions {
     flex-wrap: wrap;

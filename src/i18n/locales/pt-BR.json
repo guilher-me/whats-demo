@@ -304,5 +304,7 @@
   "privacy.deleteBody": "Use as configurações de privacidade ou armazenamento do navegador para limpar os dados salvos desta página. Isso remove o rascunho local e a preferência de idioma. Restaurar o exemplo substitui a jornada; não limpa todos os dados salvos. Arquivos baixados e links copiados anteriormente não são apagados.",
   "privacy.connectionsTitle": "Cookies e conexões",
   "privacy.connectionsBody": "O WhatsDemo não define cookies nem inclui publicidade, analytics ou rastreadores. O aplicativo não envia jornadas a um backend; gerar um link e gravar um vídeo acontece no seu navegador. Quando hospedado na web, o provedor de hospedagem pode processar registros de acesso conforme a própria política de privacidade.",
-  "automation.guideLink": "Guia de interação para IAs (llms.txt)"
+  "automation.guideLink": "Guia de interação para IAs (llms.txt)",
+  "app.navigation": "Navegação principal",
+  "app.githubLink": "Repositório no GitHub (abre em nova guia)"
 }

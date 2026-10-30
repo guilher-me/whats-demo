@@ -4,6 +4,7 @@ import brandIcon from '../../assets/whatsdemo-icon.svg';
 import { LanguageSwitcher } from '../i18n/LanguageSwitcher';
 import { PrivacyNotice } from '../features/privacy/PrivacyNotice';
 import { AgentGuideLink } from '../features/automation/AgentGuideLink';
+import { ControlIcon } from '../components/icons/ControlIcon';
 export function AppHeader({ children, disabled }: { children: ReactNode; disabled?: boolean }) {
   const t = useT();
 
@@ -19,11 +20,23 @@ export function AppHeader({ children, disabled }: { children: ReactNode; disable
           </h1>
           <div className="brand-meta">
             <p>{t('app.tagline')}</p>
-            <PrivacyNotice disabled={disabled} />
-            <AgentGuideLink />
           </div>
         </div>
       </div>
+      <nav className="header-links" aria-label={t('app.navigation')}>
+        <PrivacyNotice disabled={disabled} />
+        <AgentGuideLink />
+        <a
+          className="privacy-link agent-guide-link"
+          href="https://github.com/guiIher-me/whats-demo"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={t('app.githubLink')}
+        >
+          GitHub
+          <ControlIcon name="external" width="12" height="12" />
+        </a>
+      </nav>
       <div className="header-actions">
         <LanguageSwitcher disabled={disabled} />
         {children}
