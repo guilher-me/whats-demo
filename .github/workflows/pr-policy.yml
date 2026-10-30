@@ -1,0 +1,22 @@
+name: PR policy
+on:
+  pull_request_target:
+    branches: [development, main]
+    types: [opened, synchronize, reopened, edited]
+permissions:
+  contents: read
+jobs:
+  route:
+    name: PR branch policy
+    runs-on: ubuntu-latest
+    steps:
+      # This privileged event ONLY runs the base branch's policy against event metadata.
+      # Never checkout the PR head, install its dependencies or execute its code here.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/pr-policy.cjs

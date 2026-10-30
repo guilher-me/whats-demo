@@ -2,15 +2,16 @@ import { t } from '../../../i18n';
 import { useCallback, useEffect, useState, useRef } from 'react';
 import type { Project, Step } from '../../../core/types';
 import { createDefaultProject } from '../../../core/defaults';
-import { clone, createStep, normalizeProject, STORAGE_KEY, uid } from '../../../core/project';
+import { clone, createStep, normalizeProject, projectStorageKey, uid } from '../../../core/project';
 import { decode } from '../../../core/codec';
 import { prepareProjectImages } from '../../../core/images/sanitize';
 export type SaveState = 'example' | 'recovered' | 'saving' | 'saved' | 'failed' | 'shared';
 export function useProject() {
   const edited = useRef(false);
+  const [storageKey] = useState(() => projectStorageKey(window.location));
   const [initial] = useState<{ project: Project; state: SaveState }>(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(storageKey);
       if (raw)
         return {
           project: normalizeProject(JSON.parse(raw), { allowDrafts: true }),
@@ -77,7 +78,7 @@ export function useProject() {
   useEffect(() => {
     if (!edited.current) return;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
+      localStorage.setItem(storageKey, JSON.stringify(project));
       setSaveState('saved');
     } catch {
       setSaveState('failed');

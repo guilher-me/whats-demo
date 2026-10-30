@@ -3,6 +3,12 @@ import { validateProject } from './engine';
 import { isAllowedAvatar } from './images/policy';
 import type { Project, Step } from './types';
 export const STORAGE_KEY = 'whatsapp-fake-flows-v1';
+export function projectStorageKey(url: { protocol: string; pathname: string }): string {
+  const development =
+    /^https?:$/.test(url.protocol) &&
+    /\/development(?:\/(?:index\.html|whatsapp-fake-flows\.html)?)?$/.test(url.pathname);
+  return development ? `${STORAGE_KEY}:development` : STORAGE_KEY;
+}
 export const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 export const uid = () =>
   `step-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;

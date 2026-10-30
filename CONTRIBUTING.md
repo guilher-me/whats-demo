@@ -6,6 +6,8 @@ Contributions to the editor, message components, Flows, accessibility, translati
 
 ## Set up the project
 
+Create feature/fix branches from `development` and open PRs into `development`. Promote releases through a PR from `development` into `main`; do not target production directly from a feature branch. See [the branch and deployment workflow](docs/deployment.md) for CI, manual development deployment and repository protection settings.
+
 Follow the [requirements and installation guide](docs/getting-started.md), then run:
 
 ```sh

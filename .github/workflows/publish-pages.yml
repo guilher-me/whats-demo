@@ -1,0 +1,113 @@
+name: Publish Pages environment
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  build:
+    name: Build ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      sha: ${{ steps.source.outputs.sha }}
+    steps:
+      - name: Validate deployment request
+        env:
+          TARGET: ${{ inputs.environment }}
+        run: |
+          test "$GITHUB_REF" = refs/heads/main || { echo 'Run deployment workflows from main.'; exit 1; }
+          case "$TARGET" in production|development) ;; *) exit 1 ;; esac
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.environment == 'production' && 'main' || 'development' }}
+          persist-credentials: false
+      - name: Record source revision
+        id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site-${{ inputs.environment }}
+          path: dist/
+          if-no-files-found: error
+
+  persist:
+    name: Save ${{ inputs.environment }} build
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write
+    concurrency:
+      group: pages-state-${{ inputs.environment }}
+      cancel-in-progress: false
+    outputs:
+      published: ${{ steps.persist.outputs.published }}
+    steps:
+      # Run publishing tools from the reviewed workflow revision, never from a downloaded build.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: site-${{ inputs.environment }}
+          path: downloaded-site
+      - name: Persist environment snapshot
+        id: persist
+        run: node scripts/pages.cjs publish downloaded-site
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
+          SOURCE_REVISION: ${{ needs.build.outputs.sha }}
+
+  deploy:
+    name: Deploy combined Pages site
+    runs-on: ubuntu-latest
+    needs: persist
+    if: needs.persist.outputs.published == 'true'
+    # Pending jobs may be superseded by GitHub. Every surviving job reads BOTH latest snapshots.
+    concurrency:
+      group: github-pages-site
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}${{ inputs.environment == 'development' && 'development/' || '' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Compose production and development
+        run: node scripts/pages.cjs compose combined-site
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: combined-site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

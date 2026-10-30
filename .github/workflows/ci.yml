@@ -1,9 +1,14 @@
 name: CI
-on: [push, pull_request]
+on:
+  push:
+    branches: [main, development]
+  pull_request:
+    branches: [main, development]
 permissions:
   contents: read
 jobs:
   validate:
+    name: Validate project
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
