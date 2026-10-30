@@ -8,11 +8,13 @@
   font-size: 25px;
   line-height: 1.2;
 }
-.section-heading h2 {
-  color: var(--brand-demo);
-}
-.preview-heading h2 {
+.section-heading h2,
+.preview-heading p {
   color: var(--brand-whats);
+}
+.preview-heading h2,
+.section-heading p {
+  color: var(--brand-demo);
 }
 .eyebrow {
   letter-spacing: 0.12em;
