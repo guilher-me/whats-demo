@@ -93,8 +93,6 @@ export function EditorPanel(props: Props) {
             />
           )}
         </SortableSteps>
-        <p className="editor-hint">{t('editor.noNames')}</p>
-        {location.protocol === 'file:' && <p className="editor-hint">{t('editor.localLink')}</p>}
         <FieldError>{props.error}</FieldError>
       </div>
       <footer className="editor-footer">
