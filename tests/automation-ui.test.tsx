@@ -40,9 +40,9 @@ it('carrega e reproduz o exemplo completo da documentação sem cliques', async 
   expect(output.result.running).toBe(false);
   expect(output.result.status).toBe('Conversa concluída.');
   expect(document.querySelector('.messages')).toHaveTextContent('Seu protocolo de exemplo');
-  expect(output.shareURL).toContain('#project=v1');
+  expect(output.shareURL).toContain('whatsdemo');
   expect(api.getProject().steps).toHaveLength(4);
-  expect(JSON.parse(localStorage.getItem('whatsapp-fake-flows-v1')!)).toEqual(api.getProject());
+  expect(JSON.parse(localStorage.getItem('whatsdemo-document-alpha1')!)).toEqual(api.getProject());
 });
 it('atualiza o editor imediatamente, limpa a prévia e remove a API ao desmontar', async () => {
   render(<App />);

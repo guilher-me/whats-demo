@@ -108,3 +108,5 @@ Changing the interface language does not translate your message text or Flow JSO
 - Browser support affects video recording and image processing. The app reports unsupported operations instead of requiring a backend.
 
 For problems, [open an issue](https://github.com/guilher-me/whats-demo/issues) with a small fictional journey and steps to reproduce it.
+
+JSON files now replace experience links. Use **Import JSON** and **Export JSON** in the header. See [file format](file-format.md) for the versioned contract. Automation tools use getDocument() and loadDocument(document); createShareURL is removed.

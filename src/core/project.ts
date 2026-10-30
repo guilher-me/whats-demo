@@ -2,7 +2,7 @@ import { t } from '../i18n';
 import { validateProject } from './engine';
 import { isAllowedAvatar } from './images/policy';
 import type { Project, Step } from './types';
-export const STORAGE_KEY = 'whatsapp-fake-flows-v1';
+export const STORAGE_KEY = 'whatsdemo-document-alpha1';
 export function projectStorageKey(url: { protocol: string; pathname: string }): string {
   const development =
     /^https?:$/.test(url.protocol) &&

@@ -4,6 +4,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { useProject } from '../src/features/editor/hooks/useProject';
 import { normalizeProject, STORAGE_KEY } from '../src/core/project';
 import { encode } from '../src/core/codec';
+import { createDefaultProject } from '../src/core/defaults';
 import legacy from './fixtures/v1-project.json';
 beforeEach(() => {
   localStorage.clear();
@@ -14,16 +15,11 @@ afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
 });
-it('loads a hostile shared photo without rejecting the conversation', async () => {
-  const project = normalizeProject(legacy);
-  project.contact.avatar = 'data:image/svg+xml,' + encodeURIComponent('<svg onload="alert(1)"/>');
-  history.replaceState(null, '', '/#project=' + (await encode(project)));
+it('ignores old shared URL data entirely', async () => {
+  history.replaceState(null, '', '/#project=invalid');
   const { result } = renderHook(useProject);
   await act(async () => {});
-  expect(result.current.loading).toBe(false);
-  expect(result.current.project.contact.avatar).toBe('');
-  expect(result.current.project.steps).toEqual(project.steps);
-  expect(result.current.error).toBe('');
+  expect(result.current.project).toEqual(createDefaultProject());
 });
 it('removes unsupported photos from saved drafts while preserving their messages', async () => {
   const project = normalizeProject(legacy);

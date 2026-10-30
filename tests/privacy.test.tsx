@@ -22,7 +22,7 @@ it('opens the privacy notice without changing stored data and restores keyboard 
   await user.click(trigger);
   const dialog = screen.getByRole('dialog', { name: 'Privacidade no WhatsDemo' });
   expect(dialog).toHaveTextContent('localStorage');
-  expect(dialog).toHaveTextContent('Codificação e compressão não são criptografia.');
+  expect(dialog).toHaveTextContent('Os arquivos não são criptografados.');
   expect(dialog).toHaveTextContent('configurações de privacidade ou armazenamento');
   expect(localStorage.getItem(STORAGE_KEY)).toBe(before);
   await user.keyboard('{Escape}');

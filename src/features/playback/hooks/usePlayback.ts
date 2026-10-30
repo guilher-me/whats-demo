@@ -312,8 +312,15 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
           await received.promise;
           await clock.current?.checkpoint();
         } else {
-          setTyping(step.typing !== false);
-          await sleep(step.delay * 1000, signal);
+          if (step.typingMs !== undefined) {
+            setTyping(false);
+            await sleep(step.delay * 1000, signal);
+            setTyping(step.typing !== false);
+            await sleep(step.typingMs, signal);
+          } else {
+            setTyping(step.typing !== false);
+            await sleep(step.delay * 1000, signal);
+          }
           setTyping(false);
           // Cursor targets must exist before the next animation; commit this message synchronously.
           let messageId = '';

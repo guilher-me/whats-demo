@@ -53,6 +53,8 @@ export interface MessageStep {
   text: string;
   delay: number;
   typing?: boolean;
+  typingMs?: number;
+  resourceId?: string;
   interactive?: BusinessInteractive;
 }
 export interface MessageOption extends Option {
@@ -93,6 +95,8 @@ export interface FlowStep {
   text: string;
   delay: number;
   typing?: boolean;
+  typingMs?: number;
+  resourceId?: string;
   label: string;
   completion?: string;
   flow: FlowDefinition;
@@ -100,6 +104,13 @@ export interface FlowStep {
 }
 export type Step = MessageStep | FlowStep;
 export interface Project {
+  document?: {
+    metadata: { id: string; title: string; contentLocale: string };
+    customer: Record<string, unknown>;
+    playback: { userPace: number };
+    extensions?: Record<string, unknown>;
+    resources?: Record<string, any>;
+  };
   version: 1;
   contact: Contact;
   steps: Step[];
