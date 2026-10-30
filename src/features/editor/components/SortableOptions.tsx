@@ -44,7 +44,7 @@ function SortableOption({
     <div
       ref={setNodeRef}
       className={`sortable-option${isDragging ? ' is-dragging' : ''}`}
-      style={{ transform: CSS.Transform.toString(transform), transition }}
+      style={{ transform: CSS.Translate.toString(transform), transition }}
     >
       {children(
         <button
