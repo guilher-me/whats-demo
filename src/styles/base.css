@@ -117,10 +117,22 @@ label select {
   gap: 8px;
 }
 .language-switcher {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
+  padding-inline-end: 18px;
+  margin-inline-end: 10px;
+}
+.language-switcher::after {
+  content: '';
+  position: absolute;
+  inset-inline-end: 0;
+  top: 7px;
+  bottom: 7px;
+  width: 1px;
+  background: var(--line);
 }
 .language-switcher button {
   display: grid;
