@@ -22,6 +22,9 @@ The visible `llms.txt` link in the app header opens this guide on hosted sites. 
 The single HTML embeds this index and the automation guide in `script#llms-txt` (type text/plain), also returned by `window.whatsappFakeFlows.getInstructions()`. A link with rel=describedby identifies the instructions. Standalone users do not need the sidecar text files.
 
 
+JSON files now replace experience links. Use **Import JSON** and **Export JSON** in the header. See [file format](docs/file-format.md) for the versioned contract. Automation tools use getDocument() and loadDocument(document); createShareURL is removed.
+
+
 # Automation API v1
 
 WhatsApp Fake Flows exposes `window.whatsappFakeFlows` to tools allowed to execute JavaScript in the current page. This is a browser API, not an HTTP endpoint or MCP server. A tool restricted to read-only JavaScript must use its normal UI controls for mutations.
@@ -51,20 +54,21 @@ Prefer semantic roles and labels over CSS selectors or generated IDs. Do not byp
 
 ## API methods
 
-| Member                   | Contract                                                                                                                              |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `apiVersion`             | Public browser API version, currently 1                                                                                               |
-| `projectVersion`         | Persisted JSON version, currently 1                                                                                                   |
-| `getInstructions()`      | Embedded index and this guide as text                                                                                                 |
-| `getProject()`           | Independent copy of the current project, including local drafts                                                                       |
-| `getExample()`           | Independent copy of the Luma Home showcase (buttons, product list and two-screen Flow)                                                |
-| `getState()`             | Independent snapshot of readiness, playback status and rendered messages                                                              |
-| `validateProject(input)` | Returns `{valid:true, project}` or `{valid:false, errors:string[]}` without editing anything                                          |
-| `loadProject(input)`     | Validates and replaces the entire journey, stops playback, clears the preview and saves locally; returns the normalized project       |
-| `createShareURL(input?)` | Promise of a URL carrying the supplied valid project, or the current project if omitted; does not change the address bar or clipboard |
-| `play(mode?)`            | Promise of the final playback state; `automatic` by default, or `manual`                                                              |
-| `stop()`                 | Cancels playback and pending delays; keeps messages already rendered                                                                  |
-| `reset()`                | Stops playback and clears the preview; preserves the configured project                                                               |
+| Member                   | Contract                                                                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `apiVersion`             | Public browser API version, currently 1                                                                                         |
+| `projectVersion`         | Persisted JSON version, currently 1                                                                                             |
+| `getInstructions()`      | Embedded index and this guide as text                                                                                           |
+| `getProject()`           | Independent copy of the current project, including local drafts                                                                 |
+| `getExample()`           | Independent copy of the Luma Home showcase (buttons, product list and two-screen Flow)                                          |
+| `getState()`             | Independent snapshot of readiness, playback status and rendered messages                                                        |
+| `validateProject(input)` | Returns `{valid:true, project}` or `{valid:false, errors:string[]}` without editing anything                                    |
+| `loadProject(input)`     | Validates and replaces the entire journey, stops playback, clears the preview and saves locally; returns the normalized project |
+| `getDocument()`          | Returns the portable WhatsDemo JSON document                                                                                    |
+| `loadDocument(input)`    | Validates and loads a document; only call with user authorization to replace work                                               |
+| `play(mode?)`            | Promise of the final playback state; `automatic` by default, or `manual`                                                        |
+| `stop()`                 | Cancels playback and pending delays; keeps messages already rendered                                                            |
+| `reset()`                | Stops playback and clears the preview; preserves the configured project                                                         |
 
 `loadProject` rejects invalid input before changing the editor. It is synchronous: after returning, `getProject` reflects the applied journey. Methods throw Error on invalid operations; asynchronous methods reject. `play` rejects while a run is already active, while the initial experience is loading, or when editor fields need correction. Playback errors are reported in the resulting status snapshot.
 
@@ -94,7 +98,7 @@ Messages include `id`, `direction` (`user` or `business`), `text` and `time`; in
 4. Call `validateProject`. Correct reported errors before calling `loadProject`.
 5. Call `loadProject` to update the visible editor. It also stops any previous run.
 6. Optionally run `play('automatic')` and inspect its final state.
-7. Return the result of `createShareURL()` when asked for a link. A file URL only works where that HTML path exists; a stable hosted base URL is needed for cross-computer links.
+7. Return JSON from getDocument() when asked for an experience file. Do not construct share URLs.
 
 ## Project contract
 
@@ -235,7 +239,7 @@ const validation = api.validateProject(journey);
 if (!validation.valid) throw new Error(validation.errors.join('\n'));
 api.loadProject(validation.project);
 const result = await api.play('automatic');
-const shareURL = await api.createShareURL();
+const shareURL = JSON.stringify(api.getDocument());
 ```
 
 ## Compatibility and contribution
@@ -255,3 +259,5 @@ O campo `text` das etapas aceita `*negrito*`, `_itálico_` e `~tachado~`, inclus
 ## Typed message buttons
 
 For `interactive.kind: "buttons"`, set optional `context` to `"interactive"` (default) or `"template"`. Each button has `id`, `title` and optional `type`: `"quick_reply"` (default), `"url"` with `url`, `"phone_number"` with `phoneNumber`, `"copy_code"` with `code`, or `"voice_call"` with optional integer `ttlMinutes`. See [message rules](messages.md#button-types-and-contexts) before combining types. In mixed templates, `autoReplyId` must target a quick reply; action-only messages may target an action. Action buttons open a phone-contained simulation, not an external site/call/clipboard operation. UI selects are labeled `Message context` and `Button type`; URL, phone, code and TTL fields appear for the chosen type. More than three template buttons use `See all options`.
+
+JSON files now replace experience links. Use **Import JSON** and **Export JSON** in the header. See [file format](file-format.md) for the versioned contract. Automation tools use getDocument() and loadDocument(document); createShareURL is removed.
