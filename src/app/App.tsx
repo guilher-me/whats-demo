@@ -225,9 +225,18 @@ export function App() {
                 <div className="preview-navigation">
                   <TooltipIconButton
                     label={t('app.viewConversation')}
-                    description={t('app.draft')}
+                    description={t('app.viewConversationHint')}
                     aria-controls="phone-preview"
-                    onClick={() => setSelectedId(null)}
+                    disabled={
+                      recorder.busy ||
+                      (!playback.messages.length &&
+                        (hasErrors || editor.loading || !editor.project.steps.length))
+                    }
+                    onClick={() => {
+                      // Mount the actual composer before manual playback installs/focuses its input.
+                      flushSync(() => setSelectedId(null));
+                      if (!playback.messages.length) void run(editor.project, false);
+                    }}
                   >
                     <ControlIcon name="message" />
                   </TooltipIconButton>

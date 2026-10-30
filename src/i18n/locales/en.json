@@ -10,6 +10,7 @@
   "app.draft": "Message editing preview",
   "app.editing": "Editing step",
   "app.viewConversation": "View conversation",
+  "app.viewConversationHint": "Return to the conversation. Starts manual playback if there is no history yet.",
   "app.local": "Local simulation · no messages sent to WhatsApp",
   "app.exit": "Exit view · Esc",
   "app.restoreTitle": "Restore example?",

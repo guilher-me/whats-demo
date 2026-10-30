@@ -61,6 +61,37 @@ it('mostra uma nova etapa e reflete textos e botões em tempo real', async () =>
   );
   expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(0);
 });
+it('Ver conversa inicia a jornada manual sem histórico e permite responder imediatamente', async () => {
+  await start([
+    { id: 'user', type: 'user', text: 'oi', delay: 0 },
+    { id: 'reply', type: 'business', text: 'Atendimento iniciado', delay: 0 },
+  ]);
+  fireEvent.click(screen.getByRole('article', { name: 'Etapa 1' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Ver conversa' }));
+  expect(
+    screen.queryByLabelText('Prévia da mensagem em edição', { selector: '.draft-chat' }),
+  ).toBeNull();
+  expect(window.whatsappFakeFlows!.getState().running).toBe(true);
+  const input = screen.getByLabelText('Mensagem', { selector: 'input' });
+  expect(input).toHaveFocus();
+  fireEvent.change(input, { target: { value: 'oi' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Enviar mensagem' }));
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(1);
+  });
+  expect(document.querySelector('.messages')).toHaveTextContent('Atendimento iniciado');
+  expect(document.querySelectorAll('.bubble.user')).toHaveLength(1);
+});
+it('não abandona a edição para iniciar uma jornada inválida sem histórico', async () => {
+  const step = createStep('business');
+  if (step.type === 'flow') throw new Error('fixture');
+  step.interactive = { kind: 'buttons', buttons: [{ id: 'a', title: '' }] };
+  await start([step]);
+  fireEvent.click(screen.getByRole('article', { name: 'Etapa 1' }));
+  expect(screen.getByRole('button', { name: 'Ver conversa' })).toBeDisabled();
+  expect(window.whatsappFakeFlows!.getState().running).toBe(false);
+  expect(draft()).toBeInTheDocument();
+});
 it('permite abrir uma lista em edição sem avançar nem enviar respostas na jornada', async () => {
   const step = createStep('business');
   if (step.type === 'flow') throw new Error('fixture');
@@ -98,6 +129,7 @@ it('preserva a conversa executada, reinicia a prévia e limpa a seleção removi
   expect(draft()).toHaveTextContent('Novo texto');
   fireEvent.click(screen.getByRole('button', { name: 'Ver conversa' }));
   expect(document.querySelector('.messages')).toHaveTextContent('Mensagem original');
+  expect(window.whatsappFakeFlows!.getState().running).toBe(false);
   fireEvent.click(card);
   act(() => {
     window.whatsappFakeFlows!.reset();
