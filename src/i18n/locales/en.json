@@ -99,7 +99,7 @@
   "contact.photo": "Photo of {{v0}}",
   "contact.sizeError": "Select an image up to 2 MB.",
   "contact.readError": "Could not read the image.",
-  "sharing.copy": "Copy experience link",
+  "sharing.copy": "Copy Link",
   "sharing.generating": "Generating link…",
   "sharing.copied": "Link copied ✓",
   "sharing.title": "Experience link",

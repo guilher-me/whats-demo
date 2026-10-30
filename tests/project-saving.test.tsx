@@ -26,7 +26,7 @@ it('does not claim the untouched example is saved and separates sharing from sto
   expect(indicator()).toHaveTextContent('Exemplo · não salvo');
   expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
   expect(document.querySelector('.app-header .save-indicator')).toBeNull();
-  expect(screen.getByRole('button', { name: 'Copiar link da experiência' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Copiar link' })).toBeInTheDocument();
 });
 it('shows success only after writing and restores the saved draft on reopening', async () => {
   const project = createDefaultProject();

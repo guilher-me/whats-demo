@@ -1,5 +1,6 @@
 import type { SVGProps } from 'react';
 const paths = {
+  lock: 'M7 11V7a5 5 0 0 1 10 0v4M6 11h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2Zm6 4v3',
   play: 'm9 5 11 7-11 7V5Z',
   manual:
     'M8 12V5a2 2 0 0 1 4 0v6-1a2 2 0 0 1 4 0v1a2 2 0 0 1 4 0v5a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-3l-4-6a2 2 0 0 1 3-2l2 2',

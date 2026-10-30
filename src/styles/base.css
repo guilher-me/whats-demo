@@ -116,6 +116,15 @@ label select {
   align-items: center;
   gap: 8px;
 }
+.share-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.share-button svg {
+  flex-shrink: 0;
+}
 .language-switcher {
   position: relative;
   display: flex;

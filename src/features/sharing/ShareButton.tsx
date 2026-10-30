@@ -6,6 +6,7 @@ import { validateProject } from '../../core/engine';
 import { Button } from '../../components/ui/Button';
 import { Dialog } from '../../components/ui/Dialog';
 import { TextArea } from '../../components/ui/Field';
+import { ControlIcon } from '../../components/icons/ControlIcon';
 export function ShareButton({
   project,
   disabled,
@@ -50,7 +51,13 @@ export function ShareButton({
   };
   return (
     <>
-      <Button variant="primary" disabled={disabled || busy} onClick={() => void share()}>
+      <Button
+        variant="primary"
+        className="share-button"
+        disabled={disabled || busy}
+        onClick={() => void share()}
+      >
+        <ControlIcon name="lock" width="17" height="17" />
         {busy ? t('sharing.generating') : copied ? t('sharing.copied') : t('sharing.copy')}
       </Button>
       <Dialog
