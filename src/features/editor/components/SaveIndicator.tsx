@@ -18,7 +18,7 @@ const help: Record<SaveState, MessageKey> = {
   failed: 'storage.failureHelp',
   shared: 'storage.sharedHelp',
 };
-/** Informational status beside the edited content; sharing remains a separate action. */
+/** Project-wide persistence status beneath the app name; sharing remains a separate action. */
 export function SaveIndicator({ state }: { state: SaveState }) {
   const t = useT();
   const id = useId();

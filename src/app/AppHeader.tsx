@@ -6,7 +6,17 @@ import { PrivacyNotice } from '../features/privacy/PrivacyNotice';
 import { AgentGuideLink } from '../features/automation/AgentGuideLink';
 import { ControlIcon } from '../components/icons/ControlIcon';
 import { version } from '../../package.json';
-export function AppHeader({ children, disabled }: { children: ReactNode; disabled?: boolean }) {
+import { SaveIndicator } from '../features/editor/components/SaveIndicator';
+import type { SaveState } from '../features/editor/hooks/useProject';
+export function AppHeader({
+  children,
+  disabled,
+  saveState,
+}: {
+  children: ReactNode;
+  disabled?: boolean;
+  saveState: SaveState;
+}) {
   const t = useT();
 
   return (
@@ -23,7 +33,7 @@ export function AppHeader({ children, disabled }: { children: ReactNode; disable
             <span className="app-version">v{version}</span>
           </div>
           <div className="brand-meta">
-            <p>{t('app.tagline')}</p>
+            <SaveIndicator state={saveState} />
           </div>
         </div>
       </div>

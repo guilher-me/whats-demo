@@ -128,7 +128,7 @@ export function App() {
           .join(' ') || undefined
       }
     >
-      <AppHeader disabled={recorder.busy}>
+      <AppHeader disabled={recorder.busy} saveState={editor.saveState}>
         <ShareButton
           project={editor.project}
           disabled={hasErrors || editor.loading || recorder.busy}

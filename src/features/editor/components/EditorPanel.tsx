@@ -8,7 +8,6 @@ import { AddStepButtons } from './AddStepButtons';
 import { Button } from '../../../components/ui/Button';
 import { FieldError } from '../../../components/ui/Field';
 import type { StepAction } from './StepActions';
-import { SaveIndicator } from './SaveIndicator';
 import type { SaveState } from '../hooks/useProject';
 import { SortableSteps } from './SortableSteps';
 interface Props {
@@ -64,7 +63,6 @@ export function EditorPanel(props: Props) {
         <div className="timeline-heading">
           <div className="sequence-title">
             <h3>{t('editor.sequence')}</h3>
-            <SaveIndicator state={props.saveState} />
           </div>
           <span>{t('editor.stepCount', { count: props.project.steps.length })}</span>
         </div>

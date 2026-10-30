@@ -201,43 +201,6 @@
   flex-wrap: wrap;
   gap: 6px 12px;
 }
-.save-indicator {
-  position: relative;
-  color: var(--muted);
-  font-size: 11px;
-  cursor: help;
-}
-.save-indicator:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 4px;
-  border-radius: 3px;
-}
-.save-indicator[data-state='failed'] {
-  color: var(--danger);
-}
-.save-tooltip {
-  position: absolute;
-  z-index: 40;
-  top: calc(100% + 8px);
-  left: 0;
-  width: 260px;
-  max-width: calc(100vw - 80px);
-  padding: 10px 12px;
-  border-radius: 9px;
-  background: var(--tooltip-bg);
-  color: var(--surface);
-  line-height: 1.5;
-  font-weight: 400;
-  box-shadow: 0 4px 16px #0002;
-}
-.save-tooltip::before {
-  content: '';
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  width: 100%;
-  height: 8px;
-}
 .save-warning {
   padding: 10px 12px;
   border: 1px solid var(--danger-line);

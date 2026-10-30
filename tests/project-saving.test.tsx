@@ -25,7 +25,8 @@ it('does not claim the untouched example is saved and separates sharing from sto
   expect(indicator()).toHaveAttribute('data-state', 'example');
   expect(indicator()).toHaveTextContent('Exemplo · não salvo');
   expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
-  expect(document.querySelector('.app-header .save-indicator')).toBeNull();
+  expect(document.querySelector('.app-header .brand-meta .save-indicator')).toBe(indicator());
+  expect(document.querySelector('.editor .save-indicator')).toBeNull();
   expect(screen.getByRole('button', { name: 'Copiar link' })).toBeInTheDocument();
 });
 it('shows success only after writing and restores the saved draft on reopening', async () => {
@@ -38,13 +39,15 @@ it('shows success only after writing and restores the saved draft on reopening',
   });
   expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).contact.name).toBe('Contato de teste');
   expect(indicator()).toHaveAttribute('data-state', 'saved');
-  expect(indicator()).toHaveTextContent('Salvo automaticamente');
+  expect(indicator()).toHaveTextContent('Todas as alterações salvas');
   cleanup();
   await start();
   expect(indicator()).toHaveAttribute('data-state', 'recovered');
   expect(screen.getByLabelText('Nome do contato')).toHaveValue('Contato de teste');
   fireEvent.focus(indicator());
-  expect(screen.getByRole('tooltip')).toHaveTextContent('Armazenado somente neste navegador.');
+  expect(screen.getByRole('tooltip')).toHaveTextContent(
+    'Salvo somente neste navegador, incluindo nome do contato, foto, selo de verificação e toda a conversa.',
+  );
   fireEvent.keyDown(indicator(), { key: 'Escape' });
   expect(screen.queryByRole('tooltip')).toBeNull();
 });
