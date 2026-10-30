@@ -16,9 +16,18 @@ import { useFlowSession } from '../../flows/hooks/useFlowSession';
 import { useCursor } from './useCursor';
 import { useMessageInteraction } from './useMessageInteraction';
 import { animateMessage } from '../animateMessage';
+import { usePlaybackSpeed } from './usePlaybackSpeed';
 
 export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
   useT();
+  const { speed, current: speedRef, setSpeed } = usePlaybackSpeed();
+  const automaticMode = useRef(false);
+  // Read the current preference at each animation boundary, including during a run.
+  const wait = useCallback(
+    (milliseconds: number, signal: AbortSignal) =>
+      delay(milliseconds / (automaticMode.current ? speedRef.current : 1), signal),
+    [],
+  );
 
   const [messages, setMessages] = useState<ChatMessage[]>([]),
     [typing, setTyping] = useState(false),
@@ -35,7 +44,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     [],
   );
   const flow = useFlowSession(),
-    cursor = useCursor(phone),
+    cursor = useCursor(phone, wait),
     controller = useRef<AbortController | null>(null),
     draftRef = useRef(''),
     waitingUser = useRef<(() => void) | null>(null),
@@ -82,6 +91,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
   const stop = useCallback(() => {
     controller.current?.abort();
     controller.current = null;
+    automaticMode.current = false;
     waitingUser.current = null;
     waitingFlow.current = null;
     setRunning(false);
@@ -139,7 +149,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
       return;
     }
     flow.set({ ...session, closing: true });
-    await delay(220, active.signal);
+    await wait(220, active.signal);
     if (controller.current !== active) return;
     flow.set(null);
     if (session.step.completion) append(session.step.completion, 'user');
@@ -159,7 +169,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
   const animateFlow = async (signal: AbortSignal) => {
     for (let turn = 0; flow.current.current && turn < 30; turn++) {
       const session = flow.current.current;
-      await delay(250, signal);
+      await wait(250, signal);
       const components = getComponents(session);
       for (const c of components.filter((component) => component.name)) {
         const name = c.name!,
@@ -213,7 +223,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
         signal,
       );
       await next();
-      await delay(200, signal);
+      await wait(200, signal);
     }
     if (flow.current.current) throw new Error(t('errors.cycles'));
   };
@@ -223,6 +233,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     setDraft('');
     setFlowError('');
     const active = new AbortController();
+    automaticMode.current = automatic;
     controller.current = active;
     const signal = active.signal;
     setRunning(true);
@@ -242,7 +253,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
           const received = deferred(signal);
           waitingUser.current = received.finish;
           if (automatic) {
-            await delay(step.delay * 1000, signal);
+            await wait(step.delay * 1000, signal);
             await cursor.type(
               phone.current?.querySelector<HTMLElement>('[data-composer-input]') ?? null,
               step.text,
@@ -261,7 +272,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
           await received.promise;
         } else {
           setTyping(step.typing !== false);
-          await delay(step.delay * 1000, signal);
+          await wait(step.delay * 1000, signal);
           setTyping(false);
           // Cursor targets must exist before the next animation; commit this message synchronously.
           let messageId = '';
@@ -296,7 +307,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
             waitingFlow.current = completed.finish;
             setStatus(automatic ? 'playback.openingFlow' : 'playback.openFlow');
             if (automatic) {
-              await delay(100, signal);
+              await wait(100, signal);
               const target =
                 [...(phone.current?.querySelectorAll<HTMLElement>('[data-open-step]') ?? [])].find(
                   (n) => n.dataset.openStep === step.id,
@@ -327,6 +338,9 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     }
   };
   return {
+    speed,
+    setSpeed,
+    animationSpeed: running && automaticMode.current ? speed : 1,
     messages,
     typing,
     draft,

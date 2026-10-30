@@ -138,3 +138,58 @@
   background: transparent;
   padding: 5px;
 }
+.playback-speed {
+  position: relative;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--surface);
+}
+.playback-speed > button {
+  width: 44px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.playback-speed > button:hover:not(:disabled) {
+  background: var(--surface-hover);
+}
+.speed-panel {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 0;
+  width: 245px;
+  max-width: calc(100vw - 100px);
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow-floating);
+}
+.speed-panel label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.speed-panel input[type='range'] {
+  width: 100%;
+  margin: 14px 0 8px;
+  padding: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.speed-ticks {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+.speed-panel p {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 12px 0 0;
+}

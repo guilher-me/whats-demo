@@ -7,7 +7,7 @@ export interface CursorState {
   visible: boolean;
   pressed: boolean;
 }
-export function useCursor(phone: RefObject<HTMLDivElement | null>) {
+export function useCursor(phone: RefObject<HTMLDivElement | null>, wait: typeof delay = delay) {
   const [cursor, setCursor] = useState<CursorState>({ x: 0, y: 0, visible: false, pressed: false });
   const hide = () => setCursor((c) => ({ ...c, visible: false, pressed: false }));
   const touch = async (element: HTMLElement | null, signal: AbortSignal, action?: () => void) => {
@@ -21,12 +21,12 @@ export function useCursor(phone: RefObject<HTMLDivElement | null>) {
       visible: true,
       pressed: false,
     });
-    await delay(380, signal);
+    await wait(380, signal);
     setCursor((c) => ({ ...c, pressed: true }));
-    await delay(100, signal);
+    await wait(100, signal);
     action?.();
     setCursor((c) => ({ ...c, pressed: false }));
-    await delay(300, signal);
+    await wait(300, signal);
   };
   const type = async (
     element: HTMLElement | null,
@@ -38,17 +38,17 @@ export function useCursor(phone: RefObject<HTMLDivElement | null>) {
     await touch(element, signal, () => element?.focus());
     update('');
     if (date) {
-      await delay(250, signal);
+      await wait(250, signal);
       update(text);
     } else {
       let value = '';
       for (const char of text) {
-        await delay(75, signal);
+        await wait(75, signal);
         value += char;
         update(value);
       }
     }
-    await delay(200, signal);
+    await wait(200, signal);
   };
   return { cursor, touch, type, hide };
 }

@@ -297,7 +297,7 @@
   "privacy.title": "Privacidade no WhatsDemo",
   "privacy.description": "Como sua jornada é armazenada e compartilhada.",
   "privacy.storageTitle": "Dados salvos neste navegador",
-  "privacy.storageBody": "Sua jornada — incluindo nome do contato, foto, mensagens, JSON dos Flows e respostas automáticas — e o idioma da interface ficam armazenados localmente usando localStorage. Eles permanecem neste navegador até você substituí-los ou limpar os dados salvos.",
+  "privacy.storageBody": "Sua jornada — incluindo nome do contato, foto, mensagens, JSON dos Flows e respostas automáticas — e o idioma da interface ficam armazenados localmente usando localStorage. Eles permanecem neste navegador até você substituí-los ou limpar os dados salvos. A velocidade de reprodução também é salva como preferência local do navegador.",
   "privacy.sharingTitle": "Links compartilhados contêm a jornada",
   "privacy.sharingBody": "Copiar link codifica a jornada completa no link, incluindo imagens enviadas e respostas dos Flows. Quem tiver esse link e acesso ao aplicativo pode abrir seu conteúdo. Codificação e compressão não são criptografia. Inclua apenas informações que você pretende compartilhar.",
   "privacy.deleteTitle": "Como apagar os dados salvos",
@@ -306,5 +306,7 @@
   "privacy.connectionsBody": "O WhatsDemo não define cookies nem inclui publicidade, analytics ou rastreadores. O aplicativo não envia jornadas a um backend; gerar um link e gravar um vídeo acontece no seu navegador. Quando hospedado na web, o provedor de hospedagem pode processar registros de acesso conforme a própria política de privacidade.",
   "automation.guideLink": "Guia de interação para IAs (llms.txt)",
   "app.navigation": "Navegação principal",
-  "app.githubLink": "Repositório no GitHub (abre em nova guia)"
+  "app.githubLink": "Repositório no GitHub (abre em nova guia)",
+  "playback.speed": "Velocidade da reprodução automática",
+  "playback.speedHint": "Salva neste navegador. Alterações valem para a próxima animação ou espera; o modo manual mantém os tempos originais."
 }

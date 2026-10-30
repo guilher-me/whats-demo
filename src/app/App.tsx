@@ -1,11 +1,12 @@
 import { useT } from '../i18n';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { AppHeader } from './AppHeader';
 import { useProject } from '../features/editor/hooks/useProject';
 import { EditorPanel } from '../features/editor/components/EditorPanel';
 import { ShareButton } from '../features/sharing/ShareButton';
 import { usePlayback } from '../features/playback/hooks/usePlayback';
 import { PlaybackControls } from '../features/playback/components/PlaybackControls';
+import { PlaybackSpeedControl } from '../features/playback/components/PlaybackSpeedControl';
 import { PhonePreview } from '../features/conversation/components/PhonePreview';
 import { Button } from '../components/ui/Button';
 import { Dialog } from '../components/ui/Dialog';
@@ -197,7 +198,10 @@ export function App() {
                 ? t('app.draft')
                 : playback.status}
           </p>
-          <div className="phone-stage">
+          <div
+            className="phone-stage"
+            style={{ '--playback-speed': playback.animationSpeed } as CSSProperties}
+          >
             {showOverview ? (
               <ConversationOverview project={editor.project} phoneRef={phoneRef} />
             ) : selectedStep ? (
@@ -228,6 +232,11 @@ export function App() {
                   selectStep(null);
                   playback.reset();
                 }}
+              />
+              <PlaybackSpeedControl
+                speed={playback.speed}
+                onChange={playback.setSpeed}
+                disabled={recorder.busy}
               />
               <RecordingControls
                 controller={recorder}

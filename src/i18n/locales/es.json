@@ -297,7 +297,7 @@
   "privacy.title": "Privacidad en WhatsDemo",
   "privacy.description": "Cómo se guarda y comparte tu recorrido.",
   "privacy.storageTitle": "Datos guardados en este navegador",
-  "privacy.storageBody": "Tu recorrido —incluidos el nombre del contacto, la foto, los mensajes, el JSON de los Flows y las respuestas automáticas— y el idioma de la interfaz se guardan localmente mediante localStorage. Permanecen en este navegador hasta que los reemplaces o borres los datos guardados.",
+  "privacy.storageBody": "Tu recorrido —incluidos el nombre del contacto, la foto, los mensajes, el JSON de los Flows y las respuestas automáticas— y el idioma de la interfaz se guardan localmente mediante localStorage. Permanecen en este navegador hasta que los reemplaces o borres los datos guardados. La velocidad de reproducción también se guarda como preferencia local del navegador.",
   "privacy.sharingTitle": "Los enlaces compartidos contienen el recorrido",
   "privacy.sharingBody": "Copiar enlace codifica el recorrido completo en el enlace, incluidas las imágenes subidas y las respuestas de los Flows. Quien tenga el enlace y acceso a la aplicación puede abrir su contenido. La codificación y la compresión no son cifrado. Incluye solo información que quieras compartir.",
   "privacy.deleteTitle": "Cómo borrar los datos guardados",
@@ -306,5 +306,7 @@
   "privacy.connectionsBody": "WhatsDemo no establece cookies ni incluye publicidad, analítica o rastreadores. La aplicación no sube recorridos a un servidor; los enlaces y vídeos se generan en tu navegador. Si se aloja en línea, el proveedor de alojamiento puede procesar registros de acceso según su propia política de privacidad.",
   "automation.guideLink": "Guía de interacción para IA (llms.txt)",
   "app.navigation": "Navegación principal",
-  "app.githubLink": "Repositorio de GitHub (se abre en una pestaña nueva)"
+  "app.githubLink": "Repositorio de GitHub (se abre en una pestaña nueva)",
+  "playback.speed": "Velocidad de reproducción automática",
+  "playback.speedHint": "Se guarda en este navegador. Los cambios se aplican a la siguiente animación o espera; el modo manual mantiene sus tiempos originales."
 }

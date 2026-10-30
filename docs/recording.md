@@ -4,6 +4,8 @@ O botão **Gravar celular**, à direita da prévia, gera um vídeo local sem áu
 
 ## Uso
 
+A gravação automática usa a velocidade selecionada ao lado dos controles de reprodução. Escolha entre 0,5× e 3× antes de gravar; o controle fica bloqueado durante a captura. A contagem inicial de 3 segundos, o cronômetro e os 2 segundos finais continuam usando tempo real. A gravação manual mantém os tempos originais.
+
 1. Clique em **Gravar celular**.
 2. Escolha **Gravar manualmente** ou **Gravar automaticamente**.
 3. Aguarde a preparação e a contagem de 3 segundos. A jornada começa do início.

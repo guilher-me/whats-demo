@@ -297,7 +297,7 @@
   "privacy.title": "Privacy in WhatsDemo",
   "privacy.description": "How your journey is stored and shared.",
   "privacy.storageTitle": "Data saved in this browser",
-  "privacy.storageBody": "Your journey—including contact name, photo, messages, Flow JSON and automatic answers—and your interface language are stored locally using localStorage. They remain in this browser until you replace them or clear the saved data.",
+  "privacy.storageBody": "Your journey—including contact name, photo, messages, Flow JSON and automatic answers—and your interface language are stored locally using localStorage. They remain in this browser until you replace them or clear the saved data. Playback speed is also saved as a local browser preference.",
   "privacy.sharingTitle": "Shared links contain the journey",
   "privacy.sharingBody": "Copy Link encodes the full journey in the link, including uploaded images and Flow answers. Anyone with that link and access to the app can open its contents. Encoding and compression are not encryption. Include only information you intend to share.",
   "privacy.deleteTitle": "How to delete saved data",
@@ -306,5 +306,7 @@
   "privacy.connectionsBody": "WhatsDemo does not set cookies or include advertising, analytics or trackers. The app does not upload journeys to a backend; generating a link and recording a video happen in your browser. When hosted online, the hosting provider may process access logs under its own privacy policy.",
   "automation.guideLink": "AI interaction guide (llms.txt)",
   "app.navigation": "Main navigation",
-  "app.githubLink": "GitHub repository (opens in a new tab)"
+  "app.githubLink": "GitHub repository (opens in a new tab)",
+  "playback.speed": "Automatic playback speed",
+  "playback.speedHint": "Saved in this browser. Changes apply to the next animation or wait; manual mode keeps its original timing."
 }
