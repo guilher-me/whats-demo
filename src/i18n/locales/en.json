@@ -307,6 +307,8 @@
   "automation.guideLink": "AI interaction guide (llms.txt)",
   "app.navigation": "Main navigation",
   "app.githubLink": "GitHub repository (opens in a new tab)",
-  "playback.speed": "Automatic playback speed",
-  "playback.speedHint": "Saved in this browser. Changes apply to the next animation or wait; manual mode keeps its original timing."
+  "playback.speed": "Simulated user pace",
+  "playback.speedHint": "Adjust reading, typing and cursor clicks. Message delays and system transitions keep their configured timing. Saved in this browser.",
+  "playback.slow": "Slower · turtle",
+  "playback.fast": "Faster · hare"
 }

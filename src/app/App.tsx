@@ -200,7 +200,7 @@ export function App() {
           </p>
           <div
             className="phone-stage"
-            style={{ '--playback-speed': playback.animationSpeed } as CSSProperties}
+            style={{ '--cursor-speed': playback.cursorSpeed } as CSSProperties}
           >
             {showOverview ? (
               <ConversationOverview project={editor.project} phoneRef={phoneRef} />

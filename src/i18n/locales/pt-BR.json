@@ -307,6 +307,8 @@
   "automation.guideLink": "Guia de interação para IAs (llms.txt)",
   "app.navigation": "Navegação principal",
   "app.githubLink": "Repositório no GitHub (abre em nova guia)",
-  "playback.speed": "Velocidade da reprodução automática",
-  "playback.speedHint": "Salva neste navegador. Alterações valem para a próxima animação ou espera; o modo manual mantém os tempos originais."
+  "playback.speed": "Ritmo do usuário simulado",
+  "playback.speedHint": "Ajusta leitura, digitação e cliques do cursor. Os delays das mensagens e as transições do sistema mantêm seus tempos. Salvo neste navegador.",
+  "playback.slow": "Mais lento · tartaruga",
+  "playback.fast": "Mais rápido · lebre"
 }

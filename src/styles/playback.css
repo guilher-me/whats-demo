@@ -176,10 +176,24 @@
 }
 .speed-panel input[type='range'] {
   width: 100%;
-  margin: 14px 0 8px;
+  margin: 0;
   padding: 0;
   accent-color: var(--accent);
   cursor: pointer;
+}
+.speed-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 8px;
+  color: var(--accent);
+}
+.speed-range > span {
+  display: flex;
+  flex-shrink: 0;
+}
+.speed-ticks {
+  padding-inline: 28px;
 }
 .speed-ticks {
   display: flex;

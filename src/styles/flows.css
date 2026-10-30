@@ -19,7 +19,7 @@
   background: #fff;
   border-radius: 10px 10px 0 0;
   overflow: hidden;
-  animation: flow-in calc(0.25s / var(--playback-speed, 1)) ease-out;
+  animation: flow-in 0.25s ease-out;
 }
 .flow-header {
   display: flex;

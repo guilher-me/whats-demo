@@ -10,7 +10,7 @@ Editor de conversas e WhatsApp Flows para demonstrações, protótipos e gravaç
 
 - Mensagens do usuário, mensagens da empresa e convites para Flows.
 - Textos, atrasos, indicador de digitação, nome, foto e selo configuráveis.
-- Velocidade automática de 0,5×, 1×, 1,5×, 2× ou 3×, salva no navegador. Ajusta esperas, digitação, cursor e animações; mudanças durante o play valem para a próxima espera/animação. O modo manual e os tempos da jornada não são alterados.
+- Ritmo do usuário simulado de 0,5× a 3×, salvo no navegador: tartaruga para mais tempo de leitura e cliques, lebre para interações rápidas. Ajusta somente leitura, digitação e ações do cursor. Delays de resposta da empresa, loading, transições do sistema e modo manual mantêm seus tempos.
 - Flows em JSON, navegação entre telas e respostas automáticas.
 - Links que carregam a experiência no fragmento da URL, sem banco de dados.
 - Build portátil em um único HTML, com JavaScript, CSS e imagem padrão incorporados.

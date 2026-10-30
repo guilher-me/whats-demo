@@ -36,7 +36,7 @@ async function start(fullExample = false) {
   return view;
 }
 function chooseSpeed(index: number) {
-  fireEvent.click(screen.getByRole('button', { name: 'Velocidade da reprodução automática' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Ritmo do usuário simulado' }));
   fireEvent.change(screen.getByRole('slider'), { target: { value: String(index) } });
 }
 it('persists the preference without changing the journey and closes with Escape', async () => {
@@ -47,20 +47,18 @@ it('persists the preference without changing the journey and closes with Escape'
   expect(localStorage.getItem(PLAYBACK_SPEED_KEY)).toBe('2');
   expect(window.whatsappFakeFlows!.getProject()).toEqual(before);
   fireEvent.keyDown(screen.getByRole('slider'), { key: 'Escape' });
-  const trigger = screen.getByRole('button', { name: 'Velocidade da reprodução automática' });
+  const trigger = screen.getByRole('button', { name: 'Ritmo do usuário simulado' });
   expect(trigger).toHaveFocus();
   expect(trigger).toHaveTextContent('2×');
   expect(screen.queryByRole('slider')).toBeNull();
   view.unmount();
   await start();
-  expect(
-    screen.getByRole('button', { name: 'Velocidade da reprodução automática' }),
-  ).toHaveTextContent('2×');
+  expect(screen.getByRole('button', { name: 'Ritmo do usuário simulado' })).toHaveTextContent('2×');
 });
 it.each([
-  ['Reproduzir automaticamente', 2000],
+  ['Reproduzir automaticamente', 6000],
   ['Iniciar manual', 6000],
-])('applies 3x only to automatic timing: %s', async (mode, milliseconds) => {
+])('preserves configured system delays in both modes: %s', async (mode, milliseconds) => {
   localStorage.setItem(PLAYBACK_SPEED_KEY, '3');
   await start();
   fireEvent.click(screen.getByRole('button', { name: mode }));
@@ -71,43 +69,29 @@ it.each([
     'First message',
   ]);
   expect(document.querySelector('.phone-stage')).toHaveStyle({
-    '--playback-speed': mode === 'Iniciar manual' ? '1' : '3',
+    '--cursor-speed': mode === 'Iniciar manual' ? '1' : '3',
   });
-});
-it('uses a speed changed during playback for the next wait', async () => {
-  await start();
-  fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
-  await tick(1000);
-  chooseSpeed(4);
-  await tick(5000);
-  expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(1);
-  await tick(1999);
-  expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(1);
-  await tick(1);
-  expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(2);
 });
 it('slows down to 0.5x and cancels without late messages', async () => {
   localStorage.setItem(PLAYBACK_SPEED_KEY, '0.5');
   await start();
   fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
-  await tick(11999);
+  await tick(5999);
   expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(0);
   fireEvent.click(screen.getByRole('button', { name: 'Parar reprodução' }));
-  await tick(20000);
+  await tick(35000);
   expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(0);
 });
 it('falls back to 1x for an unsupported saved value', async () => {
   localStorage.setItem(PLAYBACK_SPEED_KEY, '999');
   await start();
-  expect(
-    screen.getByRole('button', { name: 'Velocidade da reprodução automática' }),
-  ).toHaveTextContent('1×');
+  expect(screen.getByRole('button', { name: 'Ritmo do usuário simulado' })).toHaveTextContent('1×');
 });
 it('finishes the full Luma journey with choices and both Flow screens at 3x', async () => {
   localStorage.setItem(PLAYBACK_SPEED_KEY, '3');
   await start(true);
   fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
-  await tick(20000);
+  await tick(35000);
   expect(window.whatsappFakeFlows!.getState().running).toBe(false);
   expect(document.querySelector('.play-status')).toHaveTextContent('Conversa concluída.');
   const messages = window.whatsappFakeFlows!.getState().messages;

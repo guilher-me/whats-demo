@@ -92,7 +92,7 @@
   box-shadow: 0 1px 1px #00000017;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  animation: message-in calc(0.17s / var(--playback-speed, 1)) ease-out;
+  animation: message-in 0.17s ease-out;
 }
 .bubble.user {
   align-self: flex-end;
@@ -150,7 +150,7 @@
   height: 6px;
   background: #8d989d;
   border-radius: 50%;
-  animation: typing calc(1s / var(--playback-speed, 1)) infinite;
+  animation: typing 1s infinite;
 }
 .typing i:nth-child(2) {
   animation-delay: 0.13s;
@@ -231,9 +231,9 @@
   transform: translate(-50%, -50%);
   pointer-events: none;
   transition:
-    left calc(0.35s / var(--playback-speed, 1)) ease,
-    top calc(0.35s / var(--playback-speed, 1)) ease,
-    opacity calc(0.15s / var(--playback-speed, 1));
+    left calc(0.35s / var(--cursor-speed, 1)) ease,
+    top calc(0.35s / var(--cursor-speed, 1)) ease,
+    opacity 0.15s;
 }
 .touch-cursor.pressed {
   transform: translate(-50%, -50%) scale(0.7);
@@ -303,7 +303,7 @@
   background: #fff;
   border-radius: 14px 14px 0 0;
   box-shadow: 0 -8px 25px #0001;
-  animation: flow-in calc(0.2s / var(--playback-speed, 1)) ease-out;
+  animation: flow-in 0.2s ease-out;
   outline: none;
 }
 .phone-sheet > header {

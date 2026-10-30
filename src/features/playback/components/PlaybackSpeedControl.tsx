@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useT } from '../../../i18n';
 import { PLAYBACK_SPEEDS, type PlaybackSpeed } from '../hooks/usePlaybackSpeed';
+import { ControlIcon } from '../../../components/icons/ControlIcon';
 
 export function PlaybackSpeedControl({
   speed,
@@ -56,17 +57,25 @@ export function PlaybackSpeedControl({
           <label htmlFor={`${id}-range`}>
             {t('playback.speed')} <output>{speed}×</output>
           </label>
-          <input
-            id={`${id}-range`}
-            type="range"
-            min="0"
-            max="4"
-            step="1"
-            value={PLAYBACK_SPEEDS.indexOf(speed)}
-            aria-valuetext={`${speed}×`}
-            aria-describedby={`${id}-hint`}
-            onChange={(event) => onChange(PLAYBACK_SPEEDS[Number(event.target.value)])}
-          />
+          <div className="speed-range">
+            <span role="img" aria-label={t('playback.slow')} title={t('playback.slow')}>
+              <ControlIcon name="turtle" />
+            </span>
+            <input
+              id={`${id}-range`}
+              type="range"
+              min="0"
+              max="4"
+              step="1"
+              value={PLAYBACK_SPEEDS.indexOf(speed)}
+              aria-valuetext={`${speed}×`}
+              aria-describedby={`${id}-hint`}
+              onChange={(event) => onChange(PLAYBACK_SPEEDS[Number(event.target.value)])}
+            />
+            <span role="img" aria-label={t('playback.fast')} title={t('playback.fast')}>
+              <ControlIcon name="hare" />
+            </span>
+          </div>
           <div className="speed-ticks" aria-hidden="true">
             {PLAYBACK_SPEEDS.map((value) => (
               <span key={value}>{value}×</span>

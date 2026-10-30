@@ -62,7 +62,7 @@ it('atualiza o editor imediatamente, limpa a prévia e remove a API ao desmontar
     run = api.play();
   });
   await act(async () => {
-    await vi.advanceTimersByTimeAsync(1);
+    await vi.advanceTimersByTimeAsync(1000);
   });
   await run;
   expect(document.querySelector('.messages')).toHaveTextContent('Olá pela API');

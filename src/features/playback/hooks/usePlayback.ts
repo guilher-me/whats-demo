@@ -16,6 +16,7 @@ import { useFlowSession } from '../../flows/hooks/useFlowSession';
 import { useCursor } from './useCursor';
 import { useMessageInteraction } from './useMessageInteraction';
 import { animateMessage } from '../animateMessage';
+import { messageOptions } from '../../../core/interactive';
 import { usePlaybackSpeed } from './usePlaybackSpeed';
 
 export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
@@ -149,7 +150,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
       return;
     }
     flow.set({ ...session, closing: true });
-    await wait(220, active.signal);
+    await delay(220, active.signal);
     if (controller.current !== active) return;
     flow.set(null);
     if (session.step.completion) append(session.step.completion, 'user');
@@ -169,8 +170,23 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
   const animateFlow = async (signal: AbortSignal) => {
     for (let turn = 0; flow.current.current && turn < 30; turn++) {
       const session = flow.current.current;
-      await wait(250, signal);
+      await delay(250, signal);
       const components = getComponents(session);
+      await cursor.read(
+        [
+          session.step.flow.screens[session.index].title,
+          ...components.flatMap((c) => [
+            c.text,
+            c.label,
+            ...(Array.isArray(c['data-source'])
+              ? c['data-source'].map((option) => option.title)
+              : []),
+          ]),
+        ]
+          .filter(Boolean)
+          .join(' '),
+        signal,
+      );
       for (const c of components.filter((component) => component.name)) {
         const name = c.name!,
           value = resolve(session.step.answers[name], {
@@ -223,7 +239,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
         signal,
       );
       await next();
-      await wait(200, signal);
+      await delay(200, signal);
     }
     if (flow.current.current) throw new Error(t('errors.cycles'));
   };
@@ -272,7 +288,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
           await received.promise;
         } else {
           setTyping(step.typing !== false);
-          await wait(step.delay * 1000, signal);
+          await delay(step.delay * 1000, signal);
           setTyping(false);
           // Cursor targets must exist before the next animation; commit this message synchronously.
           let messageId = '';
@@ -285,6 +301,15 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
             );
             messageId = message.id;
           });
+          if (automatic) {
+            const choices =
+              step.type === 'business' && step.interactive?.kind === 'buttons'
+                ? messageOptions(step.interactive)
+                    .map((option) => option.title)
+                    .join(' ')
+                : '';
+            await cursor.read(`${step.text} ${choices}`, signal);
+          }
           if (step.type === 'business' && step.interactive) {
             const answered = interaction.wait(messageId, step.interactive, signal);
             setStatus('playback.chooseOption');
@@ -295,6 +320,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
                 phone,
                 signal,
                 touch: cursor.touch,
+                read: cursor.read,
                 open: interaction.open,
                 reply: interaction.reply,
                 select: interaction.select,
@@ -307,7 +333,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
             waitingFlow.current = completed.finish;
             setStatus(automatic ? 'playback.openingFlow' : 'playback.openFlow');
             if (automatic) {
-              await wait(100, signal);
+              await delay(100, signal);
               const target =
                 [...(phone.current?.querySelectorAll<HTMLElement>('[data-open-step]') ?? [])].find(
                   (n) => n.dataset.openStep === step.id,
@@ -340,7 +366,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
   return {
     speed,
     setSpeed,
-    animationSpeed: running && automaticMode.current ? speed : 1,
+    cursorSpeed: running && automaticMode.current ? speed : 1,
     messages,
     typing,
     draft,

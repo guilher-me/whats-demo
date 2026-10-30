@@ -1,6 +1,7 @@
 import { t } from '../../../i18n';
 import { useState, type RefObject } from 'react';
 import { delay } from '../../../core/async';
+import { readingDuration } from '../humanTiming';
 export interface CursorState {
   x: number;
   y: number;
@@ -50,5 +51,6 @@ export function useCursor(phone: RefObject<HTMLDivElement | null>, wait: typeof 
     }
     await wait(200, signal);
   };
-  return { cursor, touch, type, hide };
+  const read = (text: string, signal: AbortSignal) => wait(readingDuration(text), signal);
+  return { cursor, touch, type, read, hide };
 }
