@@ -1,6 +1,6 @@
 import { useT } from '../../../i18n';
 import type { Contact, Project, Step } from '../../../core/types';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useAddedStepFocus } from '../hooks/useAddedStepFocus';
 import { ContactEditor } from './ContactEditor';
 import { StepCard } from './StepCard';
@@ -10,6 +10,7 @@ import { FieldError } from '../../../components/ui/Field';
 import type { StepAction } from './StepActions';
 import { SaveIndicator } from './SaveIndicator';
 import type { SaveState } from '../hooks/useProject';
+import { SortableSteps } from './SortableSteps';
 interface Props {
   saveState: SaveState;
   project: Project;
@@ -17,10 +18,11 @@ interface Props {
   activeStep: string | null;
   selectedStep: string | null;
   disabled?: boolean;
-  onSelect: (id: string) => void;
+  onSelect: (id: string | null) => void;
   error: string;
   onContact: (contact: Contact) => void;
   onChange: (id: string, change: Partial<Step>) => void;
+  onReorder: (steps: Step[]) => void;
   onAction: (id: string, action: StepAction) => void;
   onAdd: (type: Step['type']) => string | undefined;
   onRestore: () => void;
@@ -31,6 +33,10 @@ export function EditorPanel(props: Props) {
   const t = useT();
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(props.project.steps[0]?.id ?? null);
+  useEffect(() => {
+    setExpandedId(props.project.steps[0]?.id ?? null);
+  }, [props.revision]);
   const focusAdded = useAddedStepFocus(props.project.steps, scrollRef);
   return (
     <section
@@ -61,8 +67,8 @@ export function EditorPanel(props: Props) {
           </div>
           <span>{t('editor.stepCount', { count: props.project.steps.length })}</span>
         </div>
-        <div>
-          {props.project.steps.map((step, index) => (
+        <SortableSteps steps={props.project.steps} onChange={props.onReorder}>
+          {(step, index, dragHandle) => (
             <StepCard
               key={`${props.revision}:${step.id}`}
               step={step}
@@ -70,13 +76,23 @@ export function EditorPanel(props: Props) {
               total={props.project.steps.length}
               active={props.activeStep === step.id}
               selected={props.selectedStep === step.id}
-              onSelect={() => props.onSelect(step.id)}
+              dragHandle={dragHandle}
+              expanded={(props.selectedStep ?? expandedId) === step.id}
+              onToggle={() => {
+                const next = (props.selectedStep ?? expandedId) === step.id ? null : step.id;
+                setExpandedId(next);
+                props.onSelect(next);
+              }}
+              onSelect={() => {
+                setExpandedId(step.id);
+                props.onSelect(step.id);
+              }}
               onChange={(change) => props.onChange(step.id, change)}
               onAction={(action) => props.onAction(step.id, action)}
               onValidity={props.onValidity}
             />
-          ))}
-        </div>
+          )}
+        </SortableSteps>
         <p className="editor-hint">{t('editor.noNames')}</p>
         {location.protocol === 'file:' && <p className="editor-hint">{t('editor.localLink')}</p>}
         <FieldError>{props.error}</FieldError>

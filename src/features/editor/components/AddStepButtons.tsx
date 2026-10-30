@@ -25,13 +25,13 @@ export function AddStepButtons({
     <div className="component-palette">
       <div className="control-caption">
         <span>{t('editor.addHeading')}</span>
-        <small>{t('editor.chooseComponent')}</small>
       </div>
       <div className="add-row" role="group" aria-label={t('editor.addRegion')}>
         {entries.map((entry) => (
           <Button
             key={entry.type}
             aria-label={`＋ ${entry.name}`}
+            title={entry.detail}
             disabled={disabled}
             onClick={() => onAdd(entry.type)}
           >
@@ -40,7 +40,6 @@ export function AddStepButtons({
             </span>
             <span>
               <span>{entry.name}</span>
-              <small>{entry.detail}</small>
             </span>
             <span className="palette-plus" aria-hidden="true">
               ＋

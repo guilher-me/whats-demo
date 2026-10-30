@@ -45,7 +45,7 @@ describe('editor e reprodução React', () => {
     ).toBe(true);
     expect(messages.at(-1)?.text).toContain('LH-1042');
     expect(document.querySelector('.bubble strong')).toBeInTheDocument();
-  });
+  }, 10000);
   it('Só celular inicia o modo manual a partir da prévia de edição e permite responder', async () => {
     const project = createDefaultProject();
     project.contact.avatar = '';

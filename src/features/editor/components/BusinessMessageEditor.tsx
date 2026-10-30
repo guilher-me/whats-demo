@@ -6,6 +6,8 @@ import { MessageTextEditor } from './MessageTextEditor';
 import { SelectField } from '../../../components/ui/SelectField';
 import { ReplyButtonsEditor } from './ReplyButtonsEditor';
 import { ListMessageEditor } from './ListMessageEditor';
+import { MessageFormatPicker } from './MessageFormatPicker';
+import { FormSection } from '../../../components/ui/FormSection';
 export function BusinessMessageEditor({
   step,
   onChange,
@@ -24,22 +26,14 @@ export function BusinessMessageEditor({
   };
   return (
     <>
-      <SelectField
-        label={t('editor.format')}
+      <MessageFormatPicker
         value={value?.kind ?? 'text'}
-        onChange={(e) =>
+        onChange={(format) =>
           onChange({
-            interactive:
-              e.target.value === 'text'
-                ? undefined
-                : createInteractive(e.target.value as BusinessInteractive['kind']),
+            interactive: format === 'text' ? undefined : createInteractive(format),
           })
         }
-      >
-        <option value="text">{t('editor.plainText')}</option>
-        <option value="buttons">{t('editor.buttons')}</option>
-        <option value="list">{t('editor.list')}</option>
-      </SelectField>
+      />
       <MessageTextEditor
         label={t('editor.messageText')}
         value={step.text}
@@ -53,8 +47,7 @@ export function BusinessMessageEditor({
           ) : (
             <ListMessageEditor value={value} onChange={update} />
           )}
-          <details className="message-settings">
-            <summary>{t('editor.advanced')}</summary>
+          <FormSection title={t('editor.advanced')}>
             <TextField
               label={t('editor.header')}
               value={value.header ?? ''}
@@ -70,16 +63,16 @@ export function BusinessMessageEditor({
             <SelectField
               label={t('editor.autoReply')}
               value={value.autoReplyId ?? ''}
-              onChange={(e) => update({ ...value, autoReplyId: e.target.value })}
-            >
-              <option value="">{t('editor.firstOption')}</option>
-              {messageOptions(value).map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.title || t('common.untitled')}
-                </option>
-              ))}
-            </SelectField>
-          </details>
+              onValueChange={(autoReplyId) => update({ ...value, autoReplyId })}
+              options={[
+                { value: '', label: t('editor.firstOption') },
+                ...messageOptions(value).map((option) => ({
+                  value: option.id,
+                  label: option.title || t('common.untitled'),
+                })),
+              ]}
+            />
+          </FormSection>
           <FieldError>{error}</FieldError>
         </>
       )}

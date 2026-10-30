@@ -157,6 +157,7 @@ export function App() {
             })
           }
           onAction={(id, action) => edit(() => editor.action(id, action))}
+          onReorder={(steps) => edit(() => editor.update((project) => ({ ...project, steps })))}
           onAdd={(type) => {
             let addedId: string | undefined;
             edit(() => {

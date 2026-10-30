@@ -18,6 +18,12 @@
 
 `Button`, `IconButton`, `TextField`, `TextArea`, `Checkbox` e `Dialog` oferecem contratos pequenos por props. O diálogo usa Radix UI para foco, teclado e semântica. Os ícones ficam centralizados em `components/icons`.
 
+O editor também usa `ActionMenu` (Radix Dropdown Menu), `SelectField` (Radix Select) e `FormSection` (disclosure nativo). `MessageFormatPicker` usa radios nativos para alternar texto, botões e lista. Os controles recebem dados e callbacks; não acessam diretamente o projeto ou o localStorage.
+
+`EditorPanel` mantém a etapa expandida como estado temporário de interface. `StepCard` mantém seu corpo montado e usa `hidden` ao recolher: desmontar os campos perderia rascunhos JSON inválidos e removeria sua validação. Menus de ações não expandem a etapa. `SortableSteps` altera apenas a ordem do array, preservando IDs, payloads e respostas dos Flows; o teclado usa Espaço, setas e Escape. `MessageOptionEditor` mantém o título editável e agrupa a descrição em uma seção compacta.
+
+`editor-product.css` estiliza apenas o construtor e seus menus compartilhados. O renderer do celular, o contrato persistido v1 e o formato dos links não mudam. Novos controles devem usar `useT()`, tokens semânticos e os primitives compartilhados. Referências: [Radix Dropdown Menu](https://www.radix-ui.com/primitives/docs/components/dropdown-menu) e [Radix Select](https://www.radix-ui.com/primitives/docs/components/select).
+
 Estilos globais e tokens ficam em `styles/base.css` e `styles/tokens.css`. Editor, conversa e Flows têm folhas próprias. Prefira classes e amplie os tokens quando houver uma variação compartilhada.
 
 ## Persistência e evolução

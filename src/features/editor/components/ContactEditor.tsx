@@ -4,7 +4,7 @@ import type { Contact } from '../../../core/types';
 import { avatarSource, FALLBACK_AVATAR } from '../../../core/defaults';
 import { TextField } from '../../../components/ui/Field';
 import { Checkbox } from '../../../components/ui/Checkbox';
-import { Button } from '../../../components/ui/Button';
+import { ActionMenu } from '../../../components/ui/ActionMenu';
 export function ContactEditor({
   contact,
   onChange,
@@ -43,14 +43,26 @@ export function ContactEditor({
             e.currentTarget.src = FALLBACK_AVATAR;
           }}
         />
-        <Button
-          variant="ghost"
-          className="upload-button"
-          aria-label={t('contact.changeLabel')}
-          onClick={() => fileInput.current?.click()}
-        >
-          {t('contact.change')}
-        </Button>
+        <div className="contact-photo-menu">
+          <ActionMenu
+            label={t('contact.changeLabel')}
+            icon="photo"
+            items={[
+              {
+                label: t('contact.change'),
+                icon: 'photo',
+                onSelect: () => fileInput.current?.click(),
+              },
+              {
+                label: t('contact.remove'),
+                icon: 'trash',
+                danger: true,
+                disabled: !contact.avatar,
+                onSelect: () => onChange({ ...contact, avatar: '' }),
+              },
+            ]}
+          />
+        </div>
         <input
           id={id}
           ref={fileInput}
@@ -76,9 +88,6 @@ export function ContactEditor({
           checked={contact.verified}
           onChange={(e) => onChange({ ...contact, verified: e.target.checked })}
         />
-        <Button variant="ghost" onClick={() => onChange({ ...contact, avatar: '' })}>
-          {t('contact.remove')}
-        </Button>
       </div>
     </section>
   );

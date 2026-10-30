@@ -310,5 +310,21 @@
   "playback.speed": "Ritmo del usuario simulado",
   "playback.speedHint": "Ajusta la lectura, la escritura y los clics del cursor. Los retrasos de mensajes y las transiciones del sistema mantienen sus tiempos. Se guarda en este navegador.",
   "playback.slow": "Más lento · tortuga",
-  "playback.fast": "Más rápido · liebre"
+  "playback.fast": "Más rápido · liebre",
+  "editor.flowScreens": "{{count}} pantallas · JSON avanzado",
+  "editor.optionDetails": "Descripción",
+  "editor.autoAnswersTitle": "Respuestas automáticas",
+  "editor.dragStepsHint": "Pulsa Espacio para recoger, las flechas para mover, Espacio para soltar y Escape para cancelar.",
+  "editor.optionActions": "Acciones de la opción {{v0}}",
+  "editor.dragStep": "Reordenar etapa {{v0}}",
+  "editor.flowStructure": "Estructura del formulario",
+  "editor.autoAnswersHint": "Valores utilizados por el cliente simulado",
+  "editor.behavior": "Comportamiento",
+  "editor.collapseStep": "Contraer etapa {{v0}}",
+  "editor.expandStep": "Editar etapa {{v0}}",
+  "editor.dragPicked": "Etapa {{v0}} seleccionada.",
+  "editor.dragPosition": "Posición {{v0}}.",
+  "editor.dragPlaced": "Etapa colocada en la posición {{v0}}.",
+  "editor.dragCancelled": "Reordenación cancelada.",
+  "editor.needsAttention": "Revisar"
 }

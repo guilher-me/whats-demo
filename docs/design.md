@@ -1,6 +1,6 @@
 # Interface palette
 
-The application chrome uses a neutral light palette. The editor is an almost-white surface, cards are white, and the preview has a slightly darker cool-gray canvas so the phone stays the focal point. Emerald is reserved for primary actions, focus and selection; red identifies recording and errors. The WhatsApp conversation renderer retains its own native colors and wallpaper.
+The application chrome uses an almost-white palette with opposite subtle green gradients on the editor and preview panels. Cards remain white. Emerald is reserved for primary actions, focus and selection; red identifies recording and errors. The WhatsApp conversation renderer retains its own native colors and wallpaper.
 
 Shared values live in `src/styles/tokens.css`:
 
@@ -9,8 +9,8 @@ Shared values live in `src/styles/tokens.css`:
 | `--ink`             | `#182230` | Primary text                  |
 | `--muted`           | `#5F6B7A` | Secondary copy and hints      |
 | `--surface`         | `#FFFFFF` | Cards, fields and header      |
-| `--surface-editor`  | `#F7F8FA` | Editor canvas                 |
-| `--surface-preview` | `#E9EDF3` | Phone preview canvas          |
+| `--surface-editor`  | `#F3F8F5` | Editor canvas fallback        |
+| `--surface-preview` | `#F3F8F5` | Preview canvas fallback       |
 | `--line`            | `#DFE4EB` | Dividers and borders          |
 | `--accent`          | `#007F68` | Primary actions and selection |
 | `--accent-soft`     | `#EAF5F1` | Accent hover surfaces         |

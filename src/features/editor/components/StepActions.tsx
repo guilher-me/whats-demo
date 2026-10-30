@@ -1,5 +1,5 @@
 import { useT } from '../../../i18n';
-import { IconButton } from '../../../components/ui/IconButton';
+import { ActionMenu } from '../../../components/ui/ActionMenu';
 export type StepAction = 'up' | 'down' | 'copy' | 'delete';
 export function StepActions({
   first,
@@ -13,19 +13,19 @@ export function StepActions({
   const t = useT();
 
   return (
-    <div className="step-actions" role="group" aria-label={t('editor.actions')}>
-      <IconButton label={t('editor.up')} disabled={first} onClick={() => onAction('up')}>
-        ↑
-      </IconButton>
-      <IconButton label={t('editor.down')} disabled={last} onClick={() => onAction('down')}>
-        ↓
-      </IconButton>
-      <IconButton label={t('editor.duplicate')} onClick={() => onAction('copy')}>
-        ⧉
-      </IconButton>
-      <IconButton label={t('editor.remove')} onClick={() => onAction('delete')}>
-        ×
-      </IconButton>
-    </div>
+    <ActionMenu
+      label={t('editor.actions')}
+      items={[
+        { label: t('editor.duplicate'), icon: 'copy', onSelect: () => onAction('copy') },
+        { label: t('editor.up'), icon: 'up', disabled: first, onSelect: () => onAction('up') },
+        { label: t('editor.down'), icon: 'down', disabled: last, onSelect: () => onAction('down') },
+        {
+          label: t('editor.remove'),
+          icon: 'trash',
+          danger: true,
+          onSelect: () => onAction('delete'),
+        },
+      ]}
+    />
   );
 }

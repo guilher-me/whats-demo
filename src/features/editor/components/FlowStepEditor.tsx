@@ -3,6 +3,7 @@ import { useEffect, useId, useState } from 'react';
 import type { FlowStep, Values } from '../../../core/types';
 import { validateFlow } from '../../../core/engine';
 import { TextArea, TextField, FieldError } from '../../../components/ui/Field';
+import { FormSection } from '../../../components/ui/FormSection';
 export function FlowStepEditor({
   step,
   onChange,
@@ -44,8 +45,11 @@ export function FlowStepEditor({
         value={step.label}
         onChange={(e) => onChange({ label: e.target.value })}
       />
-      <details className="flow-json">
-        <summary>{t('editor.flowJson')}</summary>
+      <FormSection
+        title={t('editor.flowStructure')}
+        summary={t('editor.flowScreens', { count: step.flow.screens.length })}
+        className="flow-json"
+      >
         <TextArea
           label="Flow JSON"
           aria-invalid={!!errors.flow}
@@ -55,7 +59,13 @@ export function FlowStepEditor({
           onChange={(e) => edit('flow', e.target.value)}
           spellCheck={false}
         />
-        <FieldError id={`${errorId}-flow`}>{errors.flow}</FieldError>
+      </FormSection>
+      <FieldError id={`${errorId}-flow`}>{errors.flow}</FieldError>
+      <FormSection
+        title={t('editor.autoAnswersTitle')}
+        summary={t('editor.autoAnswersHint')}
+        className="flow-answers"
+      >
         <TextArea
           label={t('editor.answers')}
           aria-invalid={!!errors.answers}
@@ -65,13 +75,13 @@ export function FlowStepEditor({
           onChange={(e) => edit('answers', e.target.value)}
           spellCheck={false}
         />
-        <FieldError id={`${errorId}-answers`}>{errors.answers}</FieldError>
         <TextField
           label={t('editor.completion')}
           value={step.completion ?? ''}
           onChange={(e) => onChange({ completion: e.target.value })}
         />
-      </details>
+      </FormSection>
+      <FieldError id={`${errorId}-answers`}>{errors.answers}</FieldError>
     </>
   );
 }

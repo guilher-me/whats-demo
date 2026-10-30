@@ -1,5 +1,13 @@
 import type { SVGProps } from 'react';
 const paths = {
+  more: 'M12 5h.01M12 12h.01M12 19h.01',
+  chevron: 'm6 9 6 6 6-6',
+  copy: 'M9 9h11v12H9zM5 16H3V3h12v2',
+  trash: 'M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7',
+  up: 'm5 12 7-7 7 7M12 5v15',
+  down: 'm5 12 7 7 7-7M12 4v15',
+  check: 'm5 12 4 4L19 6',
+  photo: 'M3 4h18v16H3zM3 16l5-5 4 4 3-3 6 6M15 8h.01',
   turtle:
     'M3 15h14a7 7 0 0 0-14 0ZM6 15v4m8-4v4M2 15H1m16-3h2a3 3 0 0 1 3 3v1h-5M6 9l4 3 4-3m-4 3v3',
   hare: 'M12 11c-2-3-3-8-1-9 2-1 4 5 4 8 1-4 4-7 5-6 2 1-1 6-3 8l3 2v3h-4m-4-6a6 6 0 0 0-8 5H2m2 0v3h10a4 4 0 0 0-4-4m9-2h.01',

@@ -47,9 +47,7 @@ it('mostra uma nova etapa e reflete textos e botões em tempo real', async () =>
   fireEvent.click(screen.getByRole('button', { name: '＋ Empresa' }));
   expect(draft()).toHaveTextContent('Nova mensagem');
   const card = screen.getByRole('article', { name: 'Etapa 6' });
-  fireEvent.change(within(card).getByLabelText('Formato da mensagem'), {
-    target: { value: 'buttons' },
-  });
+  fireEvent.click(within(card).getByRole('radio', { name: 'Botões de resposta' }));
   fireEvent.change(within(card).getAllByLabelText('Texto do botão')[0], {
     target: { value: 'Fazer agendamento' },
   });
@@ -149,6 +147,8 @@ it('preserva a conversa executada, reinicia a prévia e limpa a seleção removi
   });
   expect(document.querySelectorAll('.bubble')).toHaveLength(0);
   fireEvent.click(card);
-  fireEvent.click(within(card).getByRole('button', { name: 'Remover etapa' }));
+  fireEvent.keyDown(within(card).getByRole('button', { name: 'Ações da etapa' }), { key: 'Enter' });
+  await act(async () => {});
+  fireEvent.click(screen.getByRole('menuitem', { name: 'Remover etapa' }));
   expect(screen.queryByRole('button', { name: 'Ver conversa' })).toBeNull();
 });

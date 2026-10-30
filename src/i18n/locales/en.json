@@ -310,5 +310,21 @@
   "playback.speed": "Simulated user pace",
   "playback.speedHint": "Adjust reading, typing and cursor clicks. Message delays and system transitions keep their configured timing. Saved in this browser.",
   "playback.slow": "Slower · turtle",
-  "playback.fast": "Faster · hare"
+  "playback.fast": "Faster · hare",
+  "editor.flowScreens": "{{count}} screens · Advanced JSON",
+  "editor.optionDetails": "Description",
+  "editor.autoAnswersTitle": "Automatic answers",
+  "editor.dragStepsHint": "Press Space to pick up, use arrow keys to move, Space to drop and Escape to cancel.",
+  "editor.optionActions": "Option {{v0}} actions",
+  "editor.dragStep": "Reorder step {{v0}}",
+  "editor.flowStructure": "Form structure",
+  "editor.autoAnswersHint": "Values used by the simulated customer",
+  "editor.behavior": "Behavior",
+  "editor.collapseStep": "Collapse step {{v0}}",
+  "editor.expandStep": "Edit step {{v0}}",
+  "editor.dragPicked": "Picked up step {{v0}}.",
+  "editor.dragPosition": "Position {{v0}}.",
+  "editor.dragPlaced": "Step placed at position {{v0}}.",
+  "editor.dragCancelled": "Reordering cancelled.",
+  "editor.needsAttention": "Needs attention"
 }

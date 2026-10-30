@@ -17,3 +17,5 @@ import './styles/controls.css';
 import './styles/playback.css';
 
 import './styles/recording.css';
+
+import './styles/editor-product.css';
