@@ -17,6 +17,8 @@ import { createStep } from '../core/project';
 import { flushSync } from 'react-dom';
 import { useRecording } from '../features/recording/useRecording';
 import { RecordingControls } from '../features/recording/components/RecordingControls';
+import { TooltipIconButton } from '../components/ui/TooltipIconButton';
+import { ControlIcon } from '../components/icons/ControlIcon';
 export function App() {
   const t = useT();
 
@@ -167,7 +169,6 @@ export function App() {
         <section className="preview" aria-label={t('app.preview')}>
           <div className="preview-heading">
             <div>
-              <span className="eyebrow">{t('app.try')}</span>
               <h2>{t('app.preview')}</h2>
             </div>
             <Button
@@ -187,16 +188,6 @@ export function App() {
           <p className="play-status" role="status" aria-live="polite">
             {selectedStep ? t('app.draft') : playback.status}
           </p>
-          {selectedStep && (
-            <div className="draft-preview-toolbar">
-              <span>
-                {t('app.editing')} {editor.project.steps.indexOf(selectedStep) + 1}
-              </span>
-              <Button variant="ghost" onClick={() => setSelectedId(null)}>
-                {t('app.viewConversation')}
-              </Button>
-            </div>
-          )}
           <div className="phone-stage">
             {selectedStep ? (
               <>
@@ -231,6 +222,18 @@ export function App() {
                 controller={recorder}
                 disabled={hasErrors || editor.loading || !editor.project.steps.length}
               />
+              {selectedStep && (
+                <div className="preview-navigation">
+                  <TooltipIconButton
+                    label={t('app.viewConversation')}
+                    description={t('app.draft')}
+                    aria-controls="phone-preview"
+                    onClick={() => setSelectedId(null)}
+                  >
+                    <ControlIcon name="message" />
+                  </TooltipIconButton>
+                </div>
+              )}
             </div>
           </div>
           <p className="preview-note">{t('app.local')}</p>

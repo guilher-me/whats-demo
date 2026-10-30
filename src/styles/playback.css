@@ -3,12 +3,14 @@
   position: relative;
   align-items: flex-start;
   gap: 12px;
-  width: min(428px, 100%);
+  width: min(428px, 100%, calc(max(320px, 100dvh - 176px) * 0.5625 + 68px));
   flex-shrink: 0;
 }
 .phone-stage .phone {
   width: calc(100% - 68px);
   max-width: 360px;
+  height: auto;
+  aspect-ratio: 9 / 16;
 }
 .playback {
   display: flex;
@@ -26,7 +28,8 @@
   box-shadow: 0 5px 18px #23392a0a;
   z-index: 35;
 }
-.playback .icon-button {
+.playback .icon-button,
+.preview-navigation .icon-button {
   display: grid;
   place-items: center;
   width: 44px;
@@ -39,6 +42,12 @@
 }
 .playback .icon-button:hover {
   background: #e6f2eb;
+}
+.preview-navigation {
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: #fff;
 }
 .playback .playback-auto {
   background: #008069;
@@ -91,7 +100,7 @@
   display: none;
 }
 .focus-mode .phone-stage {
-  width: 360px;
+  width: min(360px, calc(max(320px, 100dvh - 104px) * 0.5625));
   max-width: 100%;
 }
 .focus-mode .phone-stage .phone {
