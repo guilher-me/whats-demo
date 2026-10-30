@@ -72,7 +72,15 @@ export function PhonePreview({
       )}
       <div
         className={`touch-cursor ${p.cursor.pressed ? 'pressed' : ''}`}
-        style={{ left: p.cursor.x, top: p.cursor.y, opacity: p.cursor.visible ? 1 : 0 }}
+        style={{
+          left: p.cursor.x,
+          top: p.cursor.y,
+          opacity: p.cursor.visible ? 1 : 0,
+          transition:
+            p.cursor.travelMs === undefined
+              ? undefined
+              : `left calc(${p.cursor.travelMs}ms / var(--cursor-speed, 1)) linear, top calc(${p.cursor.travelMs}ms / var(--cursor-speed, 1)) linear, opacity 0.15s`,
+        }}
         aria-hidden="true"
       />
     </PhoneFrame>

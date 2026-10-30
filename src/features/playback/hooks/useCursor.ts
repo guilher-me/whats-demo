@@ -2,11 +2,14 @@ import { t } from '../../../i18n';
 import { useState, type RefObject } from 'react';
 import { delay } from '../../../core/async';
 import { readingDuration } from '../humanTiming';
+import { readingLines } from '../readingScan';
+import { abortError } from '../../../core/async';
 export interface CursorState {
   x: number;
   y: number;
   visible: boolean;
   pressed: boolean;
+  travelMs?: number;
 }
 export function useCursor(phone: RefObject<HTMLDivElement | null>, wait: typeof delay = delay) {
   const [cursor, setCursor] = useState<CursorState>({ x: 0, y: 0, visible: false, pressed: false });
@@ -51,6 +54,33 @@ export function useCursor(phone: RefObject<HTMLDivElement | null>, wait: typeof 
     }
     await wait(200, signal);
   };
-  const read = (text: string, signal: AbortSignal) => wait(readingDuration(text), signal);
+  const read = async (text: string, signal: AbortSignal, element?: HTMLElement | null) => {
+    if (signal.aborted) throw abortError();
+    const surface = phone.current;
+    const duration = readingDuration(text);
+    if (!surface || !element || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)
+      return wait(duration, signal);
+    element.scrollIntoView?.({ block: 'nearest' });
+    const lines = readingLines(element, surface);
+    if (!lines.length) return wait(duration, signal);
+    const segment = duration / lines.length;
+    const bounds = surface.getBoundingClientRect();
+    const move = (x: number, y: number, travelMs: number) =>
+      setCursor({
+        x: x - bounds.left - surface.clientLeft,
+        y: y - bounds.top - surface.clientTop,
+        visible: true,
+        pressed: false,
+        travelMs,
+      });
+    for (const line of lines) {
+      if (signal.aborted) throw abortError();
+      const y = (line.top + line.bottom) / 2;
+      move(line.left, y, segment * 0.2);
+      await wait(segment * 0.2, signal);
+      move(line.right, y, segment * 0.8);
+      await wait(segment * 0.8, signal);
+    }
+  };
   return { cursor, touch, type, read, hide };
 }
