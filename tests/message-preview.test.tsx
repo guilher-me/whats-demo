@@ -43,11 +43,11 @@ it('seleciona pelo teclado e atualiza o texto sem enviar mensagens', async () =>
   ).toBeNull();
 });
 it('mostra uma nova etapa e reflete textos e botões em tempo real', async () => {
-  await start();
+  await start([{ id: 'initial', type: 'user', text: 'Hi', delay: 0 }]);
   fireEvent.click(screen.getByRole('button', { name: '＋ Empresa' }));
   expect(draft()).toHaveTextContent('Nova mensagem');
-  const card = screen.getByRole('article', { name: 'Etapa 6' });
-  fireEvent.click(within(card).getByRole('radio', { name: 'Botões de resposta' }));
+  const card = screen.getByRole('article', { name: 'Etapa 2' });
+  fireEvent.click(within(card).getByRole('radio', { name: 'Botões' }));
   fireEvent.change(within(card).getAllByLabelText('Texto do botão')[0], {
     target: { value: 'Fazer agendamento' },
   });

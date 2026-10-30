@@ -8,12 +8,14 @@ export function PhoneSheet({
   description,
   children,
   onClose,
+  closeLabel,
 }: {
   container: HTMLElement | null;
   title: string;
   description: string;
   children: ReactNode;
   onClose: () => void;
+  closeLabel?: string;
 }) {
   const t = useT();
 
@@ -34,7 +36,7 @@ export function PhoneSheet({
           <header>
             <Dialog.Title>{title}</Dialog.Title>
             <Dialog.Close asChild>
-              <IconButton label={t('common.closeList')}>×</IconButton>
+              <IconButton label={closeLabel ?? t('common.closeList')}>×</IconButton>
             </Dialog.Close>
           </header>
           <Dialog.Description className="visually-hidden">{description}</Dialog.Description>

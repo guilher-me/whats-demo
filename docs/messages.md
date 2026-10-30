@@ -2,16 +2,16 @@
 
 ## Formatos implementados
 
-| Formato            | Editor                                               | Prévia                              |
-| ------------------ | ---------------------------------------------------- | ----------------------------------- |
-| Texto              | Texto da mensagem                                    | Balão comum                         |
-| Botões de resposta | Até 3 títulos, cabeçalho e rodapé opcionais          | Botões abaixo do texto              |
-| Lista              | Seções, títulos e descrições; até 10 opções no total | Convite que abre a lista no celular |
-| Flow               | Definição JSON e respostas automáticas               | Formulário com navegação            |
+| Formato | Editor                                                                  | Prévia                              |
+| ------- | ----------------------------------------------------------------------- | ----------------------------------- |
+| Texto   | Texto da mensagem                                                       | Balão comum                         |
+| Botões  | Respostas rápidas, URL, telefone, copiar código e chamada pelo WhatsApp | Botões e ações dentro do celular    |
+| Lista   | Seções, títulos e descrições; até 10 opções no total                    | Convite que abre a lista no celular |
+| Flow    | Definição JSON e respostas automáticas                                  | Formulário com navegação            |
 
-Uma mensagem interativa espera uma resposta antes de liberar a próxima etapa. Essa seleção gera um balão do cliente. No modo automático, a opção configurada é utilizada; quando não há configuração, é escolhida a primeira opção. O roteiro é linear, sem ramificações por resposta.
+Respostas rápidas e listas aguardam uma escolha e geram um balão do cliente. Botões de ação abrem uma demonstração dentro do celular, sem abrir sites, iniciar chamadas ou alterar a área de transferência. Continuar confirma uma ação; mensagens que também contêm respostas rápidas continuam aguardando uma resposta rápida. No automático, a escolha configurada é usada; por padrão, a primeira resposta rápida tem prioridade sobre ações. O roteiro é linear, sem ramificações por resposta.
 
-O simulador usa cabeçalho de texto e rodapé de até 60 caracteres e corpo de até 1024 caracteres nas mensagens interativas. Vídeo, áudio, documentos, catálogo, carrosséis e botões de URL ficam para futuras contribuições.
+O simulador usa cabeçalho de texto e rodapé de até 60 caracteres e corpo de até 1024 caracteres nas mensagens interativas. Vídeo, áudio, documentos, catálogo e carrosséis ficam para futuras contribuições.
 
 ## Composição e responsabilidades
 
@@ -20,7 +20,7 @@ O simulador usa cabeçalho de texto e rodapé de até 60 caracteres e corpo de a
 | `MessageFrame`                             | Balão, horário e slots de conteúdo e ações                      |
 | `MessageBubble`                            | Composição do conteúdo com os metadados da mensagem             |
 | `MessageAction`                            | Aparência e comportamento nativo de uma ação                    |
-| `ReplyButtons`                             | Conjunto de respostas rápidas                                   |
+| `ReplyButtons`                             | Botões tipados e abertura de ações/mais opções                  |
 | `ListInvitation`                           | Botão que abre a lista                                          |
 | `PhoneSheet`                               | Sobreposição dentro do celular, foco e teclado com Radix UI     |
 | `ListPicker`                               | Seções, opções e confirmação da lista                           |
@@ -70,3 +70,43 @@ Esta implementação cobre esses três estilos de mensagem; não é um interpret
 [Referência oficial de formatação do WhatsApp](https://faq.whatsapp.com/539178204879377/)
 
 Os indicadores de entrega usam o mesmo SVG de dois sinais: cinza para entregue, azul para visualizada. Na simulação, as mensagens do cliente passam a visualizadas quando a empresa responde. O estado é temporário, exposto em receipt no histórico, e não altera o formato do projeto salvo.
+
+## Button types and contexts
+
+The editor separates **Interactive message** from **Template message**. A template here is a visual simulation, not a submission for Meta approval. Existing v1 links without a context or button type continue to mean interactive quick replies. Typed fields are optional additions to the same schema.
+
+| Type          | Interactive message      | Template message           | Label / payload limits                             |
+| ------------- | ------------------------ | -------------------------- | -------------------------------------------------- |
+| Quick reply   | 1–3, not mixed with CTAs | Up to 10 in total          | 20 / 25 characters; ID up to 256                   |
+| Website URL   | One URL CTA, not mixed   | Up to 2                    | 20 / 25 characters; resolved URL up to 2000        |
+| Phone number  | Not offered              | Up to 1                    | Label 25; international number up to 20 characters |
+| Copy code     | Not offered              | Up to 1                    | Fixed localized label; code up to 20 characters    |
+| WhatsApp call | One call CTA, not mixed  | Supported within the total | Label 20; optional TTL below                       |
+
+Templates have **up to 10 buttons across all types**. Quick replies must form one contiguous group, before or after all other types. Quick–Quick–URL–Phone and URL–Phone–Quick are valid; Quick–URL–Quick and URL–Quick–URL are invalid. The editor preserves invalid intermediate drafts after sorting or changing context and shows an error; playback stays disabled until corrected. It never silently removes buttons to make a new context fit.
+
+For more than three buttons, the phone shows the first two plus **See all options**. The sheet exposes the full set. Manual and automatic playback both support overflow, as do message previews and recordings. Meta says 4+ buttons or mixed quick replies with another type are not displayed by WhatsApp desktop clients; this app intentionally previews a phone.
+
+WhatsApp-call TTL defaults to 10080 minutes. Interactive messages accept 1–43200 minutes; template creation accepts 1440–43200. Meta also allows a send-time template override of 1–43200, which this visual editor does not expose. The official pages do not state an additional template per-type count for voice calls; the simulator enforces the documented total rather than inventing a limit.
+
+The URL field accepts a fully resolved HTTP/HTTPS URL. Credentials, control characters, unsafe schemes and unresolved placeholders are rejected for playback. The 2000-character cap is documented for template URLs and also used as an application bound for interactive URLs. Meta templates additionally support one variable at the URL's end, with a required example and percent-encoded parameter values; enter the final resolved URL in WhatsDemo. Dynamic template rendering is not implemented.
+
+### Specialized buttons
+
+These require their own message families and are not interchangeable with generic replies or CTAs:
+
+- **Flow:** supported by the existing Flow step and JSON editor, not a generic URL action. It opens the configured screens and uses the existing completion/answers behavior.
+- **OTP:** authentication templates support copy-code, one-tap and zero-tap experiences. The ordinary promotional Copy code button is not an authentication/OTP implementation. Authentication-specific app signatures and restrictions are outside this simulator.
+- **Single-product / catalog buttons:** non-customizable buttons tied to catalog products. Multi-product buttons can show up to 30 products in up to 10 sections. These require catalog/product message components and are not implemented here.
+- **Carousel and limited-time-offer templates:** separate template structures with their own restrictions; generic template mode does not claim to validate those families.
+
+### Extending this implementation
+
+Typed definitions live in `core/types.ts`. `core/message-buttons.ts` owns context rules, safe URL parsing, labels and default automatic selection; `core/interactive.ts` validates untrusted shapes and list rules. `MessageButtonFields` adds editor fields through the reusable `MessageOptionEditor` slot. `ReplyButtons`, `MessageButtonIcon` and `ButtonActionSheet` render the same typed actions in all preview modes. `useMessageInteraction` distinguishes replies from actions; `animateMessage` clicks those same accessible components. Keep new types bounded and validated on shared-link imports, including incomplete drafts.
+
+Official references reviewed October 30, 2026:
+
+- [Interactive reply buttons](https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/interactive-reply-buttons-messages/)
+- [Interactive URL CTA messages](https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/interactive-cta-url-messages/)
+- [Template components: counts, combinations, labels and specialized buttons](https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/components/)
+- [WhatsApp call buttons and TTL](https://developers.facebook.com/documentation/business-messaging/whatsapp/calling/call-button-messages-deep-links/)

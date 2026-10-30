@@ -1,5 +1,5 @@
 import { resolve, resolveOptions } from '../../core/engine';
-import { messageOptions } from '../../core/interactive';
+import { automaticOption, isReplyButton } from '../../core/message-buttons';
 import type {
   ChatMessage,
   FlowComponent,
@@ -79,11 +79,11 @@ export function conversationOverviewMessages(project: Project): ChatMessage[] {
     let reply = '';
     if (step.type === 'flow') reply = flowOverviewReply(step);
     if (step.type === 'business' && step.interactive) {
-      const options = messageOptions(step.interactive);
-      const selected = step.interactive.autoReplyId
-        ? options.find((o) => o.id === step.interactive!.autoReplyId)
-        : options[0];
-      reply = selected?.title ?? '';
+      const selected = automaticOption(step.interactive);
+      reply =
+        selected && (step.interactive.kind === 'list' || isReplyButton(selected))
+          ? selected.title
+          : '';
       message.selection = selected?.id;
     }
     return reply

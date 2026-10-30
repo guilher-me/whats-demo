@@ -1,4 +1,6 @@
 import { t } from '../i18n';
+import { buttonRulesError, buttonShapeError } from './message-buttons';
+import type { ReplyButtonsMessage } from './types';
 import type { BusinessInteractive, MessageOption, MessageStep } from './types';
 
 export function businessMessageError(step: Pick<MessageStep, 'text' | 'interactive'>): string {
@@ -56,8 +58,14 @@ export function interactiveError(input: unknown, { allowDrafts = false } = {}): 
   if (input.footer !== undefined && !text(input.footer, 60)) return t('errors.footerLength');
   let options: unknown[];
   if (input.kind === 'buttons') {
-    if (!Array.isArray(input.buttons) || input.buttons.length < 1 || input.buttons.length > 3)
-      return t('errors.buttonsCount');
+    if (
+      !Array.isArray(input.buttons) ||
+      input.buttons.length < 1 ||
+      input.buttons.length > (allowDrafts || input.context === 'template' ? 10 : 3)
+    )
+      return t(input.context === 'template' ? 'buttons.templateCountError' : 'errors.buttonsCount');
+    const shapeError = buttonShapeError(input);
+    if (shapeError) return shapeError;
     options = input.buttons;
   } else {
     if (!text(input.button, 20, !allowDrafts)) return t('errors.listButton');
@@ -82,11 +90,20 @@ export function interactiveError(input: unknown, { allowDrafts = false } = {}): 
     if (
       !object(option) ||
       !text(option.id, input.kind === 'buttons' ? 256 : 200, true) ||
-      !text(option.title, input.kind === 'buttons' ? 20 : 24, !allowDrafts)
+      !text(
+        option.title,
+        input.kind === 'buttons' ? (allowDrafts || input.context === 'template' ? 25 : 20) : 24,
+        !allowDrafts,
+      )
     )
       return t('errors.optionIds');
     if (ids.has(option.id as string)) return t('errors.uniqueId');
-    if (!allowDrafts && input.kind === 'buttons' && titles.has(option.title as string))
+    if (
+      !allowDrafts &&
+      input.kind === 'buttons' &&
+      input.context !== 'template' &&
+      titles.has(option.title as string)
+    )
       return t('errors.uniqueTitles');
     if (option.description !== undefined && !text(option.description, 72))
       return t('errors.descriptionLength');
@@ -98,5 +115,7 @@ export function interactiveError(input: unknown, { allowDrafts = false } = {}): 
     (typeof input.autoReplyId !== 'string' || (input.autoReplyId && !ids.has(input.autoReplyId)))
   )
     return t('errors.autoReply');
-  return '';
+  return !allowDrafts && input.kind === 'buttons'
+    ? buttonRulesError(input as unknown as ReplyButtonsMessage)
+    : '';
 }

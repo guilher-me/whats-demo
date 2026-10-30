@@ -26,13 +26,13 @@ Profile photos accept PNG, JPEG and WebP up to 2 MiB, 4096 pixels per edge and 8
 
 Business messages support three formats:
 
-| Format        | Use it for                                  | Limits                                      |
-| ------------- | ------------------------------------------- | ------------------------------------------- |
-| Plain text    | Greetings, explanations and confirmations.  | Use the editor's text fields.               |
-| Reply buttons | A short set of clear choices.               | 1–3 buttons, up to 20 characters per title. |
-| Options list  | Products or services grouped into sections. | Up to 10 options across the sections.       |
+| Format       | Use it for                                                               | Limits                                                                                                     |
+| ------------ | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| Plain text   | Greetings, explanations and confirmations.                               | Use the editor's text fields.                                                                              |
+| Buttons      | Quick replies, website links, phone calls, copy codes or WhatsApp calls. | Choose Interactive message or Template message; see [button rules](messages.md#button-types-and-contexts). |
+| Options list | Products or services grouped into sections.                              | Up to 10 options across the sections.                                                                      |
 
-Set optional headers, footers and automatic answers in the message's additional settings. In manual mode, choosing a button or confirming a list records the customer's response and advances the journey. Option drag handles let you change their order.
+Set optional headers, footers and automatic answers in the message's additional settings. In manual mode, choosing a quick reply or confirming a list records the customer's response and advances the journey. Action buttons show a simulation inside the phone; they do not open websites, call numbers or copy to the clipboard. Select **Continue demo** to confirm an action. Mixed templates still wait for a quick reply. Option drag handles let you change their order.
 
 Message bodies support `*bold*`, `_italic_` and `~strikethrough~`, including combinations such as `*_bold italic_*`. Formatting appears in previews, playback and recordings. Unmatched markers remain literal; message text is not rendered as HTML.
 

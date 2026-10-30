@@ -48,14 +48,14 @@ The example uses fictional customer details. Replace its messages, business iden
 2. **Try the conversation.** Send a message to start manual playback, or use automatic playback with an animated cursor.
 3. **Share the experience.** Copy a link from a hosted installation, record a phone-only video, or hand a teammate the portable HTML app.
 
-| What you need to show                           | What WhatsDemo provides                                                                                                |
-| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| A conversation that feels like messaging        | Editable customer and business messages, typing indicators, delivery/read receipts and WhatsApp-style text formatting. |
-| More than plain text                            | Reply buttons, sectioned lists and interactive WhatsApp Flow forms.                                                    |
-| A branded scenario                              | Contact name, uploaded profile photo and an optional blue verified badge.                                              |
-| A live walkthrough or a repeatable presentation | Manual interaction and automatic playback, with adjustable simulated-user pace.                                        |
-| Something stakeholders can take away            | Experience links, phone-only MP4/WebM recording where supported, and a single-file HTML build.                         |
-| Help creating journeys with AI tools            | Accessible UI controls, an `llms.txt` guide and a versioned browser automation API.                                    |
+| What you need to show                           | What WhatsDemo provides                                                                                                        |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| A conversation that feels like messaging        | Editable customer and business messages, typing indicators, delivery/read receipts and WhatsApp-style text formatting.         |
+| More than plain text                            | Typed buttons (quick replies, URLs, phone, copy code and WhatsApp calls), sectioned lists and interactive WhatsApp Flow forms. |
+| A branded scenario                              | Contact name, uploaded profile photo and an optional blue verified badge.                                                      |
+| A live walkthrough or a repeatable presentation | Manual interaction and automatic playback, with adjustable simulated-user pace.                                                |
+| Something stakeholders can take away            | Experience links, phone-only MP4/WebM recording where supported, and a single-file HTML build.                                 |
+| Help creating journeys with AI tools            | Accessible UI controls, an `llms.txt` guide and a versioned browser automation API.                                            |
 
 ## Get started
 
