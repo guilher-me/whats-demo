@@ -3,7 +3,7 @@
   position: relative;
   align-items: flex-start;
   gap: 12px;
-  width: min(428px, 100%, calc(max(320px, 100dvh - 176px) * 0.5625 + 68px));
+  width: min(428px, 100%, calc(max(320px, 100dvh - 192px) * 0.5625 + 68px));
   flex-shrink: 0;
 }
 .phone-stage .phone {

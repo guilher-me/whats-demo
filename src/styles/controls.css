@@ -2,9 +2,11 @@
 .editor {
   background: #f8fafb;
 }
-.section-heading h2 {
+.section-heading h2,
+.preview-heading h2 {
   letter-spacing: -0.7px;
   font-size: 25px;
+  line-height: 1.2;
 }
 .eyebrow {
   letter-spacing: 0.12em;

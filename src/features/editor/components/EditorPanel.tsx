@@ -42,7 +42,6 @@ export function EditorPanel(props: Props) {
       <div className="editor-scroll" ref={scrollRef}>
         <div className="section-heading">
           <div>
-            <span className="eyebrow">{t('editor.configure')}</span>
             <h2>{t('editor.title')}</h2>
             <p>{t('editor.orderHint')}</p>
           </div>
