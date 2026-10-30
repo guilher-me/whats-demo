@@ -1,5 +1,5 @@
 import { useT } from '../../i18n';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Project } from '../../core/types';
 import { createURL } from '../../core/codec';
 import { normalizeProject } from '../../core/project';
@@ -23,12 +23,22 @@ export function ShareButton({
   onError: (message: string) => void;
 }) {
   const t = useT();
+  const mounted = useRef(true);
+  const copiedTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      clearTimeout(copiedTimer.current);
+    };
+  }, []);
 
   const [busy, setBusy] = useState(false),
     [copied, setCopied] = useState(false),
     [link, setLink] = useState(''),
     [open, setOpen] = useState(false);
   const share = async () => {
+    clearTimeout(copiedTimer.current);
     setBusy(true);
     try {
       const url = await createURL(normalizeProject(project, { allowDrafts }), location.href);
@@ -41,18 +51,19 @@ export function ShareButton({
       } catch {
         /* The dialog is the accessible fallback. */
       }
+      if (!mounted.current) return;
       if (success) {
         setCopied(true);
-        setTimeout(() => setCopied(false), 2500);
+        copiedTimer.current = setTimeout(() => setCopied(false), 2500);
       } else {
         setLink(url);
         setOpen(true);
       }
       onError('');
     } catch (error) {
-      onError((error as Error).message);
+      if (mounted.current) onError((error as Error).message);
     } finally {
-      setBusy(false);
+      if (mounted.current) setBusy(false);
     }
   };
   return (
