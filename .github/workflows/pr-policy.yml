@@ -1,6 +1,6 @@
 name: PR policy
 on:
-  pull_request_target:
+  pull_request:
     branches: [development, main]
     types: [opened, synchronize, reopened, edited]
 permissions:
@@ -10,11 +10,11 @@ jobs:
     name: PR branch policy
     runs-on: ubuntu-latest
     steps:
-      # This privileged event ONLY runs the base branch's policy against event metadata.
-      # Never checkout the PR head, install its dependencies or execute its code here.
+      # Use a normal PR check so GitHub can require it on the PR head.
+      # Only run the protected base policy (development for production promotions), never PR-head code.
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.base.sha }}
+          ref: ${{ github.base_ref == 'main' && 'development' || github.event.pull_request.base.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:

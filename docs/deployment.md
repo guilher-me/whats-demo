@@ -10,7 +10,7 @@ feature or fix branch → PR → development → PR → main
 
 Create work branches from `development` and open contributor PRs against `development`. Release through a PR from this repository's `development` branch into `main`. PRs from feature branches or a fork's branch directly into `main` fail **PR branch policy**. A maintenance PR from `main` back into `development` is allowed to synchronize a release merge.
 
-CI checks formatting, types, tests and the portable build. Pull requests build with a read-only token and never deploy. The routing check uses `pull_request_target` only to evaluate event metadata with the **base branch's** trusted policy; it never installs or executes PR-head code.
+CI checks formatting, types, tests and the portable build. Pull requests build with a read-only token and never deploy. The routing check uses the normal `pull_request` event so its result can be required on the PR head. It evaluates event metadata using the protected base branch's policy (`development` when targeting `main`); it never installs or executes PR-head code.
 
 ## Environments
 
@@ -53,7 +53,7 @@ The workflows alone cannot enforce pull requests or enable GitHub Pages settings
 3. Branch protection for **both `main` and `development`**: require pull requests, require **Validate project** and **PR branch policy**, block force pushes and deletion, and apply the rules to administrators. The number of human approvals can reflect the team's size; the routing and CI checks are separate from review approval.
 4. The **github-pages** environment's deployment-branch rule must allow `main`. Both deployment workflows execute from that branch, even when building development. Do not require the source `development` branch here.
 
-For the initial bootstrap, merge the workflow/policy files into `development` and then `main` through PRs before making the newly introduced check required. A `pull_request_target` check cannot run until its workflow exists on the target branch. Once installed, enable the required checks for normal changes.
+For the initial bootstrap, merge the workflow/policy files into `development` and then `main` through PRs before making the newly introduced check required. The protected branch must contain the policy script before the metadata check can execute it. Once installed, enable both required checks for normal changes.
 
 The build has read-only repository access. Only the snapshot job has `contents: write`; only the final Pages job has `pages: write` and `id-token: write`. No personal access token is needed in repository secrets.
 
