@@ -1,5 +1,7 @@
 # WhatsDemo
 
+O link **Privacidade**, no cabeçalho, explica o armazenamento local, como limpar os dados e o conteúdo dos links compartilhados. O aviso é informativo, está disponível nos três idiomas e não altera os dados salvos ao abrir ou fechar.
+
 Interface em inglês (padrão), espanhol e português do Brasil, com seletor de bandeiras no cabeçalho e preferência salva no navegador. As mensagens e Flows mantêm o idioma em que foram criados. Para contribuir com traduções e componentes, consulte [localização](docs/localization.md).
 
 Editor de conversas e WhatsApp Flows para demonstrações, protótipos e gravações. Monte a sequência à esquerda e experimente a conversa no celular à direita, manualmente ou com preenchimento automático e cursor animado.

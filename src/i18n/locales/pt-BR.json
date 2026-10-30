@@ -292,5 +292,16 @@
   "storage.exampleHelp": "Esta é a jornada de exemplo. Ao editar, um rascunho será salvo neste navegador.",
   "storage.sharedHelp": "Carregado de um link. Edite a jornada para salvar um rascunho neste navegador.",
   "storage.savingHelp": "Salvando as alterações neste navegador.",
-  "storage.failureHelp": "Não foi possível salvar suas alterações neste navegador. Copie o link da experiência para preservar esta jornada."
+  "storage.failureHelp": "Não foi possível salvar suas alterações neste navegador. Copie o link da experiência para preservar esta jornada.",
+  "privacy.link": "Privacidade",
+  "privacy.title": "Privacidade no WhatsDemo",
+  "privacy.description": "Como sua jornada é armazenada e compartilhada.",
+  "privacy.storageTitle": "Dados salvos neste navegador",
+  "privacy.storageBody": "Sua jornada — incluindo nome do contato, foto, mensagens, JSON dos Flows e respostas automáticas — e o idioma da interface ficam armazenados localmente usando localStorage. Eles permanecem neste navegador até você substituí-los ou limpar os dados salvos.",
+  "privacy.sharingTitle": "Links compartilhados contêm a jornada",
+  "privacy.sharingBody": "Copiar link codifica a jornada completa no link, incluindo imagens enviadas e respostas dos Flows. Quem tiver esse link e acesso ao aplicativo pode abrir seu conteúdo. Codificação e compressão não são criptografia. Inclua apenas informações que você pretende compartilhar.",
+  "privacy.deleteTitle": "Como apagar os dados salvos",
+  "privacy.deleteBody": "Use as configurações de privacidade ou armazenamento do navegador para limpar os dados salvos desta página. Isso remove o rascunho local e a preferência de idioma. Restaurar o exemplo substitui a jornada; não limpa todos os dados salvos. Arquivos baixados e links copiados anteriormente não são apagados.",
+  "privacy.connectionsTitle": "Cookies e conexões",
+  "privacy.connectionsBody": "O WhatsDemo não define cookies nem inclui publicidade, analytics ou rastreadores. O aplicativo não envia jornadas a um backend; gerar um link e gravar um vídeo acontece no seu navegador. Quando hospedado na web, o provedor de hospedagem pode processar registros de acesso conforme a própria política de privacidade."
 }

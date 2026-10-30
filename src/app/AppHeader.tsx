@@ -2,6 +2,7 @@ import { useT } from '../i18n';
 import type { ReactNode } from 'react';
 import brandIcon from '../../assets/whatsdemo-icon.svg';
 import { LanguageSwitcher } from '../i18n/LanguageSwitcher';
+import { PrivacyNotice } from '../features/privacy/PrivacyNotice';
 export function AppHeader({ children, disabled }: { children: ReactNode; disabled?: boolean }) {
   const t = useT();
 
@@ -15,7 +16,10 @@ export function AppHeader({ children, disabled }: { children: ReactNode; disable
           <h1>
             Whats<span>Demo</span>
           </h1>
-          <p>{t('app.tagline')}</p>
+          <div className="brand-meta">
+            <p>{t('app.tagline')}</p>
+            <PrivacyNotice disabled={disabled} />
+          </div>
         </div>
       </div>
       <div className="header-actions">

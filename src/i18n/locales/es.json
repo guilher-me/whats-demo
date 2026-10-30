@@ -292,5 +292,16 @@
   "storage.exampleHelp": "Este es el recorrido de ejemplo. Al editarlo se guardará un borrador en este navegador.",
   "storage.sharedHelp": "Cargado desde un enlace. Edita el recorrido para guardar un borrador en este navegador.",
   "storage.savingHelp": "Guardando los cambios en este navegador.",
-  "storage.failureHelp": "No se pudieron guardar los cambios en este navegador. Copia el enlace de la experiencia para conservar este recorrido."
+  "storage.failureHelp": "No se pudieron guardar los cambios en este navegador. Copia el enlace de la experiencia para conservar este recorrido.",
+  "privacy.link": "Privacidad",
+  "privacy.title": "Privacidad en WhatsDemo",
+  "privacy.description": "Cómo se guarda y comparte tu recorrido.",
+  "privacy.storageTitle": "Datos guardados en este navegador",
+  "privacy.storageBody": "Tu recorrido —incluidos el nombre del contacto, la foto, los mensajes, el JSON de los Flows y las respuestas automáticas— y el idioma de la interfaz se guardan localmente mediante localStorage. Permanecen en este navegador hasta que los reemplaces o borres los datos guardados.",
+  "privacy.sharingTitle": "Los enlaces compartidos contienen el recorrido",
+  "privacy.sharingBody": "Copiar enlace codifica el recorrido completo en el enlace, incluidas las imágenes subidas y las respuestas de los Flows. Quien tenga el enlace y acceso a la aplicación puede abrir su contenido. La codificación y la compresión no son cifrado. Incluye solo información que quieras compartir.",
+  "privacy.deleteTitle": "Cómo borrar los datos guardados",
+  "privacy.deleteBody": "Usa los ajustes de privacidad o almacenamiento del navegador para borrar los datos guardados de esta página. Esto elimina el borrador local y la preferencia de idioma. Restaurar el ejemplo reemplaza el recorrido; no borra todos los datos guardados. Los archivos descargados y los enlaces copiados anteriormente no se eliminan.",
+  "privacy.connectionsTitle": "Cookies y conexiones",
+  "privacy.connectionsBody": "WhatsDemo no establece cookies ni incluye publicidad, analítica o rastreadores. La aplicación no sube recorridos a un servidor; los enlaces y vídeos se generan en tu navegador. Si se aloja en línea, el proveedor de alojamiento puede procesar registros de acceso según su propia política de privacidad."
 }

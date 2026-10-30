@@ -8,17 +8,20 @@ export function Dialog({
   title,
   description,
   children,
+  trigger,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
   description?: string;
   children: ReactNode;
+  trigger?: ReactNode;
 }) {
   const t = useT();
 
   return (
     <Primitive.Root open={open} onOpenChange={onOpenChange}>
+      {trigger && <Primitive.Trigger asChild>{trigger}</Primitive.Trigger>}
       <Primitive.Portal>
         <Primitive.Overlay className="dialog-overlay" />
         <Primitive.Content className="dialog-content">

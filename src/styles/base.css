@@ -111,6 +111,39 @@ label select {
   color: var(--muted);
   font-size: 12px;
 }
+.brand-meta {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+}
+.privacy-link {
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.privacy-link:hover:not(:disabled) {
+  background: transparent;
+  color: var(--accent);
+}
+.privacy-content {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+.privacy-content h3 {
+  color: var(--ink);
+}
+.privacy-content p {
+  margin: 6px 0 0;
+  line-height: 1.6;
+}
 .header-actions {
   display: flex;
   align-items: center;
