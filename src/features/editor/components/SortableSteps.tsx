@@ -42,7 +42,7 @@ function SortableStep({
     <div
       ref={setNodeRef}
       className={`sortable-step${isDragging ? ' is-dragging' : ''}`}
-      style={{ transform: CSS.Transform.toString(transform), transition }}
+      style={{ transform: CSS.Translate.toString(transform), transition }}
     >
       {children(
         <button

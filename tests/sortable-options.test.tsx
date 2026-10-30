@@ -11,6 +11,7 @@ const options = [
   { id: 'first', title: 'Primeira', description: 'Descrição original' },
   { id: 'second', title: 'Segunda', description: 'Outra descrição' },
 ];
+let unequalHeights = false;
 function Harness({ list = false }: { list?: boolean }) {
   const [buttons, setButtons] = useState<ReplyButtonsMessage>({
     kind: 'buttons',
@@ -37,20 +38,27 @@ function Harness({ list = false }: { list?: boolean }) {
   );
 }
 beforeEach(() => {
+  unequalHeights = false;
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
     this: HTMLElement,
   ) {
     const row = this.closest('.sortable-option');
     const index = row ? Array.from(row.parentElement!.children).indexOf(row) : 0;
+    const rows = row ? Array.from(row.parentElement!.children) : [];
+    const heights = rows.map((node) =>
+      unequalHeights ? (node.querySelector('input')?.value === 'Primeira' ? 240 : 70) : 140,
+    );
+    const top = heights.slice(0, index).reduce((a, b) => a + b, 0);
+    const height = row ? heights[index] : 310;
     return {
       x: 0,
-      y: index * 140,
-      top: index * 140,
+      y: top,
+      top,
       left: 0,
       right: 400,
-      bottom: (index + 1) * 140,
+      bottom: top + height,
       width: 400,
-      height: row ? 140 : 280,
+      height,
       toJSON() {},
     };
   });
@@ -93,4 +101,25 @@ it('Escape cancela a troca sem alterar a ordem', async () => {
   render(<Harness />);
   await move(true);
   expect(JSON.parse(screen.getByTestId('state').textContent!).buttons).toEqual(options);
+});
+
+it.each([false, true])('keeps unequal option heights while dragging; list=%s', async (list) => {
+  unequalHeights = true;
+  render(<Harness list={list} />);
+  const handle = screen.getByRole('button', { name: 'Reordenar opção 2: Segunda' });
+  handle.focus();
+  fireEvent.keyDown(handle, { code: 'Space', key: ' ' });
+  await waitFor(() => expect(handle).toHaveAttribute('aria-pressed', 'true'));
+  fireEvent.keyDown(document, { code: 'ArrowUp', key: 'ArrowUp' });
+  await waitFor(() =>
+    expect(document.querySelector('[role="status"]')).toHaveTextContent('Posição 1'),
+  );
+  const moving = document.querySelector<HTMLElement>('.sortable-option.is-dragging')!;
+  expect(moving.style.transform).toContain('translate3d(');
+  expect(moving.style.transform).not.toContain('scale');
+  fireEvent.keyDown(document, { code: 'Space', key: ' ' });
+  await waitFor(() => expect(handle).not.toHaveAttribute('aria-pressed', 'true'));
+  const state = JSON.parse(screen.getByTestId('state').textContent!);
+  expect(list ? state.rows : state.buttons).toEqual([options[1], options[0]]);
+  if (!list) expect(state.autoReplyId).toBe('first');
 });
