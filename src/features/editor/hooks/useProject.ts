@@ -1,9 +1,8 @@
-import { t } from '../../../i18n';
 import { useCallback, useEffect, useState, useRef } from 'react';
 import type { Project, Step } from '../../../core/types';
 import { createDefaultProject } from '../../../core/defaults';
 import { clone, createStep, normalizeProject, projectStorageKey, uid } from '../../../core/project';
-import { decode } from '../../../core/codec';
+import { useSharedLink } from '../../sharing/useSharedLink';
 import { prepareProjectImages } from '../../../core/images/sanitize';
 export type SaveState = 'example' | 'recovered' | 'saving' | 'saved' | 'failed' | 'shared';
 export function useProject() {
@@ -24,40 +23,20 @@ export function useProject() {
   });
   const [project, setProject] = useState(initial.project);
   const [revision, setRevision] = useState(0),
-    [loading, setLoading] = useState(true),
     [error, setError] = useState(''),
     [saveState, setSaveState] = useState<SaveState>(initial.state);
-  useEffect(() => {
-    let generation = 0;
-    let disposed = false;
-    const load = async () => {
-      const id = ++generation;
-      setLoading(true);
-      try {
-        if (location.hash.startsWith('#project=')) {
-          const shared = await prepareProjectImages(normalizeProject(await decode(location.hash)));
-          if (!disposed && id === generation) {
-            setProject(shared);
-            setRevision((n) => n + 1);
-            setSaveState('shared');
-            setError('');
-          }
-        }
-      } catch (e) {
-        if (!disposed && id === generation)
-          setError(t('sharing.openFailed') + (e as Error).message);
-      } finally {
-        if (!disposed && id === generation) setLoading(false);
-      }
-    };
-    void load();
-    window.addEventListener('hashchange', load);
-    return () => {
-      disposed = true;
-      generation++;
-      window.removeEventListener('hashchange', load);
-    };
-  }, []);
+  const hasWork = useRef(initial.state === 'recovered');
+  const link = useSharedLink({
+    current: () => ({ project, hasWork: hasWork.current }),
+    accept: (shared, persist) => {
+      hasWork.current = true;
+      edited.current = persist;
+      setProject(shared);
+      setRevision((n) => n + 1);
+      setSaveState(persist ? 'saving' : 'shared');
+      setError('');
+    },
+  });
   // Also rewrite recovered drafts and synchronous automation loads. Preserve concurrent edits.
   useEffect(() => {
     let current = true;
@@ -87,6 +66,7 @@ export function useProject() {
   }, [project]);
   const update = useCallback((change: (value: Project) => Project) => {
     edited.current = true;
+    hasWork.current = true;
     setSaveState('saving');
     setProject(change);
   }, []);
@@ -123,7 +103,9 @@ export function useProject() {
   return {
     project,
     revision,
-    loading,
+    loading: link.loading,
+    hasDraft: hasWork.current,
+    link,
     error,
     setError,
     saveState,
