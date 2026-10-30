@@ -46,7 +46,7 @@ it('does not claim the untouched example is saved and separates sharing from sto
   expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
   expect(document.querySelector('.app-header .brand-meta .save-indicator')).toBe(indicator());
   expect(document.querySelector('.editor .save-indicator')).toBeNull();
-  expect(screen.getByRole('button', { name: 'Copiar link' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Exportar JSON' })).toBeInTheDocument();
 });
 it('shows success only after writing and restores the saved draft on reopening', async () => {
   const project = createDefaultProject();
@@ -79,7 +79,7 @@ it('reports a failed write visibly, keeps the edits, and clears the warning afte
     target: { value: 'Alteração preservada' },
   });
   expect(indicator()).toHaveAttribute('data-state', 'failed');
-  expect(screen.getByRole('alert')).toHaveTextContent('Copie o link da experiência');
+  expect(screen.getByRole('alert')).toHaveTextContent('Exporte');
   expect(screen.getByLabelText('Nome do contato')).toHaveValue('Alteração preservada');
   save.mockRestore();
   fireEvent.change(screen.getByLabelText('Nome do contato'), { target: { value: 'Agora salvo' } });
@@ -92,6 +92,6 @@ it('does not treat a shared-link load as a successful local save', async () => {
   project.contact.avatar = '';
   history.replaceState(null, '', await createURL(project, location.href));
   await start();
-  expect(indicator()).toHaveAttribute('data-state', 'shared');
+  expect(indicator()).toHaveAttribute('data-state', 'example');
   expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
 });

@@ -8,6 +8,7 @@ function agentDocs(root, directory, template) {
     fs.writeFileSync(path.join(directory, filename), index);
   fs.writeFileSync(path.join(directory, 'llms-full.txt'), full);
   fs.cpSync(path.join(root, 'docs'), path.join(directory, 'docs'), { recursive: true });
+  fs.cpSync(path.join(root, 'schemas'), path.join(directory, 'schemas'), { recursive: true });
   return template.replace(
     '<!-- LLM_DOCS -->',
     () =>

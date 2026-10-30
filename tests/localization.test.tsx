@@ -46,7 +46,7 @@ it('switches all three interfaces, persists the choice and preserves the project
   expect(screen.getByRole('heading', { name: 'Build the conversation' })).toBeInTheDocument();
   expect(document.documentElement).toHaveAttribute('lang', 'en');
   const before = window.whatsappFakeFlows!.getProject();
-  const link = await window.whatsappFakeFlows!.createShareURL();
+  const link = JSON.stringify(window.whatsappFakeFlows!.getDocument());
   const spanish = screen.getByRole('button', { name: 'Español' });
   fireEvent.click(spanish);
   expect(screen.getByRole('heading', { name: 'Crea la conversación' })).toBeInTheDocument();
@@ -61,7 +61,7 @@ it('switches all three interfaces, persists the choice and preserves the project
   fireEvent.click(screen.getByRole('button', { name: 'English' }));
   expect(screen.getByRole('button', { name: '＋ Business' })).toBeInTheDocument();
   expect(window.whatsappFakeFlows!.getProject()).toEqual(before);
-  expect(await window.whatsappFakeFlows!.createShareURL()).toBe(link);
+  expect(JSON.stringify(window.whatsappFakeFlows!.getDocument())).toBe(link);
 });
 
 it('has complete catalogs with matching interpolation variables', () => {

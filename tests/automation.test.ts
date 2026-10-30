@@ -62,10 +62,11 @@ it('usa cópias em ambos os sentidos e mantém o contrato versionado', () => {
 });
 it('gera links sem persistir e rejeita um projeto nulo explícito', async () => {
   const { api, replace } = setup();
-  const url = new URL(await api.createShareURL());
-  expect(await decode(url.hash)).toEqual(legacy);
+  api.loadProject({ ...legacy, contact: { ...legacy.contact, avatar: '' } });
+  replace.mockClear();
+  expect(api.getDocument().format).toBe('whatsdemo');
   expect(replace).not.toHaveBeenCalled();
-  await expect(api.createShareURL(null)).rejects.toThrow();
+  await expect(Promise.resolve().then(() => api.loadDocument(null))).rejects.toThrow();
 });
 it('bloqueia escrita durante carregamento e reprodução concorrente ou modo inválido', async () => {
   const { api, run, setState } = setup();
