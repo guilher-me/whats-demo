@@ -399,3 +399,11 @@
 .message-receipt--read {
   color: #53bdeb;
 }
+.chat-body.overview-chat {
+  bottom: 0;
+}
+.overview-chat .open-flow:disabled,
+.overview-chat .message-action:disabled {
+  opacity: 1;
+  color: #008069;
+}

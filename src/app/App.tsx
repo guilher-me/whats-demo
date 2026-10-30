@@ -19,6 +19,7 @@ import { useRecording } from '../features/recording/useRecording';
 import { RecordingControls } from '../features/recording/components/RecordingControls';
 import { TooltipIconButton } from '../components/ui/TooltipIconButton';
 import { ControlIcon } from '../components/icons/ControlIcon';
+import { ConversationOverview } from '../features/conversation/components/ConversationOverview';
 export function App() {
   const t = useT();
 
@@ -28,7 +29,12 @@ export function App() {
   const [invalid, setInvalid] = useState<Record<string, boolean>>({}),
     [focusMode, setFocusMode] = useState(false),
     [selectedId, setSelectedId] = useState<string | null>(null),
+    [showOverview, setShowOverview] = useState(false),
     [restoreOpen, setRestoreOpen] = useState(false);
+  const selectStep = (id: string | null) => {
+    setShowOverview(false);
+    setSelectedId(id);
+  };
   const onValidity = useCallback(
     (id: string, valid: boolean) =>
       setInvalid((current) => (current[id] === !valid ? current : { ...current, [id]: !valid })),
@@ -46,7 +52,7 @@ export function App() {
     phone: phoneRef,
     prepare: () =>
       flushSync(() => {
-        setSelectedId(null);
+        selectStep(null);
         setFocusMode(false);
         playback.reset();
       }),
@@ -61,7 +67,7 @@ export function App() {
   };
   const run = (project: typeof editor.project, automatic: boolean) => {
     ensureAvailable();
-    setSelectedId(null);
+    selectStep(null);
     return playback.run(project, automatic);
   };
   useAutomationAPI({
@@ -78,7 +84,7 @@ export function App() {
     hasErrors: () => hasErrors,
     replace: (project) => {
       ensureAvailable();
-      setSelectedId(null);
+      selectStep(null);
       playback.reset();
       editor.replace(project);
     },
@@ -89,7 +95,7 @@ export function App() {
     },
     reset: () => {
       ensureAvailable();
-      setSelectedId(null);
+      selectStep(null);
       playback.reset();
     },
     example: createDefaultProject,
@@ -99,7 +105,7 @@ export function App() {
   useEffect(() => {
     playback.stop();
     setInvalid({});
-    setSelectedId(null);
+    selectStep(null);
   }, [editor.revision, playback.stop]);
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
@@ -139,13 +145,13 @@ export function App() {
           onSelect={(id) => {
             if (recorder.busy) return;
             if (playback.running) playback.stop();
-            setSelectedId(id);
+            selectStep(id);
           }}
           error={editor.error}
           onContact={(contact) => edit(() => editor.update((p) => ({ ...p, contact })))}
           onChange={(id, change) =>
             edit(() => {
-              setSelectedId(id);
+              selectStep(id);
               editor.updateStep(id, change);
             })
           }
@@ -155,7 +161,7 @@ export function App() {
             edit(() => {
               const step = createStep(type);
               editor.update((project) => ({ ...project, steps: [...project.steps, step] }));
-              setSelectedId(step.id);
+              selectStep(step.id);
               addedId = step.id;
             });
             return addedId;
@@ -185,10 +191,16 @@ export function App() {
             </Button>
           </div>
           <p className="play-status" role="status" aria-live="polite">
-            {selectedStep ? t('app.draft') : playback.status}
+            {showOverview
+              ? t('app.viewConversation')
+              : selectedStep
+                ? t('app.draft')
+                : playback.status}
           </p>
           <div className="phone-stage">
-            {selectedStep ? (
+            {showOverview ? (
+              <ConversationOverview project={editor.project} phoneRef={phoneRef} />
+            ) : selectedStep ? (
               <>
                 <MessagePreview
                   key={`${selectedStep.id}:${selectedStep.type === 'business' ? (selectedStep.interactive?.kind ?? 'text') : selectedStep.type}`}
@@ -213,7 +225,7 @@ export function App() {
                 onAuto={() => void run(editor.project, true)}
                 onStop={playback.stop}
                 onReset={() => {
-                  setSelectedId(null);
+                  selectStep(null);
                   playback.reset();
                 }}
               />
@@ -221,21 +233,17 @@ export function App() {
                 controller={recorder}
                 disabled={hasErrors || editor.loading || !editor.project.steps.length}
               />
-              {selectedStep && (
+              {(selectedStep || showOverview) && (
                 <div className="preview-navigation">
                   <TooltipIconButton
                     label={t('app.viewConversation')}
                     description={t('app.viewConversationHint')}
                     aria-controls="phone-preview"
-                    disabled={
-                      recorder.busy ||
-                      (!playback.messages.length &&
-                        (hasErrors || editor.loading || !editor.project.steps.length))
-                    }
+                    disabled={recorder.busy}
+                    aria-pressed={showOverview}
                     onClick={() => {
-                      // Mount the actual composer before manual playback installs/focuses its input.
-                      flushSync(() => setSelectedId(null));
-                      if (!playback.messages.length) void run(editor.project, false);
+                      setSelectedId(null);
+                      setShowOverview(true);
                     }}
                   >
                     <ControlIcon name="message" />

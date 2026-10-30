@@ -61,36 +61,43 @@ it('mostra uma nova etapa e reflete textos e botões em tempo real', async () =>
   );
   expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(0);
 });
-it('Ver conversa inicia a jornada manual sem histórico e permite responder imediatamente', async () => {
+it('Ver conversa mostra todas as mensagens configuradas em ordem sem executar a jornada', async () => {
   await start([
-    { id: 'user', type: 'user', text: 'oi', delay: 0 },
-    { id: 'reply', type: 'business', text: 'Atendimento iniciado', delay: 0 },
+    { id: 'user', type: 'user', text: 'oi', delay: 120 },
+    { id: 'reply', type: 'business', text: 'Mensagem da empresa', delay: 120 },
+    { ...createStep('flow'), id: 'flow', text: 'Convite do formulário' },
   ]);
+  const original = window.whatsappFakeFlows!.getProject();
   fireEvent.click(screen.getByRole('article', { name: 'Etapa 1' }));
   fireEvent.click(screen.getByRole('button', { name: 'Ver conversa' }));
   expect(
     screen.queryByLabelText('Prévia da mensagem em edição', { selector: '.draft-chat' }),
   ).toBeNull();
+  const overview = document.querySelector('.overview-chat')!;
+  expect(
+    Array.from(overview.querySelectorAll('.message-content p')).map((el) => el.textContent),
+  ).toEqual(['oi', 'Mensagem da empresa', 'Convite do formulário']);
+  expect(screen.queryByRole('button', { name: 'Enviar mensagem' })).toBeNull();
+  expect(screen.getByRole('button', { name: 'Abrir formulário' })).toBeDisabled();
+  expect(window.whatsappFakeFlows!.getState().running).toBe(false);
+  expect(window.whatsappFakeFlows!.getState().messages).toEqual([]);
+  expect(window.whatsappFakeFlows!.getProject()).toEqual(original);
+  // Playback is still an explicit, separate action.
+  fireEvent.click(screen.getByRole('button', { name: 'Iniciar manual' }));
+  expect(document.querySelector('.overview-chat')).toBeNull();
   expect(window.whatsappFakeFlows!.getState().running).toBe(true);
-  const input = screen.getByLabelText('Mensagem', { selector: 'input' });
-  expect(input).toHaveFocus();
-  fireEvent.change(input, { target: { value: 'oi' } });
-  fireEvent.click(screen.getByRole('button', { name: 'Enviar mensagem' }));
-  await act(async () => {
-    await vi.advanceTimersByTimeAsync(1);
-  });
-  expect(document.querySelector('.messages')).toHaveTextContent('Atendimento iniciado');
-  expect(document.querySelectorAll('.bubble.user')).toHaveLength(1);
+  expect(screen.getByLabelText('Mensagem', { selector: 'input' })).toBeInTheDocument();
 });
-it('não abandona a edição para iniciar uma jornada inválida sem histórico', async () => {
+it('permite visualizar mensagens incompletas sem validar ou executar a jornada', async () => {
   const step = createStep('business');
   if (step.type === 'flow') throw new Error('fixture');
   step.interactive = { kind: 'buttons', buttons: [{ id: 'a', title: '' }] };
   await start([step]);
   fireEvent.click(screen.getByRole('article', { name: 'Etapa 1' }));
-  expect(screen.getByRole('button', { name: 'Ver conversa' })).toBeDisabled();
+  fireEvent.click(screen.getByRole('button', { name: 'Ver conversa' }));
   expect(window.whatsappFakeFlows!.getState().running).toBe(false);
-  expect(draft()).toBeInTheDocument();
+  expect(document.querySelector('.overview-chat')).toHaveTextContent(step.text);
+  expect(screen.getByRole('button', { name: 'Iniciar manual' })).toBeDisabled();
 });
 it('permite abrir uma lista em edição sem avançar nem enviar respostas na jornada', async () => {
   const step = createStep('business');
@@ -128,7 +135,8 @@ it('preserva a conversa executada, reinicia a prévia e limpa a seleção removi
   });
   expect(draft()).toHaveTextContent('Novo texto');
   fireEvent.click(screen.getByRole('button', { name: 'Ver conversa' }));
-  expect(document.querySelector('.messages')).toHaveTextContent('Mensagem original');
+  expect(document.querySelector('.overview-chat')).toHaveTextContent('Novo texto');
+  expect(window.whatsappFakeFlows!.getState().messages[0].text).toBe('Mensagem original');
   expect(window.whatsappFakeFlows!.getState().running).toBe(false);
   fireEvent.click(card);
   act(() => {

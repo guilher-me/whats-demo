@@ -10,7 +10,7 @@
   "app.draft": "Vista previa del mensaje en edición",
   "app.editing": "Editando paso",
   "app.viewConversation": "Ver conversación",
-  "app.viewConversationHint": "Vuelve a la conversación. Inicia el modo manual si aún no hay historial.",
+  "app.viewConversationHint": "Muestra todos los mensajes configurados en orden, sin reproducir el recorrido.",
   "app.local": "Simulación local · sin envío a WhatsApp",
   "app.exit": "Salir de la vista · Esc",
   "app.restoreTitle": "¿Restaurar el ejemplo?",

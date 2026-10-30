@@ -96,7 +96,7 @@ O arquivo de instruções não conecta um LLM automaticamente. A ferramenta prec
 
 Clique em uma etapa ou foque um de seus campos para acompanhar a mensagem no celular enquanto edita. Texto, botões, listas e convites de Flow usam os mesmos componentes da conversa. Você pode experimentar as opções e abrir o formulário nessa prévia.
 
-Use **Ver conversa** para retornar ao histórico da simulação. Se ainda não houver histórico, o botão inicia o modo manual e deixa o campo de mensagem pronto para interação. Históricos existentes são preservados. Corrija campos inválidos antes de iniciar uma nova reprodução. A prévia de edição, por si só, não adiciona mensagens ao histórico nem executa a sequência.
+Use **Ver conversa** para exibir todas as mensagens configuradas, na ordem, em uma visão estática e rolável do celular. Isso não inicia a reprodução, não espera os delays nem exige preencher formulários. O histórico de uma simulação anterior é preservado separadamente. Selecione uma etapa para voltar à edição ou use os controles de reprodução para executar a jornada.
 
 ## Controles e acessibilidade
 
