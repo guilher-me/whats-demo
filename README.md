@@ -38,7 +38,7 @@ Use it for sales demos, product reviews, workshops, usability discussions and tr
 
 Meet **Luma Home**, the fictional lighting store included with the app. A customer explores a collection, picks a lamp from a list, completes a two-screen Flow and receives a request confirmation.
 
-![](docs/media/luma-home-demo.mp4)
+https://github.com/user-attachments/assets/4c12369b-d540-4811-889e-cf8848766625
 
 The example uses fictional customer details. Replace its messages, business identity and forms with your own scenario.
 
