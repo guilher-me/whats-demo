@@ -18,8 +18,8 @@
   padding: 5px;
   border: 1px solid var(--line);
   border-radius: 15px;
-  background: #fff;
-  box-shadow: 0 5px 18px #23392a0a;
+  background: var(--surface);
+  box-shadow: var(--shadow-floating);
 }
 .record-control .icon-button {
   display: grid;
@@ -29,15 +29,15 @@
   padding: 0;
   border: 0;
   border-radius: 10px;
-  color: #ad392d;
-  background: #fff3f0;
+  color: var(--danger);
+  background: var(--danger-soft);
 }
 .record-control .icon-button:hover {
-  background: #ffe4dd;
+  background: #fee4e2;
 }
 .record-control.recording-active .icon-button {
-  color: #fff;
-  background: #b6382d;
+  color: var(--surface);
+  background: var(--danger);
 }
 .record-control svg {
   width: 21px;
@@ -51,7 +51,7 @@
     11px/1.6 Consolas,
     monospace;
   font-variant-numeric: tabular-nums;
-  color: #ad392d;
+  color: var(--danger);
 }
 .record-mode-options {
   display: grid;
@@ -86,20 +86,20 @@
   margin: 14px auto;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--surface);
 }
 .download-recording {
   display: inline-flex;
   align-items: center;
   padding: 9px 13px;
   border-radius: 9px;
-  background: #008069;
-  color: #fff;
+  background: var(--accent);
+  color: var(--surface);
   text-decoration: none;
   font-weight: 500;
 }
 .download-recording:hover {
-  background: #006f5b;
+  background: var(--accent-hover);
 }
 .editor[aria-disabled='true'] {
   opacity: 0.5;

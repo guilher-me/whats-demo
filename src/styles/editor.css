@@ -19,7 +19,7 @@
   flex-shrink: 0;
   padding: 12px 32px 16px;
   border-top: 1px solid var(--line);
-  background: #f8fafb;
+  background: var(--surface-editor);
   z-index: 2;
 }
 .editor-footer .component-palette {
@@ -40,7 +40,7 @@
   gap: 20px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--surface);
   padding: 18px;
   margin: 24px 0;
 }
@@ -54,7 +54,7 @@
   height: 58px;
   border-radius: 50%;
   object-fit: cover;
-  background: #edf3ee;
+  background: var(--soft);
 }
 .upload-button {
   font-size: 11px;
@@ -83,7 +83,7 @@
 }
 .step-card {
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface);
   border-radius: 11px;
   margin-bottom: 12px;
   overflow: hidden;
@@ -93,7 +93,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 14px;
-  background: #fbfcfb;
+  background: var(--surface-subtle);
 }
 .step-number {
   width: 23px;
@@ -120,10 +120,10 @@
   padding: 2px 6px;
   background: none;
   font-size: 15px;
-  color: #78877d;
+  color: var(--muted);
 }
 .step-actions button:hover {
-  background: #e9efeb;
+  background: var(--surface-hover);
 }
 .step-body {
   padding: 0 14px 14px;
@@ -173,7 +173,7 @@
 }
 .step-error {
   font-size: 12px;
-  color: #b64334;
+  color: var(--danger);
   margin: 6px 0 0;
 }
 .add-row {
@@ -184,16 +184,16 @@
 .add-row button {
   flex: 1;
   border-style: dashed;
-  color: #4a6b58;
+  color: var(--text-secondary);
   background: transparent;
 }
 .editor-hint {
   font-size: 11px;
-  color: #8b978f;
+  color: var(--muted);
 }
 .active-step {
-  border-color: #008069;
-  box-shadow: 0 0 0 2px #0080690c;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-ring);
 }
 .sequence-title {
   display: flex;
@@ -203,17 +203,17 @@
 }
 .save-indicator {
   position: relative;
-  color: #64776c;
+  color: var(--muted);
   font-size: 11px;
   cursor: help;
 }
 .save-indicator:focus-visible {
-  outline: 2px solid #008069;
+  outline: 2px solid var(--accent);
   outline-offset: 4px;
   border-radius: 3px;
 }
 .save-indicator[data-state='failed'] {
-  color: #a33426;
+  color: var(--danger);
 }
 .save-tooltip {
   position: absolute;
@@ -224,8 +224,8 @@
   max-width: calc(100vw - 80px);
   padding: 10px 12px;
   border-radius: 9px;
-  background: #20382e;
-  color: #fff;
+  background: var(--tooltip-bg);
+  color: var(--surface);
   line-height: 1.5;
   font-weight: 400;
   box-shadow: 0 4px 16px #0002;
@@ -240,10 +240,10 @@
 }
 .save-warning {
   padding: 10px 12px;
-  border: 1px solid #efc5ba;
+  border: 1px solid var(--danger-line);
   border-radius: 9px;
-  background: #fff3ee;
-  color: #963622;
+  background: var(--danger-soft);
+  color: var(--danger);
   font-size: 12px;
   line-height: 1.5;
 }

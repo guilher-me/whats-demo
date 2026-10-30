@@ -11,6 +11,9 @@
   max-width: 360px;
   height: auto;
   aspect-ratio: 9 / 16;
+  box-shadow:
+    0 16px 40px #10182814,
+    0 0 0 1px var(--line);
 }
 /* The remaining grid row sets the phone budget, including translated headings. */
 @media (min-width: 901px) {
@@ -46,8 +49,8 @@
   padding: 5px;
   border: 1px solid var(--line);
   border-radius: 15px;
-  background: #fff;
-  box-shadow: 0 5px 18px #23392a0a;
+  background: var(--surface);
+  box-shadow: var(--shadow-floating);
   z-index: 35;
 }
 .playback .icon-button,
@@ -59,24 +62,24 @@
   padding: 0;
   border: 0;
   border-radius: 10px;
-  background: #f3f7f4;
-  color: #356a52;
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
 }
 .playback .icon-button:hover {
-  background: #e6f2eb;
+  background: var(--surface-hover);
 }
 .preview-navigation {
   padding: 5px;
   border: 1px solid var(--line);
   border-radius: 15px;
-  background: #fff;
+  background: var(--surface);
 }
 .playback .playback-auto {
-  background: #008069;
-  color: #fff;
+  background: var(--accent);
+  color: var(--surface);
 }
 .playback .playback-auto:hover {
-  background: #006f5b;
+  background: var(--accent-hover);
 }
 .playback svg {
   width: 21px;
@@ -96,8 +99,8 @@
   max-width: calc(100vw - 100px);
   padding: 11px 13px;
   border-radius: 10px;
-  background: #20382e;
-  color: #edf7f1;
+  background: var(--tooltip-bg);
+  color: var(--tooltip-ink);
   font-size: 11px;
   font-weight: 400;
   line-height: 1.5;
@@ -113,7 +116,7 @@
 }
 .tooltip-title {
   display: block;
-  color: #fff;
+  color: var(--surface);
   font-size: 12px;
   font-weight: 600;
   margin-bottom: 3px;

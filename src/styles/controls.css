@@ -1,6 +1,6 @@
 /* Editor controls: scoped separately so conversation visuals remain reusable. */
 .editor {
-  background: #f8fafb;
+  background: var(--surface-editor);
 }
 .section-heading h2,
 .preview-heading h2 {
@@ -14,7 +14,7 @@
 }
 .contact-panel {
   border-radius: 16px;
-  box-shadow: 0 2px 8px #172a2804;
+  box-shadow: var(--shadow-card);
 }
 .contact-fields {
   min-width: 0;
@@ -22,7 +22,7 @@
 .component-palette {
   margin: 0 0 22px;
   padding: 16px;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 14px;
 }
@@ -31,7 +31,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  color: #4e625b;
+  color: var(--text-secondary);
   font-size: 10px;
   font-weight: 650;
   letter-spacing: 0.06em;
@@ -54,10 +54,10 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  border: 1px solid #e2e9e5;
+  border: 1px solid var(--line);
   border-radius: 10px;
   padding: 11px 9px;
-  background: #fff;
+  background: var(--surface);
   transition:
     border-color 0.15s,
     background 0.15s;
@@ -65,13 +65,13 @@
 }
 .add-row button:hover {
   border-color: var(--green);
-  background: #f1faf6;
+  background: var(--accent-soft);
 }
 .palette-icon {
   display: grid;
   place-items: center;
-  color: var(--green);
-  background: #edf7f1;
+  color: var(--text-secondary);
+  background: var(--soft);
   width: 30px;
   height: 30px;
   border-radius: 8px;
@@ -86,17 +86,17 @@
 }
 .palette-plus {
   margin-left: auto;
-  color: #80948a;
+  color: var(--muted);
 }
 .step-card {
   border-radius: 14px;
   margin-bottom: 16px;
-  box-shadow: 0 2px 5px #172a2804;
+  box-shadow: var(--shadow-card);
 }
 .step-top {
   padding: 13px 16px;
-  border-bottom: 1px solid #edf1ee;
-  background: #fff;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
 }
 .step-type {
   display: flex;
@@ -104,12 +104,12 @@
   gap: 8px;
 }
 .step-type svg {
-  color: var(--green);
+  color: var(--text-secondary);
   width: 17px;
   height: 17px;
 }
 .step-number {
-  background: #f2f6f3;
+  background: var(--soft);
   border: none;
   font-weight: 650;
 }
@@ -126,11 +126,11 @@
 }
 .step-body > .field textarea {
   min-height: 85px;
-  background: #fcfdfc;
-  border-color: #e0e7e2;
+  background: var(--surface);
+  border-color: var(--line);
 }
 .step-body > .field select {
-  background-color: #f7faf8;
+  background-color: var(--surface-subtle);
 }
 .step-timing {
   display: flex;
@@ -138,7 +138,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  border-top: 1px solid #edf1ee;
+  border-top: 1px solid var(--line);
   margin-top: 16px;
   padding-top: 12px;
   color: var(--muted);
@@ -175,8 +175,8 @@
 }
 .options-editor {
   padding: 14px;
-  border: 1px solid #e2ebe5;
-  background: #f8fbf9;
+  border: 1px solid var(--line);
+  background: var(--surface-subtle);
   border-radius: 10px;
 }
 .options-editor .control-caption {
@@ -185,9 +185,9 @@
 .option-editor {
   padding: 10px;
   margin: 7px 0;
-  border: 1px solid #e2e9e5;
+  border: 1px solid var(--line);
   border-radius: 9px;
-  background: #fff;
+  background: var(--surface);
 }
 .option-editor-top {
   display: flex;
@@ -212,11 +212,11 @@
 .option-editor-top button {
   padding: 4px 8px;
   border: none;
-  color: #7f9188;
+  color: var(--muted);
 }
 .option-index {
   font-size: 10px;
-  color: #8a9a92;
+  color: var(--muted);
   align-self: flex-end;
   padding-bottom: 9px;
 }
@@ -247,22 +247,22 @@
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: #64776c;
+  color: var(--muted);
 }
 .option-drag-handle {
   cursor: grab;
   touch-action: none;
 }
 .option-drag-handle:hover {
-  background: #edf4ef;
+  background: var(--surface-hover);
 }
 .option-editor-actions .icon-button:not(:disabled):hover,
 .option-editor-actions .icon-button:not(:disabled):focus-visible {
-  background: #edf4ef;
-  color: #008069;
+  background: var(--surface-hover);
+  color: var(--accent);
 }
 .option-drag-handle:focus-visible {
-  outline: 2px solid #16865e;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 .sortable-option {
@@ -273,14 +273,14 @@
   z-index: 2;
 }
 .sortable-option.is-dragging .option-editor {
-  border-color: #16865e;
-  box-shadow: 0 5px 16px #163e2626;
+  border-color: var(--accent);
+  box-shadow: 0 5px 16px #1018281a;
 }
 .sortable-option.is-dragging .option-drag-handle {
   cursor: grabbing;
 }
 .list-section-editor {
-  border: 1px solid #dce7e0;
+  border: 1px solid var(--line);
   border-radius: 10px;
   padding: 10px;
   margin: 12px 0;
@@ -288,7 +288,7 @@
 }
 .list-section-editor legend {
   font-size: 11px;
-  color: #577365;
+  color: var(--muted);
   padding: 0 5px;
 }
 .message-settings {
@@ -339,11 +339,11 @@
   }
 }
 .selected-step {
-  border-color: #008069;
-  box-shadow: 0 0 0 2px #00806912;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-ring);
 }
 .step-card:focus-visible {
-  outline: 2px solid #008069;
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 .draft-preview-note {
@@ -369,11 +369,11 @@
 }
 .message-text-editor textarea {
   min-height: 85px;
-  background: #fcfdfc;
-  border-color: #e0e7e2;
+  background: var(--surface);
+  border-color: var(--line);
 }
 .formatting-hint {
   margin: -5px 0 12px;
-  color: #64776c;
+  color: var(--muted);
   font-size: 10px;
 }

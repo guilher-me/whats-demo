@@ -8,6 +8,8 @@ Use Node.js 22.12+, 24 ou 26+ e execute `npm ci`, seguido de `npm run dev`. A im
 
 ## Componentes
 
+Use os tokens semânticos de `src/styles/tokens.css` para cores de interface. A [paleta e seus usos](docs/design.md) documentam fundos, superfícies, textos e estados; o visual da conversa simulada tem cores próprias.
+
 - Coloque elementos genéricos em `src/components/ui`. Reutilize os componentes existentes antes de criar variações.
 - Coloque comportamentos de uma funcionalidade em `src/features/<funcionalidade>`, com componentes e hooks próximos uns dos outros.
 - Mantenha regras do motor e o formato persistido em `src/core`, sem dependência de React ou do DOM.

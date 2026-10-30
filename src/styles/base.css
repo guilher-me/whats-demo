@@ -13,14 +13,14 @@ select {
 button {
   cursor: pointer;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   border-radius: 9px;
   padding: 9px 13px;
   font-weight: 500;
 }
 button:hover {
-  background: #f0f6f2;
+  background: var(--surface-hover);
 }
 button:disabled {
   cursor: default;
@@ -28,24 +28,24 @@ button:disabled {
 }
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid #008069;
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 input,
 textarea,
 select {
-  border: 1px solid #dce3de;
+  border: 1px solid var(--line);
   border-radius: 7px;
   padding: 9px 10px;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   min-width: 0;
 }
 input:focus,
 textarea:focus,
 select:focus {
-  outline: 2px solid #00806928;
-  border-color: #008069;
+  outline: 2px solid var(--accent-ring);
+  border-color: var(--accent);
 }
 textarea {
   width: 100%;
@@ -55,11 +55,11 @@ textarea {
 }
 input[type='checkbox'],
 input[type='radio'] {
-  accent-color: #008069;
+  accent-color: var(--accent);
 }
 label {
   display: block;
-  color: #4b5c55;
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 500;
 }
@@ -78,7 +78,7 @@ label select {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface);
   gap: 20px;
 }
 .brand {
@@ -154,11 +154,11 @@ label select {
   background: transparent;
 }
 .language-switcher button:hover:not(:disabled) {
-  background: #edf4ef;
+  background: var(--surface-hover);
 }
 .language-switcher button[aria-pressed='true'] {
-  border-color: #008069;
-  background: #edf4ef;
+  border-color: var(--accent);
+  background: var(--surface-hover);
 }
 .language-switcher img {
   display: block;
@@ -188,7 +188,7 @@ label select {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 1.6px;
-  color: #829187;
+  color: var(--muted);
 }
 h2 {
   margin: 4px 0;
@@ -208,7 +208,7 @@ h3 {
 .text-button {
   border: 0;
   background: transparent;
-  color: #62766b;
+  color: var(--muted);
   padding: 6px;
   font-size: 12px;
 }
@@ -220,17 +220,17 @@ h3 {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #a4b4aa;
+  background: var(--text-disabled);
   margin-right: 6px;
 }
 .flow-type .type-dot {
-  background: #008069;
+  background: var(--accent);
 }
 .error {
   padding: 12px;
   border-radius: 8px;
-  background: #fff0ed;
-  color: #ad392d;
+  background: var(--danger-soft);
+  color: var(--danger);
   margin-top: 14px;
 }
 .preview {
@@ -241,24 +241,24 @@ h3 {
   gap: 12px;
   height: calc(100vh - 88px);
   overflow-y: auto;
-  background: #eef3ef;
+  background: var(--surface-preview);
 }
 .preview-heading {
   width: 100%;
   max-width: 500px;
 }
 .button--primary {
-  background: #008069;
-  color: #fff;
-  border-color: #008069;
+  background: var(--accent);
+  color: var(--surface);
+  border-color: var(--accent);
 }
 .button--primary:hover {
-  background: #006f5b;
+  background: var(--accent-hover);
 }
 .button--primary:disabled {
-  background: #e8eeea;
-  color: #85958a;
-  border-color: #e8eeea;
+  background: var(--soft);
+  color: var(--text-disabled);
+  border-color: var(--soft);
   opacity: 1;
 }
 .play-status {
@@ -298,14 +298,14 @@ h3 {
   min-height: 100vh;
   justify-content: center;
   padding: 24px;
-  background: #eef3ef;
+  background: var(--surface-preview);
 }
 .focus-mode #exit-record {
   display: block;
   font-size: 11px;
   background: transparent;
   border: 0;
-  color: #839387;
+  color: var(--muted);
 }
 @keyframes typing {
   0%,
@@ -385,10 +385,10 @@ h3 {
   padding: 24px;
   width: min(580px, calc(100vw - 32px));
   color: var(--ink);
-  background: #fff;
+  background: var(--surface);
 }
 #share-dialog::backdrop {
-  background: #142b2455;
+  background: #10182855;
 }
 #share-dialog h2 {
   font-size: 20px;
@@ -413,7 +413,7 @@ h3 {
   font-size: 12px;
 }
 .button--danger {
-  color: #ad392d;
+  color: var(--danger);
 }
 .field {
   margin-bottom: var(--space-3);
@@ -424,7 +424,7 @@ h3 {
   margin-top: var(--space-1);
 }
 .field-error {
-  color: #ad392d;
+  color: var(--danger);
   font-size: 12px;
   margin: 6px 0;
 }
@@ -442,7 +442,7 @@ h3 {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: #142b2466;
+  background: #10182866;
 }
 .dialog-content {
   position: fixed;
@@ -456,8 +456,8 @@ h3 {
   padding: 24px;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: #fff;
-  box-shadow: 0 24px 80px #142b2433;
+  background: var(--surface);
+  box-shadow: 0 24px 80px #10182833;
 }
 .dialog-content h2 {
   margin: 0 35px 12px 0;

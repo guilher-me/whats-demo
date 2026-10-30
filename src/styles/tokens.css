@@ -1,10 +1,28 @@
 :root {
   color-scheme: only light;
-  --green: #008069;
-  --ink: #172a28;
-  --muted: #71807b;
-  --line: #dfe6e2;
-  --soft: #f3f6f3;
+  --accent: #007f68;
+  --accent-hover: #006653;
+  --accent-soft: #eaf5f1;
+  --accent-ring: #007f6824;
+  --green: var(--accent);
+  --ink: #182230;
+  --muted: #5f6b7a;
+  --line: #dfe4eb;
+  --soft: #f1f3f6;
+  --surface: #ffffff;
+  --surface-editor: #f7f8fa;
+  --surface-preview: #e9edf3;
+  --surface-subtle: #f5f7fa;
+  --surface-hover: #edf1f5;
+  --text-secondary: #475467;
+  --text-disabled: #8792a2;
+  --tooltip-bg: #1f2937;
+  --tooltip-ink: #f9fafb;
+  --danger: #b42318;
+  --danger-soft: #fff1f0;
+  --danger-line: #fecdca;
+  --shadow-card: 0 1px 3px #10182808;
+  --shadow-floating: 0 6px 20px #1018280d;
   --radius-sm: 7px;
   --radius-md: 11px;
   --space-1: 4px;
@@ -17,6 +35,6 @@
     'Segoe UI',
     Arial,
     sans-serif;
-  background: #f8faf8;
+  background: var(--surface-editor);
   color: var(--ink);
 }
