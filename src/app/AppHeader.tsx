@@ -42,6 +42,16 @@ export function AppHeader({
         <AgentGuideLink />
         <a
           className="privacy-link agent-guide-link"
+          href="https://developers.facebook.com/documentation/business-messaging/whatsapp/flows/playground"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={t('app.playgroundLink')}
+        >
+          Flows Playground
+          <ControlIcon name="external" width="12" height="12" />
+        </a>
+        <a
+          className="privacy-link agent-guide-link"
           href="https://github.com/guilher-me/whats-demo"
           target="_blank"
           rel="noopener noreferrer"
