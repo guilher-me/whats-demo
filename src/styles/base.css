@@ -262,6 +262,7 @@ label select {
   }
 }
 .workspace {
+  --panel-inset: clamp(24px, 3vw, 64px);
   display: grid;
   grid-template-columns: minmax(430px, 1fr) minmax(400px, 0.9fr);
   width: 100%;
@@ -320,7 +321,7 @@ h3 {
   display: flex;
   align-items: center;
   flex-direction: column;
-  padding: 28px 20px 16px;
+  padding: 28px var(--panel-inset) 16px;
   gap: 12px;
   height: calc(100vh - 88px);
   overflow-y: auto;

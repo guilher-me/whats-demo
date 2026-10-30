@@ -337,6 +337,7 @@
   .preview {
     height: auto;
     overflow: visible;
+    padding-inline: 20px;
   }
   .editor-scroll {
     overflow: visible;
