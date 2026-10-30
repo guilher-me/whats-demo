@@ -10,7 +10,21 @@ The page contains `<link rel="describedby">` links and a `whatsapp-fake-flows-ap
 
 For a standalone HTML, read `document.getElementById('llms-txt').textContent` or `api.getInstructions()`. No fetch is necessary. In a hosted build, the same folder contains `llms.txt`, `llm.txt` (alias), `llms-full.txt` and the referenced Markdown documentation. When hosting under a subpath, keep these files beside the HTML. The alias and full text are generated; edit the root `llms.txt` and this guide instead.
 
-## Methods
+## Interacting through accessible UI controls
+
+If your tool cannot execute the browser API, use the page's accessible roles and labels. Labels follow the selected interface language (English by default); read the current accessibility tree before acting. User-authored message text is not translated.
+
+- Use the `AI interaction guide (llm.txt)` link in the header to discover these instructions. The language selector is named `Interface language`.
+- Scope editing to the `Conversation editor` region, then to the appropriate `Step N` group. Use labeled fields such as `Message text`, `Delay before replying (s)`, `Button text` and `Flow invitation message`. Multiple steps can have identically labeled fields, so do not select globally by position.
+- Add steps through the `Add conversation steps` group (`Customer`, `Business`, `Flow`). Re-read the tree after adding, removing or reordering steps; indices and available controls can change.
+- Use `Step actions` to move, duplicate or remove a step. For draggable options, use the handle's accessible name and its keyboard instructions rather than screen coordinates.
+- Scope preview actions to `Conversation preview`. `Start manually` waits for input; use the `Message` textbox and `Send message` button, or choose the currently visible interactive option. `Play automatically` uses configured answers. These actions run the simulation only.
+- Flow forms and option lists open dialogs. Inspect their current headings, labeled fields, required controls and footer buttons before advancing; do not assume every Flow uses the same fields or screen sequence.
+- `Copy Link` writes the full journey link to the clipboard. Use it only when requested. Opening the guide does not change the journey.
+
+Prefer semantic roles and labels over CSS selectors or generated IDs. Do not bypass disabled controls. After an action, inspect the updated tree or state to confirm the intended change before continuing.
+
+## API methods
 
 | Member                   | Contract                                                                                                                              |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |

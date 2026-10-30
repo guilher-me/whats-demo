@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import brandIcon from '../../assets/whatsdemo-icon.svg';
 import { LanguageSwitcher } from '../i18n/LanguageSwitcher';
 import { PrivacyNotice } from '../features/privacy/PrivacyNotice';
+import { AgentGuideLink } from '../features/automation/AgentGuideLink';
 export function AppHeader({ children, disabled }: { children: ReactNode; disabled?: boolean }) {
   const t = useT();
 
@@ -19,6 +20,7 @@ export function AppHeader({ children, disabled }: { children: ReactNode; disable
           <div className="brand-meta">
             <p>{t('app.tagline')}</p>
             <PrivacyNotice disabled={disabled} />
+            <AgentGuideLink />
           </div>
         </div>
       </div>
