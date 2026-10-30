@@ -30,7 +30,7 @@ The `llms.txt` file provides instructions; it does not execute a model or automa
 
 ## Discovery and readiness
 
-The page contains `<link rel="describedby">` links and a `whatsapp-fake-flows-api` meta tag. Read `window.whatsappFakeFlows.apiVersion` and `getState().ready`. Wait until the API exists and ready is true before loading a project or starting playback. The `whatsapp-fake-flows:ready` event signals API installation; an initial shared URL may still be loading, so inspect the ready state as well. The event may fire again when the app is remounted.
+The page contains `<link rel="describedby">` links and a `whatsapp-fake-flows-api` meta tag. Read `window.whatsappFakeFlows.apiVersion` and `getState().ready`. Wait until the API exists and ready is true before loading a project or starting playback. The `whatsapp-fake-flows:ready` event signals API installation; an initial shared URL may still be loading, so inspect the ready state as well. The event may fire again when the app is remounted. Readiness is also false while a shared link has an error or is awaiting draft replacement confirmation. Use the recovery UI or ask the user how to proceed; do not treat the retained draft as the successfully imported experience.
 
 For a standalone HTML, read `document.getElementById('llms-txt').textContent` or `api.getInstructions()`. No fetch is necessary. In a hosted build, the same folder contains `llms.txt`, `llm.txt` (alias), `llms-full.txt` and the referenced Markdown documentation. When hosting under a subpath, keep these files beside the HTML. The alias and full text are generated; edit the root `llms.txt` and this guide instead.
 

@@ -77,6 +77,14 @@ The composer is disabled during automatic playback. Use the pause button to susp
 
 The format keeps support for older `v1z` and `v1j` links. Invalid or unsupported contact photos are replaced by the fallback avatar without discarding the journey.
 
+### Opening a shared experience
+
+An invalid link opens a prominent recovery screen. The shared experience is not loaded and the existing draft stays intact. Use **Paste another link** to validate a complete replacement URL, or **Continue my draft** (or **Explore the example** if there is no draft). Continuing removes the failed fragment so refreshing does not reopen the error.
+
+When a valid link differs from your current draft, **Open another experience?** identifies the current and incoming contacts. Use **Copy current project link** to keep a snapshot, **Cancel** to retain your draft, or **Open and replace** to save the incoming experience as the single local draft. Closing the dialog or pressing Escape also cancels. Clipboard failures offer a selectable link for manual copying. Backup links can retain incomplete editable message fields; complete them before playback.
+
+Without an existing draft, a valid shared experience opens directly and is saved when edited. Opening an identical saved experience does not ask for replacement again. Pasting a URL imports its experience fragment into the current installation; it does not navigate to the pasted host.
+
 ## Record a phone-only video
 
 Select **Record phone**, choose manual or automatic playback, and wait for the three-second countdown. In manual mode, stop the recording yourself. In automatic mode, recording finishes two seconds after the last message.
