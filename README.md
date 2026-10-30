@@ -15,6 +15,7 @@
 </p>
 
 <p align="center">
+  <a href="https://guilher-me.github.io/whats-demo/">Live demo</a> ·
   <a href="#see-it-in-action">See it in action</a> ·
   <a href="docs/getting-started.md">Install & run</a> ·
   <a href="docs/user-guide.md">User guide</a> ·
@@ -31,13 +32,13 @@ You have an idea for a WhatsApp customer journey. Explaining it with slides lose
 
 Use it for sales demos, product reviews, workshops, usability discussions and training. No WhatsApp account setup, backend or database is required to run a demo.
 
-![WhatsDemo editor and phone preview showing an interactive retail conversation](docs/media/workbench.png)
+![WhatsDemo editor showing the configured Luma Home journey beside the phone preview](docs/media/workbench.png)
 
 ## See it in action
 
 Meet **Luma Home**, the fictional lighting store included with the app. A customer explores a collection, picks a lamp from a list, completes a two-screen Flow and receives a request confirmation.
 
-![Animated walkthrough of the Luma Home demo: messages, reply buttons, an options list and a WhatsApp Flow](docs/media/luma-home-demo.gif)
+![](docs/media/luma-home-demo.mp4)
 
 The example uses fictional customer details. Replace its messages, business identity and forms with your own scenario.
 
@@ -56,9 +57,9 @@ The example uses fictional customer details. Replace its messages, business iden
 | Something stakeholders can take away            | Experience links, phone-only MP4/WebM recording where supported, and a single-file HTML build.                         |
 | Help creating journeys with AI tools            | Accessible UI controls, an `llms.txt` guide and a versioned browser automation API.                                    |
 
-![A WhatsApp Flow in the phone preview, with product choices and form fields](docs/media/flow-preview.png)
-
 ## Get started
+
+**Open the live demo.** Visit [WhatsDemo](https://guilher-me.github.io/whats-demo/) in your browser. No installation is required.
 
 **Use a portable copy.** Ask a teammate to share the generated `whatsapp-fake-flows.html` file. Open it in a modern desktop browser; you do not need to install Node.js. Start with the built-in example and follow the [user guide](docs/user-guide.md).
 
