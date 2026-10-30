@@ -51,7 +51,7 @@ A URL também depende de um endereço de hospedagem estável. Preservar o codec 
 
 ## Build portátil
 
-`scripts/build.cjs` usa esbuild para agrupar React, código, CSS e imagem padrão. O resultado substitui os pontos de inserção de `index.html` e inclui as licenças em `dist/whatsapp-fake-flows.html`. Não há dependências carregadas por CDN. O arquivo pode ser aberto diretamente e continua sendo a entrega para usuários não técnicos.
+`scripts/build.cjs` usa esbuild para agrupar React, código, CSS e imagem padrão. O resultado substitui os pontos de inserção de `index.html` e inclui as licenças em `dist/whats-demo.html`. Não há dependências carregadas por CDN. O arquivo pode ser aberto diretamente e continua sendo a entrega para usuários não técnicos.
 
 Os testes cobrem motor, compatibilidade dos links, reprodução manual/automática, cancelamento e estrutura do build. O CI executa tipos, formatação, testes e build.
 
