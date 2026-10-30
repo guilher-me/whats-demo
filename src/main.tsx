@@ -19,3 +19,5 @@ import './styles/playback.css';
 import './styles/recording.css';
 
 import './styles/editor-product.css';
+
+import './styles/sharing.css';
