@@ -21,6 +21,8 @@ import { RecordingControls } from '../features/recording/components/RecordingCon
 import { TooltipIconButton } from '../components/ui/TooltipIconButton';
 import { ControlIcon } from '../components/icons/ControlIcon';
 import { ConversationOverview } from '../features/conversation/components/ConversationOverview';
+import { LinkRecovery } from '../features/sharing/LinkRecovery';
+import { ReplaceDraftDialog } from '../features/sharing/ReplaceDraftDialog';
 export function App() {
   const t = useT();
 
@@ -65,6 +67,7 @@ export function App() {
   });
   const ensureAvailable = () => {
     if (recorder.busy) throw new Error(t('app.recordingLocked'));
+    if (editor.link.blocked) throw new Error(t('link.resolveFirst'));
   };
   const run = (project: typeof editor.project, automatic: boolean) => {
     ensureAvailable();
@@ -74,7 +77,7 @@ export function App() {
   useAutomationAPI({
     project: () => editor.project,
     state: () => ({
-      ready: !editor.loading,
+      ready: !editor.link.blocked,
       running: playback.running,
       status: playback.status,
       activeStep: playback.activeStep,
@@ -109,6 +112,13 @@ export function App() {
     selectStep(null);
   }, [editor.revision, playback.stop]);
   useEffect(() => {
+    if (editor.link.blocked) {
+      playback.stop();
+      setFocusMode(false);
+      if (recorder.busy) recorder.cancel();
+    }
+  }, [editor.link.blocked, playback.stop]);
+  useEffect(() => {
     const key = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setFocusMode(false);
     };
@@ -141,11 +151,14 @@ export function App() {
       <AppHeader disabled={recorder.busy} saveState={editor.saveState}>
         <ShareButton
           project={editor.project}
-          disabled={hasErrors || editor.loading || recorder.busy}
+          disabled={hasErrors || editor.link.blocked || recorder.busy}
           onError={editor.setError}
         />
       </AppHeader>
-      <main className="workspace">
+      {(editor.link.error || editor.link.loading) && (
+        <LinkRecovery link={editor.link} hasDraft={editor.hasDraft} />
+      )}
+      <main className="workspace" hidden={!!(editor.link.error || editor.link.loading)}>
         <EditorPanel
           saveState={editor.saveState}
           disabled={recorder.busy}
@@ -284,6 +297,15 @@ export function App() {
           )}
         </section>
       </main>
+      {editor.link.pending && (
+        <ReplaceDraftDialog
+          key={editor.link.pending.hash}
+          current={editor.project}
+          incoming={editor.link.pending.project}
+          onCancel={editor.link.dismiss}
+          onConfirm={editor.link.confirm}
+        />
+      )}
       <Dialog
         open={restoreOpen}
         onOpenChange={setRestoreOpen}
