@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { deferred } from '../../../core/async';
+import { isReplyButton } from '../../../core/message-buttons';
 import { messageOptions } from '../../../core/interactive';
 import type { BusinessInteractive, ListMessage, MessageOption } from '../../../core/types';
 interface Pending {
@@ -11,7 +12,9 @@ interface Pending {
 }
 
 /** One explicit reply per scripted message; typing into the composer cannot consume it. */
-export function useMessageInteraction(onReply: (messageId: string, option: MessageOption) => void) {
+export function useMessageInteraction(
+  onReply: (messageId: string, option: MessageOption, isResponse: boolean) => void,
+) {
   const pending = useRef<Pending | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [list, setList] = useState<{ id: string; message: ListMessage } | null>(null);
@@ -35,8 +38,14 @@ export function useMessageInteraction(onReply: (messageId: string, option: Messa
     if (!current || current.id !== id || current.signal.aborted) return;
     const option = messageOptions(current.message).find((o) => o.id === optionId);
     if (!option) return;
+    onReply(id, option, current.message.kind === 'list' || isReplyButton(option));
+    if (
+      current.message.kind === 'buttons' &&
+      !isReplyButton(option) &&
+      current.message.buttons.some(isReplyButton)
+    )
+      return;
     pending.current = null;
-    onReply(id, option);
     setPendingId(null);
     setList(null);
     setSelection('');

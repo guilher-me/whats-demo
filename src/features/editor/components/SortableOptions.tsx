@@ -68,14 +68,14 @@ function SortableOption({
 }
 
 /** Shared sorting behavior; option IDs and payloads survive an order change. */
-export function SortableOptions({
+export function SortableOptions<T extends MessageOption>({
   options,
   onChange,
   children,
 }: {
-  options: MessageOption[];
-  onChange: (options: MessageOption[]) => void;
-  children: (option: MessageOption, index: number, handle: ReactNode) => ReactNode;
+  options: T[];
+  onChange: (options: T[]) => void;
+  children: (option: T, index: number, handle: ReactNode) => ReactNode;
 }) {
   const t = useT();
 
