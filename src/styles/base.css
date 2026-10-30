@@ -264,8 +264,8 @@ label select {
 .workspace {
   display: grid;
   grid-template-columns: minmax(430px, 1fr) minmax(400px, 0.9fr);
-  max-width: 1600px;
-  margin: auto;
+  width: 100%;
+  margin: 0;
 }
 .eyebrow {
   font-size: 10px;
