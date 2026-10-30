@@ -49,3 +49,18 @@ export function VerifiedIcon(props: Props) {
     </Base>
   );
 }
+export function GhostVerifiedIcon(props: Props) {
+  return (
+    <Base width="14" height="14" fill="none" {...props}>
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeDasharray="2.1 2.1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="m22.69 11.22-.02-.01-1.6-1.63.58-2.23c.16-.6-.2-1.2-.8-1.37l-2.22-.6-.6-2.22c-.16-.6-.78-.95-1.37-.8l-2.23.58-1.64-1.61a1.12 1.12 0 0 0-1.58 0L9.57 2.94l-2.23-.58c-.6-.16-1.2.2-1.37.78l-.6 2.22-2.22.61c-.6.16-.95.77-.79 1.37l.58 2.23-1.61 1.64a1.12 1.12 0 0 0 0 1.58l1.61 1.63-.58 2.23c-.16.6.2 1.2.79 1.37l2.22.6.6 2.23c.16.6.78.95 1.37.8l2.23-.59 1.64 1.61a1.1 1.1 0 0 0 1.57 0l1.64-1.61 2.23.58c.6.16 1.2-.2 1.37-.8l.6-2.21 2.22-.6c.6-.16.95-.78.8-1.38l-.58-2.23 1.61-1.63c.43-.44.44-1.13.02-1.57Z"
+      />
+    </Base>
+  );
+}

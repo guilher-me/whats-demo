@@ -90,13 +90,43 @@
 .contact-fields .field {
   margin: 0 0 8px;
 }
-.contact-fields .checkbox {
-  margin: 0;
+.verified-badge-checkbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 8px;
+  margin-left: -8px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
   font-size: 11px;
+  transition: background 0.15s;
 }
-.contact-fields .checkbox input {
-  width: 13px;
-  height: 13px;
+.verified-badge-checkbox input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  margin: 0;
+  opacity: 0;
+}
+.verified-badge-checkbox-icon {
+  display: flex;
+  flex: 0 0 24px;
+  color: var(--text-disabled);
+}
+.verified-badge-checkbox input:checked + .verified-badge-checkbox-icon {
+  color: #0095f6;
+}
+.verified-badge-checkbox:hover {
+  background: #0095f60a;
+}
+.verified-badge-checkbox:has(input:focus-visible) {
+  outline: 2px solid #0095f6;
+  outline-offset: 2px;
 }
 .contact-fields .field input {
   padding: 8px 10px;

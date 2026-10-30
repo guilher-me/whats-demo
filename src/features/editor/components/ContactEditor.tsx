@@ -5,7 +5,7 @@ import { SafeAvatar } from '../../../components/ui/SafeAvatar';
 import { IMAGE_ACCEPT } from '../../../core/images/policy';
 import { sanitizePhotoFile } from '../../../core/images/sanitize';
 import { TextField } from '../../../components/ui/Field';
-import { Checkbox } from '../../../components/ui/Checkbox';
+import { VerifiedBadgeCheckbox } from '../../../components/ui/VerifiedBadgeCheckbox';
 import { ActionMenu } from '../../../components/ui/ActionMenu';
 export function ContactEditor({
   contact,
@@ -99,10 +99,10 @@ export function ContactEditor({
           maxLength={80}
           onChange={(e) => onChange({ ...contact, name: e.target.value })}
         />
-        <Checkbox
+        <VerifiedBadgeCheckbox
           label={t('contact.verified')}
           checked={contact.verified}
-          onChange={(e) => onChange({ ...contact, verified: e.target.checked })}
+          onChange={(verified) => onChange({ ...contact, verified })}
         />
       </div>
     </section>
