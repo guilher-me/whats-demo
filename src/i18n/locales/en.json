@@ -99,7 +99,7 @@
   "contact.photo": "Photo of {{v0}}",
   "contact.sizeError": "Select an image up to 2 MB.",
   "contact.readError": "Could not read the image.",
-  "sharing.copy": "Copy link",
+  "sharing.copy": "Copy experience link",
   "sharing.generating": "Generating link…",
   "sharing.copied": "Link copied ✓",
   "sharing.title": "Experience link",
@@ -277,5 +277,16 @@
   "language.label": "Interface language",
   "editor.stepCount": "{{count}} steps",
   "editor.stepCount_one": "{{count}} step",
-  "editor.stepCount_other": "{{count}} steps"
+  "editor.stepCount_other": "{{count}} steps",
+  "storage.example": "Example · not saved",
+  "storage.recovered": "Draft restored",
+  "storage.saving": "Saving…",
+  "storage.saved": "Saved automatically",
+  "storage.failed": "Not saved",
+  "storage.shared": "Loaded from link",
+  "storage.localOnly": "Stored only in this browser.",
+  "storage.exampleHelp": "This is the example journey. Editing it will save a draft in this browser.",
+  "storage.sharedHelp": "Loaded from a link. Edit the journey to save a draft in this browser.",
+  "storage.savingHelp": "Saving changes in this browser.",
+  "storage.failureHelp": "We couldn't save your changes in this browser. Copy the experience link to keep this journey."
 }

@@ -8,7 +8,10 @@ import { AddStepButtons } from './AddStepButtons';
 import { Button } from '../../../components/ui/Button';
 import { FieldError } from '../../../components/ui/Field';
 import type { StepAction } from './StepActions';
+import { SaveIndicator } from './SaveIndicator';
+import type { SaveState } from '../hooks/useProject';
 interface Props {
+  saveState: SaveState;
   project: Project;
   revision: number;
   activeStep: string | null;
@@ -53,7 +56,10 @@ export function EditorPanel(props: Props) {
           onError={props.onError}
         />
         <div className="timeline-heading">
-          <h3>{t('editor.sequence')}</h3>
+          <div className="sequence-title">
+            <h3>{t('editor.sequence')}</h3>
+            <SaveIndicator state={props.saveState} />
+          </div>
           <span>{t('editor.stepCount', { count: props.project.steps.length })}</span>
         </div>
         <div>
@@ -77,6 +83,11 @@ export function EditorPanel(props: Props) {
         <FieldError>{props.error}</FieldError>
       </div>
       <footer className="editor-footer">
+        {props.saveState === 'failed' && (
+          <p className="save-warning" role="alert">
+            {t('storage.failureHelp')}
+          </p>
+        )}
         <AddStepButtons
           onAdd={(type) => {
             const id = props.onAdd(type);

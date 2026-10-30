@@ -99,7 +99,7 @@
   "contact.photo": "Foto de {{v0}}",
   "contact.sizeError": "Selecione uma imagem de até 2 MB.",
   "contact.readError": "Não foi possível ler a imagem.",
-  "sharing.copy": "Copiar link",
+  "sharing.copy": "Copiar link da experiência",
   "sharing.generating": "Gerando link…",
   "sharing.copied": "Link copiado ✓",
   "sharing.title": "Link da experiência",
@@ -277,5 +277,16 @@
   "language.label": "Idioma da interface",
   "editor.stepCount": "{{count}} etapas",
   "editor.stepCount_one": "{{count}} etapa",
-  "editor.stepCount_other": "{{count}} etapas"
+  "editor.stepCount_other": "{{count}} etapas",
+  "storage.example": "Exemplo · não salvo",
+  "storage.recovered": "Rascunho recuperado",
+  "storage.saving": "Salvando…",
+  "storage.saved": "Salvo automaticamente",
+  "storage.failed": "Não salvo",
+  "storage.shared": "Carregado do link",
+  "storage.localOnly": "Armazenado somente neste navegador.",
+  "storage.exampleHelp": "Esta é a jornada de exemplo. Ao editar, um rascunho será salvo neste navegador.",
+  "storage.sharedHelp": "Carregado de um link. Edite a jornada para salvar um rascunho neste navegador.",
+  "storage.savingHelp": "Salvando as alterações neste navegador.",
+  "storage.failureHelp": "Não foi possível salvar suas alterações neste navegador. Copie o link da experiência para preservar esta jornada."
 }

@@ -99,7 +99,7 @@
   "contact.photo": "Foto de {{v0}}",
   "contact.sizeError": "Selecciona una imagen de hasta 2 MB.",
   "contact.readError": "No se pudo leer la imagen.",
-  "sharing.copy": "Copiar enlace",
+  "sharing.copy": "Copiar enlace de la experiencia",
   "sharing.generating": "Generando enlace…",
   "sharing.copied": "Enlace copiado ✓",
   "sharing.title": "Enlace de la experiencia",
@@ -277,5 +277,16 @@
   "language.label": "Idioma de la interfaz",
   "editor.stepCount": "{{count}} pasos",
   "editor.stepCount_one": "{{count}} paso",
-  "editor.stepCount_other": "{{count}} pasos"
+  "editor.stepCount_other": "{{count}} pasos",
+  "storage.example": "Ejemplo · sin guardar",
+  "storage.recovered": "Borrador recuperado",
+  "storage.saving": "Guardando…",
+  "storage.saved": "Guardado automáticamente",
+  "storage.failed": "Sin guardar",
+  "storage.shared": "Cargado desde un enlace",
+  "storage.localOnly": "Guardado solo en este navegador.",
+  "storage.exampleHelp": "Este es el recorrido de ejemplo. Al editarlo se guardará un borrador en este navegador.",
+  "storage.sharedHelp": "Cargado desde un enlace. Edita el recorrido para guardar un borrador en este navegador.",
+  "storage.savingHelp": "Guardando los cambios en este navegador.",
+  "storage.failureHelp": "No se pudieron guardar los cambios en este navegador. Copia el enlace de la experiencia para conservar este recorrido."
 }

@@ -37,6 +37,12 @@ Para futuras mudanças:
 
 A URL também depende de um endereço de hospedagem estável. Preservar o codec não torna um link local acessível em outro computador.
 
+## Salvamento local e compartilhamento
+
+`useProject` expõe um estado de persistência explícito: `example`, `recovered`, `saving`, `saved`, `failed` ou `shared`. O exemplo inicial não é anunciado como salvo; `recovered` requer um projeto local válido, e `saved` só é confirmado após `localStorage.setItem` concluir. Um link carregado é identificado separadamente e só passa a rascunho local após uma edição. Falhas mantêm as alterações em memória.
+
+`SaveIndicator`, junto de Sequência, apresenta esse estado com ajuda por hover ou foco e fechamento por Escape. Uma falha também produz um alerta no rodapé fixo do editor, mesmo quando o usuário está no fim da lista. O cabeçalho contém a ação independente Copiar link da experiência, que cria um retrato compartilhável da jornada. Os textos usam os três catálogos de tradução; o formato dos projetos e links permanece igual.
+
 ## Build portátil
 
 `scripts/build.cjs` usa esbuild para agrupar React, código, CSS e imagem padrão. O resultado substitui os pontos de inserção de `index.html` e inclui as licenças em `dist/whatsapp-fake-flows.html`. Não há dependências carregadas por CDN. O arquivo pode ser aberto diretamente e continua sendo a entrega para usuários não técnicos.

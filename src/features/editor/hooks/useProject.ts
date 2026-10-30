@@ -1,24 +1,30 @@
-import { t, type MessageKey } from '../../../i18n';
+import { t } from '../../../i18n';
 import { useCallback, useEffect, useState, useRef } from 'react';
 import type { Project, Step } from '../../../core/types';
 import { createDefaultProject } from '../../../core/defaults';
 import { clone, createStep, normalizeProject, STORAGE_KEY, uid } from '../../../core/project';
 import { decode } from '../../../core/codec';
+export type SaveState = 'example' | 'recovered' | 'saving' | 'saved' | 'failed' | 'shared';
 export function useProject() {
   const edited = useRef(false);
-  const [project, setProject] = useState<Project>(() => {
+  const [initial] = useState<{ project: Project; state: SaveState }>(() => {
     try {
-      return normalizeProject(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null'), {
-        allowDrafts: true,
-      });
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw)
+        return {
+          project: normalizeProject(JSON.parse(raw), { allowDrafts: true }),
+          state: 'recovered',
+        };
     } catch {
-      return createDefaultProject();
+      /* Invalid or unavailable storage cannot confirm a saved draft. */
     }
+    return { project: createDefaultProject(), state: 'example' };
   });
+  const [project, setProject] = useState(initial.project);
   const [revision, setRevision] = useState(0),
     [loading, setLoading] = useState(true),
     [error, setError] = useState(''),
-    [saveStatus, setSaveStatus] = useState<MessageKey>('sharing.saved');
+    [saveState, setSaveState] = useState<SaveState>(initial.state);
   useEffect(() => {
     let generation = 0;
     let disposed = false;
@@ -31,7 +37,7 @@ export function useProject() {
           if (!disposed && id === generation) {
             setProject(shared);
             setRevision((n) => n + 1);
-            setSaveStatus('sharing.loaded');
+            setSaveState('shared');
             setError('');
           }
         }
@@ -54,14 +60,15 @@ export function useProject() {
     if (!edited.current) return;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
-      setSaveStatus('sharing.saved');
+      setSaveState('saved');
     } catch {
-      setSaveStatus('sharing.saveFailed');
+      setSaveState('failed');
     }
     edited.current = false;
   }, [project]);
   const update = useCallback((change: (value: Project) => Project) => {
     edited.current = true;
+    setSaveState('saving');
     setProject(change);
   }, []);
   const updateStep = (id: string, change: Partial<Step>) =>
@@ -100,7 +107,7 @@ export function useProject() {
     loading,
     error,
     setError,
-    saveStatus: t(saveStatus),
+    saveState,
     update,
     updateStep,
     action,

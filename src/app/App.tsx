@@ -121,10 +121,7 @@ export function App() {
           .join(' ') || undefined
       }
     >
-      <AppHeader
-        disabled={recorder.busy}
-        status={hasErrors ? t('app.corrections') : editor.saveStatus}
-      >
+      <AppHeader disabled={recorder.busy}>
         <ShareButton
           project={editor.project}
           disabled={hasErrors || editor.loading || recorder.busy}
@@ -133,6 +130,7 @@ export function App() {
       </AppHeader>
       <main className="workspace">
         <EditorPanel
+          saveState={editor.saveState}
           disabled={recorder.busy}
           project={editor.project}
           revision={editor.revision}
