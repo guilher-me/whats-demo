@@ -78,7 +78,7 @@ it('slows down to 0.5x and cancels without late messages', async () => {
   fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
   await tick(5999);
   expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(0);
-  fireEvent.click(screen.getByRole('button', { name: 'Parar reprodução' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Reiniciar prévia' }));
   await tick(35000);
   expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(0);
 });

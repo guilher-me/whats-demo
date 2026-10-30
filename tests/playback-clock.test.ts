@@ -1,0 +1,43 @@
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { PlaybackClock } from '../src/features/playback/playbackClock';
+beforeEach(() => vi.useFakeTimers());
+afterEach(() => vi.useRealTimers());
+it('preserves the remaining duration across repeated pauses and timers created while paused', async () => {
+  const controller = new AbortController();
+  const clock = new PlaybackClock(controller.signal);
+  const first = vi.fn(),
+    second = vi.fn();
+  const waiting = clock.delay(1000).then(first);
+  await vi.advanceTimersByTimeAsync(300);
+  clock.pause();
+  const later = clock.delay(500).then(second);
+  await vi.advanceTimersByTimeAsync(10000);
+  expect(first).not.toHaveBeenCalled();
+  expect(second).not.toHaveBeenCalled();
+  clock.resume();
+  await vi.advanceTimersByTimeAsync(200);
+  clock.pause();
+  await vi.advanceTimersByTimeAsync(10000);
+  clock.resume();
+  await vi.advanceTimersByTimeAsync(299);
+  expect(second).not.toHaveBeenCalled();
+  await vi.advanceTimersByTimeAsync(1);
+  expect(second).toHaveBeenCalledOnce();
+  expect(first).not.toHaveBeenCalled();
+  await vi.advanceTimersByTimeAsync(200);
+  await Promise.all([waiting, later]);
+  expect(first).toHaveBeenCalledOnce();
+  controller.abort();
+});
+it('cancels a suspended run without leaving promises or timers pending', async () => {
+  const controller = new AbortController();
+  const clock = new PlaybackClock(controller.signal);
+  const waiting = clock.delay(1000).catch((error) => error);
+  clock.pause();
+  const gate = clock.checkpoint().catch((error) => error);
+  controller.abort();
+  expect((await waiting).name).toBe('AbortError');
+  expect((await gate).name).toBe('AbortError');
+  clock.resume();
+  expect(vi.getTimerCount()).toBe(0);
+});

@@ -4,18 +4,22 @@ import { ControlIcon } from '../../../components/icons/ControlIcon';
 export function PlaybackControls({
   disabled,
   running,
+  paused,
   locked = false,
   onManual,
   onAuto,
-  onStop,
+  onPause,
+  onResume,
   onReset,
 }: {
   disabled: boolean;
   running: boolean;
+  paused: boolean;
   locked?: boolean;
   onManual: () => void;
   onAuto: () => void;
-  onStop: () => void;
+  onPause: () => void;
+  onResume: () => void;
   onReset: () => void;
 }) {
   const t = useT();
@@ -23,13 +27,17 @@ export function PlaybackControls({
   return (
     <div className="playback" role="group" aria-label={t('playback.controls')}>
       <TooltipIconButton
-        label={running ? t('playback.stop') : t('playback.manual')}
-        description={running ? t('playback.stopHint') : t('playback.manualHint')}
+        label={running ? t(paused ? 'playback.resume' : 'playback.pause') : t('playback.manual')}
+        description={
+          running
+            ? t(paused ? 'playback.resumeHint' : 'playback.pauseHint')
+            : t('playback.manualHint')
+        }
         disabled={locked || (!running && disabled)}
         aria-controls="phone-preview"
-        onClick={running ? onStop : onManual}
+        onClick={running ? (paused ? onResume : onPause) : onManual}
       >
-        <ControlIcon name={running ? 'pause' : 'manual'} />
+        <ControlIcon name={running ? (paused ? 'play' : 'pause') : 'manual'} />
       </TooltipIconButton>
       <TooltipIconButton
         label={running ? t('playback.reset') : t('playback.automatic')}

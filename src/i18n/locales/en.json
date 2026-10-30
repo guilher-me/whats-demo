@@ -328,5 +328,10 @@
   "editor.dragPosition": "Position {{v0}}.",
   "editor.dragPlaced": "Step placed at position {{v0}}.",
   "editor.dragCancelled": "Reordering cancelled.",
-  "editor.needsAttention": "Needs attention"
+  "editor.needsAttention": "Needs attention",
+  "playback.pause": "Pause playback",
+  "playback.resume": "Resume playback",
+  "playback.pauseHint": "Pauses the journey without losing your place.",
+  "playback.resumeHint": "Continues from the exact point where you paused.",
+  "playback.paused": "Playback paused."
 }

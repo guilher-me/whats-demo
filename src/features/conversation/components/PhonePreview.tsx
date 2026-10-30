@@ -27,8 +27,17 @@ export function PhonePreview({
   useEffect(() => {
     if (body.current) body.current.scrollTop = body.current.scrollHeight;
   }, [p.messages, p.typing]);
+  useEffect(() => {
+    if (!p.paused) return;
+    const animations =
+      phoneRef.current
+        ?.getAnimations?.({ subtree: true })
+        .filter((a) => a.playState === 'running') ?? [];
+    animations.forEach((animation) => animation.pause());
+    return () => animations.forEach((animation) => animation.play());
+  }, [p.paused, phoneRef]);
   return (
-    <PhoneFrame contact={contact} typing={p.typing} phoneRef={phoneRef}>
+    <PhoneFrame contact={contact} typing={p.typing} paused={p.paused} phoneRef={phoneRef}>
       <div className="chat-body" ref={body}>
         <div className="day">{t('phone.today')}</div>
         <div
@@ -57,7 +66,7 @@ export function PhonePreview({
         value={p.draft}
         onChange={p.setDraft}
         onSend={onSend ?? p.send}
-        disabled={composerDisabled || p.automatic}
+        disabled={composerDisabled || p.automatic || p.paused}
       />
       {p.flow && (
         <FlowSheet
