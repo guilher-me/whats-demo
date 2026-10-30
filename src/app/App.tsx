@@ -120,6 +120,16 @@ export function App() {
     if (playback.running) playback.stop();
     operation();
   };
+  const composerDisabled =
+    hasErrors ||
+    editor.loading ||
+    !editor.project.steps.length ||
+    (!playback.running && recorder.busy);
+  const sendFromComposer = () => {
+    if (composerDisabled) return;
+    selectStep(null);
+    playback.sendOrStart(editor.project);
+  };
   return (
     <div
       className={
@@ -219,6 +229,8 @@ export function App() {
                 contact={editor.project.contact}
                 playback={playback}
                 phoneRef={phoneRef}
+                composerDisabled={composerDisabled}
+                onSend={sendFromComposer}
               />
             )}
             <div className="phone-tools">

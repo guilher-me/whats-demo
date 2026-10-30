@@ -240,7 +240,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     }
     if (flow.current.current) throw new Error(t('errors.cycles'));
   };
-  const run = async (project: Project, automatic: boolean) => {
+  const run = async (project: Project, automatic: boolean, initialMessage?: string) => {
     stop();
     setMessages([]);
     setDraft('');
@@ -252,7 +252,11 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     setRunning(true);
     try {
       const steps = clone(validateProject(project).steps);
-      for (let index = 0; index < steps.length; index++) {
+      const openingMessage = !automatic ? initialMessage?.trim() : undefined;
+      if (openingMessage) append(openingMessage, 'user');
+      // The submitted text fulfills only an opening customer step; later replies still wait.
+      const startIndex = openingMessage && steps[0]?.type === 'user' ? 1 : 0;
+      for (let index = startIndex; index < steps.length; index++) {
         const step = steps[index];
         if (signal.aborted) return;
         setActiveStep(step.id);
@@ -345,6 +349,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
       if (controller.current === active) {
         flushSync(() => {
           controller.current = null;
+          automaticMode.current = false;
           setRunning(false);
           setActiveStep(null);
           cursor.hide();
@@ -370,6 +375,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     setDraft,
     send,
     running,
+    automatic: running && automaticMode.current,
     activeStep,
     status: t(
       statusMessage.key,
@@ -381,6 +387,15 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     flowError,
     cursor: cursor.cursor,
     run,
+    sendOrStart: (project: Project) => {
+      if (automaticMode.current) return;
+      if (controller.current) {
+        send();
+        return;
+      }
+      const text = draftRef.current.trim();
+      if (text) void run(project, false, text);
+    },
     stop,
     reset,
     interaction,

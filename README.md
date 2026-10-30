@@ -9,6 +9,7 @@ Interface em inglês (padrão), espanhol e português do Brasil, com seletor de 
 Editor de conversas e WhatsApp Flows para demonstrações, protótipos e gravações. Monte a sequência à esquerda e experimente a conversa no celular à direita, manualmente ou com preenchimento automático e cursor animado.
 
 - Mensagens do usuário, mensagens da empresa e convites para Flows.
+- Enviar a primeira mensagem pelo celular inicia o modo manual automaticamente. O texto digitado substitui somente a etapa inicial do cliente; se a jornada começar pela empresa, a mensagem é acrescentada antes dela. A configuração original permanece intacta. Durante a reprodução automática, o campo e o botão de envio ficam desabilitados.
 - Editor com etapas recolhíveis, resumo de conteúdo, reordenação por mouse/teclado, menus de ações e seleção visual de formato. Comportamento, estrutura do Flow e respostas automáticas ficam em seções próprias.
 - Textos, atrasos, indicador de digitação, nome, foto e selo configuráveis.
 - Ritmo do usuário simulado de 0,5× a 3×, salvo no navegador: tartaruga para mais tempo de leitura e cliques, lebre para interações rápidas. Ajusta somente leitura, digitação e ações do cursor. Delays de resposta da empresa, loading, transições do sistema e modo manual mantêm seus tempos.

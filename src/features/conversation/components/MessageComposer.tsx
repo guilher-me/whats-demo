@@ -4,10 +4,12 @@ export function MessageComposer({
   value,
   onChange,
   onSend,
+  disabled = false,
 }: {
   value: string;
   onChange: (value: string) => void;
   onSend: () => void;
+  disabled?: boolean;
 }) {
   const t = useT();
 
@@ -17,7 +19,7 @@ export function MessageComposer({
       aria-label={t('phone.composer')}
       onSubmit={(event) => {
         event.preventDefault();
-        onSend();
+        if (!disabled && value.trim()) onSend();
       }}
     >
       <div className="composer-icons" aria-hidden="true">
@@ -30,10 +32,16 @@ export function MessageComposer({
         placeholder={t('phone.message')}
         maxLength={2000}
         autoComplete="off"
+        disabled={disabled}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
-      <button type="submit" data-send aria-label={t('phone.send')} disabled={!value.trim()}>
+      <button
+        type="submit"
+        data-send
+        aria-label={t('phone.send')}
+        disabled={disabled || !value.trim()}
+      >
         <SendIcon />
       </button>
     </form>

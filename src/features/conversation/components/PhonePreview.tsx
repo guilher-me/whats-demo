@@ -12,10 +12,14 @@ export function PhonePreview({
   contact,
   playback: p,
   phoneRef,
+  onSend,
+  composerDisabled = false,
 }: {
   contact: Contact;
   playback: Playback;
   phoneRef: RefObject<HTMLDivElement | null>;
+  onSend?: () => void;
+  composerDisabled?: boolean;
 }) {
   const t = useT();
 
@@ -49,7 +53,12 @@ export function PhonePreview({
           {p.typing && <TypingIndicator />}
         </div>
       </div>
-      <MessageComposer value={p.draft} onChange={p.setDraft} onSend={p.send} />
+      <MessageComposer
+        value={p.draft}
+        onChange={p.setDraft}
+        onSend={onSend ?? p.send}
+        disabled={composerDisabled || p.automatic}
+      />
       {p.flow && (
         <FlowSheet
           session={p.flow}
