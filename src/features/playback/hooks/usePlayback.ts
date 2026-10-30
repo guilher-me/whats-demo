@@ -18,6 +18,7 @@ import { useMessageInteraction } from './useMessageInteraction';
 import { animateMessage } from '../animateMessage';
 import { messageOptions } from '../../../core/interactive';
 import { usePlaybackSpeed } from './usePlaybackSpeed';
+import { flowReadingText } from '../../flows/reading';
 
 export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
   useT();
@@ -172,22 +173,13 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
       const session = flow.current.current;
       await delay(250, signal);
       const components = getComponents(session);
-      await cursor.read(
-        [
-          session.step.flow.screens[session.index].title,
-          ...components.flatMap((c) => [
-            c.text,
-            c.label,
-            ...(Array.isArray(c['data-source'])
-              ? c['data-source'].map((option) => option.title)
-              : []),
-          ]),
-        ]
-          .filter(Boolean)
-          .join(' '),
-        signal,
-      );
-      for (const c of components.filter((component) => component.name)) {
+      await cursor.read(session.step.flow.screens[session.index].title, signal);
+      for (const c of components.filter((component) => component.type !== 'Footer')) {
+        const context = { data: session.data, form: flow.current.current?.form ?? {} };
+        if (c.name) find(c.name)?.scrollIntoView?.({ block: 'nearest' });
+        const reading = flowReadingText(c, context);
+        if (reading) await cursor.read(reading, signal);
+        if (!c.name) continue;
         const name = c.name!,
           value = resolve(session.step.answers[name], {
             data: session.data,
@@ -234,6 +226,11 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
       if (!current) return;
       const errors = validation(current);
       if (errors.length) throw new Error(errors[0]);
+      const footer = getComponents(current).find((component) => component.type === 'Footer');
+      if (footer) {
+        const reading = flowReadingText(footer, { data: current.data, form: current.form });
+        if (reading) await cursor.read(reading, signal);
+      }
       await cursor.touch(
         phone.current?.querySelector<HTMLElement>('[data-flow-next]') ?? null,
         signal,

@@ -170,7 +170,7 @@ describe('editor e reprodução React', () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(p));
     await start();
     fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
-    for (let i = 0; i < 45; i++) await tick(1000);
+    for (let i = 0; i < 90 && window.whatsappFakeFlows!.getState().running; i++) await tick(1000);
     expect(document.querySelector('.play-status')?.textContent).toBe('Conversa concluída.');
     expect(document.querySelector('.messages')?.textContent).toContain('Meu nome é Vanessa');
   });
