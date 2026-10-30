@@ -2,7 +2,7 @@ import { useT } from '../../i18n';
 import { useState } from 'react';
 import type { Project } from '../../core/types';
 import { createURL } from '../../core/codec';
-import { validateProject } from '../../core/engine';
+import { normalizeProject } from '../../core/project';
 import { Button } from '../../components/ui/Button';
 import { Dialog } from '../../components/ui/Dialog';
 import { TextArea } from '../../components/ui/Field';
@@ -25,7 +25,7 @@ export function ShareButton({
   const share = async () => {
     setBusy(true);
     try {
-      const url = await createURL(validateProject(project), location.href);
+      const url = await createURL(normalizeProject(project), location.href);
       let success = false;
       try {
         if (navigator.clipboard?.writeText) {

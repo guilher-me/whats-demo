@@ -82,7 +82,7 @@ Messages include `id`, `direction` (`user` or `business`), `text` and `time`; in
 }
 ```
 
-`contact` configures the conversation header (usually the business). Use an empty avatar string for no photo or a `data:image/...` URL for a portable uploaded image. Do not use HTTP image URLs. Legacy `assets/` paths remain supported.
+`contact` configures the conversation header (usually the business). Use an empty avatar string for no photo or a Base64 `data:image/png`, `data:image/jpeg` or `data:image/webp` URL. Limits: 2 MiB, 4096 pixels per edge, 8 million pixels. Photos are validated and rewritten to static PNGs (maximum 512-pixel edge) before display and sharing. Uploaded SVG, other formats and external URLs are rejected. Only the exact legacy aliases `assets/prevent-senior.png` and `assets/luma-home.svg` are supported. Invalid photos become the fallback avatar without losing the journey. `validateProject()` and `loadProject()` stay synchronous; decoding and rewriting happen asynchronously, so a photo may be removed after `loadProject()` returns. See [image security](IMAGE-SECURITY.md).
 
 Every step has a unique string `id`, `type`, `text` and a numeric `delay` between 0 and 120 seconds. The maximum is 200 steps. Use deterministic IDs when generating a journey. Missing or duplicate step IDs are normalized, but explicit unique IDs make later updates easier.
 

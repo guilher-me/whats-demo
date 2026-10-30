@@ -1,19 +1,15 @@
 import { useT } from '../../../i18n';
 import type { Contact } from '../../../core/types';
-import { avatarSource, FALLBACK_AVATAR } from '../../../core/defaults';
+import { SafeAvatar } from '../../../components/ui/SafeAvatar';
 import { VerifiedIcon } from '../../../components/icons/WhatsAppIcons';
 export function ChatHeader({ contact, typing }: { contact: Contact; typing: boolean }) {
   const t = useT();
 
   return (
     <header className="chat-header">
-      <img
-        src={avatarSource(contact.avatar)}
+      <SafeAvatar
+        value={contact.avatar}
         alt={t('contact.photo', { v0: contact.name.trim() || t('common.contactLower') })}
-        onError={(e) => {
-          e.currentTarget.onerror = null;
-          e.currentTarget.src = FALLBACK_AVATAR;
-        }}
       />
       <div>
         <strong title={contact.name}>{contact.name.trim() || t('common.contact')}</strong>

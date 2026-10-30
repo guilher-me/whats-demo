@@ -56,6 +56,7 @@ export function EditorPanel(props: Props) {
           </Button>
         </div>
         <ContactEditor
+          key={props.revision}
           contact={props.project.contact}
           onChange={props.onContact}
           onError={props.onError}

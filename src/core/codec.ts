@@ -1,5 +1,6 @@
 import { t } from '../i18n';
 import type { Project } from './types';
+import { prepareProjectImages } from './images/sanitize';
 const MAX_BYTES = 4 * 1024 * 1024,
   MAX_HASH = 6 * 1024 * 1024;
 function toBase64(bytes: Uint8Array): string {
@@ -76,6 +77,6 @@ export async function decode(hash: string): Promise<unknown> {
 }
 export async function createURL(project: Project, href: string): Promise<string> {
   const url = new URL(href);
-  url.hash = 'project=' + (await encode(project));
+  url.hash = 'project=' + (await encode(await prepareProjectImages(project)));
   return url.href;
 }

@@ -4,6 +4,7 @@ import type { Project, Step } from '../../../core/types';
 import { createDefaultProject } from '../../../core/defaults';
 import { clone, createStep, normalizeProject, STORAGE_KEY, uid } from '../../../core/project';
 import { decode } from '../../../core/codec';
+import { prepareProjectImages } from '../../../core/images/sanitize';
 export type SaveState = 'example' | 'recovered' | 'saving' | 'saved' | 'failed' | 'shared';
 export function useProject() {
   const edited = useRef(false);
@@ -33,7 +34,7 @@ export function useProject() {
       setLoading(true);
       try {
         if (location.hash.startsWith('#project=')) {
-          const shared = normalizeProject(await decode(location.hash));
+          const shared = await prepareProjectImages(normalizeProject(await decode(location.hash)));
           if (!disposed && id === generation) {
             setProject(shared);
             setRevision((n) => n + 1);
@@ -56,6 +57,23 @@ export function useProject() {
       window.removeEventListener('hashchange', load);
     };
   }, []);
+  // Also rewrite recovered drafts and synchronous automation loads. Preserve concurrent edits.
+  useEffect(() => {
+    let current = true;
+    const avatar = project.contact.avatar;
+    void prepareProjectImages(project).then((safe) => {
+      if (current && safe.contact.avatar !== avatar) {
+        setProject((value) =>
+          value.contact.avatar === avatar
+            ? { ...value, contact: { ...value.contact, avatar: safe.contact.avatar } }
+            : value,
+        );
+      }
+    });
+    return () => {
+      current = false;
+    };
+  }, [project.contact.avatar]);
   useEffect(() => {
     if (!edited.current) return;
     try {

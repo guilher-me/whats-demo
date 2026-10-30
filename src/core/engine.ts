@@ -1,4 +1,5 @@
 import { t } from '../i18n';
+import { isAllowedAvatar } from './images/policy';
 import { interactiveError } from './interactive';
 import type {
   ExpressionContext,
@@ -185,11 +186,7 @@ export function validateProject(input: unknown, { allowDrafts = false } = {}): P
   )
     throw new Error(t('errors.project'));
   if (input.steps.length > 200) throw new Error(t('errors.stepLimit'));
-  if (
-    input.contact.avatar &&
-    (typeof input.contact.avatar !== 'string' ||
-      !/^(data:image\/|assets\/)/.test(input.contact.avatar))
-  )
+  if (input.contact.avatar && !isAllowedAvatar(input.contact.avatar))
     throw new Error(t('errors.photo'));
   for (const step of input.steps) {
     if (

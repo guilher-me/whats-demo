@@ -15,6 +15,7 @@ Editor de conversas e WhatsApp Flows para demonstrações, protótipos e gravaç
 - Em Flows, a leitura ocorre campo a campo: rótulo e opções são lidos antes de preencher cada campo, seguindo a ordem da tela. O botão de avançar/enviar é lido por último. Durante a leitura, o cursor permanece parado. Ele se desloca uma única vez até o próximo campo ou botão, com aceleração e desaceleração suaves, sem pontos intermediários ou correções aleatórias. Helpers, subtítulos e metadados são ignorados; a preferência por movimento reduzido é respeitada.
 - Flows em JSON, navegação entre telas e respostas automáticas.
 - Links que carregam a experiência no fragmento da URL, sem banco de dados.
+- Fotos com validação em camadas usando `file-type` e `image-dimensions`, limites antes da decodificação e recriação em PNG. A proteção vale também para links e automação; veja [segurança de imagens](docs/IMAGE-SECURITY.md).
 - Build portátil em um único HTML, com JavaScript, CSS e imagem padrão incorporados.
 
 Simulação independente: não envia mensagens nem publica Flows na Meta. O interpretador implementa um subconjunto dos componentes de Flows; componentes não suportados exibem um erro na prévia.
@@ -36,7 +37,7 @@ Abra o endereço exibido no terminal, normalmente `http://127.0.0.1:5173`. O ser
 npm run build
 ```
 
-Distribua `dist/whatsapp-fake-flows.html`. A pessoa abre o arquivo no navegador sem instalar Node.js e sem servidor. Recursos principais funcionam offline; fotos externas configuradas pelo usuário continuam dependendo da rede. Prefira enviar a foto pelo próprio editor para incorporá-la.
+Distribua `dist/whatsapp-fake-flows.html`. A pessoa abre o arquivo no navegador sem instalar Node.js e sem servidor. Recursos principais e fotos incorporadas funcionam offline. Fotos externas não são aceitas; envie um PNG, JPEG ou WebP pelo editor para incorporá-lo com validação e recriação local.
 
 O botão **Copiar link** inclui o projeto na URL. Em uma instalação hospedada, qualquer pessoa com acesso ao endereço pode abrir a experiência. Um link `file://` depende de o HTML estar disponível no mesmo caminho; para compartilhar entre computadores, envie o HTML ou hospede o build em um endereço estável. O conteúdo dos links pode ser lido por quem os recebe; use dados fictícios nas demonstrações.
 

@@ -17,7 +17,7 @@ describe('links v1 anteriores à migração React', () => {
   it('preserva unicode, imagem e query ao compartilhar', async () => {
     const project = normalizeProject(legacy);
     project.contact.name = 'Clínica São João 🩺';
-    project.contact.avatar = 'data:image/png;base64,AA==';
+    project.contact.avatar = 'assets/prevent-senior.png';
     const url = new URL(await createURL(project, 'https://example.com/app?test=1'));
     expect(url.search).toBe('?test=1');
     expect(await decode(url.hash)).toEqual(project);

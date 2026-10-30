@@ -13,6 +13,7 @@ The visible `llms.txt` link in the app header opens this guide on hosted sites. 
 - [Automation API and complete examples](docs/automation.md): Versioned API, project fields, workflow, validation, playback and offline usage.
 - [Full instructions](llms-full.txt): This index plus the automation guide in a single text file.
 - [Interactive message components](docs/messages.md): Buttons, lists, limits and extension points.
+- [Contact image security](docs/IMAGE-SECURITY.md): Accepted formats, layered validation and fallback behavior. User photos must be embedded PNG, JPEG or WebP (2 MiB, 4096 px per edge, 8 million pixels); they are rewritten before display and sharing. Invalid photos are removed without losing the journey. Uploaded SVG and external image URLs are not accepted.
 
 ## Optional
 

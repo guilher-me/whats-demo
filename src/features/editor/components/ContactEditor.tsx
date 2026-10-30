@@ -1,7 +1,9 @@
 import { useT } from '../../../i18n';
-import { useId, useRef } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import type { Contact } from '../../../core/types';
-import { avatarSource, FALLBACK_AVATAR } from '../../../core/defaults';
+import { SafeAvatar } from '../../../components/ui/SafeAvatar';
+import { IMAGE_ACCEPT } from '../../../core/images/policy';
+import { sanitizePhotoFile } from '../../../core/images/sanitize';
 import { TextField } from '../../../components/ui/Field';
 import { Checkbox } from '../../../components/ui/Checkbox';
 import { ActionMenu } from '../../../components/ui/ActionMenu';
@@ -18,30 +20,42 @@ export function ContactEditor({
 
   const id = useId();
   const fileInput = useRef<HTMLInputElement>(null);
-  const upload = (file?: File) => {
+  const [busy, setBusy] = useState(false);
+  const generation = useRef(0);
+  const latestContact = useRef(contact);
+  latestContact.current = contact;
+  useEffect(
+    () => () => {
+      generation.current++;
+    },
+    [],
+  );
+  // Loading a different project or removing a photo cancels any stale upload result.
+  useEffect(() => {
+    generation.current++;
+    setBusy(false);
+  }, [contact.avatar]);
+  const upload = async (file?: File) => {
     if (!file) return;
-    if (!file.type.startsWith('image/') || file.size > 2 * 1024 * 1024) {
-      onError(t('contact.sizeError'));
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      onChange({ ...contact, avatar: String(reader.result) });
+    const id = ++generation.current;
+    setBusy(true);
+    try {
+      const avatar = await sanitizePhotoFile(file);
+      if (generation.current !== id) return;
+      onChange({ ...latestContact.current, avatar });
       onError('');
-    };
-    reader.onerror = () => onError(t('contact.readError'));
-    reader.readAsDataURL(file);
+    } catch {
+      if (generation.current === id) onError(t('contact.sizeError'));
+    } finally {
+      if (generation.current === id) setBusy(false);
+    }
   };
   return (
     <section className="contact-panel" aria-label={t('contact.region')}>
       <div className="contact-image">
-        <img
-          src={avatarSource(contact.avatar)}
+        <SafeAvatar
+          value={contact.avatar}
           alt={t('contact.photo', { v0: contact.name.trim() || t('common.contactLower') })}
-          onError={(e) => {
-            e.currentTarget.onerror = null;
-            e.currentTarget.src = FALLBACK_AVATAR;
-          }}
         />
         <div className="contact-photo-menu">
           <ActionMenu
@@ -51,6 +65,7 @@ export function ContactEditor({
               {
                 label: t('contact.change'),
                 icon: 'photo',
+                disabled: busy,
                 onSelect: () => fileInput.current?.click(),
               },
               {
@@ -63,15 +78,16 @@ export function ContactEditor({
             ]}
           />
         </div>
+        {busy && <small role="status">{t('contact.processing')}</small>}
         <input
           id={id}
           ref={fileInput}
           aria-label={t('contact.select')}
           hidden
           type="file"
-          accept="image/*"
+          accept={IMAGE_ACCEPT}
           onChange={(e) => {
-            upload(e.target.files?.[0]);
+            void upload(e.target.files?.[0]);
             e.target.value = '';
           }}
         />

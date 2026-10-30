@@ -1,11 +1,29 @@
 import { t } from '../i18n';
 import { validateProject } from './engine';
+import { isAllowedAvatar } from './images/policy';
 import type { Project, Step } from './types';
 export const STORAGE_KEY = 'whatsapp-fake-flows-v1';
 export const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 export const uid = () =>
   `step-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 export function normalizeProject(input: unknown, options?: { allowDrafts?: boolean }): Project {
+  // Keep the synchronous v1 API; invalid photos cannot invalidate the whole journey.
+  if (
+    input &&
+    typeof input === 'object' &&
+    'contact' in input &&
+    input.contact &&
+    typeof input.contact === 'object'
+  ) {
+    const contact = input.contact;
+    input = {
+      ...input,
+      contact: {
+        ...contact,
+        avatar: 'avatar' in contact && isAllowedAvatar(contact.avatar) ? contact.avatar : '',
+      },
+    };
+  }
   const project = clone(validateProject(input, options));
   const used = new Set<string>();
   project.contact.avatar ||= '';
