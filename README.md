@@ -89,16 +89,17 @@ WhatsDemo is an independent simulator. It does not send real WhatsApp messages o
 
 ## Explore the project
 
-| Guide                                       | What you will find                                                                                        |
-| ------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| [Install & run](docs/getting-started.md)    | Requirements, local development, portable builds and hosting.                                             |
-| [User guide](docs/user-guide.md)            | Messages, Flows, manual/automatic playback, sharing and recording.                                        |
-| [Build with an LLM](docs/ai-guide.md)       | Give an AI tool the right context and let it help construct a journey.                                    |
-| [Automation API](docs/automation.md)        | The browser API contract, validation rules and complete examples.                                         |
-| [Contributing](CONTRIBUTING.md)             | Setup, component conventions, compatibility and validation.                                               |
-| [Image security](docs/IMAGE-SECURITY.md)    | Validation, image rewriting, limits and fallback behavior.                                                |
-| [Developer reference](docs/architecture.md) | Architecture and extension points; some developer reference guides are currently in Brazilian Portuguese. |
-| [MIT license](LICENSE)                      | License terms for the project.                                                                            |
+| Guide                                              | What you will find                                                                                        |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| [Install & run](docs/getting-started.md)           | Requirements, local development, portable builds and hosting.                                             |
+| [User guide](docs/user-guide.md)                   | Messages, Flows, manual/automatic playback, sharing and recording.                                        |
+| [Build with an LLM](docs/ai-guide.md)              | Give an AI tool the right context and let it help construct a journey.                                    |
+| [Automation API](docs/automation.md)               | The browser API contract, validation rules and complete examples.                                         |
+| [Contributing](CONTRIBUTING.md)                    | Setup, component conventions, compatibility and validation.                                               |
+| [Deployment & branch workflow](docs/deployment.md) | Production CI/CD, manual development publishing and feature → development → main PRs.                     |
+| [Image security](docs/IMAGE-SECURITY.md)           | Validation, image rewriting, limits and fallback behavior.                                                |
+| [Developer reference](docs/architecture.md)        | Architecture and extension points; some developer reference guides are currently in Brazilian Portuguese. |
+| [MIT license](LICENSE)                             | License terms for the project.                                                                            |
 
 Have an idea or found a problem? [Open an issue](https://github.com/guilher-me/whats-demo/issues). Contributions to components, accessibility, translations and documentation are welcome.
 

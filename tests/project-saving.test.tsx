@@ -4,7 +4,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
 import { createDefaultProject } from '../src/core/defaults';
-import { STORAGE_KEY } from '../src/core/project';
+import { projectStorageKey, STORAGE_KEY } from '../src/core/project';
 import { createURL } from '../src/core/codec';
 beforeEach(() => {
   localStorage.clear();
@@ -20,6 +20,25 @@ async function start() {
   await act(async () => {});
 }
 const indicator = () => document.querySelector('.save-indicator') as HTMLElement;
+it('keeps development edits separate from the existing production draft', async () => {
+  const production = createDefaultProject();
+  production.contact.name = 'Production contact';
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(production));
+  history.replaceState(null, '', '/whats-demo/development/');
+  await start();
+  expect(screen.getByLabelText('Nome do contato')).not.toHaveValue('Production contact');
+  fireEvent.change(screen.getByLabelText('Nome do contato'), {
+    target: { value: 'Development contact' },
+  });
+  expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).contact.name).toBe('Production contact');
+  expect(JSON.parse(localStorage.getItem(projectStorageKey(location))!).contact.name).toBe(
+    'Development contact',
+  );
+  cleanup();
+  history.replaceState(null, '', '/whats-demo/');
+  await start();
+  expect(screen.getByLabelText('Nome do contato')).toHaveValue('Production contact');
+});
 it('does not claim the untouched example is saved and separates sharing from storage', async () => {
   await start();
   expect(indicator()).toHaveAttribute('data-state', 'example');

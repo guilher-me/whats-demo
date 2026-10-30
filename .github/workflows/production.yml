@@ -1,0 +1,16 @@
+name: Production
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  publish:
+    uses: ./.github/workflows/publish-pages.yml
+    with:
+      environment: production
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
