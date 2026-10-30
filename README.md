@@ -11,7 +11,7 @@ Editor de conversas e WhatsApp Flows para demonstrações, protótipos e gravaç
 - Mensagens do usuário, mensagens da empresa e convites para Flows.
 - Textos, atrasos, indicador de digitação, nome, foto e selo configuráveis.
 - Ritmo do usuário simulado de 0,5× a 3×, salvo no navegador: tartaruga para mais tempo de leitura e cliques, lebre para interações rápidas. Ajusta somente leitura, digitação e ações do cursor. Delays de resposta da empresa, loading, transições do sistema e modo manual mantêm seus tempos.
-- Em Flows, a leitura ocorre campo a campo: rótulo e opções são lidos antes de preencher cada campo, seguindo a ordem da tela. O botão de avançar/enviar é lido por último. O cursor alterna pausas com poucos movimentos curtos de atenção, sem seguir cada linha. Helpers, subtítulos e metadados são ignorados. As aproximações aos controles usam trajetórias suaves e pontos de clique seguros variados, reproduzíveis a cada execução; a preferência por movimento reduzido é respeitada.
+- Em Flows, a leitura ocorre campo a campo: rótulo e opções são lidos antes de preencher cada campo, seguindo a ordem da tela. O botão de avançar/enviar é lido por último. Durante a leitura, o cursor permanece parado. Ele se desloca uma única vez até o próximo campo ou botão, com aceleração e desaceleração suaves, sem pontos intermediários ou correções aleatórias. Helpers, subtítulos e metadados são ignorados; a preferência por movimento reduzido é respeitada.
 - Flows em JSON, navegação entre telas e respostas automáticas.
 - Links que carregam a experiência no fragmento da URL, sem banco de dados.
 - Build portátil em um único HTML, com JavaScript, CSS e imagem padrão incorporados.

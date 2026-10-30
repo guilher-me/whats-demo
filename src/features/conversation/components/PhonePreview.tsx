@@ -79,7 +79,7 @@ export function PhonePreview({
           transition:
             p.cursor.travelMs === undefined
               ? undefined
-              : `left calc(${p.cursor.travelMs}ms / var(--cursor-speed, 1)) cubic-bezier(.22,.61,.36,1), top calc(${p.cursor.travelMs}ms / var(--cursor-speed, 1)) cubic-bezier(.3,.1,.3,1), opacity 0.15s`,
+              : `left calc(${p.cursor.travelMs}ms / var(--cursor-speed, 1)) cubic-bezier(.4,0,.2,1), top calc(${p.cursor.travelMs}ms / var(--cursor-speed, 1)) cubic-bezier(.4,0,.2,1), opacity 0.15s`,
         }}
         aria-hidden="true"
       />

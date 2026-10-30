@@ -173,24 +173,12 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
       const session = flow.current.current;
       await delay(250, signal);
       const components = getComponents(session);
-      await cursor.read(
-        session.step.flow.screens[session.index].title,
-        signal,
-        phone.current?.querySelector<HTMLElement>('.flow-header strong'),
-      );
-      for (const [index, c] of components
-        .filter((component) => component.type !== 'Footer')
-        .entries()) {
+      await cursor.read(session.step.flow.screens[session.index].title, signal);
+      for (const c of components.filter((component) => component.type !== 'Footer')) {
         const context = { data: session.data, form: flow.current.current?.form ?? {} };
         if (c.name) find(c.name)?.scrollIntoView?.({ block: 'nearest' });
         const reading = flowReadingText(c, context);
-        if (reading)
-          await cursor.read(
-            reading,
-            signal,
-            phone.current?.querySelector('.flow-content')?.children[index] as
-              HTMLElement | undefined,
-          );
+        if (reading) await cursor.read(reading, signal);
         if (!c.name) continue;
         const name = c.name!,
           value = resolve(session.step.answers[name], {
@@ -241,12 +229,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
       const footer = getComponents(current).find((component) => component.type === 'Footer');
       if (footer) {
         const reading = flowReadingText(footer, { data: current.data, form: current.form });
-        if (reading)
-          await cursor.read(
-            reading,
-            signal,
-            phone.current?.querySelector<HTMLElement>('[data-flow-next]'),
-          );
+        if (reading) await cursor.read(reading, signal);
       }
       await cursor.touch(
         phone.current?.querySelector<HTMLElement>('[data-flow-next]') ?? null,
@@ -322,10 +305,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
                     .map((option) => option.title)
                     .join(' ')
                 : '';
-            const bubble = [
-              ...(phone.current?.querySelectorAll<HTMLElement>('[data-message-id]') ?? []),
-            ].find((element) => element.dataset.messageId === messageId);
-            await cursor.read(`${step.text} ${choices}`, signal, bubble);
+            await cursor.read(`${step.text} ${choices}`, signal);
           }
           if (step.type === 'business' && step.interactive) {
             const answered = interaction.wait(messageId, step.interactive, signal);

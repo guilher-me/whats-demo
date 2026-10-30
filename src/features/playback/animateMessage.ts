@@ -48,7 +48,6 @@ export async function animateMessage({
         .map((option) => `${option.title} ${option.description ?? ''}`)
         .join(' '),
       signal,
-      phone.current?.querySelector<HTMLElement>('.phone-sheet'),
     );
     const target =
       [...(phone.current?.querySelectorAll<HTMLElement>('[data-list-option]') ?? [])].find(
