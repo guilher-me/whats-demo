@@ -57,7 +57,7 @@ export function ShareButton({
         disabled={disabled || busy}
         onClick={() => void share()}
       >
-        <ControlIcon name="lock" width="17" height="17" />
+        <ControlIcon name="link" width="17" height="17" />
         {busy ? t('sharing.generating') : copied ? t('sharing.copied') : t('sharing.copy')}
       </Button>
       <Dialog
