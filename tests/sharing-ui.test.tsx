@@ -22,19 +22,13 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-it.each([
-  ['Editor', 'editor', '{Home}{Enter}'],
-  ['Prévia', 'demo', '{End}{Enter}'],
-])('copies the %s link from the keyboard without a dialog', async (label, mode, keys) => {
+it('copies one link from the keyboard and opens only Preview initially', async () => {
   const user = userEvent.setup();
   const write = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
   render(<App />);
-  expect(screen.queryByRole('button', { name: 'Criar com IA' })).toBeNull();
   const trigger = screen.getByRole('button', { name: 'Copiar link' });
   trigger.focus();
   await user.keyboard('{Enter}');
-  expect(screen.getByRole('menuitem', { name: label })).toBeVisible();
-  await user.keyboard(keys);
 
   await screen.findByText('Link copiado.');
   expect(write).toHaveBeenCalledTimes(1);
@@ -43,14 +37,35 @@ it.each([
   expect(fromWhatsApp).toBe(copied);
   const url = new URL(fromWhatsApp);
   expect(sharedRoute(url.hash)).toMatchObject({
-    mode,
+    mode: 'editor',
+    previewOnly: true,
     locale: 'pt-BR',
     token: expect.stringMatching(/^v3z\.[A-Za-z0-9]+$/),
   });
   expect(await decode(url.hash)).toEqual(window.whatsappFakeFlows!.getProject());
+  expect(screen.queryByRole('menu')).toBeNull();
   expect(screen.queryByRole('dialog')).toBeNull();
   expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
   expect(trigger).toHaveFocus();
+
+  cleanup();
+  history.replaceState(null, '', url.hash);
+  render(<App />);
+  const expandCode = await screen.findByRole('button', { name: 'Expandir Código' });
+  const expandEditor = screen.getByRole('button', { name: 'Expandir Editor' });
+  expect(expandCode).toHaveAttribute('aria-expanded', 'false');
+  expect(expandEditor).toHaveAttribute('aria-expanded', 'false');
+  expect(document.getElementById('workspace-code')).not.toBeVisible();
+  expect(document.getElementById('workspace-editor')).not.toBeVisible();
+  expect(document.getElementById('workspace-preview')).toBeVisible();
+  expect(screen.getByRole('button', { name: 'Iniciar manual' })).toBeEnabled();
+  expect(screen.queryByRole('button', { name: /Só celular/ })).toBeNull();
+
+  await user.click(expandEditor);
+  await user.click(expandCode);
+  expect(document.getElementById('workspace-editor')).toBeVisible();
+  expect(document.getElementById('workspace-code')).toBeVisible();
+  expect(document.getElementById('workspace-preview')).toBeVisible();
 });
 
 it('passes the promised URL to ClipboardItem and reports a blocked write inline', async () => {
@@ -67,9 +82,10 @@ it('passes the promised URL to ClipboardItem and reports a blocked write inline'
   const write = vi.spyOn(navigator.clipboard, 'write').mockRejectedValue(new Error('blocked'));
   render(<App />);
   await user.click(screen.getByRole('button', { name: 'Copiar link' }));
-  await user.click(screen.getByRole('menuitem', { name: 'Editor' }));
   expect(write).toHaveBeenCalledTimes(1);
-  expect(await (await clipboardData)?.text()).toContain('#editor=v3z.');
+  expect(await (await clipboardData)?.text()).toMatch(
+    /#editor=v3z\.[A-Za-z0-9]+&lang=pt-BR&view=preview$/,
+  );
   expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível copiar o link.');
   expect(screen.queryByRole('dialog')).toBeNull();
 });

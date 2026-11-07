@@ -98,14 +98,6 @@
 .workspace-panel .preview-heading > div {
   flex: 1 1 165px;
 }
-.focus-mode .workspace-panel:not([hidden]) {
-  height: auto;
-  min-height: 0;
-}
-.focus-mode .workspace-panel > .preview {
-  min-height: 100dvh;
-}
-
 @media (min-width: 960px) {
   .editor-app {
     display: flex;

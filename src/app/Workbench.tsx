@@ -40,13 +40,11 @@ export function Workbench({
   contents,
   collapsed,
   onToggle,
-  focusMode,
   locked,
 }: {
   contents: Record<Panel, ReactNode>;
   collapsed: Partial<Record<Panel, boolean>>;
   onToggle: (panel: Panel) => void;
-  focusMode: boolean;
   locked: boolean;
 }) {
   const t = useT();
@@ -55,7 +53,7 @@ export function Workbench({
   const [heights, setHeights] = useState({ code: 410, editor: 540, preview: 690 });
   const drag = useRef<{ pointer: number; resize: (delta: number) => void; origin: number }>(null);
   const nodes = useRef<Partial<Record<Panel, HTMLDivElement | null>>>({});
-  const visible = panels.filter((panel) => (focusMode ? panel === 'preview' : !collapsed[panel]));
+  const visible = panels.filter((panel) => !collapsed[panel]);
   const visibleWeight = visible.reduce((total, panel) => total + weights[panel], 0);
   const effectiveWeights = visibleWeight ? weights : { code: 1, editor: 1, preview: 1 };
 
@@ -95,31 +93,29 @@ export function Workbench({
 
   return (
     <main className="workspace">
-      {!focusMode && (
-        <div className="workspace-toolbar" role="group" aria-label={t('workspace.panels')}>
-          {panels.map((panel) => {
-            const name = t(labels[panel]);
-            const open = !collapsed[panel];
-            const action = t(open ? 'workspace.collapse' : 'workspace.expand', { name });
-            return (
-              <Button
-                key={panel}
-                variant="ghost"
-                className="workspace-toggle"
-                aria-label={action}
-                title={action}
-                aria-expanded={open}
-                aria-controls={'workspace-' + panel}
-                disabled={locked || (open && visible.length === 1)}
-                onClick={() => onToggle(panel)}
-              >
-                {name}
-                <ControlIcon name="chevron" width="14" height="14" />
-              </Button>
-            );
-          })}
-        </div>
-      )}
+      <div className="workspace-toolbar" role="group" aria-label={t('workspace.panels')}>
+        {panels.map((panel) => {
+          const name = t(labels[panel]);
+          const open = !collapsed[panel];
+          const action = t(open ? 'workspace.collapse' : 'workspace.expand', { name });
+          return (
+            <Button
+              key={panel}
+              variant="ghost"
+              className="workspace-toggle"
+              aria-label={action}
+              title={action}
+              aria-expanded={open}
+              aria-controls={'workspace-' + panel}
+              disabled={locked || (open && visible.length === 1)}
+              onClick={() => onToggle(panel)}
+            >
+              {name}
+              <ControlIcon name="chevron" width="14" height="14" />
+            </Button>
+          );
+        })}
+      </div>
       <div className="workspace-panels">
         {panels.map((panel) => {
           const index = visible.indexOf(panel);

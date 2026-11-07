@@ -9,8 +9,8 @@ The `llms.txt` file provides instructions; it does not execute a model or automa
 Construct a JSON-compatible project using the contract below. Configure it in the editor through the public API or visible controls. Return an editor link by default, and use preview mode when the user wants only the interactive phone.
 
 - **Browser API** — validate the configuration, then call `window.whatsappFakeFlows.loadProject(project)` when the user authorizes replacing the active draft. Generate a link with `await window.whatsappFakeFlows.createShareURL(project)`. Pass `'demo'` as the second argument to open the preview.
-- **Browser controls** — paste the whole journey in **Code**, use **Validate** and **Apply**, then select **Copy link** and choose **Editor** or **Preview**. The link is copied immediately using the current interface language.
-- **Static module** — the hosted build publishes `share.mjs` beside the app. It exports `createShareURL(project, mode?, baseURL?, locale?)`. The default opens the production editor. Pass a reachable app address and `'en'`, `'es'` or `'pt-BR'` as needed.
+- **Browser controls** — paste the whole journey in **Code**, use **Validate** and **Apply**, then select **Copy link**. The copied link opens with only **Preview** expanded and uses the current interface language.
+- **Static module** — the hosted build publishes `share.mjs` beside the app. It exports `createShareURL(project, mode?, baseURL?, locale?, view?)`. The default opens the production editor. Pass a reachable app address and `'en'`, `'es'` or `'pt-BR'` as needed. In editor mode, pass `'preview'` as the fifth argument to start with **Code** and **Editor** collapsed.
 
 The two modes use the same compressed payload. The link includes the interface language and keeps the browser language preference separate. The site reads it from the fragment. Links have a maximum length of 8,000 characters, with a 128 KiB uncompressed limit. If the generator reports a limit error, shorten the conversation and try again. Use sample data because link recipients can read all project content.
 

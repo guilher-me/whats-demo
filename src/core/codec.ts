@@ -164,10 +164,12 @@ export async function createShareURL(
   mode: ShareMode = 'editor',
   href = 'https://guilher-me.github.io/whats-demo/',
   locale: Locale = currentLocale(),
+  view?: 'preview',
 ): Promise<string> {
   if (mode !== 'demo' && mode !== 'editor') throw new Error(t('errors.mode'));
   const url = shareBase(href);
-  url.hash = shareHash(mode, await encode(input), locale);
+  const hash = shareHash(mode, await encode(input), locale);
+  url.hash = mode === 'editor' && view === 'preview' ? hash + '&view=preview' : hash;
   if (url.href.length > MAX_LINK_LENGTH)
     throw new Error(t('sharing.linkLength', { length: url.href.length, max: MAX_LINK_LENGTH }));
   return url.href;
@@ -181,17 +183,21 @@ export function sharedRoute(hash: string) {
   const match = /^#(demo|editor|project)(?:=|$)/.exec(hash);
   if (!match) return undefined;
   const legacy = match[1] === 'project';
-  const [token, language] = hash.slice(match[0].length).split('&', 2);
-  const locale = language?.startsWith('lang=') ? language.slice(5) : undefined;
+  const [token, ...parameters] = hash.slice(match[0].length).split('&');
+  const settings = new URLSearchParams(parameters.join('&'));
+  const locale = settings.get('lang');
   return {
     mode: (legacy ? 'demo' : match[1]) as ShareMode,
     legacy,
     token,
     locale: isLocale(locale) ? locale : undefined,
+    previewOnly: match[1] === 'editor' && settings.get('view') === 'preview',
   };
 }
 
-export async function loadSharedProject(route: NonNullable<ReturnType<typeof sharedRoute>>) {
+export async function loadSharedProject(
+  route: Pick<NonNullable<ReturnType<typeof sharedRoute>>, 'legacy' | 'token'>,
+) {
   if (!(route.legacy ? /^v1[zj]\./ : /^v[23]z\./).test(route.token))
     throw new Error(t('errors.linkVersion'));
   const input = await decode(route.token);

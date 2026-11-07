@@ -1,10 +1,10 @@
-.labeled-menu-trigger {
+.button-with-icon {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   white-space: nowrap;
 }
-.labeled-menu-trigger svg {
+.button-with-icon svg {
   width: 16px;
   height: 16px;
 }
