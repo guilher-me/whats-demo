@@ -38,8 +38,15 @@ it.each([
 
   await screen.findByText('Link copiado.');
   expect(write).toHaveBeenCalledTimes(1);
-  const url = new URL(write.mock.calls[0][0]);
-  expect(sharedRoute(url.hash)).toMatchObject({ mode, locale: 'pt-BR' });
+  const copied = write.mock.calls[0][0];
+  const fromWhatsApp = copied.replaceAll('_', '');
+  expect(fromWhatsApp).toBe(copied);
+  const url = new URL(fromWhatsApp);
+  expect(sharedRoute(url.hash)).toMatchObject({
+    mode,
+    locale: 'pt-BR',
+    token: expect.stringMatching(/^v3z\.[A-Za-z0-9]+$/),
+  });
   expect(await decode(url.hash)).toEqual(window.whatsappFakeFlows!.getProject());
   expect(screen.queryByRole('dialog')).toBeNull();
   expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
@@ -62,7 +69,7 @@ it('passes the promised URL to ClipboardItem and reports a blocked write inline'
   await user.click(screen.getByRole('button', { name: 'Copiar link' }));
   await user.click(screen.getByRole('menuitem', { name: 'Editor' }));
   expect(write).toHaveBeenCalledTimes(1);
-  expect(await (await clipboardData)?.text()).toContain('#editor=v2z.');
+  expect(await (await clipboardData)?.text()).toContain('#editor=v3z.');
   expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível copiar o link.');
   expect(screen.queryByRole('dialog')).toBeNull();
 });

@@ -63,7 +63,7 @@ it('gera um HTML com React, estilos, foto e licenças incorporados', async () =>
     );
     expect(generated.stderr).toBe('');
     expect(generated.status).toBe(0);
-    expect(generated.stdout).toMatch(/https:\/\/guilher-me\.github\.io\/whats-demo\/#editor=v2z\./);
+    expect(generated.stdout).toMatch(/https:\/\/guilher-me\.github\.io\/whats-demo\/#editor=v3z\./);
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
