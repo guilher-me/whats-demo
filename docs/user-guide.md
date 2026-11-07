@@ -10,7 +10,9 @@ Use **Restore example** to load it. The app asks you to confirm before replacing
 
 ## Build the conversation
 
-The left panel is the editor; the right panel is the phone preview.
+The workspace opens with **Code**, **Editor** and **Preview**. Drag a divider to resize adjacent panels. With a divider focused, use Left and Right in the desktop layout or Up and Down when panels are stacked. Use the panel buttons to collapse or reopen a panel while retaining its content.
+
+**Code** shows the entire journey as JSON. Paste or edit a draft there, use **Validate** to check it, and select **Apply** to update the editor and phone. **Copy JSON** copies the text on screen. If the visual editor changes while a code draft is pending, reload the current project before applying. The diagnostics distinguish Flow JSON rules, simulator support and missing automatic answers. Missing automatic answers leave manual playback available.
 
 1. Set the **contact name** and choose whether to display the **verified account badge**.
 2. Add a **Customer**, **Business** or **Flow** step from the fixed bar at the bottom of the editor. New steps go at the end and receive focus.

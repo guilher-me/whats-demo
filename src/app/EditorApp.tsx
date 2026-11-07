@@ -1,6 +1,9 @@
-import { useT } from '../i18n';
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { currentLocale, useT } from '../i18n';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { AppHeader } from './AppHeader';
+import { Workbench, type Panel } from './Workbench';
+import { JourneyCode } from '../features/code/JourneyCode';
+import { journeyDiagnostics } from '../features/flows/diagnostics';
 import { useProject, type SharedCopy } from '../features/editor/hooks/useProject';
 import { EditorPanel } from '../features/editor/components/EditorPanel';
 import { ShareControls } from '../features/sharing/ShareControls';
@@ -34,7 +37,19 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
     [focusMode, setFocusMode] = useState(false),
     [selectedId, setSelectedId] = useState<string | null>(null),
     [showOverview, setShowOverview] = useState(false),
-    [restoreOpen, setRestoreOpen] = useState(false);
+    [restoreOpen, setRestoreOpen] = useState(false),
+    [collapsed, setCollapsed] = useState<Partial<Record<Panel, boolean>>>({});
+  const diagnostics = useMemo(
+    () => journeyDiagnostics(editor.project),
+    [editor.project, currentLocale()],
+  );
+  const automaticIssue = diagnostics.find((issue) => issue.kind === 'automatic');
+  const previewIssue = automaticIssue ?? diagnostics[0];
+  const togglePanel = (panel: Panel) => {
+    if (panel === 'preview' && !collapsed.preview && playback.running && !playback.paused)
+      playback.pause();
+    setCollapsed((panels) => ({ ...panels, [panel]: !panels[panel] }));
+  };
   const selectStep = (id: string | null) => {
     setShowOverview(false);
     setSelectedId(id);
@@ -72,8 +87,16 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
   const ensureAvailable = () => {
     if (recorder.busy) throw new Error(t('app.recordingLocked'));
   };
+  const replaceProject = (project: typeof editor.project) => {
+    ensureAvailable();
+    selectStep(null);
+    playback.reset();
+    editor.replace(project);
+  };
   const run = (project: typeof editor.project, automatic: boolean) => {
     ensureAvailable();
+    if (automatic && automaticIssue) throw new Error(automaticIssue.message);
+    if (collapsed.preview) setCollapsed((panels) => ({ ...panels, preview: false }));
     selectStep(null);
     return playback.run(project, automatic);
   };
@@ -91,12 +114,7 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
       ),
     }),
     hasErrors: () => hasErrors,
-    replace: (project) => {
-      ensureAvailable();
-      selectStep(null);
-      playback.reset();
-      editor.replace(project);
-    },
+    replace: replaceProject,
     run,
     stop: () => {
       ensureAvailable();
@@ -151,157 +169,178 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
     selectStep(null);
     playback.sendOrStart(editor.project);
   };
+  const editorPanel = (
+    <EditorPanel
+      saveState={editor.saveState}
+      disabled={recorder.busy}
+      project={editor.project}
+      revision={editor.revision}
+      activeStep={playback.activeStep}
+      selectedStep={selectedStep?.id ?? null}
+      onSelect={(id) => {
+        if (recorder.busy) return;
+        if (playback.running) playback.stop();
+        selectStep(id);
+      }}
+      error={editor.error}
+      onContact={(contact) => edit(() => editor.update((p) => ({ ...p, contact })))}
+      onChange={(id, change) =>
+        edit(() => {
+          selectStep(id);
+          editor.updateStep(id, change);
+        })
+      }
+      onAction={(id, action) => edit(() => editor.action(id, action))}
+      onReorder={(steps) => edit(() => editor.update((project) => ({ ...project, steps })))}
+      onAdd={(type) => {
+        let addedId: string | undefined;
+        edit(() => {
+          const step = createStep(type);
+          editor.update((project) => ({ ...project, steps: [...project.steps, step] }));
+          selectStep(step.id);
+          addedId = step.id;
+        });
+        return addedId;
+      }}
+      onRestore={() => setRestoreOpen(true)}
+      restoreLabel={restoreLabel}
+      onValidity={onValidity}
+      onAddAttachment={addAttachment}
+    />
+  );
+  const preview = (
+    <section className="preview" aria-label={t('app.preview')}>
+      <div className="preview-heading">
+        <div>
+          <h2>{t('app.preview')}</h2>
+          <p>{t('app.previewHint')}</p>
+          {previewIssue && (
+            <p className="workspace-flow-issue" title={previewIssue.path}>
+              {previewIssue.message}
+            </p>
+          )}
+        </div>
+        <Button
+          variant="ghost"
+          disabled={recorder.busy || hasErrors || !editor.project.steps.length}
+          title={playback.running ? t('app.expand') : t('app.startPhone')}
+          onClick={() => {
+            if (!playback.running) void run(editor.project, false);
+            setFocusMode(true);
+          }}
+        >
+          {t('app.phoneOnly')}
+        </Button>
+      </div>
+      <p className="play-status" role="status" aria-live="polite">
+        {showOverview ? t('app.viewConversation') : selectedStep ? t('app.draft') : playback.status}
+      </p>
+      <div
+        className="phone-stage"
+        style={{ '--cursor-speed': playback.cursorSpeed } as CSSProperties}
+      >
+        {showOverview ? (
+          <ConversationOverview project={editor.project} phoneRef={phoneRef} />
+        ) : selectedStep ? (
+          <>
+            <MessagePreview
+              key={`${selectedStep.id}:${selectedStep.type === 'flow' ? 'flow' : (selectedStep.media?.kind ?? selectedStep.interactive?.kind ?? selectedStep.type)}`}
+              contact={editor.project.contact}
+              step={selectedStep}
+              phoneRef={phoneRef}
+              attachment={stepAttachment(selectedStep, attachments)}
+            />
+          </>
+        ) : (
+          <JourneyPhone
+            project={editor.project}
+            playback={playback}
+            phoneRef={phoneRef}
+            disabled={composerDisabled}
+            onSend={sendFromComposer}
+            onStart={() => void run(editor.project, false)}
+          />
+        )}
+        <div className="phone-tools">
+          <PlaybackControls
+            locked={recorder.busy}
+            autoDisabled={!!automaticIssue}
+            disabled={hasErrors || !editor.project.steps.length}
+            running={playback.running}
+            paused={playback.paused}
+            onManual={() => void run(editor.project, false)}
+            onAuto={() => void run(editor.project, true)}
+            onPause={playback.pause}
+            onResume={playback.resume}
+            onReset={() => {
+              selectStep(null);
+              playback.reset();
+            }}
+          />
+          <PlaybackSpeedControl
+            speed={playback.speed}
+            onChange={playback.setSpeed}
+            disabled={recorder.busy || playback.paused}
+          />
+          <RecordingControls
+            controller={recorder}
+            autoDisabled={!!automaticIssue}
+            disabled={hasErrors || !editor.project.steps.length}
+          />
+          {(selectedStep || showOverview) && (
+            <div className="preview-navigation">
+              <TooltipIconButton
+                label={t('app.viewConversation')}
+                description={t('app.viewConversationHint')}
+                aria-controls="phone-preview"
+                disabled={recorder.busy}
+                aria-pressed={showOverview}
+                onClick={() => {
+                  setSelectedId(null);
+                  setShowOverview(true);
+                }}
+              >
+                <ControlIcon name="message" />
+              </TooltipIconButton>
+            </div>
+          )}
+        </div>
+      </div>
+      <p className="preview-note">{t('app.local')}</p>
+      {focusMode && (
+        <Button variant="ghost" onClick={() => setFocusMode(false)}>
+          {t('app.exit')}
+        </Button>
+      )}
+    </section>
+  );
   return (
     <div
-      className={
-        [focusMode ? 'focus-mode' : '', recorder.busy ? 'is-capturing' : '']
-          .filter(Boolean)
-          .join(' ') || undefined
-      }
+      className={['editor-app', focusMode ? 'focus-mode' : '', recorder.busy ? 'is-capturing' : '']
+        .filter(Boolean)
+        .join(' ')}
     >
       <AppHeader disabled={recorder.busy} saveState={editor.saveState}>
         <ShareControls project={editor.project} disabled={recorder.busy} hasErrors={hasErrors} />
       </AppHeader>
-      <main className="workspace">
-        <EditorPanel
-          saveState={editor.saveState}
-          disabled={recorder.busy}
-          project={editor.project}
-          revision={editor.revision}
-          activeStep={playback.activeStep}
-          selectedStep={selectedStep?.id ?? null}
-          onSelect={(id) => {
-            if (recorder.busy) return;
-            if (playback.running) playback.stop();
-            selectStep(id);
-          }}
-          error={editor.error}
-          onContact={(contact) => edit(() => editor.update((p) => ({ ...p, contact })))}
-          onChange={(id, change) =>
-            edit(() => {
-              selectStep(id);
-              editor.updateStep(id, change);
-            })
-          }
-          onAction={(id, action) => edit(() => editor.action(id, action))}
-          onReorder={(steps) => edit(() => editor.update((project) => ({ ...project, steps })))}
-          onAdd={(type) => {
-            let addedId: string | undefined;
-            edit(() => {
-              const step = createStep(type);
-              editor.update((project) => ({ ...project, steps: [...project.steps, step] }));
-              selectStep(step.id);
-              addedId = step.id;
-            });
-            return addedId;
-          }}
-          onRestore={() => setRestoreOpen(true)}
-          restoreLabel={restoreLabel}
-          onValidity={onValidity}
-          onAddAttachment={addAttachment}
-        />
-        <section className="preview" aria-label={t('app.preview')}>
-          <div className="preview-heading">
-            <div>
-              <h2>{t('app.preview')}</h2>
-              <p>{t('app.previewHint')}</p>
-            </div>
-            <Button
-              variant="ghost"
-              disabled={recorder.busy || hasErrors || !editor.project.steps.length}
-              title={playback.running ? t('app.expand') : t('app.startPhone')}
-              onClick={() => {
-                if (!playback.running) void run(editor.project, false);
-                setFocusMode(true);
-              }}
-            >
-              {t('app.phoneOnly')}
-            </Button>
-          </div>
-          <p className="play-status" role="status" aria-live="polite">
-            {showOverview
-              ? t('app.viewConversation')
-              : selectedStep
-                ? t('app.draft')
-                : playback.status}
-          </p>
-          <div
-            className="phone-stage"
-            style={{ '--cursor-speed': playback.cursorSpeed } as CSSProperties}
-          >
-            {showOverview ? (
-              <ConversationOverview project={editor.project} phoneRef={phoneRef} />
-            ) : selectedStep ? (
-              <>
-                <MessagePreview
-                  key={`${selectedStep.id}:${selectedStep.type === 'flow' ? 'flow' : (selectedStep.media?.kind ?? selectedStep.interactive?.kind ?? selectedStep.type)}`}
-                  contact={editor.project.contact}
-                  step={selectedStep}
-                  phoneRef={phoneRef}
-                  attachment={stepAttachment(selectedStep, attachments)}
-                />
-              </>
-            ) : (
-              <JourneyPhone
-                project={editor.project}
-                playback={playback}
-                phoneRef={phoneRef}
-                disabled={composerDisabled}
-                onSend={sendFromComposer}
-                onStart={() => void run(editor.project, false)}
-              />
-            )}
-            <div className="phone-tools">
-              <PlaybackControls
-                locked={recorder.busy}
-                disabled={hasErrors || !editor.project.steps.length}
-                running={playback.running}
-                paused={playback.paused}
-                onManual={() => void run(editor.project, false)}
-                onAuto={() => void run(editor.project, true)}
-                onPause={playback.pause}
-                onResume={playback.resume}
-                onReset={() => {
-                  selectStep(null);
-                  playback.reset();
-                }}
-              />
-              <PlaybackSpeedControl
-                speed={playback.speed}
-                onChange={playback.setSpeed}
-                disabled={recorder.busy || playback.paused}
-              />
-              <RecordingControls
-                controller={recorder}
-                disabled={hasErrors || !editor.project.steps.length}
-              />
-              {(selectedStep || showOverview) && (
-                <div className="preview-navigation">
-                  <TooltipIconButton
-                    label={t('app.viewConversation')}
-                    description={t('app.viewConversationHint')}
-                    aria-controls="phone-preview"
-                    disabled={recorder.busy}
-                    aria-pressed={showOverview}
-                    onClick={() => {
-                      setSelectedId(null);
-                      setShowOverview(true);
-                    }}
-                  >
-                    <ControlIcon name="message" />
-                  </TooltipIconButton>
-                </div>
-              )}
-            </div>
-          </div>
-          <p className="preview-note">{t('app.local')}</p>
-          {focusMode && (
-            <Button variant="ghost" onClick={() => setFocusMode(false)}>
-              {t('app.exit')}
-            </Button>
-          )}
-        </section>
-      </main>
+      <Workbench
+        collapsed={collapsed}
+        onToggle={togglePanel}
+        focusMode={focusMode}
+        locked={recorder.busy}
+        contents={{
+          code: (
+            <JourneyCode
+              project={editor.project}
+              diagnostics={diagnostics}
+              disabled={recorder.busy}
+              onApply={replaceProject}
+            />
+          ),
+          editor: editorPanel,
+          preview,
+        }}
+      />
       <Dialog
         open={restoreOpen}
         onOpenChange={setRestoreOpen}

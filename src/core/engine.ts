@@ -187,7 +187,7 @@ export function validateProject(input: unknown, { allowDrafts = false } = {}): P
   )
     throw new Error(t('errors.project'));
   if (input.steps.length > 200) throw new Error(t('errors.stepLimit'));
-  for (const step of input.steps) {
+  for (const [index, step] of input.steps.entries()) {
     if (
       !isObject(step) ||
       !['user', 'business', 'flow'].includes(String(step.type)) ||
@@ -209,8 +209,13 @@ export function validateProject(input: unknown, { allowDrafts = false } = {}): P
     )
       throw new Error(t('errors.invalidVoiceDuration', { v0: MAX_VOICE_SECONDS }));
     if (step.type === 'flow') {
-      validateFlow(step.flow);
-      if (!isObject(step.answers)) throw new Error(t('errors.answers'));
+      try {
+        validateFlow(step.flow);
+      } catch (error) {
+        throw new Error(`steps[${index}].flow · ${(error as Error).message}`);
+      }
+      if (!isObject(step.answers))
+        throw new Error(`steps[${index}].answers · ${t('errors.answers')}`);
     }
     if (step.interactive !== undefined) {
       if (step.type !== 'business') throw new Error(t('errors.onlyBusiness'));

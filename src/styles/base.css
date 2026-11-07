@@ -295,13 +295,6 @@ label select {
     justify-content: flex-end;
   }
 }
-.workspace {
-  --panel-inset: clamp(24px, 3vw, 64px);
-  display: grid;
-  grid-template-columns: minmax(430px, 1fr) minmax(400px, 0.9fr);
-  width: 100%;
-  margin: 0;
-}
 .eyebrow {
   font-size: 10px;
   font-weight: 600;
@@ -408,9 +401,6 @@ h3 {
 .focus-mode .preview-note {
   display: none;
 }
-.focus-mode .workspace {
-  display: block;
-}
 .focus-mode .preview {
   height: auto;
   min-height: 100vh;
@@ -458,9 +448,6 @@ h3 {
   }
 }
 @media (max-width: 900px) {
-  .workspace {
-    grid-template-columns: 1fr;
-  }
   .editor,
   .preview {
     height: auto;

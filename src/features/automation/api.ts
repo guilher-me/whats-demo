@@ -1,6 +1,7 @@
 import { t } from '../../i18n';
 import { clone, normalizeProject } from '../../core/project';
 import { createShareURL, type ShareMode } from '../../core/codec';
+import { reviewJourney, type JourneyDiagnostic } from '../flows/diagnostics';
 import type { ChatMessage, Project } from '../../core/types';
 
 export interface AutomationState {
@@ -25,7 +26,8 @@ export interface AutomationBindings {
   href: () => string;
 }
 export type ValidationResult =
-  { valid: true; project: Project } | { valid: false; errors: string[] };
+  | { valid: true; project: Project; diagnostics: JourneyDiagnostic[] }
+  | { valid: false; errors: string[]; diagnostics?: JourneyDiagnostic[] };
 
 /** Versioned public contract; never exposes mutable application state or executes supplied code. */
 export function createAutomationAPI(bindings: AutomationBindings) {
@@ -41,7 +43,10 @@ export function createAutomationAPI(bindings: AutomationBindings) {
     getState: () => clone(bindings.state()),
     validateProject(input: unknown): ValidationResult {
       try {
-        return { valid: true, project: normalizeProject(input) };
+        const { project, diagnostics, errors } = reviewJourney(input);
+        return errors.length
+          ? { valid: false, errors, diagnostics }
+          : { valid: true, project, diagnostics };
       } catch (error) {
         return { valid: false, errors: [(error as Error).message] };
       }

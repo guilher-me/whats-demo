@@ -9,10 +9,12 @@ export function RecordingDialogs({
   open,
   onOpenChange,
   controller: recording,
+  autoDisabled = false,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   controller: RecordingController;
+  autoDisabled?: boolean;
 }) {
   const t = useT();
 
@@ -41,7 +43,7 @@ export function RecordingDialogs({
                 <small>{t('recording.manualHint')}</small>
               </span>
             </Button>
-            <Button variant="primary" onClick={() => choose('automatic')}>
+            <Button variant="primary" disabled={autoDisabled} onClick={() => choose('automatic')}>
               <ControlIcon name="play" />
               <span>
                 {t('recording.automatic')}
