@@ -26,6 +26,12 @@ Profile photos accept PNG, JPEG and WebP up to 2 MiB, 4096 pixels per edge and 8
 
 For a customer voice note, choose **Voice message (mock)** under **Format**. Set **Recording duration** from 1 to 120 seconds for automatic playback. In manual playback, hold the microphone and release it to send. The preview animates a waveform and adds a voice bubble with the elapsed time. The entire interaction is silent.
 
+Use **Conversation attachments** above **Sequence** to add images and simulated documents. A document has a display name, an illustrative size and an optional image cover. Select **Image** or **Document** in a customer or business step and choose an attachment or add one there. Image captions belong to the step.
+
+In manual playback, tap the paper clip and choose an item from the conversation's simulated gallery or document picker. Items marked **Available to the customer** appear there. In automatic playback, the cursor selects the item configured for the step and types its caption. Opening a received document shows a simulated details card. Exporting the experience includes the processed images and document metadata.
+
+![Attachment library in the editor and the same three images in the simulated phone gallery](media/attachments-workbench.webp)
+
 Business messages support three formats:
 
 | Format       | Use it for                                                               | Limits                                                                                                     |

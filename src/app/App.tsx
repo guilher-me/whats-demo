@@ -21,6 +21,8 @@ import { RecordingControls } from '../features/recording/components/RecordingCon
 import { TooltipIconButton } from '../components/ui/TooltipIconButton';
 import { ControlIcon } from '../components/icons/ControlIcon';
 import { ConversationOverview } from '../features/conversation/components/ConversationOverview';
+import { stepAttachment, validateAttachments } from '../core/attachments';
+import type { Attachment, MessageStep } from '../core/types';
 export function App() {
   const t = useT();
 
@@ -41,10 +43,13 @@ export function App() {
       setInvalid((current) => (current[id] === !valid ? current : { ...current, [id]: !valid })),
     [],
   );
+  const attachments = editor.project.attachments ?? [];
   const hasErrors = editor.project.steps.some((step) =>
-    step.type === 'business'
-      ? !!businessMessageError(step)
-      : step.type === 'flow' && invalid[step.id],
+    step.type !== 'flow' && step.media
+      ? !stepAttachment(step, attachments)
+      : step.type === 'business'
+        ? !!businessMessageError(step)
+        : step.type === 'flow' && invalid[step.id],
   );
   const selectedStep = !playback.running
     ? editor.project.steps.find((step) => step.id === selectedId)
@@ -65,6 +70,7 @@ export function App() {
   });
   const ensureAvailable = () => {
     if (recorder.busy) throw new Error(t('app.recordingLocked'));
+    if (editor.loading) throw new Error(t('errors.loading'));
   };
   const run = (project: typeof editor.project, automatic: boolean) => {
     ensureAvailable();
@@ -74,13 +80,15 @@ export function App() {
   useAutomationAPI({
     project: () => editor.project,
     state: () => ({
-      ready: true,
+      ready: !editor.loading,
       running: playback.running,
       status: playback.status,
       activeStep: playback.activeStep,
       flowScreen: playback.flow?.step.flow.screens[playback.flow.index]?.id ?? null,
       pendingMessageId: playback.interaction.pendingId,
-      messages: playback.messages,
+      messages: playback.messages.map(({ attachment, ...message }) =>
+        attachment ? { ...message, attachmentId: attachment.id } : message,
+      ),
     }),
     hasErrors: () => hasErrors,
     replace: (project) => {
@@ -116,9 +124,27 @@ export function App() {
     return () => window.removeEventListener('keydown', key);
   }, []);
   const edit = (operation: () => void) => {
-    if (recorder.busy) return;
+    if (recorder.busy || editor.loading) return;
     if (playback.running) playback.stop();
     operation();
+  };
+  const addAttachment = (item: Attachment, target?: MessageStep) => {
+    ensureAvailable();
+    const next = validateAttachments([...attachments, item]);
+    edit(() => {
+      editor.update((project) => ({
+        ...project,
+        attachments: next,
+        steps: target
+          ? project.steps.map((step) =>
+              step.id === target.id && step.type !== 'flow' && step.media?.kind === item.kind
+                ? { ...step, media: { ...step.media, attachmentId: item.id } }
+                : step,
+            )
+          : project.steps,
+      }));
+      if (target) selectStep(target.id);
+    });
   };
   const composerDisabled =
     hasErrors ||
@@ -133,6 +159,7 @@ export function App() {
   const openingStep = editor.project.steps[0];
   const opensWithVoice =
     openingStep?.type === 'user' && openingStep.voiceDurationSeconds !== undefined;
+  const opensWithAttachment = openingStep?.type === 'user' && !!openingStep.media;
   return (
     <div
       className={
@@ -156,7 +183,7 @@ export function App() {
               playback: { userPace: playback.speed },
             },
           }}
-          disabled={recorder.busy || playback.running}
+          disabled={editor.loading || recorder.busy || playback.running}
           onImport={(project) => {
             selectStep(null);
             playback.reset();
@@ -168,7 +195,7 @@ export function App() {
       <main className="workspace">
         <EditorPanel
           saveState={editor.saveState}
-          disabled={recorder.busy}
+          disabled={recorder.busy || editor.loading}
           project={editor.project}
           revision={editor.revision}
           activeStep={playback.activeStep}
@@ -201,6 +228,38 @@ export function App() {
           onRestore={() => setRestoreOpen(true)}
           onError={editor.setError}
           onValidity={onValidity}
+          onAddAttachment={addAttachment}
+          onRemoveAttachment={(id) =>
+            edit(() =>
+              editor.update((project) =>
+                project.steps.some(
+                  (step) => step.type !== 'flow' && step.media?.attachmentId === id,
+                )
+                  ? project
+                  : {
+                      ...project,
+                      attachments: project.attachments?.filter((item) => item.id !== id),
+                    },
+              ),
+            )
+          }
+          onAttachmentVisibility={(id, visible) =>
+            edit(() =>
+              editor.update((project) =>
+                !visible &&
+                project.steps.some(
+                  (step) => step.type === 'user' && step.media?.attachmentId === id,
+                )
+                  ? project
+                  : {
+                      ...project,
+                      attachments: project.attachments?.map((item) =>
+                        item.id === id ? { ...item, customerVisible: visible } : item,
+                      ),
+                    },
+              ),
+            )
+          }
         />
         <section className="preview" aria-label={t('app.preview')}>
           <div className="preview-heading">
@@ -238,10 +297,11 @@ export function App() {
             ) : selectedStep ? (
               <>
                 <MessagePreview
-                  key={`${selectedStep.id}:${selectedStep.type === 'business' ? (selectedStep.interactive?.kind ?? 'text') : selectedStep.type}`}
+                  key={`${selectedStep.id}:${selectedStep.type === 'flow' ? 'flow' : (selectedStep.media?.kind ?? selectedStep.interactive?.kind ?? selectedStep.type)}`}
                   contact={editor.project.contact}
                   step={selectedStep}
                   phoneRef={phoneRef}
+                  attachment={stepAttachment(selectedStep, attachments)}
                 />
               </>
             ) : (
@@ -252,6 +312,9 @@ export function App() {
                 composerDisabled={composerDisabled}
                 onSend={sendFromComposer}
                 onStartVoice={opensWithVoice ? () => void run(editor.project, false) : undefined}
+                onStartAttachment={
+                  opensWithAttachment ? () => void run(editor.project, false) : undefined
+                }
               />
             )}
             <div className="phone-tools">

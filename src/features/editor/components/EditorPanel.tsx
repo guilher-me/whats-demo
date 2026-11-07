@@ -1,5 +1,5 @@
 import { useT } from '../../../i18n';
-import type { Contact, Project, Step } from '../../../core/types';
+import type { Attachment, Contact, MessageStep, Project, Step } from '../../../core/types';
 import { useRef, useState, useEffect } from 'react';
 import { useAddedStepFocus } from '../hooks/useAddedStepFocus';
 import { ContactEditor } from './ContactEditor';
@@ -10,6 +10,11 @@ import { FieldError } from '../../../components/ui/Field';
 import type { StepAction } from './StepActions';
 import type { SaveState } from '../hooks/useProject';
 import { SortableSteps } from './SortableSteps';
+import { availableAttachments, MAX_ATTACHMENTS, stepAttachment } from '../../../core/attachments';
+import { AttachmentLibrary } from './AttachmentLibrary';
+import { AttachmentDialog } from './AttachmentDialog';
+import { AttachmentDetails } from '../../conversation/components/AttachmentVisual';
+import { Dialog } from '../../../components/ui/Dialog';
 interface Props {
   saveState: SaveState;
   project: Project;
@@ -27,12 +32,20 @@ interface Props {
   onRestore: () => void;
   onError: (error: string) => void;
   onValidity: (id: string, valid: boolean) => void;
+  onAddAttachment: (item: Attachment, step?: MessageStep) => void;
+  onRemoveAttachment: (id: string) => void;
+  onAttachmentVisibility: (id: string, visible: boolean) => void;
 }
 export function EditorPanel(props: Props) {
   const t = useT();
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const [expandedId, setExpandedId] = useState<string | null>(props.project.steps[0]?.id ?? null);
+  const [picker, setPicker] = useState<{ stepId?: string; revision: number }>();
+  const [preview, setPreview] = useState<{ item: Attachment; revision: number }>();
+  const attachments = props.project.attachments ?? [];
+  const target = props.project.steps.find((step) => step.id === picker?.stepId);
+  const mediaTarget = target?.type !== 'flow' && target?.media ? target : undefined;
   useEffect(() => {
     setExpandedId(props.project.steps[0]?.id ?? null);
   }, [props.revision]);
@@ -59,6 +72,15 @@ export function EditorPanel(props: Props) {
           contact={props.project.contact}
           onChange={props.onContact}
           onError={props.onError}
+        />
+        <AttachmentLibrary
+          key={`attachments:${props.revision}`}
+          items={attachments}
+          steps={props.project.steps}
+          onAdd={() => setPicker({ revision: props.revision })}
+          onPreview={(item) => setPreview({ item, revision: props.revision })}
+          onRemove={props.onRemoveAttachment}
+          onVisibility={props.onAttachmentVisibility}
         />
         <div className="timeline-heading">
           <div className="sequence-title">
@@ -89,6 +111,8 @@ export function EditorPanel(props: Props) {
               onChange={(change) => props.onChange(step.id, change)}
               onAction={(action) => props.onAction(step.id, action)}
               onValidity={props.onValidity}
+              attachment={stepAttachment(step, attachments)}
+              onChooseAttachment={() => setPicker({ stepId: step.id, revision: props.revision })}
             />
           )}
         </SortableSteps>
@@ -108,6 +132,39 @@ export function EditorPanel(props: Props) {
           disabled={props.disabled || props.project.steps.length >= 200}
         />
       </footer>
+      {picker?.revision === props.revision && (!picker.stepId || mediaTarget) && (
+        <AttachmentDialog
+          kind={mediaTarget?.media?.kind}
+          customer={mediaTarget?.type !== 'business'}
+          atLimit={attachments.length >= MAX_ATTACHMENTS}
+          items={
+            mediaTarget?.media
+              ? availableAttachments(
+                  attachments,
+                  mediaTarget.media.kind,
+                  mediaTarget.type === 'user',
+                )
+              : []
+          }
+          onClose={() => setPicker(undefined)}
+          onSelect={
+            mediaTarget?.media
+              ? (item) => {
+                  props.onChange(mediaTarget.id, {
+                    media: { ...mediaTarget.media, kind: item.kind, attachmentId: item.id },
+                  });
+                  setPicker(undefined);
+                }
+              : undefined
+          }
+          onCreate={(item) => props.onAddAttachment(item, mediaTarget)}
+        />
+      )}
+      {preview?.revision === props.revision && (
+        <Dialog open title={preview.item.name} onOpenChange={() => setPreview(undefined)}>
+          <AttachmentDetails item={preview.item} />
+        </Dialog>
+      )}
     </section>
   );
 }

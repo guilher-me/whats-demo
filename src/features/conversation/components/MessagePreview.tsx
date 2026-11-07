@@ -1,6 +1,6 @@
 import { useT } from '../../../i18n';
 import { useEffect, useState, type RefObject } from 'react';
-import type { ChatMessage, Contact, Step } from '../../../core/types';
+import type { Attachment, ChatMessage, Contact, Step } from '../../../core/types';
 import { messageOptions } from '../../../core/interactive';
 import { PhoneFrame } from './PhoneFrame';
 import { MessageBubble } from './MessageBubble';
@@ -14,10 +14,12 @@ export function MessagePreview({
   contact,
   step,
   phoneRef,
+  attachment,
 }: {
   contact: Contact;
   step: Step;
   phoneRef: RefObject<HTMLDivElement | null>;
+  attachment?: Attachment;
 }) {
   const t = useT();
 
@@ -36,7 +38,8 @@ export function MessagePreview({
   const message: ChatMessage = {
     id: step.id,
     direction: step.type === 'user' ? 'user' : 'business',
-    text: step.text,
+    text: step.type !== 'flow' && step.media ? (step.media.caption ?? '') : step.text,
+    attachment,
     time: '12:00',
     ...(step.type === 'user' && step.voiceDurationSeconds !== undefined
       ? { voiceDurationMs: step.voiceDurationSeconds * 1000 }
@@ -52,6 +55,7 @@ export function MessagePreview({
         <div className="messages">
           <MessageBubble
             message={message}
+            phoneRef={phoneRef}
             running
             pendingId={step.id}
             onReply={(_, id) => setSelected(id)}

@@ -6,11 +6,15 @@ export function MessageComposer({
   onChange,
   onSend,
   disabled = false,
+  onAttach,
+  attachmentDisabled,
 }: {
   value: string;
   onChange: (value: string) => void;
   onSend: () => void;
   disabled?: boolean;
+  onAttach?: () => void;
+  attachmentDisabled?: boolean;
 }) {
   const t = useT();
   const empty = !value.trim();
@@ -24,7 +28,7 @@ export function MessageComposer({
         if (!disabled && value.trim()) onSend();
       }}
     >
-      <ComposerField empty={empty}>
+      <ComposerField empty={empty} onAttach={onAttach} attachmentDisabled={attachmentDisabled}>
         <input
           data-composer-input
           aria-label={t('phone.message')}

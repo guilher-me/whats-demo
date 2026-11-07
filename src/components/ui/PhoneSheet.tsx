@@ -9,6 +9,7 @@ export function PhoneSheet({
   children,
   onClose,
   closeLabel,
+  onReturnFocus,
 }: {
   container: HTMLElement | null;
   title: string;
@@ -16,6 +17,7 @@ export function PhoneSheet({
   children: ReactNode;
   onClose: () => void;
   closeLabel?: string;
+  onReturnFocus?: () => void;
 }) {
   const t = useT();
 
@@ -32,6 +34,14 @@ export function PhoneSheet({
         <Dialog.Content
           className="phone-sheet"
           onInteractOutside={(event) => event.preventDefault()}
+          onCloseAutoFocus={
+            onReturnFocus
+              ? (event) => {
+                  event.preventDefault();
+                  onReturnFocus();
+                }
+              : undefined
+          }
         >
           <header>
             <Dialog.Title>{title}</Dialog.Title>

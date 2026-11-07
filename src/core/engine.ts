@@ -2,6 +2,7 @@ import { t } from '../i18n';
 import { isAllowedAvatar } from './images/policy';
 import { interactiveError } from './interactive';
 import { MAX_VOICE_SECONDS } from './voice-message';
+import { validateMediaSteps } from './attachments';
 import type {
   ExpressionContext,
   FlowComponent,
@@ -222,7 +223,9 @@ export function validateProject(input: unknown, { allowDrafts = false } = {}): P
         throw new Error(t('errors.messageLength'));
     }
   }
-  return input as unknown as Project;
+  const project = input as unknown as Project;
+  validateMediaSteps(project, allowDrafts);
+  return project;
 }
 export const SUPPORTED_COMPONENTS = new Set([
   'TextHeading',

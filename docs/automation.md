@@ -27,23 +27,26 @@ Prefer semantic roles and labels over CSS selectors or generated IDs. Do not byp
 
 ## API methods
 
-| Member                   | Contract                                                                                                                        |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| `apiVersion`             | Public browser API version, currently 1                                                                                         |
-| `projectVersion`         | Persisted JSON version, currently 1                                                                                             |
-| `getInstructions()`      | Embedded index and this guide as text                                                                                           |
-| `getProject()`           | Independent copy of the current project, including local drafts                                                                 |
-| `getExample()`           | Independent copy of the Luma Home showcase (buttons, product list and two-screen Flow)                                          |
-| `getState()`             | Independent snapshot of readiness, playback status and rendered messages                                                        |
-| `validateProject(input)` | Returns `{valid:true, project}` or `{valid:false, errors:string[]}` without editing anything                                    |
-| `loadProject(input)`     | Validates and replaces the entire journey, stops playback, clears the preview and saves locally; returns the normalized project |
-| `getDocument()`          | Returns the portable WhatsDemo JSON document                                                                                    |
-| `loadDocument(input)`    | Validates and loads a document; only call with user authorization to replace work                                               |
-| `play(mode?)`            | Promise of the final playback state; `automatic` by default, or `manual`                                                        |
-| `stop()`                 | Cancels playback and pending delays; keeps messages already rendered                                                            |
-| `reset()`                | Stops playback and clears the preview; preserves the configured project                                                         |
+| Member                     | Contract                                                                                                                        |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `apiVersion`               | Public browser API version, currently 1                                                                                         |
+| `projectVersion`           | Persisted JSON version, currently 1                                                                                             |
+| `getInstructions()`        | Embedded index and this guide as text                                                                                           |
+| `getProject()`             | Independent copy of the current project, including local drafts                                                                 |
+| `getExample()`             | Independent copy of the Luma Home showcase (buttons, product list and two-screen Flow)                                          |
+| `getState()`               | Independent snapshot of readiness, playback status and rendered messages                                                        |
+| `validateProject(input)`   | Returns `{valid:true, project}` or `{valid:false, errors:string[]}` without editing anything                                    |
+| `loadProject(input)`       | Validates and replaces the entire journey, stops playback, clears the preview and saves locally; returns the normalized project |
+| `getDocument()`            | Returns the portable WhatsDemo JSON document                                                                                    |
+| `loadDocument(input)`      | Validates and loads a document; only call with user authorization to replace work                                               |
+| `loadDocumentAsync(input)` | Validates and reprocesses attachments before applying a document                                                                |
+| `play(mode?)`              | Promise of the final playback state; `automatic` by default, or `manual`                                                        |
+| `stop()`                   | Cancels playback and pending delays; keeps messages already rendered                                                            |
+| `reset()`                  | Stops playback and clears the preview; preserves the configured project                                                         |
 
 `loadProject` rejects invalid input before changing the editor. It is synchronous: after returning, `getProject` reflects the applied journey. Methods throw Error on invalid operations; asynchronous methods reject. `play` rejects while a run is already active, while the initial experience is loading, or when editor fields need correction. Playback errors are reported in the resulting status snapshot.
+
+For image and simulated-document journeys, use `getDocument()` and await `loadDocumentAsync(input)`. The asynchronous load preserves the current project on failure or if the editor changes during processing. In `getState().messages`, `attachmentId` identifies the item actually sent. Image captions appear in `text`.
 
 `play('manual')` waits for human interaction and its promise stays pending until completion or interruption. Use `void api.play('manual')` to start without awaiting. `await api.play('automatic')` fills the configured answers and resolves after the simulation ends. `stop` interrupts either mode.
 
@@ -234,4 +237,4 @@ O campo `text` das etapas aceita `*negrito*`, `_itálico_` e `~tachado~`, inclus
 
 For `interactive.kind: "buttons"`, set optional `context` to `"interactive"` (default) or `"template"`. Each button has `id`, `title` and optional `type`: `"quick_reply"` (default), `"url"` with `url`, `"phone_number"` with `phoneNumber`, `"copy_code"` with `code`, or `"voice_call"` with optional integer `ttlMinutes`. See [message rules](messages.md#button-types-and-contexts) before combining types. In mixed templates, `autoReplyId` must target a quick reply; action-only messages may target an action. Action buttons open a phone-contained simulation, not an external site/call/clipboard operation. UI selects are labeled `Message context` and `Button type`; URL, phone, code and TTL fields appear for the chosen type. More than three template buttons use `See all options`.
 
-JSON files now replace experience links. Use **Import JSON** and **Export JSON** in the header. See [file format](file-format.md) for the versioned contract. Automation tools use getDocument() and loadDocument(document); createShareURL is removed.
+JSON files now replace experience links. Use **Import JSON** and **Export JSON** in the header. Automation tools use `getDocument()` and await `loadDocumentAsync(document)` for journeys with attachments. [File format](file-format.md)

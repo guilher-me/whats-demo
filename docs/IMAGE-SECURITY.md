@@ -16,6 +16,8 @@ The exact bundled Luma Home and legacy Prevent Senior assets are trusted applica
 
 ## Limits of this protection
 
-This reduces attack surface; it is not malware detection or a guarantee against unknown browser decoder vulnerabilities. Rewriting necessarily decodes the input. Keep browsers and dependencies updated, preserve limits before decoding, and never render untrusted images as inline SVG, HTML, `object` or `iframe`. The limits apply to contact photos, not to every other journey field. They do not make the entire application a general-purpose HTML sanitizer.
+Conversation images and optional simulated-document covers use the same rasterization pipeline. The attachment library contains reprocessed PNGs and simulated document metadata. Imports, saved attachment libraries and asynchronous automation loads validate and process the library before exposing it to the UI. The limits are 50 attachment items per conversation and 8 MiB for the exported JSON. Attachment images accept embedded raster data and use the regular image decoder, with avatar-specific built-in aliases handled separately.
+
+Rewriting reduces the attack surface and still relies on the browser decoder processing untrusted input. Keep browsers and dependencies updated and preserve limits before decoding. Render processed images through image elements. The image limits apply to contact photos, attachment images and document covers.
 
 Regression tests cover spoofed MIME, active content, disallowed URLs and paths, malformed Base64, byte/pixel limits, rewrite and cleanup, decoder failures/timeouts, stale rendering and old link compatibility. Real browser checks should accompany changes to decoding or Canvas behavior.

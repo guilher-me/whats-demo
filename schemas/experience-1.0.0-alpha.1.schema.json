@@ -51,7 +51,36 @@
         "assets",
         "flows",
         "templates"
-      ]
+      ],
+      "properties": {
+        "attachments": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "type": "object",
+            "required": ["id", "kind", "name", "customerVisible"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-zA-Z0-9_-]{1,100}$" },
+              "kind": { "enum": ["image", "document"] },
+              "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+              "customerVisible": { "type": "boolean" },
+              "assetId": { "type": "string" },
+              "coverAssetId": { "type": "string" },
+              "sizeLabel": { "type": "string", "minLength": 1, "maxLength": 24 }
+            },
+            "additionalProperties": false,
+            "if": { "properties": { "kind": { "const": "image" } } },
+            "then": {
+              "required": ["assetId"],
+              "properties": { "coverAssetId": false, "sizeLabel": false }
+            },
+            "else": {
+              "required": ["sizeLabel"],
+              "properties": { "assetId": false }
+            }
+          }
+        }
+      }
     },
     "journey": {
       "type": "object",
@@ -94,9 +123,16 @@
                     "enum": [
                       "text",
                       "voice_mock",
+                      "image",
+                      "document_mock",
                       "interactive",
                       "template"
                     ]
+                  },
+                  "image": {
+                    "type": "object",
+                    "properties": { "caption": { "type": "string", "maxLength": 1024 } },
+                    "additionalProperties": false
                   }
                 }
               },
@@ -111,7 +147,8 @@
                 }
               },
               "bindings": {
-                "type": "object"
+                "type": "object",
+                "properties": { "attachmentId": { "type": "string" } }
               }
             },
             "if": {
@@ -139,7 +176,20 @@
                   ]
                 }
               }
-            }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "message": { "properties": { "type": { "enum": ["image", "document_mock"] } } }
+                  }
+                },
+                "then": {
+                  "required": ["bindings"],
+                  "properties": { "bindings": { "required": ["attachmentId"] } }
+                }
+              }
+            ]
           }
         }
       }

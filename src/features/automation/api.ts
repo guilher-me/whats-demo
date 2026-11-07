@@ -1,6 +1,11 @@
 import { t } from '../../i18n';
 import { clone, normalizeProject } from '../../core/project';
-import { exportDocument, importDocument, SCHEMA_VERSION } from '../../core/document';
+import {
+  exportDocument,
+  importDocument,
+  prepareDocument,
+  SCHEMA_VERSION,
+} from '../../core/document';
 import type { ChatMessage, Project } from '../../core/types';
 
 export interface AutomationState {
@@ -10,7 +15,7 @@ export interface AutomationState {
   activeStep: string | null;
   flowScreen: string | null;
   pendingMessageId: string | null;
-  messages: ChatMessage[];
+  messages: (Omit<ChatMessage, 'attachment'> & { attachmentId?: string })[];
 }
 export interface AutomationBindings {
   project: () => Project;
@@ -29,6 +34,7 @@ export type ValidationResult =
 
 /** Versioned public contract; never exposes mutable application state or executes supplied code. */
 export function createAutomationAPI(bindings: AutomationBindings) {
+  let loadRequest = 0;
   const requireReady = () => {
     if (!bindings.state().ready) throw new Error(t('errors.loading'));
   };
@@ -49,6 +55,8 @@ export function createAutomationAPI(bindings: AutomationBindings) {
     loadProject(input: unknown): Project {
       requireReady();
       const project = normalizeProject(input);
+      if (project.attachments?.length) throw new Error(t('attachments.asyncLoad'));
+      ++loadRequest;
       bindings.replace(project);
       return clone(project);
     },
@@ -57,8 +65,22 @@ export function createAutomationAPI(bindings: AutomationBindings) {
     loadDocument: (input: unknown) => {
       requireReady();
       const project = importDocument(input);
+      if (project.attachments?.length) throw new Error(t('attachments.asyncLoad'));
+      ++loadRequest;
       bindings.replace(project);
       return exportDocument(project);
+    },
+    async loadDocumentAsync(input: unknown) {
+      requireReady();
+      const current = bindings.project();
+      const request = ++loadRequest;
+      const project = await prepareDocument(input);
+      requireReady();
+      if (request !== loadRequest || current !== bindings.project())
+        throw new Error(t('attachments.staleLoad'));
+      const document = exportDocument(project);
+      bindings.replace(project);
+      return document;
     },
     async play(mode: 'automatic' | 'manual' = 'automatic'): Promise<AutomationState> {
       requireReady();

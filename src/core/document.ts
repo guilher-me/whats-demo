@@ -1,10 +1,17 @@
-import type { Project, Step, MessageButton, BusinessInteractive } from './types';
+import type { Project, Step, MessageButton, BusinessInteractive, Attachment } from './types';
 import { normalizeProject } from './project';
 import { sanitizeAvatar, prepareProjectImages } from './images/sanitize';
 import { DEFAULT_AVATAR, trustedAvatar } from './avatarAssets';
 import { buttonType } from './message-buttons';
+import {
+  MAX_ATTACHMENTS,
+  MAX_DOCUMENT_BYTES,
+  validateAttachments,
+  validateMediaSteps,
+} from './attachments';
+import { prepareAttachments } from './images/prepare-attachments';
+export { MAX_DOCUMENT_BYTES } from './attachments';
 export const SCHEMA_VERSION = '1.0.0-alpha.1';
-export const MAX_DOCUMENT_BYTES = 8 * 1024 * 1024;
 type ObjectValue = Record<string, any>;
 export interface ExperienceDocument {
   format: 'whatsdemo';
@@ -15,6 +22,7 @@ export interface ExperienceDocument {
     assets: Record<string, ObjectValue>;
     flows: Record<string, ObjectValue>;
     templates: Record<string, ObjectValue>;
+    attachments?: ObjectValue[];
   };
   journey: { steps: ObjectValue[] };
   playback: { userPace: number };
@@ -27,7 +35,13 @@ const obj = (x: unknown): ObjectValue =>
   x && typeof x === 'object' && !Array.isArray(x) ? (x as ObjectValue) : fail();
 const str = (x: unknown): string => (typeof x === 'string' ? x : fail());
 const map = (x: unknown) => obj(x ?? {});
+function checkDocumentBytes(json: string) {
+  if (new TextEncoder().encode(json).length > MAX_DOCUMENT_BYTES)
+    throw new Error('The file exceeds the 8 MiB limit.');
+}
+
 export function exportDocument(project: Project): ExperienceDocument {
+  validateMediaSteps(project);
   const saved = project.document;
   const resources: ExperienceDocument['resources'] = {
     assets:
@@ -58,6 +72,30 @@ export function exportDocument(project: Project): ExperienceDocument {
     }
     business.avatarAssetId = 'avatar';
   }
+  if (project.attachments?.length) {
+    const images = new Map<string, string>();
+    const storeImage = (source: string, id: string) => {
+      const existing = images.get(source);
+      if (existing) return existing;
+      const match = /^data:image\/png;base64,([A-Za-z0-9+/]+=*)$/.exec(source);
+      if (!match) return fail();
+      const assetId = `attachment-${id}`;
+      resources.assets[assetId] = { mimeType: 'image/png', encoding: 'base64', data: match[1] };
+      images.set(source, assetId);
+      return assetId;
+    };
+    resources.attachments = project.attachments.map((item) => {
+      const { id, name, customerVisible, kind } = item;
+      const base = { id, name, customerVisible, kind };
+      return item.kind === 'image'
+        ? { ...base, assetId: storeImage(item.source, id) }
+        : {
+            ...base,
+            sizeLabel: item.sizeLabel,
+            ...(item.cover ? { coverAssetId: storeImage(item.cover, id) } : {}),
+          };
+    });
+  }
   const steps = project.steps.map((step) => {
     let message: ObjectValue = { type: 'text', text: { body: step.text } };
     const simulation: ObjectValue = {
@@ -66,7 +104,13 @@ export function exportDocument(project: Project): ExperienceDocument {
       ...(step.typingMs !== undefined ? { typingMs: step.typingMs } : {}),
     };
     let bindings: ObjectValue | undefined;
-    if (step.type === 'user' && step.voiceDurationSeconds !== undefined) {
+    if (step.type !== 'flow' && step.media) {
+      bindings = { attachmentId: step.media.attachmentId };
+      message =
+        step.media.kind === 'image'
+          ? { type: 'image', image: { caption: step.media.caption ?? '' } }
+          : { type: 'document_mock' };
+    } else if (step.type === 'user' && step.voiceDurationSeconds !== undefined) {
       message = { type: 'voice_mock' };
       simulation.recordingSeconds = step.voiceDurationSeconds;
     } else if (step.type === 'flow') {
@@ -198,7 +242,7 @@ export function exportDocument(project: Project): ExperienceDocument {
       ...(bindings ? { bindings } : {}),
     };
   });
-  return {
+  const document: ExperienceDocument = {
     format: 'whatsdemo',
     schemaVersion: SCHEMA_VERSION,
     metadata: saved?.metadata ?? {
@@ -212,6 +256,8 @@ export function exportDocument(project: Project): ExperienceDocument {
     playback: saved?.playback ?? { userPace: 1 },
     ...(saved?.extensions ? { extensions: saved.extensions } : {}),
   };
+  if (resources.attachments) checkDocumentBytes(JSON.stringify(document, null, 2));
+  return document;
 }
 export function importDocument(input: unknown): Project {
   const scan = (value: unknown, depth = 0): void => {
@@ -263,6 +309,47 @@ export function importDocument(input: unknown): Project {
       avatar = 'data:' + a.mimeType + ';base64,' + str(a.data);
     }
   }
+  const attachmentAssets = new Set<string>();
+  const imageSource = (rawId: unknown) => {
+    const id = str(rawId);
+    const asset = obj(assets[id]);
+    if (
+      asset.encoding !== 'base64' ||
+      !['image/png', 'image/jpeg', 'image/webp'].includes(asset.mimeType) ||
+      Object.keys(asset).some((key) => !['encoding', 'mimeType', 'data'].includes(key))
+    )
+      return fail();
+    attachmentAssets.add(id);
+    return `data:${asset.mimeType};base64,${str(asset.data)}`;
+  };
+  let attachments: Attachment[] | undefined;
+  if (resources.attachments !== undefined) {
+    if (!Array.isArray(resources.attachments) || resources.attachments.length > MAX_ATTACHMENTS)
+      fail();
+    attachments = validateAttachments(
+      resources.attachments.map((raw: unknown) => {
+        const item = obj(raw);
+        const { id, kind, name, customerVisible } = item;
+        const base = { id, kind, name, customerVisible };
+        const keys = ['id', 'kind', 'name', 'customerVisible'];
+        if (
+          kind === 'image' &&
+          Object.keys(item).every((key) => [...keys, 'assetId'].includes(key))
+        )
+          return { ...base, source: imageSource(item.assetId) };
+        if (
+          kind === 'document' &&
+          Object.keys(item).every((key) => [...keys, 'sizeLabel', 'coverAssetId'].includes(key))
+        )
+          return {
+            ...base,
+            sizeLabel: item.sizeLabel,
+            ...(item.coverAssetId === undefined ? {} : { cover: imageSource(item.coverAssetId) }),
+          };
+        return fail();
+      }),
+    );
+  }
   const list = obj(d.journey).steps;
   if (!Array.isArray(list) || list.length > 200) fail();
   const ids = new Set<string>();
@@ -295,6 +382,23 @@ export function importDocument(input: unknown): Project {
         : {}),
     };
     if (m.type === 'text') return { ...base, text: str(obj(m.text).body) };
+    if (m.type === 'image' || m.type === 'document_mock') {
+      const image = m.type === 'image' ? map(m.image) : {};
+      if (
+        Object.keys(binding).some((key) => key !== 'attachmentId') ||
+        Object.keys(m).some((key) => key !== 'type' && !(key === 'image' && m.type === 'image')) ||
+        Object.keys(image).some((key) => key !== 'caption')
+      )
+        fail();
+      return {
+        ...base,
+        media: {
+          kind: m.type === 'image' ? 'image' : 'document',
+          attachmentId: str(binding.attachmentId),
+          ...(m.type === 'image' ? { caption: str(image.caption ?? '') } : {}),
+        },
+      };
+    }
     if (m.type === 'voice_mock') {
       if (s.sender !== 'customer' || typeof sim.recordingSeconds !== 'number') fail();
       return { ...base, type: 'user', voiceDurationSeconds: sim.recordingSeconds };
@@ -415,12 +519,26 @@ export function importDocument(input: unknown): Project {
     }
     return { ...base, interactive };
   });
+  const { attachments: _library, ...legacyResources } = resources;
   const project: Project = {
     version: 1,
     contact: { name: str(business.name), avatar, verified: business.verified },
     steps,
+    ...(attachments?.length ? { attachments } : {}),
     document: {
-      resources,
+      resources: {
+        ...legacyResources,
+        assets: Object.fromEntries(
+          Object.entries(assets).filter(
+            ([id]) =>
+              !attachmentAssets.has(id) ||
+              id === business.avatarAssetId ||
+              id === customer.avatarAssetId,
+          ),
+        ),
+        flows,
+        templates,
+      },
       metadata: { id: meta.id, title: meta.title, contentLocale: meta.contentLocale },
       customer,
       playback: { userPace: playback.userPace },
@@ -431,8 +549,11 @@ export function importDocument(input: unknown): Project {
 }
 export async function readDocument(file: File): Promise<Project> {
   if (file.size > MAX_DOCUMENT_BYTES) throw new Error('The file exceeds the 8 MiB limit.');
-  const raw = JSON.parse(await file.text());
-  const project = importDocument(raw);
+  return prepareDocument(JSON.parse(await file.text()));
+}
+export async function prepareDocument(input: unknown): Promise<Project> {
+  checkDocumentBytes(JSON.stringify(input));
+  const project = await prepareAttachments(importDocument(input));
   for (const asset of Object.values(project.document?.resources?.assets ?? {}) as ObjectValue[]) {
     if (asset.type === 'builtin') {
       if (asset.name !== 'luma-home' || asset.source !== DEFAULT_AVATAR) fail();
@@ -449,13 +570,14 @@ export async function readDocument(file: File): Promise<Project> {
     asset.mimeType = match![1];
     asset.data = match![2];
   }
-  return prepareProjectImages(project);
+  const safe = await prepareProjectImages(project);
+  if (safe.attachments?.length) exportDocument(safe);
+  return safe;
 }
 export async function downloadDocument(project: Project) {
-  const safe = await prepareProjectImages(project);
+  const safe = await prepareProjectImages(await prepareAttachments(project));
   const json = JSON.stringify(exportDocument(safe), null, 2);
-  if (new TextEncoder().encode(json).length > MAX_DOCUMENT_BYTES)
-    throw new Error('The file exceeds the 8 MiB limit.');
+  checkDocumentBytes(json);
   const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
   const a = document.createElement('a');
   a.href = url;

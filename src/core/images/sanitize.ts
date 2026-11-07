@@ -71,8 +71,7 @@ async function rasterize(bytes: Uint8Array, mime: string): Promise<string> {
     canvas.width = canvas.height = 0;
   }
 }
-export function sanitizeAvatar(value: string): Promise<string> {
-  if (trustedAvatar(value)) return Promise.resolve(value);
+export function sanitizeImage(value: string): Promise<string> {
   const cached = cache.get(value);
   if (cached) return Promise.resolve(cached);
   const existing = pending.get(value);
@@ -96,6 +95,9 @@ export function sanitizeAvatar(value: string): Promise<string> {
   void work.finally(() => pending.delete(value)).catch(() => {});
   return work;
 }
+export function sanitizeAvatar(value: string): Promise<string> {
+  return trustedAvatar(value) ? Promise.resolve(value) : sanitizeImage(value);
+}
 export async function sanitizePhotoFile(file: File): Promise<string> {
   // MIME and extension are not trusted; both parsers and the browser decoder check the bytes.
   if (
@@ -106,7 +108,7 @@ export async function sanitizePhotoFile(file: File): Promise<string> {
     throw new InvalidImageError();
   const bytes = new Uint8Array(await file.arrayBuffer());
   inspectImage(bytes, file.type);
-  return sanitizeAvatar(dataURL(bytes, file.type));
+  return sanitizeImage(dataURL(bytes, file.type));
 }
 /** A rejected photo must never discard an otherwise valid conversation. */
 export async function prepareProjectImages(project: Project): Promise<Project> {

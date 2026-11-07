@@ -47,12 +47,26 @@ export interface Contact {
   avatar: string;
   verified: boolean;
 }
+interface AttachmentBase {
+  id: string;
+  name: string;
+  customerVisible: boolean;
+}
+export type Attachment = AttachmentBase &
+  ({ kind: 'image'; source: string } | { kind: 'document'; sizeLabel: string; cover?: string });
+export type AttachmentKind = Attachment['kind'];
+export interface MediaStep {
+  kind: AttachmentKind;
+  attachmentId?: string;
+  caption?: string;
+}
 export interface MessageStep {
   id: string;
   type: 'user' | 'business';
   text: string;
   delay: number;
   voiceDurationSeconds?: number;
+  media?: MediaStep;
   typing?: boolean;
   typingMs?: number;
   resourceId?: string;
@@ -114,6 +128,7 @@ export interface Project {
   };
   version: 1;
   contact: Contact;
+  attachments?: Attachment[];
   steps: Step[];
 }
 export interface ExpressionContext {
@@ -126,6 +141,7 @@ export interface ChatMessage {
   text: string;
   time: string;
   voiceDurationMs?: number;
+  attachment?: Attachment;
   flowStep?: FlowStep;
   completed?: boolean;
   interactive?: BusinessInteractive;
