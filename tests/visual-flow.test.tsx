@@ -4,6 +4,7 @@ import { Blob as NativeBlob } from 'node:buffer';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
+import { readJsonEditor, writeJsonEditor } from './fixtures/json-editor';
 import { decode } from '../src/core/codec';
 import example from '../src/core/default-project.json';
 import { createStep, STORAGE_KEY } from '../src/core/project';
@@ -212,12 +213,12 @@ it('preserves JSON formatting and keeps invalid changes out of the phone and the
   const flow: FlowDefinition = structuredClone(step.flow);
   flow.screens[0].title = 'Título aplicado pelo JSON';
   const formatted = JSON.stringify(flow, null, 4) + '\n';
-  fireEvent.change(input, { target: { value: formatted } });
-  expect(input).toHaveValue(formatted);
+  writeJsonEditor(input, formatted);
+  expect(readJsonEditor(input)).toBe(formatted);
   expect(phone().getByText('Título aplicado pelo JSON')).toBeVisible();
   expect(
-    JSON.parse(screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'JSON da jornada' }).value)
-      .steps[0].flow,
+    JSON.parse(readJsonEditor(screen.getByRole('textbox', { name: 'JSON da jornada' }))).steps[0]
+      .flow,
   ).toEqual(flow);
 
   flow.screens[0].layout.children.at(-1)!['on-click-action'] = {
@@ -225,9 +226,9 @@ it('preserves JSON formatting and keeps invalid changes out of the phone and the
     next: { type: 'screen', name: 'MISSING' },
     payload: {},
   };
-  fireEvent.change(input, { target: { value: JSON.stringify(flow) } });
+  writeJsonEditor(input, JSON.stringify(flow));
   expect(screen.getAllByText(/on-click-action/).length).toBeGreaterThan(0);
-  fireEvent.change(input, { target: { value: '{truncated' } });
+  writeJsonEditor(input, '{truncated');
   fireEvent.click(tab('Visual'));
   expect(screen.getByLabelText('Título da tela')).toBeDisabled();
   expect(phone().getByText('Título aplicado pelo JSON')).toBeVisible();
@@ -235,7 +236,7 @@ it('preserves JSON formatting and keeps invalid changes out of the phone and the
     'Título aplicado pelo JSON',
   );
   fireEvent.click(tab('JSON'));
-  expect(input).toHaveValue('{truncated');
+  expect(readJsonEditor(input)).toBe('{truncated');
   fireEvent.click(button('Descartar rascunho'));
   fireEvent.click(tab('Visual'));
   expect(screen.getByLabelText('Título da tela')).toBeEnabled();

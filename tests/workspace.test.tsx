@@ -3,12 +3,13 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
+import { readJsonEditor, writeJsonEditor } from './fixtures/json-editor';
 import { createDefaultProject } from '../src/core/defaults';
 import type { FlowStep } from '../src/core/types';
 import { STORAGE_KEY } from '../src/core/project';
 
 const button = (name: string) => screen.getByRole('button', { name });
-const code = () => screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'JSON da jornada' });
+const code = () => screen.getByRole('textbox', { name: 'JSON da jornada' });
 const api = () => window.whatsappFakeFlows!;
 
 beforeEach(() => {
@@ -25,16 +26,37 @@ it('keeps a code draft when collapsing and reopening the workbench panels', () =
   render(<App />);
   const panels = within(screen.getByRole('group', { name: 'Painéis da jornada' }));
   expect(panels.getAllByRole('button')).toHaveLength(3);
-  fireEvent.change(code(), { target: { value: '{invalid draft' } });
+  writeJsonEditor(code(), '{invalid draft');
   fireEvent.click(button('Recolher Código'));
   expect(screen.queryByRole('textbox', { name: 'JSON da jornada' })).toBeNull();
   fireEvent.click(button('Recolher Editor'));
   expect(button('Recolher Preview')).toBeDisabled();
   fireEvent.click(button('Expandir Código'));
-  expect(code()).toHaveValue('{invalid draft');
+  expect(readJsonEditor(code())).toBe('{invalid draft');
   expect(button('Recolher Preview')).toBeEnabled();
   fireEvent.click(button('Expandir Editor'));
   expect(screen.getByLabelText('Nome do contato')).toBeVisible();
+});
+
+it('formats JSON with line numbers and highlighting without rewriting literals or applying it', () => {
+  render(<App />);
+  const previous = api().getProject();
+  writeJsonEditor(code(), '{"name":"\\u0041","number":9007199254740993,"flag":true}');
+  fireEvent.click(button('Formatar JSON'));
+  expect(readJsonEditor(code())).toBe(
+    '{\n  "name": "\\u0041",\n  "number": 9007199254740993,\n  "flag": true\n}',
+  );
+  expect(document.querySelector('.journey-code .cm-lineNumbers')).toBeVisible();
+  expect(code().querySelector('.json-key')).toHaveTextContent('"name"');
+  expect(code().querySelector('.json-string')).toHaveTextContent('\\u0041');
+  expect(api().getProject()).toEqual(previous);
+
+  writeJsonEditor(code(), '{"incomplete":');
+  fireEvent.click(button('Formatar JSON'));
+  expect(screen.getByRole('alert')).toHaveTextContent(
+    'Corrija a sintaxe do JSON antes de formatar.',
+  );
+  expect(readJsonEditor(code())).toBe('{"incomplete":');
 });
 
 it('resizes the stacked panels with the keyboard', () => {
@@ -57,14 +79,14 @@ it('resizes the stacked panels with the keyboard', () => {
 it('applies valid journey JSON atomically and preserves the editor on failure', () => {
   render(<App />);
   const previous = api().getProject();
-  fireEvent.change(code(), { target: { value: '{invalid' } });
+  writeJsonEditor(code(), '{invalid');
   fireEvent.click(button('Aplicar'));
   expect(screen.getByRole('alert')).toHaveTextContent('JSON inválido.');
   expect(api().getProject()).toEqual(previous);
   expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
 
   const next = { ...previous, contact: { ...previous.contact, name: 'Empresa do código' } };
-  fireEvent.change(code(), { target: { value: JSON.stringify(next) } });
+  writeJsonEditor(code(), JSON.stringify(next));
   fireEvent.click(button('Validar'));
   expect(screen.getByText('Jornada validada.')).toBeVisible();
   expect(api().getProject()).toEqual(previous);
@@ -76,15 +98,15 @@ it('applies valid journey JSON atomically and preserves the editor on failure', 
 
 it('keeps newer visual edits separate from a pending code draft', () => {
   render(<App />);
-  const draft = code().value.replace('Luma Home', 'Proposta do código');
-  fireEvent.change(code(), { target: { value: draft } });
+  const draft = readJsonEditor(code()).replace('Luma Home', 'Proposta do código');
+  writeJsonEditor(code(), draft);
   fireEvent.change(screen.getByLabelText('Nome do contato'), {
     target: { value: 'Edição visual' },
   });
-  expect(code()).toHaveValue(draft);
+  expect(readJsonEditor(code())).toBe(draft);
   expect(button('Aplicar')).toBeDisabled();
   fireEvent.click(button('Recarregar do editor'));
-  expect(JSON.parse(code().value).contact.name).toBe('Edição visual');
+  expect(JSON.parse(readJsonEditor(code())).contact.name).toBe('Edição visual');
 });
 
 it('reports precise Flow errors and keeps the manual mode for missing automatic answers', async () => {
@@ -93,7 +115,7 @@ it('reports precise Flow errors and keeps the manual mode for missing automatic 
   const stepIndex = candidate.steps.findIndex((step) => step.type === 'flow');
   const step = candidate.steps[stepIndex] as FlowStep;
   step.answers = {};
-  fireEvent.change(code(), { target: { value: JSON.stringify(candidate) } });
+  writeJsonEditor(code(), JSON.stringify(candidate));
   fireEvent.click(button('Aplicar'));
   const issues = screen.getByRole('list', { name: 'Diagnósticos da jornada' });
   expect(issues).toHaveTextContent(`steps[${stepIndex}].answers.`);
@@ -104,7 +126,7 @@ it('reports precise Flow errors and keeps the manual mode for missing automatic 
   step.flow.screens[0].layout.children.unshift({ type: 'InvalidWidget' });
   const result = api().validateProject(candidate);
   expect(result.valid).toBe(false);
-  fireEvent.change(code(), { target: { value: JSON.stringify(candidate) } });
+  writeJsonEditor(code(), JSON.stringify(candidate));
   fireEvent.click(button('Aplicar'));
   expect(screen.getByRole('alert')).toHaveTextContent('Corrija os erros de Flow JSON');
   expect(screen.getByRole('list', { name: 'Diagnósticos da jornada' })).toHaveTextContent(

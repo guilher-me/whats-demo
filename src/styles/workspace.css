@@ -142,18 +142,6 @@
   color: var(--muted);
   font-size: 12px;
 }
-textarea.journey-code {
-  flex: 1;
-  min-height: 75px;
-  resize: none;
-  white-space: pre;
-  overflow: auto;
-  tab-size: 2;
-  font:
-    12px/1.55 ui-monospace,
-    Consolas,
-    monospace;
-}
 .code-actions {
   display: flex;
   flex-wrap: wrap;

@@ -432,15 +432,6 @@
   padding: 0;
   border: 0;
 }
-.form-section .json-input {
-  min-height: 210px;
-  font-size: 11px;
-  line-height: 1.55;
-  background: var(--surface-subtle);
-}
-.form-section .answers-input {
-  min-height: 140px;
-}
 .options-editor {
   padding: 0;
   border: 0;

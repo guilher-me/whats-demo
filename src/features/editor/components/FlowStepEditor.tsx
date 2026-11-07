@@ -3,8 +3,9 @@ import { useEffect, useId, useMemo, useState } from 'react';
 import type { FlowDefinition, FlowStep, Values } from '../../../core/types';
 import { validateFlow } from '../../../core/engine';
 import { Button } from '../../../components/ui/Button';
-import { TextArea, TextField, FieldError } from '../../../components/ui/Field';
+import { TextField, FieldError } from '../../../components/ui/Field';
 import { FormSection } from '../../../components/ui/FormSection';
+import { JsonEditor } from '../../../components/ui/JsonEditor';
 import {
   flowDefinitionDiagnostics,
   flowDiagnostics,
@@ -31,6 +32,7 @@ export function FlowStepEditor({
   const t = useT();
   const id = useId();
   const [tab, setTab] = useState<Tab>('visual');
+  const [jsonOpened, setJsonOpened] = useState(false);
   const [screenId, setScreenId] = useState(step.flow.screens[0].id);
   const [source, setSource] = useState(() => JSON.stringify(step.flow, null, 2));
   const [draft, setDraft] = useState<{ visual?: FlowDefinition; issues: JourneyDiagnostic[] }>();
@@ -85,6 +87,7 @@ export function FlowStepEditor({
 
   const selectTab = (next: Tab) => {
     setTab(next);
+    if (next === 'json') setJsonOpened(true);
     document.getElementById(id + '-' + next)?.focus();
   };
   const selectScreen = (selectedId: string) => {
@@ -179,35 +182,34 @@ export function FlowStepEditor({
           id={id + '-panel-json'}
           aria-labelledby={id + '-json'}
         >
-          <TextArea
-            label="Flow JSON"
-            className="json-input"
-            spellCheck={false}
-            value={source}
-            aria-invalid={!!draft || hasDefinitionError || undefined}
-            aria-describedby={issues.length ? id + '-issues' : undefined}
-            onChange={(event) => {
-              const raw = event.currentTarget.value;
-              setSource(raw);
-              let input: unknown;
-              try {
-                input = JSON.parse(raw) as unknown;
-              } catch (error) {
-                setDraft({
-                  issues: [
-                    {
-                      kind: 'definition',
-                      severity: 'error',
-                      path: 'flow',
-                      message: t('code.invalidJson') + ' ' + (error as Error).message,
-                    },
-                  ],
-                });
-                return;
-              }
-              accept(input);
-            }}
-          />
+          {jsonOpened && (
+            <JsonEditor
+              label="Flow JSON"
+              value={source}
+              invalid={!!draft || hasDefinitionError}
+              describedBy={issues.length ? id + '-issues' : undefined}
+              onChange={(raw) => {
+                setSource(raw);
+                let input: unknown;
+                try {
+                  input = JSON.parse(raw) as unknown;
+                } catch (error) {
+                  setDraft({
+                    issues: [
+                      {
+                        kind: 'definition',
+                        severity: 'error',
+                        path: 'flow',
+                        message: t('code.invalidJson') + ' ' + (error as Error).message,
+                      },
+                    ],
+                  });
+                  return;
+                }
+                accept(input);
+              }}
+            />
+          )}
         </div>
         {draft && (
           <div className="builder-draft">
@@ -242,15 +244,15 @@ export function FlowStepEditor({
         title={t('editor.autoAnswersTitle')}
         summary={t('editor.autoAnswersHint')}
         className="flow-answers"
+        mountOnOpen
       >
-        <TextArea
+        <JsonEditor
           label={t('editor.answers')}
           value={answers}
-          className="json-input answers-input"
-          spellCheck={false}
-          aria-invalid={!!answersError}
-          aria-describedby={answersError ? id + '-answers-error' : undefined}
-          onChange={(event) => editAnswers(event.currentTarget.value)}
+          className="answers-code"
+          invalid={!!answersError}
+          describedBy={answersError ? id + '-answers-error' : undefined}
+          onChange={editAnswers}
         />
         <TextField
           label={t('editor.completion')}

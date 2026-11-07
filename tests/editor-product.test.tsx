@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import axe from 'axe-core';
 import { App } from '../src/app/App';
+import { readJsonEditor, writeJsonEditor } from './fixtures/json-editor';
 import { createStep, STORAGE_KEY } from '../src/core/project';
 import { createInteractive } from '../src/core/interactive';
 import { SelectField } from '../src/components/ui/SelectField';
@@ -71,11 +72,11 @@ it('keeps an invalid Flow draft and its validation when the step is collapsed', 
   await start();
   fireEvent.click(screen.getByRole('button', { name: 'Editar etapa 3' }));
   fireEvent.click(screen.getByRole('tab', { name: 'JSON' }));
-  fireEvent.change(screen.getByLabelText('Flow JSON'), { target: { value: '{broken' } });
+  writeJsonEditor(screen.getByLabelText('Flow JSON'), '{broken');
   expect(screen.getByRole('button', { name: 'Iniciar manual' })).toBeDisabled();
   fireEvent.click(screen.getByRole('button', { name: 'Editar etapa 1' }));
   fireEvent.click(screen.getByRole('button', { name: 'Editar etapa 3' }));
-  expect(screen.getByLabelText('Flow JSON')).toHaveValue('{broken');
+  expect(readJsonEditor(screen.getByLabelText('Flow JSON'))).toBe('{broken');
   expect(screen.getByRole('button', { name: 'Iniciar manual' })).toBeDisabled();
 });
 it('opens the actions of a collapsed step without expanding its editor', async () => {

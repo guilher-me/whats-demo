@@ -453,6 +453,8 @@
   "code.definition": "Flow JSON",
   "code.simulator": "Simulador",
   "code.automatic": "Reprodução automática",
+  "code.format": "Formatar JSON",
+  "code.formatError": "Corrija a sintaxe do JSON antes de formatar.",
   "code.validate": "Validar",
   "code.apply": "Aplicar",
   "code.copy": "Copiar JSON",
