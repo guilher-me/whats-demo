@@ -30,6 +30,21 @@ function dependencyNotices(root, inputs) {
     })
     .join('\n');
 }
+function shareBuildOptions(root, directory) {
+  return {
+    absWorkingDir: root,
+    entryPoints: ['src/core/share.ts'],
+    outfile: path.join(directory, 'share.mjs'),
+    bundle: true,
+    platform: 'neutral',
+    mainFields: ['module', 'main'],
+    format: 'esm',
+    target: 'es2022',
+    minify: true,
+    legalComments: 'inline',
+    define: { 'process.env.NODE_ENV': '"production"' },
+  };
+}
 async function build({ root = ROOT, output = path.join(root, 'dist', 'whats-demo.html') } = {}) {
   const result = await esbuild.build({
     absWorkingDir: root,
@@ -78,6 +93,7 @@ async function build({ root = ROOT, output = path.join(root, 'dist', 'whats-demo
     throw new Error('O HTML não pode depender de arquivos externos.');
   fs.mkdirSync(path.dirname(output), { recursive: true });
   fs.writeFileSync(output, html.replace(/\r\n/g, '\n'));
+  await esbuild.build(shareBuildOptions(root, path.dirname(output)));
   if (path.resolve(output) === path.join(root, 'dist', 'whats-demo.html'))
     fs.rmSync(path.join(root, 'dist', 'whatsapp-fake-flows.html'), { force: true });
   return { output, bytes: Buffer.byteLength(html) };
@@ -90,7 +106,7 @@ async function cli() {
       ' KB · React, CSS, JavaScript, imagens e licenças incorporados',
   );
 }
-module.exports = { build, cli };
+module.exports = { build, cli, shareBuildOptions };
 if (require.main === module)
   cli().catch((error) => {
     console.error(error);

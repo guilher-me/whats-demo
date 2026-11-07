@@ -117,7 +117,7 @@ it.each(['editor', 'flow', 'list'] as const)(
       act(() =>
         window.whatsappFakeFlows!.loadProject({
           version: 1,
-          contact: { name: 'Empresa exemplo', avatar: '', verified: true },
+          contact: { name: 'Empresa exemplo', verified: true },
           steps: [step],
         }),
       );

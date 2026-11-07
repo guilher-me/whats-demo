@@ -1,4 +1,4 @@
-import { i18n, useT, type Locale } from './index';
+import { chooseLocale, i18n, useT, type Locale } from './index';
 import englishFlag from '../../assets/flags/us.svg';
 import spanishFlag from '../../assets/flags/es.svg';
 import brazilianFlag from '../../assets/flags/br.svg';
@@ -20,7 +20,7 @@ export function LanguageSwitcher({ disabled = false }: { disabled?: boolean }) {
           title={choice.name}
           aria-pressed={i18n.language === choice.locale}
           disabled={disabled}
-          onClick={() => void i18n.changeLanguage(choice.locale)}
+          onClick={() => chooseLocale(choice.locale)}
         >
           <img src={choice.flag} alt="" width="26" height="26" />
         </button>

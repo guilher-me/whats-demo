@@ -46,16 +46,16 @@ The example uses fictional customer details. Replace its messages, business iden
 
 1. **Build the journey.** Add customer messages, business replies or Flows. Edit text, choices, delays and automatic answers.
 2. **Try the conversation.** Send a message to start manual playback, or use automatic playback with an animated cursor.
-3. **Share the experience.** Copy a link from a hosted installation, record a phone-only video, or hand a teammate the portable HTML app.
+3. **Share the experience.** Copy a link from a hosted installation, open it as an interactive demo or an editable copy.
 
-| What you need to show                           | What WhatsDemo provides                                                                                                        |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| A conversation that feels like messaging        | Editable customer and business messages, typing indicators, delivery/read receipts and WhatsApp-style text formatting.         |
-| More than plain text                            | Typed buttons (quick replies, URLs, phone, copy code and WhatsApp calls), sectioned lists and interactive WhatsApp Flow forms. |
-| A branded scenario                              | Contact name, uploaded profile photo and an optional blue verified badge.                                                      |
-| A live walkthrough or a repeatable presentation | Manual interaction and automatic playback, with adjustable simulated-user pace.                                                |
-| Something stakeholders can take away            | Experience links, phone-only MP4/WebM recording where supported, and a single-file HTML build.                                 |
-| Help creating journeys with AI tools            | Accessible UI controls, an `llms.txt` guide and a versioned browser automation API.                                            |
+| What you need to show                           | What WhatsDemo provides                                                                                                                               |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A conversation that feels like messaging        | Editable customer and business messages, typing indicators, delivery/read receipts and WhatsApp-style text formatting.                                |
+| More than plain text                            | Typed buttons (quick replies, URLs, phone, copy code and WhatsApp calls), sectioned lists, simulated attachments and interactive WhatsApp Flow forms. |
+| A branded scenario                              | Contact name, a fixed WhatsApp store icon and an optional blue verified badge.                                                                        |
+| A live walkthrough or a repeatable presentation | Manual interaction and automatic playback, with adjustable simulated-user pace.                                                                       |
+| Something stakeholders can take away            | Experience links, phone-only MP4/WebM recording where supported, and a single-file HTML build.                                                        |
+| Help creating journeys with AI tools            | Accessible UI controls, an `llms.txt` guide, static link generator and versioned browser API.                                                         |
 
 ## Get started
 
@@ -82,9 +82,7 @@ The result is `dist/whats-demo.html`. See [requirements, installation and distri
 
 ## Your demo stays in your browser
 
-Edits are saved locally in the current browser. **Copy Link** encodes the journey in the URL fragment, including the contact photo; there is no project database. Anyone with the complete link can read its content, so use fictional data.
-
-A shared link needs a reachable copy of the app. Links from a hosted installation can be opened by people who can access that address. A `file://` link depends on the recipient having the HTML at the same path; distribute the HTML or host the build when sharing between computers. [Read the sharing guide](docs/user-guide.md#share-a-demo).
+Edits are saved in the current browser. **Copy link** creates a snapshot for **Editor** or **Preview** in the current interface language. Demo recipients can play the journey and use **Edit a copy**. The URL carries the compressed journey with simulated attachment previews. Anyone who receives it can read the content. Use fictional data. [Read the sharing guide](docs/user-guide.md#share-a-demo).
 
 WhatsDemo is an independent simulator. It does not send real WhatsApp messages or publish Flows to Meta. Conversation steps run in sequence; button and list choices do not create branching journeys. The Flow renderer supports a subset of Meta's components. See [scope and limitations](docs/user-guide.md#scope-and-limitations).
 
@@ -98,12 +96,9 @@ WhatsDemo is an independent simulator. It does not send real WhatsApp messages o
 | [Automation API](docs/automation.md)               | The browser API contract, validation rules and complete examples.                                         |
 | [Contributing](CONTRIBUTING.md)                    | Setup, component conventions, compatibility and validation.                                               |
 | [Deployment & branch workflow](docs/deployment.md) | Production CI/CD, manual development publishing and feature → development → main PRs.                     |
-| [Image security](docs/IMAGE-SECURITY.md)           | Validation, image rewriting, limits and fallback behavior.                                                |
 | [Developer reference](docs/architecture.md)        | Architecture and extension points; some developer reference guides are currently in Brazilian Portuguese. |
 | [MIT license](LICENSE)                             | License terms for the project.                                                                            |
 
 Have an idea or found a problem? [Open an issue](https://github.com/guilher-me/whats-demo/issues). Contributions to components, accessibility, translations and documentation are welcome.
 
 MIT © 2026 **Guilherme Cardoso**. Third-party notices are included in the generated HTML. Demonstration assets and their sources are documented in [assets/README.md](assets/README.md).
-
-JSON files now replace experience links. Use **Import JSON** and **Export JSON** in the header. See [file format](docs/file-format.md) for the versioned contract. Automation tools use getDocument() and loadDocument(document); createShareURL is removed.

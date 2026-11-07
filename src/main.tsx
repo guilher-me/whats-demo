@@ -21,3 +21,4 @@ import './styles/recording.css';
 import './styles/editor-product.css';
 
 import './styles/sharing.css';
+import './styles/attachments.css';

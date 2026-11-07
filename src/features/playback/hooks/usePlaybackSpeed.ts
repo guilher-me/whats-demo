@@ -14,18 +14,22 @@ function initialSpeed(): PlaybackSpeed {
     return 1;
   }
 }
-export function usePlaybackSpeed() {
-  const [speed, setState] = useState(initialSpeed);
+export function usePlaybackSpeed(persist = true) {
+  const [speed, setState] = useState(() => (persist ? initialSpeed() : 1));
   const current = useRef(speed);
-  const setSpeed = useCallback((value: number) => {
-    if (!isPlaybackSpeed(value)) return;
-    current.current = value;
-    setState(value);
-    try {
-      localStorage.setItem(PLAYBACK_SPEED_KEY, String(value));
-    } catch {
-      // The control still works if browser storage is unavailable.
-    }
-  }, []);
+  const setSpeed = useCallback(
+    (value: number) => {
+      if (!isPlaybackSpeed(value)) return;
+      current.current = value;
+      setState(value);
+      if (!persist) return;
+      try {
+        localStorage.setItem(PLAYBACK_SPEED_KEY, String(value));
+      } catch {
+        // The control still works if browser storage is unavailable.
+      }
+    },
+    [persist],
+  );
   return { speed, current, setSpeed };
 }

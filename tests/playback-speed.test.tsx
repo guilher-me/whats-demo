@@ -24,7 +24,7 @@ async function tick(ms: number) {
 }
 async function start(fullExample = false) {
   const project = createDefaultProject();
-  project.contact.avatar = '';
+
   if (!fullExample)
     project.steps = [
       { id: 'one', type: 'business', text: 'First message', delay: 6 },

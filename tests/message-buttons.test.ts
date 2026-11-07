@@ -27,7 +27,10 @@ describe('official button policies', () => {
   it('keeps missing types and contexts compatible with existing quick replies', () => {
     expect(buttonType(quick('old'))).toBe('quick_reply');
     expect(interactiveError({ kind: 'buttons', buttons: [quick('old')] })).toBe('');
-    expect(normalizeProject(legacy)).toEqual(legacy);
+    expect(normalizeProject(legacy)).toEqual({
+      ...legacy,
+      contact: { name: legacy.contact.name, verified: legacy.contact.verified },
+    });
   });
   it('distinguishes interactive single CTA messages from up to three quick replies', () => {
     expect(interactiveError({ kind: 'buttons', buttons: [url()] })).toBe('');

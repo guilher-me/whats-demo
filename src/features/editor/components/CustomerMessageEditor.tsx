@@ -1,16 +1,23 @@
 import { useT } from '../../../i18n';
-import type { MessageStep } from '../../../core/types';
+import type { Attachment, MessageStep } from '../../../core/types';
 import { DEFAULT_VOICE_SECONDS, MAX_VOICE_SECONDS } from '../../../core/voice-message';
 import { TextField } from '../../../components/ui/Field';
 import { SelectField } from '../../../components/ui/SelectField';
 import { MessageTextEditor } from './MessageTextEditor';
+import { MessageAttachmentEditor } from './MessageAttachmentEditor';
 
 export function CustomerMessageEditor({
   step,
   onChange,
+  attachment,
+  alternatives,
+  onChooseAttachment,
 }: {
   step: MessageStep;
   onChange: (change: Partial<MessageStep>) => void;
+  attachment?: Attachment;
+  alternatives: Attachment[];
+  onChooseAttachment: (alternative?: boolean) => void;
 }) {
   const t = useT();
   const seconds = step.voiceDurationSeconds;
@@ -19,16 +26,29 @@ export function CustomerMessageEditor({
     <>
       <SelectField
         label={t('editor.format')}
-        value={seconds === undefined ? 'text' : 'voice'}
+        value={step.media?.kind ?? (seconds === undefined ? 'text' : 'voice')}
         options={[
           { value: 'text', label: t('editor.plainText') },
           { value: 'voice', label: t('editor.voiceMock') },
+          { value: 'image', label: t('attachments.image') },
+          { value: 'document', label: t('attachments.document') },
         ]}
         onValueChange={(format) =>
-          onChange({ voiceDurationSeconds: format === 'voice' ? DEFAULT_VOICE_SECONDS : undefined })
+          onChange({
+            voiceDurationSeconds: format === 'voice' ? DEFAULT_VOICE_SECONDS : undefined,
+            media: format === 'image' || format === 'document' ? { kind: format } : undefined,
+          })
         }
       />
-      {seconds === undefined ? (
+      {step.media ? (
+        <MessageAttachmentEditor
+          step={step}
+          onChange={onChange}
+          attachment={attachment}
+          alternatives={alternatives}
+          onChoose={onChooseAttachment}
+        />
+      ) : seconds === undefined ? (
         <MessageTextEditor
           label={t('editor.messageText')}
           value={step.text}

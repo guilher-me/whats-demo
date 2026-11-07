@@ -1,6 +1,6 @@
 import { t } from '../../i18n';
 import { clone, normalizeProject } from '../../core/project';
-import { exportDocument, importDocument, SCHEMA_VERSION } from '../../core/document';
+import { createShareURL, type ShareMode } from '../../core/codec';
 import type { ChatMessage, Project } from '../../core/types';
 
 export interface AutomationState {
@@ -10,7 +10,7 @@ export interface AutomationState {
   activeStep: string | null;
   flowScreen: string | null;
   pendingMessageId: string | null;
-  messages: ChatMessage[];
+  messages: (Omit<ChatMessage, 'attachment'> & { attachmentId?: string })[];
 }
 export interface AutomationBindings {
   project: () => Project;
@@ -33,7 +33,7 @@ export function createAutomationAPI(bindings: AutomationBindings) {
     if (!bindings.state().ready) throw new Error(t('errors.loading'));
   };
   return Object.freeze({
-    apiVersion: 1 as const,
+    apiVersion: 2 as const,
     projectVersion: 1 as const,
     getInstructions: () => bindings.instructions(),
     getProject: () => clone(bindings.project()),
@@ -52,13 +52,8 @@ export function createAutomationAPI(bindings: AutomationBindings) {
       bindings.replace(project);
       return clone(project);
     },
-    schemaVersion: SCHEMA_VERSION,
-    getDocument: () => clone(exportDocument(bindings.project())),
-    loadDocument: (input: unknown) => {
-      requireReady();
-      const project = importDocument(input);
-      bindings.replace(project);
-      return exportDocument(project);
+    createShareURL(input: unknown = bindings.project(), mode: ShareMode = 'editor') {
+      return createShareURL(input, mode, bindings.href());
     },
     async play(mode: 'automatic' | 'manual' = 'automatic'): Promise<AutomationState> {
       requireReady();

@@ -41,7 +41,7 @@ it('reads and fills each field in order instead of reading the entire Flow first
   act(() =>
     window.whatsappFakeFlows!.loadProject({
       version: 1,
-      contact: { name: 'Store', avatar: '', verified: false },
+      contact: { name: 'Store', verified: false },
       steps: [
         {
           id: 'form',

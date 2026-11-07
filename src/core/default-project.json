@@ -2,7 +2,6 @@
   "version": 1,
   "contact": {
     "name": "Luma Home",
-    "avatar": "assets/luma-home.svg",
     "verified": true
   },
   "steps": [
