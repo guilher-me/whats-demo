@@ -3,7 +3,9 @@ import '@testing-library/jest-dom/vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
-import { exportDocument, importDocument } from '../src/core/document';
+import { decode, encode } from '../src/core/codec';
+import { validateProject } from '../src/core/engine';
+import { Blob as NativeBlob } from 'node:buffer';
 import { STORAGE_KEY } from '../src/core/project';
 import type { Project, Step } from '../src/core/types';
 
@@ -11,7 +13,7 @@ const voice: Step = { id: 'voice', type: 'user', text: '', delay: 0, voiceDurati
 const reply: Step = { id: 'reply', type: 'business', text: 'Obrigado!', delay: 0 };
 const project = (steps: Step[]): Project => ({
   version: 1,
-  contact: { name: 'Demo', avatar: '', verified: false },
+  contact: { name: 'Demo', verified: false },
   steps,
 });
 const api = () => window.whatsappFakeFlows!;
@@ -98,19 +100,17 @@ it('cancels an automatic hold on reset and discards it before a new run', async 
   expect(api().getState().messages).toMatchObject([{ voiceDurationMs: 1200 }]);
 });
 
-it('round trips voice metadata and rejects invalid durations and senders', () => {
-  const doc = exportDocument(project([voice, reply]));
-  expect(doc.journey.steps[0]).toMatchObject({
-    sender: 'customer',
-    message: { type: 'voice_mock' },
-    simulation: { recordingSeconds: 2 },
-  });
-  expect(exportDocument(importDocument(doc))).toEqual(doc);
-  for (const seconds of [undefined, 0, 1.5, 121, '2']) {
-    const invalid = structuredClone(doc);
-    invalid.journey.steps[0].simulation.recordingSeconds = seconds;
-    expect(() => importDocument(invalid)).toThrow();
+it('round trips voice metadata in links and rejects invalid durations and senders', async () => {
+  vi.stubGlobal('Blob', NativeBlob);
+  try {
+    expect(await decode(await encode(project([voice, reply])))).toEqual(project([voice, reply]));
+    for (const seconds of [0, 1.5, 121, '2']) {
+      expect(() =>
+        validateProject(project([{ ...voice, voiceDurationSeconds: seconds } as Step])),
+      ).toThrow();
+    }
+    expect(() => validateProject(project([{ ...voice, type: 'business' } as Step]))).toThrow();
+  } finally {
+    vi.unstubAllGlobals();
   }
-  doc.journey.steps[0].sender = 'business';
-  expect(() => importDocument(doc)).toThrow();
 });

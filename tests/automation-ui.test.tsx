@@ -40,7 +40,7 @@ it('carrega e reproduz o exemplo completo da documentação sem cliques', async 
   expect(output.result.running).toBe(false);
   expect(output.result.status).toBe('Conversa concluída.');
   expect(document.querySelector('.messages')).toHaveTextContent('Seu protocolo de exemplo');
-  expect(output.shareURL).toContain('whatsdemo');
+  expect(new URL(output.shareURL).hash).toMatch(/^#demo=v2z\./);
   expect(api.getProject().steps).toHaveLength(4);
   expect(JSON.parse(localStorage.getItem('whatsdemo-document-alpha1')!)).toEqual(api.getProject());
 });
@@ -50,7 +50,7 @@ it('atualiza o editor imediatamente, limpa a prévia e remove a API ao desmontar
   const api = window.whatsappFakeFlows!;
   const project = {
     version: 1,
-    contact: { name: 'API teste', avatar: '', verified: false },
+    contact: { name: 'API teste', verified: false },
     steps: [{ id: 'a', type: 'business', text: 'Olá pela API', delay: 0 }],
   };
   act(() => {

@@ -5,7 +5,8 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
 import { createDefaultProject } from '../src/core/defaults';
 import { projectStorageKey, STORAGE_KEY } from '../src/core/project';
-import { createURL } from '../src/core/codec';
+import { createShareURL } from '../src/core/codec';
+import { Blob as NativeBlob } from 'node:buffer';
 beforeEach(() => {
   localStorage.clear();
   history.replaceState(null, '', '/');
@@ -46,11 +47,11 @@ it('does not claim the untouched example is saved and separates sharing from sto
   expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
   expect(document.querySelector('.app-header .brand-meta .save-indicator')).toBe(indicator());
   expect(document.querySelector('.editor .save-indicator')).toBeNull();
-  expect(screen.getByRole('button', { name: 'Exportar JSON' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Copiar link' })).toBeInTheDocument();
 });
 it('shows success only after writing and restores the saved draft on reopening', async () => {
   const project = createDefaultProject();
-  project.contact.avatar = '';
+
   localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
   await start();
   fireEvent.change(screen.getByLabelText('Nome do contato'), {
@@ -65,7 +66,7 @@ it('shows success only after writing and restores the saved draft on reopening',
   expect(screen.getByLabelText('Nome do contato')).toHaveValue('Contato de teste');
   fireEvent.focus(indicator());
   expect(screen.getByRole('tooltip')).toHaveTextContent(
-    'Salvo somente neste navegador, incluindo nome do contato, foto, selo de verificação e toda a conversa.',
+    'Salvo somente neste navegador, incluindo o perfil do contato e toda a conversa.',
   );
   fireEvent.keyDown(indicator(), { key: 'Escape' });
   expect(screen.queryByRole('tooltip')).toBeNull();
@@ -79,19 +80,53 @@ it('reports a failed write visibly, keeps the edits, and clears the warning afte
     target: { value: 'Alteração preservada' },
   });
   expect(indicator()).toHaveAttribute('data-state', 'failed');
-  expect(screen.getByRole('alert')).toHaveTextContent('Exporte');
+  expect(screen.getByRole('alert')).toHaveTextContent('Copie um link');
   expect(screen.getByLabelText('Nome do contato')).toHaveValue('Alteração preservada');
   save.mockRestore();
   fireEvent.change(screen.getByLabelText('Nome do contato'), { target: { value: 'Agora salvo' } });
   expect(indicator()).toHaveAttribute('data-state', 'saved');
   expect(screen.queryByRole('alert')).toBeNull();
 });
-it('does not treat a shared-link load as a successful local save', async () => {
-  vi.stubGlobal('CompressionStream', undefined);
+it('opens a shared copy separately, saves its edits and keeps the original snapshot', async () => {
+  vi.stubGlobal('Blob', NativeBlob);
+  const draft = createDefaultProject();
+  draft.contact.name = 'Rascunho original';
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
   const project = createDefaultProject();
-  project.contact.avatar = '';
-  history.replaceState(null, '', await createURL(project, location.href));
+  project.contact.name = 'Jornada compartilhada';
+  const editor = new URL(await createShareURL(project, 'editor', location.href));
+  history.replaceState(null, '', editor.hash);
   await start();
-  expect(indicator()).toHaveAttribute('data-state', 'example');
-  expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+  const name = await screen.findByLabelText('Nome do contato');
+  expect(name).toHaveValue('Jornada compartilhada');
+  expect(indicator()).toHaveAttribute('data-state', 'shared');
+  fireEvent.change(name, { target: { value: 'Cópia editada' } });
+  expect(indicator()).toHaveAttribute('data-state', 'saved');
+  expect(localStorage.getItem(STORAGE_KEY)).toBe(JSON.stringify(draft));
+
+  cleanup();
+  history.replaceState(null, '', editor.hash.replace('#editor=', '#demo='));
+  await start();
+  expect(await screen.findByTitle('Jornada compartilhada')).toBeVisible();
+  expect(screen.queryByLabelText('Nome do contato')).toBeNull();
+  expect(screen.getByRole('link', { name: 'Editar uma cópia' })).toHaveAttribute(
+    'href',
+    editor.hash,
+  );
+  expect(window.whatsappFakeFlows).toBeUndefined();
+
+  cleanup();
+  history.replaceState(null, '', editor.hash);
+  await start();
+  expect(await screen.findByLabelText('Nome do contato')).toHaveValue('Cópia editada');
+});
+
+it('reports a truncated share link and preserves the local draft', async () => {
+  const draft = createDefaultProject();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+  history.replaceState(null, '', '#demo=v2z.broken');
+  await start();
+  expect(await screen.findByRole('alert')).toHaveTextContent('corrompido');
+  expect(screen.getByRole('link', { name: 'Abrir meu editor' })).toBeVisible();
+  expect(localStorage.getItem(STORAGE_KEY)).toBe(JSON.stringify(draft));
 });

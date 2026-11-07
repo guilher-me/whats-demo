@@ -1,5 +1,4 @@
 import { t } from '../i18n';
-import { isAllowedAvatar } from './images/policy';
 import { interactiveError } from './interactive';
 import { MAX_VOICE_SECONDS } from './voice-message';
 import { validateMediaSteps } from './attachments';
@@ -188,8 +187,6 @@ export function validateProject(input: unknown, { allowDrafts = false } = {}): P
   )
     throw new Error(t('errors.project'));
   if (input.steps.length > 200) throw new Error(t('errors.stepLimit'));
-  if (input.contact.avatar && !isAllowedAvatar(input.contact.avatar))
-    throw new Error(t('errors.photo'));
   for (const step of input.steps) {
     if (
       !isObject(step) ||

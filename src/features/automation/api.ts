@@ -1,11 +1,6 @@
 import { t } from '../../i18n';
 import { clone, normalizeProject } from '../../core/project';
-import {
-  exportDocument,
-  importDocument,
-  prepareDocument,
-  SCHEMA_VERSION,
-} from '../../core/document';
+import { createShareURL, type ShareMode } from '../../core/codec';
 import type { ChatMessage, Project } from '../../core/types';
 
 export interface AutomationState {
@@ -34,12 +29,11 @@ export type ValidationResult =
 
 /** Versioned public contract; never exposes mutable application state or executes supplied code. */
 export function createAutomationAPI(bindings: AutomationBindings) {
-  let loadRequest = 0;
   const requireReady = () => {
     if (!bindings.state().ready) throw new Error(t('errors.loading'));
   };
   return Object.freeze({
-    apiVersion: 1 as const,
+    apiVersion: 2 as const,
     projectVersion: 1 as const,
     getInstructions: () => bindings.instructions(),
     getProject: () => clone(bindings.project()),
@@ -55,32 +49,11 @@ export function createAutomationAPI(bindings: AutomationBindings) {
     loadProject(input: unknown): Project {
       requireReady();
       const project = normalizeProject(input);
-      if (project.attachments?.length) throw new Error(t('attachments.asyncLoad'));
-      ++loadRequest;
       bindings.replace(project);
       return clone(project);
     },
-    schemaVersion: SCHEMA_VERSION,
-    getDocument: () => clone(exportDocument(bindings.project())),
-    loadDocument: (input: unknown) => {
-      requireReady();
-      const project = importDocument(input);
-      if (project.attachments?.length) throw new Error(t('attachments.asyncLoad'));
-      ++loadRequest;
-      bindings.replace(project);
-      return exportDocument(project);
-    },
-    async loadDocumentAsync(input: unknown) {
-      requireReady();
-      const current = bindings.project();
-      const request = ++loadRequest;
-      const project = await prepareDocument(input);
-      requireReady();
-      if (request !== loadRequest || current !== bindings.project())
-        throw new Error(t('attachments.staleLoad'));
-      const document = exportDocument(project);
-      bindings.replace(project);
-      return document;
+    createShareURL(input: unknown = bindings.project(), mode: ShareMode = 'demo') {
+      return createShareURL(input, mode, bindings.href());
     },
     async play(mode: 'automatic' | 'manual' = 'automatic'): Promise<AutomationState> {
       requireReady();

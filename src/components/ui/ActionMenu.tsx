@@ -1,5 +1,5 @@
 import * as Menu from '@radix-ui/react-dropdown-menu';
-import type { ComponentProps } from 'react';
+import type { ComponentProps, Ref } from 'react';
 import { ControlIcon } from '../icons/ControlIcon';
 
 export interface MenuAction {
@@ -14,9 +14,15 @@ export function ActionMenu({
   label,
   items,
   icon = 'more',
+  disabled,
+  showLabel = false,
+  triggerRef,
 }: {
   label: string;
   items: MenuAction[];
+  disabled?: boolean;
+  showLabel?: boolean;
+  triggerRef?: Ref<HTMLButtonElement>;
   icon?: ComponentProps<typeof ControlIcon>['name'];
 }) {
   return (
@@ -24,12 +30,15 @@ export function ActionMenu({
       <Menu.Trigger asChild>
         <button
           type="button"
-          className="ui-icon-button"
+          ref={triggerRef}
+          className={showLabel ? 'button button--primary labeled-menu-trigger' : 'ui-icon-button'}
           data-editor-action
+          disabled={disabled}
           aria-label={label}
           title={label}
         >
           <ControlIcon name={icon} />
+          {showLabel && <span>{label}</span>}
         </button>
       </Menu.Trigger>
       <Menu.Portal>

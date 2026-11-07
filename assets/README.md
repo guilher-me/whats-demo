@@ -15,10 +15,9 @@ O build incorpora o símbolo e o favicon no HTML portátil. A mudança de identi
 
 As bandeiras redondas em `flags/` são do [Circle Flags / HatScripts](https://github.com/HatScripts/circle-flags), sob MIT. A licença original está em `flags/LICENSE.md`. São SVGs locais incorporados ao HTML para o seletor de idiomas (inglês, espanhol e português do Brasil).
 
-| Arquivo | Uso | Origem |
-| --- | --- | --- |
-| `luma-home.svg` | Logo da loja fictícia Luma Home, usada no exemplo padrão | Identidade demonstrativa original do projeto |
-| `prevent-senior.png` | Foto de exemplo legado, preservada para compatibilidade de links antigos | Imagem fornecida pelo usuário |
+| Arquivo                   | Uso                                                      | Origem                                                                                                                               |
+| ------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `whatsapp-store.svg`      | Ícone fixo da empresa na conversa e no editor            | [Ícone de loja do WhatsApp indicado pelo usuário](https://static.xx.fbcdn.net/rsrc.php/yW/r/ILX1T5nokOb.svg)                         |
 | `whatsapp-background.png` | Fundo do celular, também usado na prévia e nas gravações | [Imagem indicada pelo usuário](https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png) |
 
 O fundo é mantido em seu PNG original (760 × 1396). O build incorpora as imagens no HTML como data URLs; não há download dessas imagens durante o uso do arquivo portátil.

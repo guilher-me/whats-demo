@@ -22,7 +22,7 @@ async function tick(ms: number) {
 }
 async function start(steps: Project['steps']) {
   const project = createDefaultProject();
-  project.contact.avatar = '';
+
   project.steps = steps;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
   render(<App />);

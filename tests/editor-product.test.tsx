@@ -30,7 +30,7 @@ async function start() {
     STORAGE_KEY,
     JSON.stringify({
       version: 1,
-      contact: { name: 'Store', avatar: '', verified: true },
+      contact: { name: 'Store', verified: true },
       steps: [
         { id: 'hello', type: 'user', text: 'Hello', delay: 0.4 },
         {

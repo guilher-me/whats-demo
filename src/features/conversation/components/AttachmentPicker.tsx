@@ -6,7 +6,7 @@ import { MAX_CAPTION } from '../../../core/attachments';
 import type { Attachment } from '../../../core/types';
 import { useT } from '../../../i18n';
 import type { Playback } from '../../playback/hooks/usePlayback';
-import { AttachmentDetails, AttachmentTile } from './AttachmentVisual';
+import { AttachmentDetails, AttachmentTile, AttachmentVisual } from './AttachmentVisual';
 import { useEffect, useRef } from 'react';
 
 const choices = [
@@ -52,7 +52,7 @@ function PhotoSendBar({
           onClick={onReview}
           disabled={disabled}
         >
-          <img src={photo.source} alt="" />
+          <AttachmentVisual item={photo} />
           <ControlIcon name="pencil" />
         </button>
       )}
@@ -175,7 +175,7 @@ export function AttachmentPicker({
                       disabled={disabled}
                       onClick={() => media.select(item.id)}
                     >
-                      <img src={item.source} alt="" draggable={false} />
+                      <AttachmentVisual item={item} />
                       {photo?.id === item.id && (
                         <span className="photo-selection" aria-hidden="true">
                           1
@@ -189,7 +189,7 @@ export function AttachmentPicker({
         </div>
       ) : review ? (
         <div className="photo-review-canvas" ref={content}>
-          <img src={photo.source} alt={photo.name} draggable={false} />
+          <AttachmentVisual item={photo} />
         </div>
       ) : (
         <div className="attachment-phone-content" ref={content}>

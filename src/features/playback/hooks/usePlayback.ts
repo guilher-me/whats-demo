@@ -14,12 +14,12 @@ import { messageOptions } from '../../../core/interactive';
 import { usePlaybackSpeed } from './usePlaybackSpeed';
 import { PlaybackClock } from '../playbackClock';
 import { flowReadingText } from '../../flows/reading';
-import { availableAttachments, stepAttachment } from '../../../core/attachments';
+import { conversationAttachments, stepAttachment } from '../../../core/attachments';
 import { useAttachmentPlayback } from './useAttachmentPlayback';
 
-export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
+export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpeed = true) {
   useT();
-  const { speed, current: speedRef, setSpeed } = usePlaybackSpeed();
+  const { speed, current: speedRef, setSpeed } = usePlaybackSpeed(persistSpeed);
   const automaticMode = useRef(false);
   const clock = useRef<PlaybackClock | null>(null);
   const sleep = useCallback(
@@ -330,7 +330,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     try {
       const validated = validateProject(project);
       const steps = clone(validated.steps);
-      const attachments = validated.attachments ?? [];
+      const attachments = conversationAttachments(validated);
       const openingMessage = !automatic ? initialMessage?.trim() : undefined;
       if (openingMessage) append(openingMessage, 'user');
       // The submitted text fulfills only an opening customer step; later replies still wait.
@@ -361,7 +361,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
             flushSync(() =>
               media.set({
                 kind: item.kind,
-                items: availableAttachments(attachments, item.kind, true),
+                items: attachments.filter((attachment) => attachment.kind === item.kind),
                 view: 'closed',
                 caption: '',
               }),

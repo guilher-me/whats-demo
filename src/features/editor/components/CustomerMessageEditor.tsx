@@ -10,12 +10,14 @@ export function CustomerMessageEditor({
   step,
   onChange,
   attachment,
+  alternatives,
   onChooseAttachment,
 }: {
   step: MessageStep;
   onChange: (change: Partial<MessageStep>) => void;
   attachment?: Attachment;
-  onChooseAttachment: () => void;
+  alternatives: Attachment[];
+  onChooseAttachment: (alternative?: boolean) => void;
 }) {
   const t = useT();
   const seconds = step.voiceDurationSeconds;
@@ -43,6 +45,7 @@ export function CustomerMessageEditor({
           step={step}
           onChange={onChange}
           attachment={attachment}
+          alternatives={alternatives}
           onChoose={onChooseAttachment}
         />
       ) : seconds === undefined ? (

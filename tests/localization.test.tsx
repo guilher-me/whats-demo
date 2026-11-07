@@ -3,6 +3,7 @@ import '@testing-library/jest-dom/vitest';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import axe from 'axe-core';
+import { Blob as NativeBlob } from 'node:buffer';
 import { App } from '../src/app/App';
 import { catalogs, i18n, initialLocale, LOCALE_KEY, locales, t } from '../src/i18n';
 import { createDefaultProject } from '../src/core/defaults';
@@ -33,10 +34,9 @@ it('uses English by default, honors only supported saved choices and tolerates b
 });
 
 it('switches all three interfaces, persists the choice and preserves the project and shared link', async () => {
-  // jsdom's Blob lacks stream(); exercise the portable JSON share-link fallback here.
-  vi.stubGlobal('CompressionStream', undefined);
+  vi.stubGlobal('Blob', NativeBlob);
   const project = createDefaultProject();
-  project.contact.avatar = '';
+
   project.steps = [
     { id: 'message', type: 'business', text: 'Mensagem original do usuário', delay: 0 },
   ];
@@ -46,7 +46,7 @@ it('switches all three interfaces, persists the choice and preserves the project
   expect(screen.getByRole('heading', { name: 'Build the conversation' })).toBeInTheDocument();
   expect(document.documentElement).toHaveAttribute('lang', 'en');
   const before = window.whatsappFakeFlows!.getProject();
-  const link = JSON.stringify(window.whatsappFakeFlows!.getDocument());
+  const link = await window.whatsappFakeFlows!.createShareURL();
   const spanish = screen.getByRole('button', { name: 'Español' });
   fireEvent.click(spanish);
   expect(screen.getByRole('heading', { name: 'Crea la conversación' })).toBeInTheDocument();
@@ -61,7 +61,7 @@ it('switches all three interfaces, persists the choice and preserves the project
   fireEvent.click(screen.getByRole('button', { name: 'English' }));
   expect(screen.getByRole('button', { name: '＋ Business' })).toBeInTheDocument();
   expect(window.whatsappFakeFlows!.getProject()).toEqual(before);
-  expect(JSON.stringify(window.whatsappFakeFlows!.getDocument())).toBe(link);
+  expect(await window.whatsappFakeFlows!.createShareURL()).toBe(link);
 });
 
 it('has complete catalogs with matching interpolation variables', () => {
@@ -100,7 +100,7 @@ it.each(locales)(
 
 it('refreshes playback status after a language switch without restarting the conversation', async () => {
   const project = createDefaultProject();
-  project.contact.avatar = '';
+
   project.steps = [{ id: 'user', type: 'user', text: 'oi', delay: 0 }];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
   render(<App />);

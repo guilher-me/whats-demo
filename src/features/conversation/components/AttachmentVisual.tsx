@@ -3,9 +3,11 @@ import type { Attachment } from '../../../core/types';
 import { useT } from '../../../i18n';
 
 export function AttachmentVisual({ item }: { item: Attachment }) {
-  const source = item.kind === 'image' ? item.source : item.cover;
-  return source ? (
-    <img src={source} alt="" draggable={false} />
+  return item.kind === 'image' ? (
+    <span className="attachment-image-placeholder" aria-hidden="true">
+      <ControlIcon name="photo" />
+      <span>{item.name}</span>
+    </span>
   ) : (
     <span className="attachment-file-icon" aria-hidden="true">
       <ControlIcon name="file" />

@@ -38,7 +38,7 @@ npm run build
 
 This checks TypeScript and generates `dist/whats-demo.html`, with JavaScript, CSS, images and dependency license notices embedded. Do not edit the generated HTML; change the source and rebuild.
 
-The build also creates `llms.txt`, its `llm.txt` alias, `llms-full.txt` and the referenced `docs/` files beside the HTML. The standalone HTML embeds the AI instructions too.
+The build also creates `share.mjs`, `llms.txt`, its `llm.txt` alias, `llms-full.txt` and the referenced schema and docs beside the HTML. The standalone HTML embeds the AI instructions too.
 
 ## Share or host a build
 
@@ -46,7 +46,7 @@ The build also creates `llms.txt`, its `llm.txt` alias, `llms-full.txt` and the 
 - **Host it:** publish the contents of `dist/` on a static web host. Open `whats-demo.html` at that address; keep the documentation files beside it so the AI guide links work.
 - **Share a custom journey:** use **Copy Link** from a hosted installation with a stable address. The URL fragment carries the project; no project database is involved.
 
-A `file://` experience link only works where the app exists at that same path. Sending a local link alone does not make the HTML available to another computer. See [sharing and local storage](user-guide.md#share-a-demo).
+Links created from an opened HTML file point to the public WhatsDemo site. See [sharing and local storage](user-guide.md#share-a-demo).
 
 ## Commands
 

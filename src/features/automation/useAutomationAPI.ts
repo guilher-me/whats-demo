@@ -27,7 +27,7 @@ export function useAutomationAPI(bindings: AutomationBindings) {
     });
     window.whatsappFakeFlows = api;
     window.dispatchEvent(
-      new CustomEvent('whatsapp-fake-flows:ready', { detail: { apiVersion: 1 } }),
+      new CustomEvent('whatsapp-fake-flows:ready', { detail: { apiVersion: api.apiVersion } }),
     );
     return () => {
       if (window.whatsappFakeFlows === api) delete window.whatsappFakeFlows;

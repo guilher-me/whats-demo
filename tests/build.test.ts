@@ -4,6 +4,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createRequire } from 'node:module';
 import { Script } from 'node:vm';
+import { pathToFileURL } from 'node:url';
+import { spawnSync } from 'node:child_process';
 const require = createRequire(import.meta.url);
 it('gera um HTML com React, estilos, foto e licenças incorporados', async () => {
   const directory = mkdtempSync(join(tmpdir(), 'fake-flows-react-'));
@@ -28,13 +30,13 @@ it('gera um HTML com React, estilos, foto e licenças incorporados', async () =>
     expect(html).toContain('react-dom@');
     expect(html).toContain('dom-to-image-more@');
     expect(html).toContain('fix-webm-duration@');
-    expect(html).toContain('file-type@');
-    expect(html).toContain('image-dimensions@');
+    expect(html).not.toContain('file-type@');
+    expect(html).not.toContain('image-dimensions@');
     expect(html).not.toMatch(/<script\b[^>]*src=/i);
     expect(html).not.toContain('APP_SCRIPT');
     expect(html).not.toContain('LLM_DOCS');
     expect(html).toContain('id="llms-txt"');
-    expect(html).toContain('Automation API v1');
+    expect(html).toContain('Automation API v2');
     expect(readFileSync(join(directory, 'llms.txt'), 'utf8')).toContain('window.whatsappFakeFlows');
     expect(readFileSync(join(directory, 'llm.txt'), 'utf8')).toBe(
       readFileSync(join(directory, 'llms.txt'), 'utf8'),
@@ -44,6 +46,24 @@ it('gera um HTML com React, estilos, foto e licenças incorporados', async () =>
     const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
     expect(scripts).toHaveLength(1);
     new Script(scripts[0][1]);
+    const generator = pathToFileURL(join(directory, 'share.mjs')).href;
+    const generated = spawnSync(
+      process.execPath,
+      [
+        '--input-type=module',
+        '-e',
+        `
+      import { createShareURL } from ${JSON.stringify(generator)};
+      const project = {version:1, contact:{name:"Test", verified:false},
+        steps:[{id:"hello", type:"business", text:"Hello", delay:0}]};
+      console.log(await createShareURL(project));
+    `,
+      ],
+      { encoding: 'utf8' },
+    );
+    expect(generated.stderr).toBe('');
+    expect(generated.status).toBe(0);
+    expect(generated.stdout).toMatch(/https:\/\/guilher-me\.github\.io\/whats-demo\/#demo=v2z\./);
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }

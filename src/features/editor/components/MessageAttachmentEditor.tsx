@@ -9,16 +9,19 @@ import { MessageTextEditor } from './MessageTextEditor';
 export function MessageAttachmentEditor({
   step,
   attachment,
+  alternatives = [],
   onChoose,
   onChange,
 }: {
   step: MessageStep;
   attachment?: Attachment;
-  onChoose: () => void;
+  alternatives?: Attachment[];
+  onChoose: (alternative?: boolean) => void;
   onChange: (change: Partial<MessageStep>) => void;
 }) {
   const t = useT();
   const media = step.media;
+  if (!media) return null;
   return (
     <>
       {attachment && (
@@ -26,12 +29,62 @@ export function MessageAttachmentEditor({
           <span className="attachment-square">
             <AttachmentVisual item={attachment} />
           </span>
-          <span>{attachment.name}</span>
+          <div>
+            <strong>{attachment.name}</strong>
+            {step.type === 'user' && <small>{t('attachments.automatic')}</small>}
+          </div>
         </div>
       )}
-      <Button onClick={onChoose}>{t('attachments.choose')}</Button>
+      <Button onClick={() => onChoose()}>{t('attachments.choose')}</Button>
       {!attachment && <FieldError>{t('attachments.required')}</FieldError>}
-      {media?.kind === 'image' && (
+      {step.type === 'user' && attachment && (
+        <div className="attachment-alternatives">
+          {alternatives.length > 0 && (
+            <ul aria-label={t('attachments.alternatives')}>
+              {alternatives.map((item) => (
+                <li key={item.id}>
+                  <span>{item.name}</span>
+                  <Button
+                    variant="ghost"
+                    onClick={() =>
+                      onChange({
+                        media: {
+                          ...media,
+                          attachmentId: item.id,
+                          alternativeIds: alternatives.map((option) =>
+                            option.id === item.id ? attachment.id : option.id,
+                          ),
+                        },
+                      })
+                    }
+                  >
+                    {t('attachments.useAutomatically', { name: item.name })}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() =>
+                      onChange({
+                        media: {
+                          ...media,
+                          alternativeIds: alternatives
+                            .filter((option) => option.id !== item.id)
+                            .map((option) => option.id),
+                        },
+                      })
+                    }
+                  >
+                    {t('attachments.removeAlternative', { name: item.name })}
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <Button variant="ghost" onClick={() => onChoose(true)}>
+            {t('attachments.addAlternative')}
+          </Button>
+        </div>
+      )}
+      {media.kind === 'image' && (
         <MessageTextEditor
           label={t('attachments.caption')}
           value={media.caption ?? ''}

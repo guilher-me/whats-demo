@@ -36,7 +36,7 @@ const tick = async (ms: number) => {
 };
 async function start(interactive: ReplyButtonsMessage) {
   const project = createDefaultProject();
-  project.contact.avatar = '';
+
   project.steps = [
     { id: 'buttons', type: 'business', text: 'Our offers', delay: 0, interactive },
     { id: 'done', type: 'business', text: 'Next step', delay: 0 },

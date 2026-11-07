@@ -57,6 +57,9 @@ describe('mensagens interativas', () => {
       },
     ];
     expect(normalizeProject(await decode(await encode(project)))).toEqual(project);
-    expect(normalizeProject(legacy)).toEqual(legacy);
+    expect(normalizeProject(legacy)).toEqual({
+      ...legacy,
+      contact: { name: legacy.contact.name, verified: legacy.contact.verified },
+    });
   });
 });

@@ -70,23 +70,6 @@
   height: 54px;
   box-shadow: 0 0 0 1px var(--line);
 }
-.contact-photo-menu {
-  position: absolute;
-  right: -4px;
-  bottom: -3px;
-}
-.contact-photo-menu .ui-icon-button {
-  width: 25px;
-  height: 25px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  box-shadow: var(--shadow-card);
-}
-.contact-photo-menu svg {
-  width: 13px;
-  height: 13px;
-}
 .contact-fields .field {
   margin: 0 0 8px;
 }

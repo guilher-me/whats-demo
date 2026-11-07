@@ -12,7 +12,7 @@ Use **Restore example** to load it. The app asks you to confirm before replacing
 
 The left panel is the editor; the right panel is the phone preview.
 
-1. Set the **contact name**, upload a profile photo and choose whether to display the **verified account badge**.
+1. Set the **contact name** and choose whether to display the **verified account badge**.
 2. Add a **Customer**, **Business** or **Flow** step from the fixed bar at the bottom of the editor. New steps go at the end and receive focus.
 3. Expand a step to edit it. Select a step or focus one of its fields to see the message update in the phone.
 4. Open **Behavior** to set the delay and, for business replies, the typing indicator.
@@ -20,19 +20,11 @@ The left panel is the editor; the right panel is the phone preview.
 
 The header status describes saving for the **entire project**, including contact details and the conversation. Hover or focus it for details. Changes are stored in the current browser, not in an online account. Clearing browser storage removes that local draft.
 
-Profile photos accept PNG, JPEG and WebP up to 2 MiB, 4096 pixels per edge and 8 million pixels. They are validated and rewritten locally before display and sharing. See [image security](IMAGE-SECURITY.md).
-
 ## Messages, buttons and lists
 
 For a customer voice note, choose **Voice message (mock)** under **Format**. Set **Recording duration** from 1 to 120 seconds for automatic playback. In manual playback, hold the microphone and release it to send. The preview animates a waveform and adds a voice bubble with the elapsed time. The entire interaction is silent.
 
-Use **Conversation attachments** above **Sequence** to add images and simulated documents. A document has a display name, an illustrative size and an optional image cover. Select **Image** or **Document** in a customer or business step and choose an attachment or add one there. Image captions belong to the step.
-
-In manual playback, tap the paper clip and choose **Gallery** or **Document**. The picker shows items marked **Available to the customer**. In **Recents**, tap a photo to select it and reveal the caption field and send button. Tap its small preview to review the photo in full screen. In automatic playback, the cursor selects the configured item, types its caption and sends it. Opening a received document shows a simulated details card. Exporting the experience includes the processed images and document metadata. [WhatsApp for Android media reference](https://faq.whatsapp.com/759301289012856)
-
-![Attachment library in the editor and the same three images in the simulated phone gallery](media/attachments-workbench.webp)
-
-Business messages support three formats:
+For text-based Business messages, choose one of these formats.
 
 | Format       | Use it for                                                               | Limits                                                                                                     |
 | ------------ | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
@@ -43,6 +35,12 @@ Business messages support three formats:
 Set optional headers, footers and automatic answers in the message's additional settings. In manual mode, choosing a quick reply or confirming a list records the customer's response and advances the journey. Action buttons show a simulation inside the phone; they do not open websites, call numbers or copy to the clipboard. Select **Continue demo** to confirm an action. Mixed templates still wait for a quick reply. Option drag handles let you change their order.
 
 Message bodies support `*bold*`, `_italic_` and `~strikethrough~`, including combinations such as `*_bold italic_*`. Formatting appears in previews, playback and recordings. Unmatched markers remain literal; message text is not rendered as HTML.
+
+## Add simulated attachments
+
+Set a Customer or Business message to **Image** or **Document**. Choose a preview already used in the sequence or create a new one in the step. Images get labels such as `IMG 01`; documents show a PDF icon, a filename and an illustrative size. The fixed store icon represents the business in every journey.
+
+Image captions belong to the message. The same preview can appear in several steps with different captions. A Customer step can add extra manual choices and choose which item automatic playback sends. The gallery and document picker collect the matching items across the whole sequence, including later steps, and show each item once. In manual playback, the paperclip opens the picker. You can cancel or go back, or select an item, add an optional image caption and send it.
 
 ## Add a WhatsApp Flow
 
@@ -64,7 +62,7 @@ Use **View conversation** to inspect all configured messages in order without wa
 
 ### Manual playback
 
-Type in the phone's message field and press **Enter** or click **Send** to start manual playback. Your text replaces a configured opening customer text step. If the journey starts with a business step, your message appears before it and all configured steps remain. If it starts with a simulated voice step, hold the microphone to start the journey and record the first message. These actions leave the saved configuration intact.
+Type in the phone's message field and press **Enter** or click **Send** to start manual playback. Your text replaces a configured opening customer text step. If the journey starts with a business step, your message appears before it and all configured steps remain. If it starts with a simulated voice step, hold the microphone to start. For an opening attachment step, use the paperclip. These actions leave the saved configuration intact.
 
 You can also select **Start manually**. Later customer steps wait for a reply; buttons, lists and Flows wait for your interaction. The **Phone only** view gives the conversation more space and starts manual playback if needed.
 
@@ -76,22 +74,13 @@ The composer is disabled during automatic playback. Use the pause button to susp
 
 ## Share a demo
 
-**Copy Link** encodes a snapshot of the current project in the URL fragment. It includes contact details, photo, messages, Flow definitions and automatic answers. There is no project database.
+Use **Copy link** and select **Demo mode** for someone who wants to test the conversation, or **Editor mode** for someone who wants to change it. The demo has the phone, manual and automatic playback, and **Edit a copy**. The editor saves changes to a separate browser-local copy. Open the demo link again to see its original snapshot.
 
-- On a hosted installation, recipients need access to the same app address.
-- A `file://` link depends on the app existing at the same path on the recipient's machine. Share the HTML too, or host the build.
-- Sharing the HTML alone distributes the app and its built-in example; it does not include your current local draft.
-- Anyone with the full experience link can read the encoded data. Use fictional details. The link is not encrypted storage.
+Use **Create with AI** to paste a configuration from your AI tool and generate a link without editing your draft. See [the AI guide](ai-guide.md).
 
-The format keeps support for older `v1z` and `v1j` links. Invalid or unsupported contact photos are replaced by the fallback avatar without discarding the journey.
+The link holds the compressed journey, including messages, Flow definitions, automatic answers and simulated attachment labels. Anyone with the full URL can read the content. Use fictional data and a hosted address your recipients can reach. Links copied from a local HTML file target the public WhatsDemo site.
 
-### Opening a shared experience
-
-An invalid link opens a prominent recovery screen. The shared experience is not loaded and the existing draft stays intact. Use **Paste another link** to validate a complete replacement URL, or **Continue my draft** (or **Explore the example** if there is no draft). Continuing removes the failed fragment so refreshing does not reopen the error.
-
-When a valid link differs from your current draft, **Open another experience?** identifies the current and incoming contacts. Use **Copy current project link** to keep a snapshot, **Cancel** to retain your draft, or **Open and replace** to save the incoming experience as the single local draft. Closing the dialog or pressing Escape also cancels. Clipboard failures offer a selectable link for manual copying. Backup links can retain incomplete editable message fields; complete them before playback.
-
-Without an existing draft, a valid shared experience opens directly and is saved when edited. Opening an identical saved experience does not ask for replacement again. Pasting a URL imports its experience fragment into the current installation; it does not navigate to the pasted host.
+Old links open as demos and use simulated previews for their referenced attachments. Invalid or truncated links open a recovery screen with a shortcut to the local editor. Your stored draft remains available.
 
 ## Record a phone-only video
 
@@ -113,8 +102,6 @@ Changing the interface language does not translate your message text or Flow JSO
 - Conversation steps execute in sequence. A button or list choice does not branch to a different sequence of messages. Flow screen navigation and supported conditional components work within the form.
 - The Flow renderer implements a subset of Meta's components. Do not treat a successful simulation as production API validation.
 - Local drafts are browser-specific. Experience links carry readable project data and depend on a reachable app address.
-- Browser support affects video recording and image processing. The app reports unsupported operations instead of requiring a backend.
+- Browser support affects video recording and link compression. The app reports unsupported operations instead of requiring a backend.
 
 For problems, [open an issue](https://github.com/guilher-me/whats-demo/issues) with a small fictional journey and steps to reproduce it.
-
-JSON files now replace experience links. Use **Import JSON** and **Export JSON** in the header. See [file format](file-format.md) for the versioned contract. Automation tools use getDocument() and loadDocument(document); createShareURL is removed.

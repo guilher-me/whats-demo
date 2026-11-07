@@ -25,6 +25,7 @@ export function StepCard({
   onAction,
   onValidity,
   attachment,
+  alternatives,
   onChooseAttachment,
 }: {
   step: Step;
@@ -40,7 +41,8 @@ export function StepCard({
   onAction: (action: StepAction) => void;
   onValidity: (id: string, valid: boolean) => void;
   attachment?: Attachment;
-  onChooseAttachment: () => void;
+  alternatives: Attachment[];
+  onChooseAttachment: (alternative?: boolean) => void;
 }) {
   const t = useT();
   const id = useId();
@@ -137,6 +139,7 @@ export function StepCard({
             step={step}
             onChange={onChange}
             attachment={attachment}
+            alternatives={alternatives}
             onChooseAttachment={onChooseAttachment}
           />
         ) : (

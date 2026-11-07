@@ -19,7 +19,7 @@ export function BusinessMessageEditor({
   step: MessageStep;
   onChange: (change: Partial<MessageStep>) => void;
   attachment?: Attachment;
-  onChooseAttachment: () => void;
+  onChooseAttachment: (alternative?: boolean) => void;
 }) {
   const t = useT();
 

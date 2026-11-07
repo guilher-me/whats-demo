@@ -18,7 +18,7 @@ it('mantém entregue ao enviar e marca visualizada quando a empresa responde', a
     STORAGE_KEY,
     JSON.stringify({
       version: 1,
-      contact: { name: 'Empresa teste', avatar: '', verified: false },
+      contact: { name: 'Empresa teste', verified: false },
       steps: [
         { id: 'user', type: 'user', text: 'oi', delay: 0 },
         { id: 'reply', type: 'business', text: 'Olá', delay: 1 },

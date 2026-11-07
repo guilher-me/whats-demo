@@ -36,7 +36,7 @@ Do not change the meaning of the `v1z` and `v1j` link prefixes or reuse existing
 
 The public browser API uses `window.whatsappFakeFlows` with `apiVersion: 1`. Preserve that contract, including synchronous methods. Update [automation documentation](docs/automation.md) and the `llms.txt` index when tool-facing behavior changes.
 
-Untrusted photos must pass through the shared validation and rewriting pipeline before rendering or sharing. Do not add a raw `img.src` bypass. Read the [image security policy](docs/IMAGE-SECURITY.md) before changing that boundary.
+Render simulated attachments from metadata with the shared preview component. Use bundled images for the fixed business icon and wallpaper. Keep journey data as text and validate shared links before loading them.
 
 ## Translate interface text
 

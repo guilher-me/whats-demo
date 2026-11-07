@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WhatsDemo journey v1",
+  "type": "object",
+  "required": ["version", "contact", "steps"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": 1 },
+    "contact": {
+      "type": "object",
+      "required": ["name", "verified"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "maxLength": 80 },
+        "verified": { "type": "boolean" }
+      }
+    },
+    "attachments": {
+      "type": "array",
+      "maxItems": 50,
+      "items": { "$ref": "#/$defs/attachment" }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 200,
+      "items": { "$ref": "#/$defs/step" }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "minLength": 1 },
+    "attachment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "kind"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-zA-Z0-9_-]{1,100}$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "kind": { "enum": ["image", "document"] },
+        "sizeLabel": { "type": "string", "minLength": 1, "maxLength": 24 }
+      },
+      "if": { "properties": { "kind": { "const": "document" } } },
+      "then": { "required": ["sizeLabel"] },
+      "else": { "properties": { "sizeLabel": false } }
+    },
+    "media": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "attachmentId"],
+      "properties": {
+        "kind": { "enum": ["image", "document"] },
+        "attachmentId": { "$ref": "#/$defs/id" },
+        "alternativeIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "caption": { "type": "string", "maxLength": 1024 }
+      },
+      "if": { "properties": { "kind": { "const": "document" } } },
+      "then": { "properties": { "caption": false } }
+    },
+    "step": {
+      "type": "object",
+      "required": ["id", "type", "text", "delay"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "type": { "enum": ["user", "business", "flow"] },
+        "text": { "type": "string" },
+        "delay": { "type": "number", "minimum": 0, "maximum": 120 },
+        "typing": { "type": "boolean" },
+        "typingMs": { "type": "number", "minimum": 0 },
+        "voiceDurationSeconds": { "type": "integer", "minimum": 1, "maximum": 120 },
+        "media": { "$ref": "#/$defs/media" },
+        "interactive": {
+          "type": "object",
+          "required": ["kind"],
+          "properties": { "kind": { "enum": ["buttons", "list"] } }
+        },
+        "label": { "type": "string" },
+        "completion": { "type": "string" },
+        "flow": { "type": "object", "required": ["screens"] },
+        "answers": { "type": "object" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "flow" } } },
+          "then": {
+            "required": ["label", "flow", "answers"],
+            "properties": { "interactive": false, "media": false, "voiceDurationSeconds": false }
+          },
+          "else": {
+            "properties": { "label": false, "completion": false, "flow": false, "answers": false }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "user" } } },
+          "then": { "properties": { "interactive": false } },
+          "else": {
+            "properties": {
+              "voiceDurationSeconds": false,
+              "media": { "properties": { "alternativeIds": false } }
+            }
+          }
+        },
+        {
+          "if": { "required": ["media"] },
+          "then": { "properties": { "interactive": false, "voiceDurationSeconds": false } }
+        }
+      ]
+    }
+  }
+}

@@ -46,7 +46,7 @@ it('valida sem alterar o projeto e rejeita carregamentos inválidos atomicamente
   expect(api.validateProject({ version: 99 }).valid).toBe(false);
   expect(() => api.loadProject({ version: 99 })).toThrow();
   expect(replace).not.toHaveBeenCalled();
-  expect(api.getProject()).toEqual(legacy);
+  expect(api.getProject()).toEqual(normalizeProject(legacy));
 });
 it('usa cópias em ambos os sentidos e mantém o contrato versionado', () => {
   const { api } = setup();
@@ -57,16 +57,16 @@ it('usa cópias em ambos os sentidos e mantém o contrato versionado', () => {
   loaded.steps.length = 0;
   expect(api.getProject().contact.name).toBe('Empresa nova');
   expect(api.getProject().steps.length).toBeGreaterThan(0);
-  expect(api.apiVersion).toBe(1);
+  expect(api.apiVersion).toBe(2);
   expect(Object.isFrozen(api)).toBe(true);
 });
 it('gera links sem persistir e rejeita um projeto nulo explícito', async () => {
   const { api, replace } = setup();
-  api.loadProject({ ...legacy, contact: { ...legacy.contact, avatar: '' } });
-  replace.mockClear();
-  expect(api.getDocument().format).toBe('whatsdemo');
+  const url = new URL(await api.createShareURL(legacy, 'editor'));
+  expect(url.hash).toMatch(/^#editor=v2z\./);
+  expect(await decode(url.hash)).toEqual(normalizeProject(legacy));
+  await expect(api.createShareURL(null)).rejects.toThrow();
   expect(replace).not.toHaveBeenCalled();
-  await expect(Promise.resolve().then(() => api.loadDocument(null))).rejects.toThrow();
 });
 it('bloqueia escrita durante carregamento e reprodução concorrente ou modo inválido', async () => {
   const { api, run, setState } = setup();
@@ -79,5 +79,5 @@ it('bloqueia escrita durante carregamento e reprodução concorrente ou modo inv
   await expect(api.play('other' as 'manual')).rejects.toThrow('Modo inválido');
   expect(run).not.toHaveBeenCalled();
   expect((await api.play()).status).toBe('Conversa concluída.');
-  expect(run).toHaveBeenCalledWith(legacy, true);
+  expect(run).toHaveBeenCalledWith(normalizeProject(legacy), true);
 });
