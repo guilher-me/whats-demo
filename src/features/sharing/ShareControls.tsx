@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActionMenu } from '../../components/ui/ActionMenu';
-import { createShareURL, type ShareMode } from '../../core/codec';
+import { Button } from '../../components/ui/Button';
+import { ControlIcon } from '../../components/icons/ControlIcon';
+import { createShareURL } from '../../core/codec';
 import type { Project } from '../../core/types';
 import { useT } from '../../i18n';
 
 async function writeLink(link: Promise<string>) {
   const clipboard = navigator.clipboard;
-  // Start the write within the menu gesture while the link is being compressed.
+  // Start the write within the button gesture while the link is being compressed.
   if (clipboard?.write && typeof ClipboardItem === 'function') {
     await clipboard.write([
       new ClipboardItem({
@@ -37,7 +38,7 @@ export function ShareControls({
     return () => window.clearTimeout(timer);
   }, [notice]);
 
-  const copy = async (mode: ShareMode) => {
+  const copy = async () => {
     if (pending.current) return;
     if (hasErrors) {
       setNotice({ text: t('errors.pendingFields'), error: true });
@@ -46,7 +47,7 @@ export function ShareControls({
 
     pending.current = true;
     setNotice(undefined);
-    const link = createShareURL(project, mode, location.href);
+    const link = createShareURL(project, 'editor', location.href, undefined, 'preview');
     const [generated, copied] = await Promise.allSettled([link, writeLink(link)]);
     pending.current = false;
     if (generated.status === 'rejected')
@@ -57,16 +58,15 @@ export function ShareControls({
 
   return (
     <div className="share-control">
-      <ActionMenu
-        label={t('sharing.copy')}
-        icon="link"
-        showLabel
+      <Button
+        variant="primary"
+        className="button-with-icon"
         disabled={disabled}
-        items={[
-          { label: t('sharing.editor'), icon: 'pencil', onSelect: () => void copy('editor') },
-          { label: t('sharing.preview'), icon: 'play', onSelect: () => void copy('demo') },
-        ]}
-      />
+        onClick={() => void copy()}
+      >
+        <ControlIcon name="link" />
+        {t('sharing.copy')}
+      </Button>
       {notice && (
         <p className="share-notice" role={notice.error ? 'alert' : 'status'}>
           {notice.text}

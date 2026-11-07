@@ -16,7 +16,10 @@ import { Dialog } from '../components/ui/Dialog';
 import { businessMessageError } from '../core/interactive';
 import { createDefaultProject } from '../core/defaults';
 import { useAutomationAPI } from '../features/automation/useAutomationAPI';
-import { MessagePreview } from '../features/conversation/components/MessagePreview';
+import {
+  MessagePreview,
+  type FlowPreviewRequest,
+} from '../features/conversation/components/MessagePreview';
 import { createStep } from '../core/project';
 import { flushSync } from 'react-dom';
 import { useRecording } from '../features/recording/useRecording';
@@ -26,7 +29,7 @@ import { ControlIcon } from '../components/icons/ControlIcon';
 import { ConversationOverview } from '../features/conversation/components/ConversationOverview';
 import { selectAttachment, stepAttachment, validateAttachments } from '../core/attachments';
 import type { Attachment, MessageStep } from '../core/types';
-export function EditorApp({ copy }: { copy?: SharedCopy }) {
+export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnly?: boolean }) {
   const t = useT();
   const restoreLabel = t(copy ? 'sharing.restoreSource' : 'editor.restore');
 
@@ -34,11 +37,13 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
     phoneRef = useRef<HTMLDivElement>(null),
     playback = usePlayback(phoneRef);
   const [invalid, setInvalid] = useState<Record<string, boolean>>({}),
-    [focusMode, setFocusMode] = useState(false),
     [selectedId, setSelectedId] = useState<string | null>(null),
+    [flowPreview, setFlowPreview] = useState<FlowPreviewRequest>(),
     [showOverview, setShowOverview] = useState(false),
     [restoreOpen, setRestoreOpen] = useState(false),
-    [collapsed, setCollapsed] = useState<Partial<Record<Panel, boolean>>>({});
+    [collapsed, setCollapsed] = useState<Partial<Record<Panel, boolean>>>(() =>
+      previewOnly ? { code: true, editor: true } : {},
+    );
   const diagnostics = useMemo(
     () => journeyDiagnostics(editor.project),
     [editor.project, currentLocale()],
@@ -53,6 +58,7 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
   const selectStep = (id: string | null) => {
     setShowOverview(false);
     setSelectedId(id);
+    setFlowPreview((current) => (current?.stepId === id ? current : undefined));
   };
   const onValidity = useCallback(
     (id: string, valid: boolean) =>
@@ -75,7 +81,6 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
     prepare: () =>
       flushSync(() => {
         selectStep(null);
-        setFocusMode(false);
         playback.reset();
       }),
     run: (automatic) => playback.run(editor.project, automatic),
@@ -134,13 +139,6 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
     setInvalid({});
     selectStep(null);
   }, [editor.revision, playback.stop]);
-  useEffect(() => {
-    const key = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setFocusMode(false);
-    };
-    window.addEventListener('keydown', key);
-    return () => window.removeEventListener('keydown', key);
-  }, []);
   const edit = (operation: () => void) => {
     if (recorder.busy) return;
     if (playback.running) playback.stop();
@@ -205,6 +203,19 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
       onRestore={() => setRestoreOpen(true)}
       restoreLabel={restoreLabel}
       onValidity={onValidity}
+      onFlowPreview={(stepId, screenId) => {
+        edit(() => {
+          selectStep(stepId);
+          setFlowPreview({ stepId, screenId });
+          if (!screenId) {
+            setCollapsed((panels) => ({ ...panels, preview: false }));
+            if (window.matchMedia?.('(max-width: 959px)').matches)
+              window.requestAnimationFrame(() =>
+                phoneRef.current?.scrollIntoView?.({ block: 'nearest' }),
+              );
+          }
+        });
+      }}
       onAddAttachment={addAttachment}
     />
   );
@@ -215,22 +226,24 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
           <h2>{t('app.preview')}</h2>
           <p>{t('app.previewHint')}</p>
           {previewIssue && (
-            <p className="workspace-flow-issue" title={previewIssue.path}>
+            <p
+              className="workspace-flow-issue"
+              data-severity={previewIssue.severity}
+              title={previewIssue.path}
+            >
               {previewIssue.message}
             </p>
           )}
         </div>
-        <Button
-          variant="ghost"
-          disabled={recorder.busy || hasErrors || !editor.project.steps.length}
-          title={playback.running ? t('app.expand') : t('app.startPhone')}
-          onClick={() => {
-            if (!playback.running) void run(editor.project, false);
-            setFocusMode(true);
-          }}
-        >
-          {t('app.phoneOnly')}
-        </Button>
+        {flowPreview?.stepId === selectedStep?.id && flowPreview && (
+          <Button
+            variant="ghost"
+            disabled={recorder.busy}
+            onClick={() => setFlowPreview({ ...flowPreview })}
+          >
+            {t('builder.restart')}
+          </Button>
+        )}
       </div>
       <p className="play-status" role="status" aria-live="polite">
         {showOverview ? t('app.viewConversation') : selectedStep ? t('app.draft') : playback.status}
@@ -248,6 +261,7 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
               contact={editor.project.contact}
               step={selectedStep}
               phoneRef={phoneRef}
+              flowPreview={flowPreview?.stepId === selectedStep.id ? flowPreview : undefined}
               attachment={stepAttachment(selectedStep, attachments)}
             />
           </>
@@ -297,6 +311,7 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
                 aria-pressed={showOverview}
                 onClick={() => {
                   setSelectedId(null);
+                  setFlowPreview(undefined);
                   setShowOverview(true);
                 }}
               >
@@ -307,26 +322,16 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
         </div>
       </div>
       <p className="preview-note">{t('app.local')}</p>
-      {focusMode && (
-        <Button variant="ghost" onClick={() => setFocusMode(false)}>
-          {t('app.exit')}
-        </Button>
-      )}
     </section>
   );
   return (
-    <div
-      className={['editor-app', focusMode ? 'focus-mode' : '', recorder.busy ? 'is-capturing' : '']
-        .filter(Boolean)
-        .join(' ')}
-    >
+    <div className={recorder.busy ? 'editor-app is-capturing' : 'editor-app'}>
       <AppHeader disabled={recorder.busy} saveState={editor.saveState}>
         <ShareControls project={editor.project} disabled={recorder.busy} hasErrors={hasErrors} />
       </AppHeader>
       <Workbench
         collapsed={collapsed}
         onToggle={togglePanel}
-        focusMode={focusMode}
         locked={recorder.busy}
         contents={{
           code: (

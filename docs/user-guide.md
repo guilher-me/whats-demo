@@ -48,7 +48,9 @@ Image captions belong to the message. The same preview can appear in several ste
 
 A Flow step combines a business invitation, an opening button, a Flow JSON definition, automatic answers and an optional customer completion message.
 
-- **Form structure** contains the advanced JSON editor. The renderer supports a subset of WhatsApp Flow components, including screen navigation and conditional fields.
+- **Form structure** opens on **Visual**. Select a screen to see it in the phone. Add or reorder components, then set the final button to **Next screen** or **Complete**. Connect a new screen by selecting it as the destination of an earlier screen's button.
+- **JSON** edits just the Flow definition. Valid edits update Visual and Preview immediately. Invalid edits stay in the step as a draft while the phone shows the previous valid version. Edit conditions, bindings and payloads in JSON.
+- **Test Flow** opens the first screen in the phone. Navigate, go back, complete and restart with test values kept in the preview session.
 - **Automatic answers** tell automatic playback what to enter and select.
 - In manual mode, open the invitation and fill the form yourself. Required fields must be completed before moving on.
 
@@ -66,7 +68,7 @@ Use **View conversation** to inspect all configured messages in order without wa
 
 Type in the phone's message field and press **Enter** or click **Send** to start manual playback. Your text replaces a configured opening customer text step. If the journey starts with a business step, your message appears before it and all configured steps remain. If it starts with a simulated voice step, hold the microphone to start. For an opening attachment step, use the paperclip. These actions leave the saved configuration intact.
 
-You can also select **Start manually**. Later customer steps wait for a reply; buttons, lists and Flows wait for your interaction. The **Phone only** view gives the conversation more space and starts manual playback if needed.
+You can also select **Start manually**. Later customer steps wait for a reply; buttons, lists and Flows wait for your interaction.
 
 ### Automatic playback
 
@@ -76,7 +78,7 @@ The composer is disabled during automatic playback. Use the pause button to susp
 
 ## Share a demo
 
-Use **Copy link** and choose **Editor** or **Preview**. The link is copied immediately in the current interface language. **Editor** opens a browser-local copy with the editor and phone preview. **Preview** opens the interactive phone with manual and automatic playback and **Edit a copy**.
+Select **Copy link** to copy the link in the current interface language. The link opens a browser-local copy with only **Preview** expanded. Recipients can play the journey immediately or expand **Code** and **Editor** to edit their copy.
 
 An AI tool with browser access can build the journey in the editor and copy the result. See [the AI guide](ai-guide.md).
 

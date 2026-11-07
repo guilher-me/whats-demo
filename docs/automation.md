@@ -9,8 +9,8 @@ The `llms.txt` file provides instructions; it does not execute a model or automa
 Construct a JSON-compatible project using the contract below. Configure it in the editor through the public API or visible controls. Return an editor link by default, and use preview mode when the user wants only the interactive phone.
 
 - **Browser API** — validate the configuration, then call `window.whatsappFakeFlows.loadProject(project)` when the user authorizes replacing the active draft. Generate a link with `await window.whatsappFakeFlows.createShareURL(project)`. Pass `'demo'` as the second argument to open the preview.
-- **Browser controls** — paste the whole journey in **Code**, use **Validate** and **Apply**, then select **Copy link** and choose **Editor** or **Preview**. The link is copied immediately using the current interface language.
-- **Static module** — the hosted build publishes `share.mjs` beside the app. It exports `createShareURL(project, mode?, baseURL?, locale?)`. The default opens the production editor. Pass a reachable app address and `'en'`, `'es'` or `'pt-BR'` as needed.
+- **Browser controls** — paste the whole journey in **Code**, use **Validate** and **Apply**, then select **Copy link**. The copied link opens with only **Preview** expanded and uses the current interface language.
+- **Static module** — the hosted build publishes `share.mjs` beside the app. It exports `createShareURL(project, mode?, baseURL?, locale?, view?)`. The default opens the production editor. Pass a reachable app address and `'en'`, `'es'` or `'pt-BR'` as needed. In editor mode, pass `'preview'` as the fifth argument to start with **Code** and **Editor** collapsed.
 
 The two modes use the same compressed payload. The link includes the interface language and keeps the browser language preference separate. The site reads it from the fragment. Links have a maximum length of 8,000 characters, with a 128 KiB uncompressed limit. If the generator reports a limit error, shorten the conversation and try again. Use sample data because link recipients can read all project content.
 
@@ -117,7 +117,7 @@ Use 1–10 sections and at most 10 rows across all sections combined. Each secti
 
 A Flow step's `flow` field contains the JSON definition, not a Flow URL. `answers` maps form field names to values used in automatic mode. Supply an answer for every required field reached by the chosen route.
 
-Supported leaf components: TextHeading, TextSubheading, TextBody, TextCaption, RadioButtonsGroup, CheckboxGroup, Dropdown, OptIn, TextInput, TextArea, DatePicker and Footer. Layout containers and If conditions are flattened by the engine. The simulator supports `navigate` to a screen and `complete`; it does not implement server-backed data_exchange or the full Meta API. The local diagnostics report Flow JSON issues and simulator coverage. A missing required answer on the configured route is shown before automatic playback, while manual playback remains available. The Meta Playground is available for comparison.
+Supported leaf components: TextHeading, TextSubheading, TextBody, TextCaption, RadioButtonsGroup, CheckboxGroup, Dropdown, OptIn, TextInput, TextArea, DatePicker and Footer. Layout containers and If conditions are flattened by the engine. The simulator supports `navigate` to a screen and `complete`; it does not implement server-backed data_exchange or the full Meta API. The local diagnostics report Flow JSON issues and simulator coverage. Missing required answers and answers that reference unavailable options are shown before automatic playback, while manual playback remains available. The editor offers synchronized Visual and JSON tabs for the same Flow definition. The Meta Playground is available for comparison.
 
 Use ISO dates (YYYY-MM-DD), option IDs for single choice fields, arrays of IDs for checkbox groups, booleans for OptIn and strings for text fields. Expressions reference `${form.field}` and `${data.field}`. Preserve the Meta Flow field names such as `data-source` and `on-click-action`.
 
@@ -231,7 +231,7 @@ console.log(await createShareURL(project, 'demo'));
 
 ## Compatibility and contribution
 
-API v2 uses `createShareURL` and `loadProject` for simulated attachments. Existing `#project=v1z…` and `#project=v1j…` links open as demos. Legacy drafts and links keep attachment names and valid step references. Old image bytes and custom avatars are discarded on recovery. Invalid links leave the local draft intact.
+API v2 uses `createShareURL` and `loadProject` for simulated attachments. New links use a `v3z` alphanumeric payload. Existing `v2z` links still open in both modes. Existing `#project=v1z…` and `#project=v1j…` links open as demos. Legacy drafts and links keep attachment names and valid step references. Old image bytes and custom avatars are discarded on recovery. Invalid links leave the local draft intact.
 
 The implementation uses the same codec and project validation in the app, public module and browser API. Add tests for contract changes and update the schema and instructions together.
 

@@ -28,6 +28,17 @@ describe('share link compatibility', () => {
     }
   });
 
+  it('opens intact v2z links in both modes', async () => {
+    const project = normalizeProject(legacy);
+    const token = 'v2z.' + deflateSync(JSON.stringify(project)).toString('base64url');
+    expect(token).toContain('_');
+    for (const mode of ['demo', 'editor']) {
+      const route = sharedRoute(`#${mode}=${token}&lang=es`)!;
+      expect(route).toMatchObject({ mode, locale: 'es' });
+      expect(await loadSharedProject(route)).toEqual(project);
+    }
+  });
+
   it('uses one compressed payload for both modes and keeps the environment path', async () => {
     const project = normalizeProject(legacy);
     project.contact.name = 'Clínica São João 🩺';
@@ -36,7 +47,7 @@ describe('share link compatibility', () => {
     const editor = new URL(await createShareURL(project, 'editor', base));
     expect(demo.pathname).toBe('/app/development/');
     expect(demo.search).toBe('');
-    expect(demo.hash).toMatch(/^#demo=v2z\..+&lang=pt-BR$/);
+    expect(demo.hash).toMatch(/^#demo=v3z\.[A-Za-z0-9]+&lang=pt-BR$/);
     expect(await createShareURL(project, undefined, base)).toBe(editor.href);
     expect(sharedRoute(editor.hash)?.locale).toBe('pt-BR');
     expect(editor.hash).toBe(demo.hash.replace('#demo=', '#editor='));
@@ -46,7 +57,10 @@ describe('share link compatibility', () => {
   it('rejects invalid versions, broken compressed data and excessive links and inflation', async () => {
     await expect(decode('v99.no')).rejects.toThrow('versão');
     await expect(decode('v2z.broken')).rejects.toThrow('corrompido');
-    await expect(decode('v2z.' + 'a'.repeat(8001))).rejects.toThrow();
+    await expect(decode('v3z.' + 'a'.repeat(8001))).rejects.toThrow();
+    for (const malformed of ['0', 'zz', '0_']) {
+      await expect(decode('v3z.' + malformed)).rejects.toThrow('inválido');
+    }
     const project = normalizeProject(legacy);
     project.steps[0].text = randomBytes(8000).toString('hex');
     await expect(createShareURL(project)).rejects.toThrow('8000');

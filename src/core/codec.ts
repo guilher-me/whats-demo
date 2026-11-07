@@ -10,11 +10,59 @@ const LEGACY_MAX_HASH = 6 * 1024 * 1024;
 
 class SizeLimitError extends Error {}
 
-function toBase64(bytes: Uint8Array): string {
-  let text = '';
-  for (let i = 0; i < bytes.length; i += 32768)
-    text += String.fromCharCode(...bytes.subarray(i, i + 32768));
-  return btoa(text).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const BASE62 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+const BASE62_BLOCK_BYTES = 32;
+const BASE62_BLOCK_CHARS = 43;
+const BASE62_BITS_PER_CHAR = Math.log2(BASE62.length);
+
+function base62Width(bytes: number): number {
+  return Math.ceil((bytes * 8) / BASE62_BITS_PER_CHAR);
+}
+
+// Fixed-width blocks preserve leading zero bytes and bound the size of each BigInt.
+function toBase62(bytes: Uint8Array): string {
+  const blocks: string[] = [];
+  for (let start = 0; start < bytes.length; start += BASE62_BLOCK_BYTES) {
+    const block = bytes.subarray(start, start + BASE62_BLOCK_BYTES);
+    let value = 0n;
+    for (const byte of block) value = (value << 8n) | BigInt(byte);
+
+    let digits = '';
+    while (value > 0n) {
+      digits = BASE62[Number(value % 62n)] + digits;
+      value /= 62n;
+    }
+    blocks.push(digits.padStart(base62Width(block.length), BASE62[0]));
+  }
+  return blocks.join('');
+}
+
+function fromBase62(text: string): Uint8Array {
+  const tailChars = text.length % BASE62_BLOCK_CHARS;
+  const tailBytes = Math.floor((tailChars * BASE62_BITS_PER_CHAR) / 8);
+  if (tailChars !== base62Width(tailBytes)) throw new Error(t('errors.invalidLink'));
+
+  const fullBlocks = Math.floor(text.length / BASE62_BLOCK_CHARS);
+  const bytes = new Uint8Array(fullBlocks * BASE62_BLOCK_BYTES + tailBytes);
+  for (
+    let start = 0, offset = 0;
+    start < text.length;
+    start += BASE62_BLOCK_CHARS, offset += BASE62_BLOCK_BYTES
+  ) {
+    let value = 0n;
+    for (const char of text.slice(start, start + BASE62_BLOCK_CHARS)) {
+      const digit = BASE62.indexOf(char);
+      if (digit < 0) throw new Error(t('errors.invalidLink'));
+      value = value * 62n + BigInt(digit);
+    }
+    const end = Math.min(offset + BASE62_BLOCK_BYTES, bytes.length);
+    for (let index = end - 1; index >= offset; index--) {
+      bytes[index] = Number(value & 255n);
+      value >>= 8n;
+    }
+    if (value !== 0n) throw new Error(t('errors.invalidLink'));
+  }
+  return bytes;
 }
 
 function fromBase64(text: string): Uint8Array {
@@ -67,21 +115,21 @@ export async function encode(input: unknown): Promise<string> {
     throw new SizeLimitError(t('sharing.dataTooLarge', { max: MAX_SHARE_BYTES / 1024 }));
   if (typeof CompressionStream !== 'function') throw new Error(t('errors.modernBrowser'));
   return (
-    'v2z.' +
-    toBase64(await transform(bytes, new CompressionStream('deflate'), MAX_SHARE_BYTES + 1024))
+    'v3z.' +
+    toBase62(await transform(bytes, new CompressionStream('deflate'), MAX_SHARE_BYTES + 1024))
   );
 }
 
 export async function decode(hash: string): Promise<unknown> {
   const value = sharedRoute(hash.startsWith('#') ? hash : '#' + hash)?.token ?? hash;
   if (value.length > LEGACY_MAX_HASH) throw new Error(t('errors.linkTooLarge'));
-  const match = /^(v1z|v1j|v2z)\.([\w-]+)$/.exec(value);
+  const match = /^(v1z|v1j|v2z|v3z)\.([\w-]+)$/.exec(value);
   if (!match) throw new Error(t('errors.linkVersion'));
   const version = match[1];
-  const modern = version === 'v2z';
+  const modern = version === 'v2z' || version === 'v3z';
   if (modern && value.length > MAX_LINK_LENGTH) throw new Error(t('errors.linkTooLarge'));
   const limit = modern ? MAX_SHARE_BYTES : LEGACY_MAX_BYTES;
-  let bytes = fromBase64(match[2]);
+  let bytes = version === 'v3z' ? fromBase62(match[2]) : fromBase64(match[2]);
   if (version !== 'v1j') {
     if (typeof DecompressionStream !== 'function') throw new Error(t('errors.modernBrowser'));
     try {
@@ -116,10 +164,12 @@ export async function createShareURL(
   mode: ShareMode = 'editor',
   href = 'https://guilher-me.github.io/whats-demo/',
   locale: Locale = currentLocale(),
+  view?: 'preview',
 ): Promise<string> {
   if (mode !== 'demo' && mode !== 'editor') throw new Error(t('errors.mode'));
   const url = shareBase(href);
-  url.hash = shareHash(mode, await encode(input), locale);
+  const hash = shareHash(mode, await encode(input), locale);
+  url.hash = mode === 'editor' && view === 'preview' ? hash + '&view=preview' : hash;
   if (url.href.length > MAX_LINK_LENGTH)
     throw new Error(t('sharing.linkLength', { length: url.href.length, max: MAX_LINK_LENGTH }));
   return url.href;
@@ -133,18 +183,22 @@ export function sharedRoute(hash: string) {
   const match = /^#(demo|editor|project)(?:=|$)/.exec(hash);
   if (!match) return undefined;
   const legacy = match[1] === 'project';
-  const [token, language] = hash.slice(match[0].length).split('&', 2);
-  const locale = language?.startsWith('lang=') ? language.slice(5) : undefined;
+  const [token, ...parameters] = hash.slice(match[0].length).split('&');
+  const settings = new URLSearchParams(parameters.join('&'));
+  const locale = settings.get('lang');
   return {
     mode: (legacy ? 'demo' : match[1]) as ShareMode,
     legacy,
     token,
     locale: isLocale(locale) ? locale : undefined,
+    previewOnly: match[1] === 'editor' && settings.get('view') === 'preview',
   };
 }
 
-export async function loadSharedProject(route: NonNullable<ReturnType<typeof sharedRoute>>) {
-  if (!route.token.startsWith(route.legacy ? 'v1' : 'v2z.'))
+export async function loadSharedProject(
+  route: Pick<NonNullable<ReturnType<typeof sharedRoute>>, 'legacy' | 'token'>,
+) {
+  if (!(route.legacy ? /^v1[zj]\./ : /^v[23]z\./).test(route.token))
     throw new Error(t('errors.linkVersion'));
   const input = await decode(route.token);
   const project = route.legacy

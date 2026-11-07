@@ -46,7 +46,7 @@ describe('editor e reprodução React', () => {
     expect(messages.at(-1)?.text).toContain('LH-1042');
     expect(document.querySelector('.bubble strong')).toBeInTheDocument();
   }, 10000);
-  it('Só celular inicia o modo manual a partir da prévia de edição e permite responder', async () => {
+  it('inicia o modo manual a partir da prévia de edição e permite responder', async () => {
     const project = createDefaultProject();
 
     project.steps = [
@@ -56,20 +56,17 @@ describe('editor e reprodução React', () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
     await start();
     fireEvent.click(screen.getByRole('article', { name: 'Etapa 1' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Só celular ↗' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Iniciar manual' }));
     await tick(1);
-    expect(document.querySelector('.focus-mode')).toBeInTheDocument();
     expect(window.whatsappFakeFlows!.getState().running).toBe(true);
     expect(document.querySelector('.bubble.user')).toBeNull();
     fireEvent.change(screen.getByLabelText('Mensagem'), { target: { value: 'oi' } });
     fireEvent.click(screen.getByRole('button', { name: 'Enviar mensagem' }));
     await tick(1);
     expect(document.querySelector('.messages')).toHaveTextContent('Olá, podemos ajudar?');
-    fireEvent.keyDown(window, { key: 'Escape' });
-    expect(document.querySelector('.focus-mode')).toBeNull();
   });
   it.each(['Iniciar manual', 'Reproduzir automaticamente'])(
-    'Só celular preserva a jornada em andamento: %s',
+    'recolher Código e Editor preserva a jornada em andamento: %s',
     async (mode) => {
       const project = createDefaultProject();
 
@@ -83,12 +80,12 @@ describe('editor e reprodução React', () => {
       await tick(1);
       const messages = window.whatsappFakeFlows!.getState().messages;
       expect(messages).toHaveLength(1);
-      fireEvent.click(screen.getByRole('button', { name: 'Só celular ↗' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Recolher Código' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Recolher Editor' }));
       await tick(1);
-      expect(document.querySelector('.focus-mode')).toBeInTheDocument();
       expect(window.whatsappFakeFlows!.getState().messages).toEqual(messages);
       expect(window.whatsappFakeFlows!.getState().running).toBe(true);
-      fireEvent.click(screen.getByRole('button', { name: 'Sair da visualização · Esc' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Expandir Editor' }));
       expect(window.whatsappFakeFlows!.getState().running).toBe(true);
     },
   );

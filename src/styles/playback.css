@@ -32,10 +32,6 @@
   .phone-stage .phone {
     width: min(360px, calc(100cqh * 0.5625), calc(100cqw - 68px));
   }
-  .focus-mode .preview {
-    display: flex;
-    align-items: center;
-  }
 }
 .playback {
   display: flex;
@@ -120,18 +116,6 @@
   font-size: 12px;
   font-weight: 600;
   margin-bottom: 3px;
-}
-.focus-mode .playback {
-  display: none;
-}
-.focus-mode .phone-stage {
-  width: min(360px, calc(max(320px, 100dvh - 104px) * 0.5625));
-  max-width: 100%;
-  height: auto;
-  container-type: normal;
-}
-.focus-mode .phone-stage .phone {
-  width: 100%;
 }
 .upload-button {
   border: 0;

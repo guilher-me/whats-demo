@@ -24,6 +24,7 @@ export function StepCard({
   onChange,
   onAction,
   onValidity,
+  onFlowPreview,
   attachment,
   alternatives,
   onChooseAttachment,
@@ -40,6 +41,7 @@ export function StepCard({
   onChange: (change: Partial<Step>) => void;
   onAction: (action: StepAction) => void;
   onValidity: (id: string, valid: boolean) => void;
+  onFlowPreview: (screenId?: string) => void;
   attachment?: Attachment;
   alternatives: Attachment[];
   onChooseAttachment: (alternative?: boolean) => void;
@@ -150,7 +152,13 @@ export function StepCard({
           />
         )}
         {step.type === 'flow' && (
-          <FlowStepEditor step={step} onChange={onChange} onValidity={valid} />
+          <FlowStepEditor
+            step={step}
+            expanded={expanded}
+            onChange={onChange}
+            onValidity={valid}
+            onPreview={onFlowPreview}
+          />
         )}
         <StepTiming step={step} onChange={onChange} />
       </div>

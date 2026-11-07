@@ -82,7 +82,7 @@ The result is `dist/whats-demo.html`. See [requirements, installation and distri
 
 ## Your demo stays in your browser
 
-Edits are saved in the current browser. **Copy link** creates a snapshot for **Editor** or **Preview** in the current interface language. Demo recipients can play the journey and use **Edit a copy**. The URL carries the compressed journey with simulated attachment previews. Anyone who receives it can read the content. Use fictional data. [Read the sharing guide](docs/user-guide.md#share-a-demo).
+Edits are saved in the current browser. **Copy link** copies a snapshot in the current interface language. Recipients can play the journey immediately or expand **Code** and **Editor** to edit their local copy. The URL carries the compressed journey with simulated attachment previews. Anyone who receives it can read the content. Use fictional data. [Read the sharing guide](docs/user-guide.md#share-a-demo).
 
 WhatsDemo is an independent simulator. It does not send real WhatsApp messages or publish Flows to Meta. Conversation steps run in sequence; button and list choices do not create branching journeys. The Flow renderer supports a subset of Meta's components. See [scope and limitations](docs/user-guide.md#scope-and-limitations).
 

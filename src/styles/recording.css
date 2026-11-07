@@ -104,9 +104,6 @@
 .editor[aria-disabled='true'] {
   opacity: 0.5;
 }
-.focus-mode .phone-tools {
-  display: none;
-}
 .is-capturing .phone-stage {
   width: 428px;
   max-width: none;

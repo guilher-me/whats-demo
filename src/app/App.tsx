@@ -15,7 +15,7 @@ function subscribe(listener: () => void) {
 function SharedExperience({ route }: { route: SharedRoute }) {
   const t = useT();
   const [result, setResult] = useState<{ project: Project } | { error: string }>();
-  const { mode, legacy, token, locale } = route;
+  const { mode, legacy, token, locale, previewOnly } = route;
   useLayoutEffect(() => {
     if (!locale) return;
     void i18n.changeLanguage(locale);
@@ -25,7 +25,7 @@ function SharedExperience({ route }: { route: SharedRoute }) {
   }, [locale]);
   useEffect(() => {
     let active = true;
-    void loadSharedProject({ mode, legacy, token, locale }).then(
+    void loadSharedProject({ legacy, token }).then(
       (project) => {
         if (active) setResult({ project });
       },
@@ -36,7 +36,7 @@ function SharedExperience({ route }: { route: SharedRoute }) {
     return () => {
       active = false;
     };
-  }, [mode, legacy, token, locale]);
+  }, [legacy, token]);
 
   if (!result)
     return (
@@ -58,7 +58,7 @@ function SharedExperience({ route }: { route: SharedRoute }) {
       </main>
     );
   return mode === 'editor' ? (
-    <EditorApp copy={{ project: result.project, token }} />
+    <EditorApp copy={{ project: result.project, token }} previewOnly={previewOnly} />
   ) : (
     <DemoApp project={result.project} token={legacy ? undefined : token} locale={locale} />
   );

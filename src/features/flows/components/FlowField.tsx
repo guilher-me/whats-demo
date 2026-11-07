@@ -82,7 +82,7 @@ export function FlowField({ component: c, context, onChange }: Props) {
       'data-field': name,
       'aria-required': c.required || undefined,
       value: String(value ?? ''),
-      maxLength: c['max-chars'],
+      maxLength: c.type === 'TextArea' ? (c['max-length'] ?? c['max-chars']) : c['max-chars'],
       autoComplete: 'off',
       'aria-describedby': hint ? `${id}-hint` : undefined,
     };

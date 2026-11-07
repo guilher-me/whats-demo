@@ -23,3 +23,4 @@ import './styles/editor-product.css';
 import './styles/sharing.css';
 import './styles/attachments.css';
 import './styles/workspace.css';
+import './styles/json-editor.css';

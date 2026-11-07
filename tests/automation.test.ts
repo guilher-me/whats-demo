@@ -63,7 +63,7 @@ it('usa cópias em ambos os sentidos e mantém o contrato versionado', () => {
 it('gera links sem persistir e rejeita um projeto nulo explícito', async () => {
   const { api, replace } = setup();
   const url = new URL(await api.createShareURL(legacy, 'editor'));
-  expect(url.hash).toMatch(/^#editor=v2z\./);
+  expect(url.hash).toMatch(/^#editor=v3z\./);
   expect(await decode(url.hash)).toEqual(normalizeProject(legacy));
   await expect(api.createShareURL(null)).rejects.toThrow();
   expect(replace).not.toHaveBeenCalled();

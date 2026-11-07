@@ -124,7 +124,8 @@ it('opens a shared copy separately, saves its edits and keeps the original snaps
 it('reports a truncated share link and preserves the local draft', async () => {
   const draft = createDefaultProject();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
-  history.replaceState(null, '', '#demo=v2z.broken');
+  // Base62 for the first byte of a zlib stream, with the rest missing.
+  history.replaceState(null, '', '#demo=v3z.1w');
   await start();
   expect(await screen.findByRole('alert')).toHaveTextContent('corrompido');
   expect(screen.getByRole('link', { name: 'Abrir meu editor' })).toBeVisible();

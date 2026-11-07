@@ -28,7 +28,7 @@ export function ActionMenu({
       <Menu.Trigger asChild>
         <button
           type="button"
-          className={showLabel ? 'button button--primary labeled-menu-trigger' : 'ui-icon-button'}
+          className={showLabel ? 'button button--primary button-with-icon' : 'ui-icon-button'}
           data-editor-action
           disabled={disabled}
           aria-label={label}

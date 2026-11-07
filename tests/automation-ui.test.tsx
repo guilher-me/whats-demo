@@ -40,7 +40,7 @@ it('carrega e reproduz o exemplo completo da documentação sem cliques', async 
   expect(output.result.running).toBe(false);
   expect(output.result.status).toBe('Conversa concluída.');
   expect(document.querySelector('.messages')).toHaveTextContent('Seu protocolo de exemplo');
-  expect(new URL(output.shareURL).hash).toMatch(/^#demo=v2z\./);
+  expect(new URL(output.shareURL).hash).toMatch(/^#demo=v3z\./);
   expect(api.getProject().steps).toHaveLength(4);
   expect(JSON.parse(localStorage.getItem('whatsdemo-document-alpha1')!)).toEqual(api.getProject());
 });

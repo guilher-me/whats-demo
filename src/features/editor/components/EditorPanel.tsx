@@ -35,6 +35,7 @@ interface Props {
   onRestore: () => void;
   restoreLabel: string;
   onValidity: (id: string, valid: boolean) => void;
+  onFlowPreview: (id: string, screenId?: string) => void;
   onAddAttachment: (item: Attachment, step: MessageStep, alternative: boolean) => void;
 }
 export function EditorPanel(props: Props) {
@@ -105,6 +106,7 @@ export function EditorPanel(props: Props) {
               onChange={(change) => props.onChange(step.id, change)}
               onAction={(action) => props.onAction(step.id, action)}
               onValidity={props.onValidity}
+              onFlowPreview={(screenId) => props.onFlowPreview(step.id, screenId)}
               attachment={stepAttachment(step, attachments)}
               alternatives={attachments.filter(
                 (item) => step.type !== 'flow' && step.media?.alternativeIds?.includes(item.id),

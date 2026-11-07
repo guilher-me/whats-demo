@@ -1,6 +1,7 @@
-import { useId, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import { FieldError } from '../../components/ui/Field';
+import { JsonEditor } from '../../components/ui/JsonEditor';
 import type { Project } from '../../core/types';
 import { useT } from '../../i18n';
 import { reviewJourney, type JourneyDiagnostic } from '../flows/diagnostics';
@@ -17,7 +18,6 @@ export function JourneyCode({
   onApply: (project: Project) => void;
 }) {
   const t = useT();
-  const textId = useId();
   const current = useMemo(() => JSON.stringify(project, null, 2), [project]);
   const [draft, setDraft] = useState<{ base: string; text: string }>();
   const [result, setResult] = useState<{
@@ -77,20 +77,13 @@ export function JourneyCode({
         <h2>{t('workspace.code')}</h2>
         <p>{t('code.hint')}</p>
       </div>
-      <label htmlFor={textId} className="visually-hidden">
-        {t('code.label')}
-      </label>
-      <textarea
-        id={textId}
+      <JsonEditor
+        label={t('code.label')}
         className="journey-code"
         value={text}
-        spellCheck={false}
-        autoComplete="off"
-        autoCapitalize="off"
         readOnly={disabled}
-        aria-invalid={!!result?.error || undefined}
-        onChange={(event) => {
-          const value = event.currentTarget.value;
+        invalid={!!result?.error}
+        onChange={(value) => {
           setDraft(value === current ? undefined : { text: value, base: draft?.base ?? current });
           setResult(undefined);
         }}
