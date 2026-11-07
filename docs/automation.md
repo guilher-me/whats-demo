@@ -6,14 +6,13 @@ The `llms.txt` file provides instructions; it does not execute a model or automa
 
 ## Generate links from an AI tool
 
-Construct a JSON-compatible project using the contract below. Use the official generator and return the resulting URL as **Test the demo**. Choose the editor mode only when the user wants to edit a copy. Generation validates the journey and works independently of the user's saved draft.
+Construct a JSON-compatible project using the contract below. Configure it in the editor through the public API or visible controls. Return an editor link by default, and use preview mode when the user wants only the interactive phone.
 
-- **Browser API** — in the editor, call `await window.whatsappFakeFlows.createShareURL(project, 'demo')`.
-- **Static module** — the hosted build publishes `share.mjs` beside the app. It exports `createShareURL(project, mode?, baseURL?)`. The default is demo mode on the production site. Pass the reachable app address as `baseURL` for another deployment. In Node.js, fetch the official module and import it as a data URL in memory. See the module example below.
-- **Browser controls** — paste the project JSON in **Create with AI**, select **Demo mode** or **Editor mode**, then choose **Generate link**. The generated URL is available to open or copy.
-- **Text only** — return the configuration as JSON in a code block and direct the user to **Create with AI**. The user pastes the configuration in the site.
+- **Browser API** — validate the configuration, then call `window.whatsappFakeFlows.loadProject(project)` when the user authorizes replacing the active draft. Generate a link with `await window.whatsappFakeFlows.createShareURL(project)`. Pass `'demo'` as the second argument to open the preview.
+- **Browser controls** — build the journey in the editor, then use **Copy link** and select **Editor** or **Preview**. The link is copied immediately using the current interface language.
+- **Static module** — the hosted build publishes `share.mjs` beside the app. It exports `createShareURL(project, mode?, baseURL?, locale?)`. The default opens the production editor. Pass a reachable app address and `'en'`, `'es'` or `'pt-BR'` as needed.
 
-The two modes use the same compressed payload. The site reads it from the fragment. Links have a maximum length of 8,000 characters, with a 128 KiB uncompressed limit. If the generator reports a limit error, shorten the conversation and try again. Use sample data because link recipients can read all project content.
+The two modes use the same compressed payload. The link includes the interface language and keeps the browser language preference separate. The site reads it from the fragment. Links have a maximum length of 8,000 characters, with a 128 KiB uncompressed limit. If the generator reports a limit error, shorten the conversation and try again. Use sample data because link recipients can read all project content.
 
 ## Browser API and readiness
 
@@ -26,7 +25,7 @@ The editor contains `<link rel="describedby">` links and a `whatsapp-fake-flows-
 | `getProject()`, `getExample()`  | Independent copies of the current project and showcase.                                                                                                             |
 | `getState()`                    | Snapshot with readiness, playback status and rendered messages.                                                                                                     |
 | `validateProject(input)`        | Returns `{ valid: true, project }` or `{ valid: false, errors }` without changing the draft.                                                                        |
-| `createShareURL(input?, mode?)` | Returns a promise for a validated link. Defaults to the current project and demo mode.                                                                              |
+| `createShareURL(input?, mode?)` | Returns a promise for a validated link. Defaults to the current project and editor mode.                                                                            |
 | `loadProject(input)`            | Validates and replaces the current editor draft. Returns the normalized project. Call only when authorized.                                                         |
 | `play(mode?)`                   | Runs the project and resolves with the final state. Defaults to `automatic`; use `void api.play('manual')` to start without waiting for user interaction to finish. |
 | `stop()`, `reset()`             | Interrupt playback. Reset also clears rendered messages.                                                                                                            |

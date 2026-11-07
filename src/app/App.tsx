@@ -1,7 +1,7 @@
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useEffect, useLayoutEffect, useState, useSyncExternalStore } from 'react';
 import { loadSharedProject, sharedRoute } from '../core/codec';
 import type { Project } from '../core/types';
-import { useT } from '../i18n';
+import { i18n, initialLocale, useT } from '../i18n';
 import { DemoApp } from './DemoApp';
 import { EditorApp } from './EditorApp';
 
@@ -15,10 +15,17 @@ function subscribe(listener: () => void) {
 function SharedExperience({ route }: { route: SharedRoute }) {
   const t = useT();
   const [result, setResult] = useState<{ project: Project } | { error: string }>();
-  const { mode, legacy, token } = route;
+  const { mode, legacy, token, locale } = route;
+  useLayoutEffect(() => {
+    if (!locale) return;
+    void i18n.changeLanguage(locale);
+    return () => {
+      void i18n.changeLanguage(initialLocale());
+    };
+  }, [locale]);
   useEffect(() => {
     let active = true;
-    void loadSharedProject({ mode, legacy, token }).then(
+    void loadSharedProject({ mode, legacy, token, locale }).then(
       (project) => {
         if (active) setResult({ project });
       },
@@ -29,7 +36,7 @@ function SharedExperience({ route }: { route: SharedRoute }) {
     return () => {
       active = false;
     };
-  }, [mode, legacy, token]);
+  }, [mode, legacy, token, locale]);
 
   if (!result)
     return (
@@ -53,7 +60,7 @@ function SharedExperience({ route }: { route: SharedRoute }) {
   return mode === 'editor' ? (
     <EditorApp copy={{ project: result.project, token }} />
   ) : (
-    <DemoApp project={result.project} token={legacy ? undefined : token} />
+    <DemoApp project={result.project} token={legacy ? undefined : token} locale={locale} />
   );
 }
 

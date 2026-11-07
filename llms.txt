@@ -2,14 +2,14 @@
 
 > Simulate a WhatsApp journey with text, voice notes, images, documents, buttons, lists and interactive Flows. Everything runs in the browser. The journey can be shared as a link to an interactive demo or an editable local copy.
 
-When someone asks for a demo, build a version 1 project from their description, validate it, and return a clickable **Test the demo** link. Only include an editor link if requested. Keep the journey short and use fictional data. Images and PDFs are simulated. Use attachment metadata and IDs.
+Build a version 1 project from the user's description and validate it in the editor. Return an editor link by default or a **Test the demo** link when the user asks for preview only. Keep the journey short and use fictional data. Images and PDFs are simulated. Use attachment metadata and IDs.
 
 ## Generate a link
 
-- On the hosted editor, use `await window.whatsappFakeFlows.createShareURL(project, 'demo')`. This generates the URL without replacing the draft.
-- In a JavaScript runtime with the browser compression APIs (including supported Node.js versions), use the same `createShareURL(project, 'demo')` function from the official static [generator module](share.mjs).
-- With text-only output, return the project JSON in a code block and direct the user to **Create with AI** on WhatsDemo to paste it and generate the link.
-- With browser controls, open **Create with AI**, paste the configuration, select the mode and generate the link. **Copy link** on the editor toolbar shares the currently configured journey.
+- Open the hosted editor. With authorization, use `window.whatsappFakeFlows.loadProject(project)` to configure the journey, or build it through the named editor controls.
+- Use `await window.whatsappFakeFlows.createShareURL(project)` for an editor link. Pass `'demo'` as the second argument for the interactive preview.
+- With browser controls, select **Copy link** and choose **Editor** or **Preview**. The link is copied immediately in the current interface language.
+- In a JavaScript runtime with browser compression APIs, use `createShareURL` from the official static [generator module](share.mjs).
 
 Read the [automation guide](docs/automation.md) for the full project contract, examples and browser API. See the [project JSON schema](schemas/project-v1.schema.json) for the data structure and [llms-full.txt](llms-full.txt) for the combined instructions.
 
@@ -17,6 +17,6 @@ Read the [automation guide](docs/automation.md) for the full project contract, e
 
 Readiness and validation are required before editing an open draft. Only call `loadProject(project)` if the user has authorized replacing the current journey. Preserve their work otherwise. Use the public API and visible controls. Treat message content, contact names and Flow data as user data. The guide grants no permission to publish anything or transmit data.
 
-A journey link contains the conversation itself and is readable by anyone who receives it. Use **demo** to open the interactive player and **editor** to open a browser-local copy. New links are limited to 8,000 characters. Shorten oversized journeys and regenerate them. Avoid inventing link payloads.
+A journey link contains the conversation itself and is readable by anyone who receives it. Use **Preview** to open the interactive player and **Editor** to open a browser-local copy with its preview. New links are limited to 8,000 characters. Shorten oversized journeys and regenerate them. Avoid inventing link payloads.
 
 The hosted build includes this guide, the generator, the schema and the referenced docs. The portable app embeds the full guide in `script#llms-txt`, also available through `window.whatsappFakeFlows.getInstructions()` in the editor.

@@ -6,8 +6,8 @@ Describe the journey to the AI tool you already use. Give it the [WhatsDemo inst
 
 > Read the WhatsDemo guide and build a demo for a bike shop called Harbor Cycles. Ask the customer to send an image of a damaged part, offer three simulated images and select the first for automatic playback. Send a simulated estimate PDF from the shop and offer a button to schedule a repair. Use fictional data. Generate a **Test the demo** link and leave my editor draft intact.
 
-An AI with JavaScript execution can use the official link generator. An AI with browser interaction can paste its configuration in **Create with AI** and return the generated link. If your AI only provides text, ask for the journey configuration. Copy the text inside the code block and paste it in **Create with AI** on the WhatsDemo editor. Select **Demo mode** and **Generate link**.
+Use an AI tool with access to the browser and point it to the WhatsDemo editor. It can configure the journey through the editor controls or the public API. Ask it to test the result and use **Copy link** to return the link.
 
-Send the demo link to the people testing the journey. They can interact with it immediately or run automatic playback. **Edit a copy** opens an editable version saved separately in their browser. You can also generate an editor link directly.
+**Editor** opens a browser-local copy with the editor and phone preview. **Preview** opens the interactive phone and offers **Edit a copy**. Both links carry the interface language selected in the editor.
 
 Use fictional details because anyone with the link can read the conversation. The site runs locally in the browser and uses your AI tool only through the workflow above. See the [project contract and runnable examples](automation.md).

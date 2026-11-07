@@ -74,9 +74,9 @@ The composer is disabled during automatic playback. Use the pause button to susp
 
 ## Share a demo
 
-Use **Copy link** and select **Demo mode** for someone who wants to test the conversation, or **Editor mode** for someone who wants to change it. The demo has the phone, manual and automatic playback, and **Edit a copy**. The editor saves changes to a separate browser-local copy. Open the demo link again to see its original snapshot.
+Use **Copy link** and choose **Editor** or **Preview**. The link is copied immediately in the current interface language. **Editor** opens a browser-local copy with the editor and phone preview. **Preview** opens the interactive phone with manual and automatic playback and **Edit a copy**.
 
-Use **Create with AI** to paste a configuration from your AI tool and generate a link without editing your draft. See [the AI guide](ai-guide.md).
+An AI tool with browser access can build the journey in the editor and copy the result. See [the AI guide](ai-guide.md).
 
 The link holds the compressed journey, including messages, Flow definitions, automatic answers and simulated attachment labels. Anyone with the full URL can read the content. Use fictional data and a hosted address your recipients can reach. Links copied from a local HTML file target the public WhatsDemo site.
 

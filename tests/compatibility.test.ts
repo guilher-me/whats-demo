@@ -36,7 +36,9 @@ describe('share link compatibility', () => {
     const editor = new URL(await createShareURL(project, 'editor', base));
     expect(demo.pathname).toBe('/app/development/');
     expect(demo.search).toBe('');
-    expect(demo.hash).toMatch(/^#demo=v2z\./);
+    expect(demo.hash).toMatch(/^#demo=v2z\..+&lang=pt-BR$/);
+    expect(await createShareURL(project, undefined, base)).toBe(editor.href);
+    expect(sharedRoute(editor.hash)?.locale).toBe('pt-BR');
     expect(editor.hash).toBe(demo.hash.replace('#demo=', '#editor='));
     expect(await loadSharedProject(sharedRoute(demo.hash)!)).toEqual(project);
   });

@@ -1,14 +1,22 @@
 import { useRef, useState, type CSSProperties } from 'react';
-import { useT } from '../i18n';
+import { useT, type Locale } from '../i18n';
 import type { Project } from '../core/types';
-import { createShareURL } from '../core/codec';
+import { createShareURL, shareHash } from '../core/codec';
 import { Button } from '../components/ui/Button';
 import { JourneyPhone } from '../features/conversation/components/JourneyPhone';
 import { PlaybackControls } from '../features/playback/components/PlaybackControls';
 import { PlaybackSpeedControl } from '../features/playback/components/PlaybackSpeedControl';
 import { usePlayback } from '../features/playback/hooks/usePlayback';
 
-export function DemoApp({ project, token }: { project: Project; token?: string }) {
+export function DemoApp({
+  project,
+  token,
+  locale,
+}: {
+  project: Project;
+  token?: string;
+  locale?: Locale;
+}) {
   const t = useT();
   const phoneRef = useRef<HTMLDivElement>(null);
   const playback = usePlayback(phoneRef, false);
@@ -22,11 +30,11 @@ export function DemoApp({ project, token }: { project: Project; token?: string }
     }
   };
   return (
-    <main className="shared-demo" aria-label={t('sharing.demo')}>
+    <main className="shared-demo" aria-label={t('sharing.preview')}>
       <header className="shared-demo-header">
         <h1>WhatsDemo</h1>
         {token ? (
-          <a className="button" href={'#editor=' + token}>
+          <a className="button" href={shareHash('editor', token, locale)}>
             {t('sharing.editCopy')}
           </a>
         ) : (

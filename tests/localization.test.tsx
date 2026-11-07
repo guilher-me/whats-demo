@@ -7,6 +7,7 @@ import { Blob as NativeBlob } from 'node:buffer';
 import { App } from '../src/app/App';
 import { catalogs, i18n, initialLocale, LOCALE_KEY, locales, t } from '../src/i18n';
 import { createDefaultProject } from '../src/core/defaults';
+import { sharedRoute } from '../src/core/codec';
 import { STORAGE_KEY } from '../src/core/project';
 import { businessMessageError } from '../src/core/interactive';
 beforeEach(async () => {
@@ -33,7 +34,7 @@ it('uses English by default, honors only supported saved choices and tolerates b
   expect(initialLocale()).toBe('en');
 });
 
-it('switches all three interfaces, persists the choice and preserves the project and shared link', async () => {
+it('switches all three interfaces, persists the choice and includes it in the shared link', async () => {
   vi.stubGlobal('Blob', NativeBlob);
   const project = createDefaultProject();
 
@@ -53,6 +54,9 @@ it('switches all three interfaces, persists the choice and preserves the project
   expect(spanish).toHaveAttribute('aria-pressed', 'true');
   expect(document.documentElement.lang).toBe('es');
   expect(localStorage.getItem(LOCALE_KEY)).toBe('es');
+  const spanishLink = sharedRoute(new URL(await window.whatsappFakeFlows!.createShareURL()).hash);
+  expect(spanishLink?.locale).toBe('es');
+  expect(spanishLink?.token).toBe(sharedRoute(new URL(link).hash)?.token);
   expect(screen.getByRole('button', { name: '＋ Empresa' })).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Português (Brasil)' }));
   expect(screen.getByRole('heading', { name: 'Monte a conversa' })).toBeInTheDocument();

@@ -1,11 +1,22 @@
-import { useRef, useState, type FormEvent, type MouseEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ActionMenu } from '../../components/ui/ActionMenu';
-import { Button } from '../../components/ui/Button';
-import { Dialog } from '../../components/ui/Dialog';
-import { FieldError } from '../../components/ui/Field';
-import { createShareURL, MAX_SHARE_BYTES, type ShareMode } from '../../core/codec';
+import { createShareURL, type ShareMode } from '../../core/codec';
 import type { Project } from '../../core/types';
 import { useT } from '../../i18n';
+
+async function writeLink(link: Promise<string>) {
+  const clipboard = navigator.clipboard;
+  // Start the write within the menu gesture while the link is being compressed.
+  if (clipboard?.write && typeof ClipboardItem === 'function') {
+    await clipboard.write([
+      new ClipboardItem({
+        'text/plain': link.then((url) => new Blob([url], { type: 'text/plain' })),
+      }),
+    ]);
+  } else {
+    await clipboard.writeText(await link);
+  }
+}
 
 export function ShareControls({
   project,
@@ -17,161 +28,50 @@ export function ShareControls({
   hasErrors: boolean;
 }) {
   const t = useT();
-  const [dialog, setDialog] = useState<ShareMode | 'ai'>();
-  const [input, setInput] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [url, setUrl] = useState('');
-  const [error, setError] = useState('');
-  const [status, setStatus] = useState('');
-  const result = useRef<HTMLInputElement>(null);
-  const request = useRef(0);
-  const menuTrigger = useRef<HTMLButtonElement>(null);
-  const returnFocus = useRef<HTMLButtonElement | null>(null);
+  const pending = useRef(false);
+  const [notice, setNotice] = useState<{ text: string; error?: boolean }>();
 
-  const generate = async (mode: ShareMode, candidate: () => unknown) => {
-    const id = ++request.current;
-    setBusy(true);
-    setError('');
-    setStatus('');
-    setUrl('');
-    try {
-      const next = await createShareURL(candidate(), mode, location.href);
-      if (id === request.current) setUrl(next);
-    } catch (failure) {
-      if (id === request.current) setError((failure as Error).message);
-    } finally {
-      if (id === request.current) setBusy(false);
+  useEffect(() => {
+    if (!notice || notice.error) return;
+    const timer = window.setTimeout(() => setNotice(undefined), 2500);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
+
+  const copy = async (mode: ShareMode) => {
+    if (pending.current) return;
+    if (hasErrors) {
+      setNotice({ text: t('errors.pendingFields'), error: true });
+      return;
     }
-  };
-  const openShare = (mode: ShareMode) => {
-    returnFocus.current = menuTrigger.current;
-    setDialog(mode);
-    void generate(mode, () => {
-      if (hasErrors) throw new Error(t('errors.pendingFields'));
-      return project;
-    });
-  };
-  const clearResult = () => {
-    ++request.current;
-    setBusy(false);
-    setUrl('');
-    setError('');
-    setStatus('');
-  };
-  const openAI = (event: MouseEvent<HTMLButtonElement>) => {
-    returnFocus.current = event.currentTarget;
-    clearResult();
-    setInput('');
-    setDialog('ai');
-  };
-  const generateFromAI = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const mode = new FormData(event.currentTarget).get('mode') === 'editor' ? 'editor' : 'demo';
-    void generate(mode, () => {
-      try {
-        return JSON.parse(input) as unknown;
-      } catch {
-        throw new Error(t('sharing.invalidJSON'));
-      }
-    });
-  };
-  const copy = async () => {
-    const id = request.current;
-    try {
-      await navigator.clipboard.writeText(url);
-      if (id === request.current) setStatus(t('sharing.copied'));
-    } catch {
-      if (id !== request.current) return;
-      result.current?.focus();
-      result.current?.select();
-      setStatus(t('sharing.copyFallback'));
-    }
+
+    pending.current = true;
+    setNotice(undefined);
+    const link = createShareURL(project, mode, location.href);
+    const [generated, copied] = await Promise.allSettled([link, writeLink(link)]);
+    pending.current = false;
+    if (generated.status === 'rejected')
+      setNotice({ text: (generated.reason as Error).message, error: true });
+    else if (copied.status === 'rejected') setNotice({ text: t('sharing.copyError'), error: true });
+    else setNotice({ text: t('sharing.copied') });
   };
 
   return (
-    <>
-      <Button onClick={openAI} disabled={disabled}>
-        {t('sharing.createWithAI')}
-      </Button>
+    <div className="share-control">
       <ActionMenu
         label={t('sharing.copy')}
         icon="link"
         showLabel
-        triggerRef={menuTrigger}
         disabled={disabled}
         items={[
-          { label: t('sharing.demo'), icon: 'play', onSelect: () => openShare('demo') },
-          { label: t('sharing.editor'), icon: 'pencil', onSelect: () => openShare('editor') },
+          { label: t('sharing.editor'), icon: 'pencil', onSelect: () => void copy('editor') },
+          { label: t('sharing.preview'), icon: 'play', onSelect: () => void copy('demo') },
         ]}
       />
-      {dialog && (
-        <Dialog
-          open
-          title={t(
-            dialog === 'ai'
-              ? 'sharing.createWithAI'
-              : dialog === 'demo'
-                ? 'sharing.demo'
-                : 'sharing.editor',
-          )}
-          description={t(dialog === 'ai' ? 'sharing.aiHint' : 'sharing.privacy')}
-          onReturnFocus={() => returnFocus.current?.focus()}
-          onOpenChange={(open) => {
-            if (open) return;
-            ++request.current;
-            setBusy(false);
-            setDialog(undefined);
-          }}
-        >
-          {dialog === 'ai' && (
-            <form className="share-form" onSubmit={generateFromAI}>
-              <label>
-                <span>{t('sharing.configuration')}</span>
-                <textarea
-                  rows={5}
-                  required
-                  maxLength={MAX_SHARE_BYTES}
-                  value={input}
-                  onChange={(event) => {
-                    clearResult();
-                    setInput(event.currentTarget.value);
-                  }}
-                />
-              </label>
-              <label>
-                <span>{t('sharing.mode')}</span>
-                <select name="mode" onChange={clearResult}>
-                  <option value="demo">{t('sharing.demo')}</option>
-                  <option value="editor">{t('sharing.editor')}</option>
-                </select>
-              </label>
-              <Button type="submit" variant="primary" disabled={busy}>
-                {t('sharing.generate')}
-              </Button>
-            </form>
-          )}
-          {busy && <p role="status">{t('errors.loading')}</p>}
-          <FieldError>{error}</FieldError>
-          {url && (
-            <div className="share-result">
-              {dialog === 'ai' && <p>{t('sharing.privacy')}</p>}
-              <label className="field">
-                <span>{t('sharing.link')}</span>
-                <input ref={result} value={url} readOnly />
-              </label>
-              <div className="dialog-actions">
-                <a className="button" href={url} target="_blank" rel="noopener noreferrer">
-                  {t('sharing.openLink')}
-                </a>
-                <Button variant="primary" onClick={() => void copy()}>
-                  {t('sharing.copy')}
-                </Button>
-              </div>
-              {status && <p role="status">{status}</p>}
-            </div>
-          )}
-        </Dialog>
+      {notice && (
+        <p className="share-notice" role={notice.error ? 'alert' : 'status'}>
+          {notice.text}
+        </p>
       )}
-    </>
+    </div>
   );
 }

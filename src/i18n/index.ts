@@ -9,10 +9,18 @@ export const locales = ['en', 'es', 'pt-BR'] as const;
 export type Locale = (typeof locales)[number];
 export type MessageKey = keyof typeof en;
 export const catalogs = { en, es, 'pt-BR': ptBR };
+export function isLocale(value: string | null | undefined): value is Locale {
+  return locales.some((locale) => locale === value);
+}
+
+export function currentLocale(): Locale {
+  return isLocale(i18n.resolvedLanguage) ? i18n.resolvedLanguage : 'en';
+}
+
 export function initialLocale(): Locale {
   try {
     const saved = localStorage.getItem(LOCALE_KEY);
-    if (locales.includes(saved as Locale)) return saved as Locale;
+    if (isLocale(saved)) return saved;
   } catch {
     /* Local files and private browsing may deny storage. */
   }
@@ -31,11 +39,14 @@ void i18n.use(initReactI18next).init({
 });
 function applyLocale(language: string) {
   if (typeof document !== 'undefined') document.documentElement.lang = language;
+}
+export function chooseLocale(language: Locale) {
   try {
     localStorage.setItem(LOCALE_KEY, language);
   } catch {
     /* The in-memory choice still works. */
   }
+  void i18n.changeLanguage(language);
 }
 i18n.on('languageChanged', applyLocale);
 if (typeof document !== 'undefined') document.documentElement.lang = i18n.language;

@@ -52,7 +52,7 @@ export function createAutomationAPI(bindings: AutomationBindings) {
       bindings.replace(project);
       return clone(project);
     },
-    createShareURL(input: unknown = bindings.project(), mode: ShareMode = 'demo') {
+    createShareURL(input: unknown = bindings.project(), mode: ShareMode = 'editor') {
       return createShareURL(input, mode, bindings.href());
     },
     async play(mode: 'automatic' | 'manual' = 'automatic'): Promise<AutomationState> {

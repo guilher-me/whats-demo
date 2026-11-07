@@ -30,7 +30,7 @@ Estilos globais e tokens ficam em `styles/base.css` e `styles/tokens.css`. Edito
 
 O editor usa a chave `whatsdemo-document-alpha1` do localStorage, com sufixos para desenvolvimento e cópias abertas por link. O projeto mantém `version: 1`. A recuperação de projetos antigos mantém os textos e as referências a anexos, descartando imagens reais e avatares personalizados.
 
-O codec de `core/codec.ts` cria `#demo=v2z.…` e `#editor=v2z.…` com o mesmo payload UTF-8, Deflate e Base64URL. O navegador valida o tamanho antes e durante a descompressão. Os formatos legados `#project=v1z.…` e `#project=v1j.…` abrem no simulador.
+O codec de `core/codec.ts` cria `#demo=v2z.…` e `#editor=v2z.…` com o mesmo payload UTF-8, Deflate e Base64URL e o idioma da interface em `lang`. O link padrão abre o editor. O navegador valida o tamanho antes e durante a descompressão. Os formatos legados `#project=v1z.…` e `#project=v1j.…` abrem no simulador.
 
 As fixtures em `tests/fixtures` foram criadas com o formato anterior à migração. Não as regenere a cada alteração: elas demonstram que links salvos continuam legíveis.
 

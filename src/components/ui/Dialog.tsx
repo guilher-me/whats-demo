@@ -9,7 +9,6 @@ export function Dialog({
   description,
   children,
   trigger,
-  onReturnFocus,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -17,7 +16,6 @@ export function Dialog({
   description?: string;
   children: ReactNode;
   trigger?: ReactNode;
-  onReturnFocus?: () => void;
 }) {
   const t = useT();
 
@@ -26,14 +24,7 @@ export function Dialog({
       {trigger && <Primitive.Trigger asChild>{trigger}</Primitive.Trigger>}
       <Primitive.Portal>
         <Primitive.Overlay className="dialog-overlay" />
-        <Primitive.Content
-          className="dialog-content"
-          onCloseAutoFocus={(event) => {
-            if (!onReturnFocus) return;
-            event.preventDefault();
-            onReturnFocus();
-          }}
-        >
+        <Primitive.Content className="dialog-content">
           <Primitive.Title>{title}</Primitive.Title>
           <Primitive.Description>{description ?? ' '}</Primitive.Description>
           <Primitive.Close asChild>

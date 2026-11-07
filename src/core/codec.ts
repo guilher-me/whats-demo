@@ -1,4 +1,4 @@
-import { t } from '../i18n';
+import { currentLocale, isLocale, t, type Locale } from '../i18n';
 import { normalizeProject } from './project';
 import { recoverProject } from './legacy-project';
 
@@ -73,7 +73,7 @@ export async function encode(input: unknown): Promise<string> {
 }
 
 export async function decode(hash: string): Promise<unknown> {
-  const value = hash.replace(/^#?(?:project|demo|editor)=/, '');
+  const value = sharedRoute(hash.startsWith('#') ? hash : '#' + hash)?.token ?? hash;
   if (value.length > LEGACY_MAX_HASH) throw new Error(t('errors.linkTooLarge'));
   const match = /^(v1z|v1j|v2z)\.([\w-]+)$/.exec(value);
   if (!match) throw new Error(t('errors.linkVersion'));
@@ -113,25 +113,33 @@ export function shareBase(href: string) {
 
 export async function createShareURL(
   input: unknown,
-  mode: ShareMode = 'demo',
+  mode: ShareMode = 'editor',
   href = 'https://guilher-me.github.io/whats-demo/',
+  locale: Locale = currentLocale(),
 ): Promise<string> {
   if (mode !== 'demo' && mode !== 'editor') throw new Error(t('errors.mode'));
   const url = shareBase(href);
-  url.hash = mode + '=' + (await encode(input));
+  url.hash = shareHash(mode, await encode(input), locale);
   if (url.href.length > MAX_LINK_LENGTH)
     throw new Error(t('sharing.linkLength', { length: url.href.length, max: MAX_LINK_LENGTH }));
   return url.href;
+}
+
+export function shareHash(mode: ShareMode, token: string, locale?: Locale) {
+  return '#' + mode + '=' + token + (locale ? '&lang=' + locale : '');
 }
 
 export function sharedRoute(hash: string) {
   const match = /^#(demo|editor|project)(?:=|$)/.exec(hash);
   if (!match) return undefined;
   const legacy = match[1] === 'project';
+  const [token, language] = hash.slice(match[0].length).split('&', 2);
+  const locale = language?.startsWith('lang=') ? language.slice(5) : undefined;
   return {
     mode: (legacy ? 'demo' : match[1]) as ShareMode,
     legacy,
-    token: hash.slice(match[0].length),
+    token,
+    locale: isLocale(locale) ? locale : undefined,
   };
 }
 
