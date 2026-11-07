@@ -7,7 +7,10 @@ import { ControlIcon } from '../../../components/icons/ControlIcon';
 import { StepActions, type StepAction } from './StepActions';
 import { FlowStepEditor } from './FlowStepEditor';
 import { BusinessMessageEditor } from './BusinessMessageEditor';
+import { CustomerMessageEditor } from './CustomerMessageEditor';
 import { businessMessageError } from '../../../core/interactive';
+import { formatVoiceTime } from '../../../core/voice-message';
+import { MicrophoneIcon } from '../../../components/icons/WhatsAppIcons';
 export function StepCard({
   step,
   index,
@@ -38,6 +41,7 @@ export function StepCard({
   const t = useT();
   const id = useId();
   const [flowInvalid, setFlowInvalid] = useState(false);
+  const voiceSeconds = step.type === 'user' ? step.voiceDurationSeconds : undefined;
   const invalid =
     step.type === 'business' ? !!businessMessageError(step) : step.type === 'flow' && flowInvalid;
 
@@ -84,9 +88,13 @@ export function StepCard({
           }}
         >
           <span className="step-type">
-            <ControlIcon
-              name={step.type === 'flow' ? 'flow' : step.type === 'user' ? 'user' : 'message'}
-            />
+            {voiceSeconds === undefined ? (
+              <ControlIcon
+                name={step.type === 'flow' ? 'flow' : step.type === 'user' ? 'user' : 'message'}
+              />
+            ) : (
+              <MicrophoneIcon width="20" height="20" />
+            )}
             {step.type === 'flow'
               ? 'WhatsApp Flow'
               : step.type === 'user'
@@ -94,8 +102,10 @@ export function StepCard({
                 : t('editor.businessMessage')}
           </span>
           <span className="step-summary">
-            {step.text.replace(/[*_~]/g, '').replace(/\s+/g, ' ').slice(0, 110) ||
-              t('common.untitled')}
+            {voiceSeconds === undefined
+              ? step.text.replace(/[*_~]/g, '').replace(/\s+/g, ' ').slice(0, 110) ||
+                t('common.untitled')
+              : `${t('editor.voiceMock')} · ${formatVoiceTime(voiceSeconds * 1000)}`}
           </span>
           <ControlIcon name="chevron" className="step-chevron" />
         </button>
@@ -106,9 +116,11 @@ export function StepCard({
       <div className="step-body" id={id} hidden={!expanded}>
         {step.type === 'business' ? (
           <BusinessMessageEditor step={step} onChange={onChange} />
+        ) : step.type === 'user' ? (
+          <CustomerMessageEditor step={step} onChange={onChange} />
         ) : (
           <MessageTextEditor
-            label={step.type === 'flow' ? t('editor.flowInvitation') : t('editor.messageText')}
+            label={t('editor.flowInvitation')}
             value={step.text}
             onChange={(text) => onChange({ text })}
           />

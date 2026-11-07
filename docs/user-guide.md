@@ -24,6 +24,8 @@ Profile photos accept PNG, JPEG and WebP up to 2 MiB, 4096 pixels per edge and 8
 
 ## Messages, buttons and lists
 
+For a customer voice note, choose **Voice message (mock)** under **Format**. Set **Recording duration** from 1 to 120 seconds for automatic playback. In manual playback, hold the microphone and release it to send. The preview animates a waveform and adds a voice bubble with the elapsed time. The entire interaction is silent.
+
 Business messages support three formats:
 
 | Format       | Use it for                                                               | Limits                                                                                                     |
@@ -56,7 +58,7 @@ Use **View conversation** to inspect all configured messages in order without wa
 
 ### Manual playback
 
-Type in the phone's message field and press **Enter** or click **Send**. This starts manual playback automatically. Your text replaces only a configured opening customer step. If the journey starts with a business step, your message appears before it and all configured steps remain. The saved configuration is unchanged.
+Type in the phone's message field and press **Enter** or click **Send** to start manual playback. Your text replaces a configured opening customer text step. If the journey starts with a business step, your message appears before it and all configured steps remain. If it starts with a simulated voice step, hold the microphone to start the journey and record the first message. These actions leave the saved configuration intact.
 
 You can also select **Start manually**. Later customer steps wait for a reply; buttons, lists and Flows wait for your interaction. The **Phone only** view gives the conversation more space and starts manual playback if needed.
 

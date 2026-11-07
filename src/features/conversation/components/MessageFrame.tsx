@@ -8,6 +8,7 @@ export function MessageFrame({
   time,
   receipt,
   interactive,
+  voice,
   children,
   actions,
 }: {
@@ -16,6 +17,7 @@ export function MessageFrame({
   time: string;
   receipt?: 'delivered' | 'read';
   interactive?: boolean;
+  voice?: boolean;
   children: ReactNode;
   actions?: ReactNode;
 }) {
@@ -25,7 +27,7 @@ export function MessageFrame({
     <article
       aria-label={direction === 'user' ? t('editor.customerMessage') : t('editor.businessMessage')}
       data-message-id={id}
-      className={`bubble ${direction === 'user' ? 'user' : ''} ${interactive ? 'flow-card' : ''}`}
+      className={`bubble ${direction === 'user' ? 'user' : ''} ${interactive ? 'flow-card' : ''} ${voice ? 'voice-bubble' : ''}`}
     >
       <div className="message-content">{children}</div>
       <time className="message-time" dateTime={time}>

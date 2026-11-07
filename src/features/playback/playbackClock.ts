@@ -11,6 +11,8 @@ interface PendingDelay {
 /** Keeps one run alive while suspending its timers, without replaying completed actions. */
 export class PlaybackClock {
   paused = false;
+  private pausedAt = 0;
+  private pausedDuration = 0;
   private pending = new Set<PendingDelay>();
   constructor(readonly signal: AbortSignal) {
     signal.addEventListener('abort', this.cancel, { once: true });
@@ -41,16 +43,19 @@ export class PlaybackClock {
       : this.paused
         ? this.delay(0)
         : Promise.resolve();
+  now = () => (this.paused ? this.pausedAt : performance.now()) - this.pausedDuration;
   pause = () => {
     if (this.paused || this.signal.aborted) return;
+    this.pausedAt = performance.now();
     this.paused = true;
     for (const entry of this.pending) {
       clearTimeout(entry.timer);
-      entry.remaining = Math.max(0, entry.remaining - (performance.now() - entry.started));
+      entry.remaining = Math.max(0, entry.remaining - (this.pausedAt - entry.started));
     }
   };
   resume = () => {
     if (!this.paused || this.signal.aborted) return;
+    this.pausedDuration += performance.now() - this.pausedAt;
     this.paused = false;
     for (const entry of this.pending) this.arm(entry);
   };

@@ -130,6 +130,9 @@ export function App() {
     selectStep(null);
     playback.sendOrStart(editor.project);
   };
+  const openingStep = editor.project.steps[0];
+  const opensWithVoice =
+    openingStep?.type === 'user' && openingStep.voiceDurationSeconds !== undefined;
   return (
     <div
       className={
@@ -248,6 +251,7 @@ export function App() {
                 phoneRef={phoneRef}
                 composerDisabled={composerDisabled}
                 onSend={sendFromComposer}
+                onStartVoice={opensWithVoice ? () => void run(editor.project, false) : undefined}
               />
             )}
             <div className="phone-tools">

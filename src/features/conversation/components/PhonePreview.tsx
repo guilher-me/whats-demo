@@ -6,6 +6,7 @@ import { PhoneFrame } from './PhoneFrame';
 import { MessageBubble } from './MessageBubble';
 import { TypingIndicator } from './TypingIndicator';
 import { MessageComposer } from './MessageComposer';
+import { VoiceComposer } from './VoiceComposer';
 import { FlowSheet } from '../../flows/components/FlowSheet';
 import { ListPicker } from './ListPicker';
 export function PhonePreview({
@@ -13,12 +14,14 @@ export function PhonePreview({
   playback: p,
   phoneRef,
   onSend,
+  onStartVoice,
   composerDisabled = false,
 }: {
   contact: Contact;
   playback: Playback;
   phoneRef: RefObject<HTMLDivElement | null>;
   onSend?: () => void;
+  onStartVoice?: () => void;
   composerDisabled?: boolean;
 }) {
   const t = useT();
@@ -62,12 +65,27 @@ export function PhonePreview({
           {p.typing && <TypingIndicator />}
         </div>
       </div>
-      <MessageComposer
-        value={p.draft}
-        onChange={p.setDraft}
-        onSend={onSend ?? p.send}
-        disabled={composerDisabled || p.automatic || p.paused}
-      />
+      {p.voiceComposer || (!p.running && onStartVoice) ? (
+        <VoiceComposer
+          recording={p.recordingVoice}
+          elapsed={p.voiceElapsed}
+          paused={p.paused}
+          disabled={composerDisabled || p.automatic || p.paused}
+          onBegin={() => {
+            if (!p.running) onStartVoice?.();
+            return p.beginVoice();
+          }}
+          onSend={p.sendVoice}
+          onCancel={p.cancelVoice}
+        />
+      ) : (
+        <MessageComposer
+          value={p.draft}
+          onChange={p.setDraft}
+          onSend={onSend ?? p.send}
+          disabled={composerDisabled || p.automatic || p.paused}
+        />
+      )}
       {p.flow && (
         <FlowSheet
           session={p.flow}
