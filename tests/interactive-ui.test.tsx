@@ -23,7 +23,7 @@ async function tick(ms: number) {
 }
 async function start(kind: BusinessInteractive['kind']) {
   const project = createDefaultProject();
-  project.contact.avatar = '';
+
   const interactive = createInteractive(kind);
   interactive.autoReplyId = 'option-2';
   project.steps = [

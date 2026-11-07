@@ -17,7 +17,7 @@ afterEach(() => {
 async function start(steps: Step[]) {
   localStorage.setItem(
     STORAGE_KEY,
-    JSON.stringify({ version: 1, contact: { name: 'Demo', avatar: '', verified: false }, steps }),
+    JSON.stringify({ version: 1, contact: { name: 'Demo', verified: false }, steps }),
   );
   render(<App />);
   await act(async () => {});

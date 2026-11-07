@@ -3,6 +3,10 @@ import { MessageFrame } from './MessageFrame';
 import { BusinessMessageActions } from './BusinessMessageActions';
 import { FormattedMessageText } from './FormattedMessageText';
 import { VoiceMessage } from './VoiceMessage';
+import { useRef, useState, type RefObject } from 'react';
+import { PhoneSheet } from '../../../components/ui/PhoneSheet';
+import { useT } from '../../../i18n';
+import { AttachmentDetails, AttachmentVisual } from './AttachmentVisual';
 export function MessageBubble({
   message,
   running,
@@ -10,6 +14,8 @@ export function MessageBubble({
   onOpen,
   onReply,
   onList,
+  phoneRef,
+  attachmentDisabled,
 }: {
   message: ChatMessage;
   running: boolean;
@@ -17,7 +23,13 @@ export function MessageBubble({
   onOpen: (step: FlowStep) => void;
   onReply: (messageId: string, optionId: string) => void;
   onList: (messageId: string) => void;
+  phoneRef?: RefObject<HTMLDivElement | null>;
+  attachmentDisabled?: boolean;
 }) {
+  const t = useT();
+  const [open, setOpen] = useState(false);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const attachment = message.attachment;
   return (
     <MessageFrame
       id={message.id}
@@ -40,7 +52,45 @@ export function MessageBubble({
       {message.interactive?.header && (
         <div className="message-header">{message.interactive.header}</div>
       )}
-      {message.voiceDurationMs === undefined ? (
+      {attachment ? (
+        <div className="message-attachment">
+          <button
+            type="button"
+            ref={trigger}
+            className={`message-attachment-preview ${attachment.kind}`}
+            aria-label={attachment.name}
+            disabled={attachmentDisabled}
+            onClick={() => setOpen(true)}
+          >
+            <AttachmentVisual item={attachment} />
+            {attachment.kind === 'document' && (
+              <span className="message-document-name">
+                <strong>{attachment.name}</strong>
+                <small>PDF · {attachment.sizeLabel}</small>
+              </span>
+            )}
+          </button>
+          {attachment.kind === 'image' && message.text && (
+            <p>
+              <FormattedMessageText text={message.text} />
+            </p>
+          )}
+          {open && (
+            <PhoneSheet
+              container={phoneRef?.current ?? null}
+              title={attachment.name}
+              description={t('attachments.preview')}
+              closeLabel={t('common.closeDialog')}
+              onClose={() => setOpen(false)}
+              onReturnFocus={() => trigger.current?.focus()}
+            >
+              <div className="attachment-phone-content">
+                <AttachmentDetails item={attachment} />
+              </div>
+            </PhoneSheet>
+          )}
+        </div>
+      ) : message.voiceDurationMs === undefined ? (
         <p>
           <FormattedMessageText text={message.text} />
         </p>

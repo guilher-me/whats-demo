@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import axe from 'axe-core';
 import { App } from '../src/app/App';
+import { readJsonEditor, writeJsonEditor } from './fixtures/json-editor';
 import { createStep, STORAGE_KEY } from '../src/core/project';
 import { createInteractive } from '../src/core/interactive';
 import { SelectField } from '../src/components/ui/SelectField';
@@ -30,7 +31,7 @@ async function start() {
     STORAGE_KEY,
     JSON.stringify({
       version: 1,
-      contact: { name: 'Store', avatar: '', verified: true },
+      contact: { name: 'Store', verified: true },
       steps: [
         { id: 'hello', type: 'user', text: 'Hello', delay: 0.4 },
         {
@@ -70,11 +71,12 @@ it('expands one step at a time, collapses it and preserves the project', async (
 it('keeps an invalid Flow draft and its validation when the step is collapsed', async () => {
   await start();
   fireEvent.click(screen.getByRole('button', { name: 'Editar etapa 3' }));
-  fireEvent.change(screen.getByLabelText('Flow JSON'), { target: { value: '{broken' } });
+  fireEvent.click(screen.getByRole('tab', { name: 'JSON' }));
+  writeJsonEditor(screen.getByLabelText('Flow JSON'), '{broken');
   expect(screen.getByRole('button', { name: 'Iniciar manual' })).toBeDisabled();
   fireEvent.click(screen.getByRole('button', { name: 'Editar etapa 1' }));
   fireEvent.click(screen.getByRole('button', { name: 'Editar etapa 3' }));
-  expect(screen.getByLabelText('Flow JSON')).toHaveValue('{broken');
+  expect(readJsonEditor(screen.getByLabelText('Flow JSON'))).toBe('{broken');
   expect(screen.getByRole('button', { name: 'Iniciar manual' })).toBeDisabled();
 });
 it('opens the actions of a collapsed step without expanding its editor', async () => {
@@ -142,7 +144,9 @@ it.each(locales)(
     await start();
     fireEvent.click(screen.getByRole('button', { name: t('editor.expandStep', { v0: 2 }) }));
     const group = screen.getByRole('group', { name: t('editor.format') });
-    expect(within(group).getAllByRole('radio')).toHaveLength(3);
+    expect(within(group).getAllByRole('radio')).toHaveLength(5);
+    expect(within(group).getByRole('radio', { name: t('attachments.image') })).toBeVisible();
+    expect(within(group).getByRole('radio', { name: t('attachments.document') })).toBeVisible();
     const results = await axe.run(document.body, {
       rules: { 'color-contrast': { enabled: false } },
     });

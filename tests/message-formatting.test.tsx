@@ -52,7 +52,7 @@ it('lida com uma mensagem longa de marcadores não fechados sem perder conteúdo
 it('formata a prévia e a reprodução mantendo a sintaxe original no projeto e no link', async () => {
   const project = {
     version: 1 as const,
-    contact: { name: 'Empresa teste', avatar: '', verified: false },
+    contact: { name: 'Empresa teste', verified: false },
     steps: [{ id: 'a', type: 'business' as const, text: '*Olá* _cliente_ ~antigo~', delay: 0 }],
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
@@ -77,7 +77,7 @@ it('formata a prévia e a reprodução mantendo a sintaxe original no projeto e 
 it('formata mensagens digitadas pelo cliente', async () => {
   const project = {
     version: 1,
-    contact: { name: 'Empresa teste', avatar: '', verified: false },
+    contact: { name: 'Empresa teste', verified: false },
     steps: [{ id: 'a', type: 'user', text: 'oi', delay: 0 }],
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(project));

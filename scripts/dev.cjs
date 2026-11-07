@@ -3,6 +3,7 @@ const fs = require('node:fs'),
   esbuild = require('esbuild');
 const { agentDocs } = require('./agent-docs.cjs');
 const { brandHtml } = require('./branding.cjs');
+const { shareBuildOptions } = require('./build.cjs');
 async function start() {
   const root = path.resolve(__dirname, '..'),
     directory = path.join(root, '.dev');
@@ -30,11 +31,12 @@ async function start() {
     loader: { '.png': 'dataurl', '.svg': 'dataurl' },
     define: { 'process.env.NODE_ENV': '"development"' },
   });
-  await context.watch();
+  const share = await esbuild.context(shareBuildOptions(root, directory));
+  await Promise.all([context.watch(), share.watch()]);
   const server = await context.serve({ host: '127.0.0.1', port: 5173, servedir: directory });
   console.log(`Local: http://127.0.0.1:${server.port}`);
   const stop = async () => {
-    await context.dispose();
+    await Promise.all([context.dispose(), share.dispose()]);
     process.exit();
   };
   process.once('SIGINT', stop);

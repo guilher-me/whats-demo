@@ -18,7 +18,7 @@ afterEach(() => {
 });
 async function start(steps?: Step[]) {
   const project = createDefaultProject();
-  project.contact.avatar = '';
+
   if (steps) project.steps = steps;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
   render(<App />);

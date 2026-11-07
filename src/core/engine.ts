@@ -1,7 +1,7 @@
 import { t } from '../i18n';
-import { isAllowedAvatar } from './images/policy';
 import { interactiveError } from './interactive';
 import { MAX_VOICE_SECONDS } from './voice-message';
+import { validateMediaSteps } from './attachments';
 import type {
   ExpressionContext,
   FlowComponent,
@@ -85,6 +85,15 @@ export function condition(
       return false;
   }
 }
+export function walkComponents(components: FlowComponent[]): FlowComponent[] {
+  return components.flatMap((component) => [
+    component,
+    ...walkComponents(component.children ?? []),
+    ...walkComponents(component.then ?? []),
+    ...walkComponents(component.else ?? []),
+  ]);
+}
+
 export function flatten(children: FlowComponent[], context: ExpressionContext): FlowComponent[] {
   return children.flatMap((component) =>
     component.type === 'If'
@@ -160,7 +169,8 @@ export function validateField(c: FlowComponent, value: Value): string {
   if (typeof value === 'string') {
     if (c['min-chars'] && value.length < c['min-chars'])
       return t('errors.minChars', { v0: label, v1: c['min-chars'] });
-    if (c['max-chars'] && value.length > c['max-chars']) return t('errors.maxChars', { v0: label });
+    const max = c.type === 'TextArea' ? (c['max-length'] ?? c['max-chars']) : c['max-chars'];
+    if (max && value.length > max) return t('errors.maxChars', { v0: label });
     if (c['input-type'] === 'number' && !/^\d+$/.test(value))
       return t('errors.numbers', { v0: label });
     if (c['input-type'] === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
@@ -187,9 +197,7 @@ export function validateProject(input: unknown, { allowDrafts = false } = {}): P
   )
     throw new Error(t('errors.project'));
   if (input.steps.length > 200) throw new Error(t('errors.stepLimit'));
-  if (input.contact.avatar && !isAllowedAvatar(input.contact.avatar))
-    throw new Error(t('errors.photo'));
-  for (const step of input.steps) {
+  for (const [index, step] of input.steps.entries()) {
     if (
       !isObject(step) ||
       !['user', 'business', 'flow'].includes(String(step.type)) ||
@@ -211,8 +219,13 @@ export function validateProject(input: unknown, { allowDrafts = false } = {}): P
     )
       throw new Error(t('errors.invalidVoiceDuration', { v0: MAX_VOICE_SECONDS }));
     if (step.type === 'flow') {
-      validateFlow(step.flow);
-      if (!isObject(step.answers)) throw new Error(t('errors.answers'));
+      try {
+        validateFlow(step.flow);
+      } catch (error) {
+        throw new Error(`steps[${index}].flow · ${(error as Error).message}`);
+      }
+      if (!isObject(step.answers))
+        throw new Error(`steps[${index}].answers · ${t('errors.answers')}`);
     }
     if (step.interactive !== undefined) {
       if (step.type !== 'business') throw new Error(t('errors.onlyBusiness'));
@@ -222,7 +235,9 @@ export function validateProject(input: unknown, { allowDrafts = false } = {}): P
         throw new Error(t('errors.messageLength'));
     }
   }
-  return input as unknown as Project;
+  const project = input as unknown as Project;
+  validateMediaSteps(project, allowDrafts);
+  return project;
 }
 export const SUPPORTED_COMPONENTS = new Set([
   'TextHeading',

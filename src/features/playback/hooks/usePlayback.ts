@@ -1,13 +1,7 @@
 import { t, useT, type MessageKey } from '../../../i18n';
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { flushSync } from 'react-dom';
-import type {
-  BusinessInteractive,
-  ChatMessage,
-  FlowStep,
-  Project,
-  Value,
-} from '../../../core/types';
+import type { ChatMessage, FlowStep, Project, Value } from '../../../core/types';
 import { clone, uid } from '../../../core/project';
 import { resolve, validateProject } from '../../../core/engine';
 import { deferred, delay } from '../../../core/async';
@@ -20,10 +14,12 @@ import { messageOptions } from '../../../core/interactive';
 import { usePlaybackSpeed } from './usePlaybackSpeed';
 import { PlaybackClock } from '../playbackClock';
 import { flowReadingText } from '../../flows/reading';
+import { conversationAttachments, stepAttachment } from '../../../core/attachments';
+import { useAttachmentPlayback } from './useAttachmentPlayback';
 
-export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
+export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpeed = true) {
   useT();
-  const { speed, current: speedRef, setSpeed } = usePlaybackSpeed();
+  const { speed, current: speedRef, setSpeed } = usePlaybackSpeed(persistSpeed);
   const automaticMode = useRef(false);
   const clock = useRef<PlaybackClock | null>(null);
   const sleep = useCallback(
@@ -58,11 +54,13 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     [],
   );
   const flow = useFlowSession(),
+    media = useAttachmentPlayback(),
     cursor = useCursor(phone, wait),
     controller = useRef<AbortController | null>(null),
     draftRef = useRef(''),
     waitingUser = useRef<(() => void) | null>(null),
     waitingVoice = useRef<(() => void) | null>(null),
+    waitingAttachment = useRef<(() => void) | null>(null),
     voiceStartedAt = useRef<number | null>(null),
     waitingFlow = useRef<(() => void) | null>(null);
   const setDraft = (value: string) => {
@@ -72,9 +70,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
   const append = (
     text: string,
     direction: ChatMessage['direction'],
-    step?: FlowStep,
-    interactive?: BusinessInteractive,
-    voiceDurationMs?: number,
+    content?: Pick<ChatMessage, 'flowStep' | 'interactive' | 'voiceDurationMs' | 'attachment'>,
   ) => {
     const message: ChatMessage = {
       id: uid(),
@@ -83,9 +79,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
       time: new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(
         new Date(),
       ),
-      flowStep: step,
-      interactive,
-      ...(voiceDurationMs === undefined ? {} : { voiceDurationMs }),
+      ...content,
       receipt: direction === 'user' ? 'delivered' : undefined,
     };
     setMessages((current) => [
@@ -118,6 +112,8 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     automaticMode.current = false;
     waitingUser.current = null;
     waitingVoice.current = null;
+    waitingAttachment.current = null;
+    media.set(null);
     setVoiceComposer(false);
     cancelVoice();
     waitingFlow.current = null;
@@ -128,7 +124,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     interaction.reset();
     cursor.hide();
     setStatus('playback.stopped');
-  }, [flow.set, interaction.reset, cancelVoice]);
+  }, [flow.set, interaction.reset, cancelVoice, media.set]);
   const pause = () => {
     if (!controller.current || clock.current?.paused) return;
     if (!automaticMode.current) cancelVoice();
@@ -155,7 +151,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
   );
   const send = () => {
     const text = draftRef.current.trim();
-    if (!text || clock.current?.paused || waitingVoice.current) return;
+    if (!text || clock.current?.paused || waitingVoice.current || waitingAttachment.current) return;
     append(text, 'user');
     setDraft('');
     const done = waitingUser.current;
@@ -186,9 +182,23 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     const duration = configuredMs ?? Math.round(voiceElapsed());
     // The following text step needs its composer mounted before the cursor can target it.
     flushSync(() => {
-      append('', 'user', undefined, undefined, duration);
+      append('', 'user', { voiceDurationMs: duration });
       cancelVoice();
       setVoiceComposer(false);
+    });
+    done();
+  };
+  const sendAttachment = () => {
+    const done = waitingAttachment.current;
+    const session = media.current.current;
+    const selected = session?.selected;
+    if (!done || !selected || clock.current?.paused) return;
+    if (session.view !== 'preview' && !(session.view === 'items' && selected.kind === 'image'))
+      return;
+    waitingAttachment.current = null;
+    flushSync(() => {
+      append(session.caption, 'user', { attachment: selected });
+      media.set(null);
     });
     done();
   };
@@ -318,13 +328,18 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     const signal = active.signal;
     setRunning(true);
     try {
-      const steps = clone(validateProject(project).steps);
+      const validated = validateProject(project);
+      const steps = clone(validated.steps);
+      const attachments = conversationAttachments(validated);
       const openingMessage = !automatic ? initialMessage?.trim() : undefined;
       if (openingMessage) append(openingMessage, 'user');
       // The submitted text fulfills only an opening customer step; later replies still wait.
       const first = steps[0];
       const startIndex =
-        openingMessage && first?.type === 'user' && first.voiceDurationSeconds === undefined
+        openingMessage &&
+        first?.type === 'user' &&
+        first.voiceDurationSeconds === undefined &&
+        !first.media
           ? 1
           : 0;
       for (let index = startIndex; index < steps.length; index++) {
@@ -339,7 +354,42 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
         if (step.type === 'user') {
           // Register the expected input before the composer can submit.
           const received = deferred(signal);
-          if (step.voiceDurationSeconds !== undefined) {
+          if (step.media) {
+            const item = stepAttachment(step, attachments);
+            if (!item) throw new Error(t('attachments.required'));
+            waitingAttachment.current = received.finish;
+            flushSync(() =>
+              media.set({
+                kind: item.kind,
+                items: attachments.filter((attachment) => attachment.kind === item.kind),
+                view: 'closed',
+                caption: '',
+              }),
+            );
+            if (automatic) {
+              const target = (selector: string) =>
+                phone.current?.querySelector<HTMLElement>(selector) ?? null;
+              await wait(step.delay * 1000, signal);
+              await cursor.touch(target('[data-attach]'), signal, () => flushSync(media.open));
+              await cursor.touch(target('[data-attachment-kind]'), signal, () =>
+                flushSync(media.showItems),
+              );
+              await cursor.touch(target(`[data-attachment-item="${item.id}"]`), signal, () =>
+                flushSync(() => media.select(item.id)),
+              );
+              if (step.media.caption)
+                await cursor.type(
+                  target('[data-attachment-caption]'),
+                  step.media.caption,
+                  signal,
+                  media.caption,
+                );
+              await cursor.touch(target('[data-send-attachment]'), signal, sendAttachment);
+            } else {
+              setStatus('attachments.wait');
+              phone.current?.querySelector<HTMLButtonElement>('[data-attach]')?.focus();
+            }
+          } else if (step.voiceDurationSeconds !== undefined) {
             const durationMs = step.voiceDurationSeconds * 1000;
             waitingVoice.current = received.finish;
             flushSync(() => setVoiceComposer(true));
@@ -391,15 +441,16 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
             await sleep(step.delay * 1000, signal);
           }
           setTyping(false);
+          const text =
+            step.type === 'business' && step.media ? (step.media.caption ?? '') : step.text;
           // Cursor targets must exist before the next animation; commit this message synchronously.
           let messageId = '';
           flushSync(() => {
-            const message = append(
-              step.text,
-              'business',
-              step.type === 'flow' ? step : undefined,
-              step.type === 'business' ? step.interactive : undefined,
-            );
+            const message = append(text, 'business', {
+              flowStep: step.type === 'flow' ? step : undefined,
+              interactive: step.type === 'business' ? step.interactive : undefined,
+              attachment: stepAttachment(step, attachments),
+            });
             messageId = message.id;
           });
           if (automatic) {
@@ -409,7 +460,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
                     .map((option) => option.title)
                     .join(' ')
                 : '';
-            await cursor.read(`${step.text} ${choices}`, signal);
+            await cursor.read(`${text} ${choices}`, signal);
           }
           if (step.type === 'business' && step.interactive) {
             const answered = interaction.wait(messageId, step.interactive, signal);
@@ -485,6 +536,8 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     beginVoice,
     sendVoice,
     cancelVoice,
+    media,
+    sendAttachment,
     running,
     paused,
     pause,

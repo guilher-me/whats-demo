@@ -9,12 +9,14 @@ import { MessageComposer } from './MessageComposer';
 import { VoiceComposer } from './VoiceComposer';
 import { FlowSheet } from '../../flows/components/FlowSheet';
 import { ListPicker } from './ListPicker';
+import { AttachmentPicker } from './AttachmentPicker';
 export function PhonePreview({
   contact,
   playback: p,
   phoneRef,
   onSend,
   onStartVoice,
+  onStartAttachment,
   composerDisabled = false,
 }: {
   contact: Contact;
@@ -22,11 +24,13 @@ export function PhonePreview({
   phoneRef: RefObject<HTMLDivElement | null>;
   onSend?: () => void;
   onStartVoice?: () => void;
+  onStartAttachment?: () => void;
   composerDisabled?: boolean;
 }) {
   const t = useT();
 
   const body = useRef<HTMLDivElement>(null);
+  const attach = p.media.session || (!p.running && onStartAttachment);
   useEffect(() => {
     if (body.current) body.current.scrollTop = body.current.scrollHeight;
   }, [p.messages, p.typing]);
@@ -60,6 +64,10 @@ export function PhonePreview({
               pendingId={p.interaction.pendingId}
               onReply={p.interaction.reply}
               onList={p.interaction.open}
+              phoneRef={phoneRef}
+              attachmentDisabled={
+                p.automatic || (!!p.media.session && p.media.session.view !== 'closed')
+              }
             />
           ))}
           {p.typing && <TypingIndicator />}
@@ -80,12 +88,27 @@ export function PhonePreview({
         />
       ) : (
         <MessageComposer
-          value={p.draft}
+          value={attach ? '' : p.draft}
           onChange={p.setDraft}
           onSend={onSend ?? p.send}
-          disabled={composerDisabled || p.automatic || p.paused}
+          disabled={!!attach || composerDisabled || p.automatic || p.paused}
+          attachmentDisabled={composerDisabled || p.automatic || p.paused}
+          onAttach={
+            attach
+              ? () => {
+                  if (!p.running) onStartAttachment?.();
+                  p.media.open();
+                }
+              : undefined
+          }
         />
       )}
+      <AttachmentPicker
+        media={p.media}
+        container={phoneRef.current}
+        disabled={p.automatic || p.paused}
+        onSend={p.sendAttachment}
+      />
       {p.flow && (
         <FlowSheet
           session={p.flow}

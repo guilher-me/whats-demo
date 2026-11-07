@@ -1,6 +1,6 @@
 import { useT } from '../../../i18n';
 import { useCallback, useId, useState, type ReactNode } from 'react';
-import type { Step } from '../../../core/types';
+import type { Attachment, Step } from '../../../core/types';
 import { MessageTextEditor } from './MessageTextEditor';
 import { StepTiming } from './StepTiming';
 import { ControlIcon } from '../../../components/icons/ControlIcon';
@@ -24,6 +24,10 @@ export function StepCard({
   onChange,
   onAction,
   onValidity,
+  onFlowPreview,
+  attachment,
+  alternatives,
+  onChooseAttachment,
 }: {
   step: Step;
   index: number;
@@ -37,13 +41,21 @@ export function StepCard({
   onChange: (change: Partial<Step>) => void;
   onAction: (action: StepAction) => void;
   onValidity: (id: string, valid: boolean) => void;
+  onFlowPreview: (screenId?: string) => void;
+  attachment?: Attachment;
+  alternatives: Attachment[];
+  onChooseAttachment: (alternative?: boolean) => void;
 }) {
   const t = useT();
   const id = useId();
   const [flowInvalid, setFlowInvalid] = useState(false);
   const voiceSeconds = step.type === 'user' ? step.voiceDurationSeconds : undefined;
-  const invalid =
-    step.type === 'business' ? !!businessMessageError(step) : step.type === 'flow' && flowInvalid;
+  const media = step.type === 'flow' ? undefined : step.media;
+  const invalid = media
+    ? !attachment
+    : step.type === 'business'
+      ? !!businessMessageError(step)
+      : step.type === 'flow' && flowInvalid;
 
   const valid = useCallback(
     (value: boolean) => {
@@ -102,10 +114,13 @@ export function StepCard({
                 : t('editor.businessMessage')}
           </span>
           <span className="step-summary">
-            {voiceSeconds === undefined
-              ? step.text.replace(/[*_~]/g, '').replace(/\s+/g, ' ').slice(0, 110) ||
-                t('common.untitled')
-              : `${t('editor.voiceMock')} · ${formatVoiceTime(voiceSeconds * 1000)}`}
+            {media
+              ? (attachment?.name ??
+                t(media.kind === 'image' ? 'attachments.image' : 'attachments.document'))
+              : voiceSeconds === undefined
+                ? step.text.replace(/[*_~]/g, '').replace(/\s+/g, ' ').slice(0, 110) ||
+                  t('common.untitled')
+                : `${t('editor.voiceMock')} · ${formatVoiceTime(voiceSeconds * 1000)}`}
           </span>
           <ControlIcon name="chevron" className="step-chevron" />
         </button>
@@ -115,9 +130,20 @@ export function StepCard({
       </div>
       <div className="step-body" id={id} hidden={!expanded}>
         {step.type === 'business' ? (
-          <BusinessMessageEditor step={step} onChange={onChange} />
+          <BusinessMessageEditor
+            step={step}
+            onChange={onChange}
+            attachment={attachment}
+            onChooseAttachment={onChooseAttachment}
+          />
         ) : step.type === 'user' ? (
-          <CustomerMessageEditor step={step} onChange={onChange} />
+          <CustomerMessageEditor
+            step={step}
+            onChange={onChange}
+            attachment={attachment}
+            alternatives={alternatives}
+            onChooseAttachment={onChooseAttachment}
+          />
         ) : (
           <MessageTextEditor
             label={t('editor.flowInvitation')}
@@ -126,7 +152,13 @@ export function StepCard({
           />
         )}
         {step.type === 'flow' && (
-          <FlowStepEditor step={step} onChange={onChange} onValidity={valid} />
+          <FlowStepEditor
+            step={step}
+            expanded={expanded}
+            onChange={onChange}
+            onValidity={valid}
+            onPreview={onFlowPreview}
+          />
         )}
         <StepTiming step={step} onChange={onChange} />
       </div>

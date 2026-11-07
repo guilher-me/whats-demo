@@ -26,6 +26,7 @@ export interface FlowComponent {
   'helper-text'?: string;
   'min-chars'?: number;
   'max-chars'?: number;
+  'max-length'?: number;
   'min-selected-items'?: number;
   pattern?: string;
   'on-click-action'?: FlowAction;
@@ -44,8 +45,20 @@ export interface FlowDefinition {
 }
 export interface Contact {
   name: string;
-  avatar: string;
   verified: boolean;
+}
+interface AttachmentBase {
+  id: string;
+  name: string;
+}
+export type Attachment = AttachmentBase &
+  ({ kind: 'image' } | { kind: 'document'; sizeLabel: string });
+export type AttachmentKind = Attachment['kind'];
+export interface MediaStep {
+  kind: AttachmentKind;
+  attachmentId?: string;
+  alternativeIds?: string[];
+  caption?: string;
 }
 export interface MessageStep {
   id: string;
@@ -53,9 +66,9 @@ export interface MessageStep {
   text: string;
   delay: number;
   voiceDurationSeconds?: number;
+  media?: MediaStep;
   typing?: boolean;
   typingMs?: number;
-  resourceId?: string;
   interactive?: BusinessInteractive;
 }
 export interface MessageOption extends Option {
@@ -97,7 +110,6 @@ export interface FlowStep {
   delay: number;
   typing?: boolean;
   typingMs?: number;
-  resourceId?: string;
   label: string;
   completion?: string;
   flow: FlowDefinition;
@@ -105,15 +117,9 @@ export interface FlowStep {
 }
 export type Step = MessageStep | FlowStep;
 export interface Project {
-  document?: {
-    metadata: { id: string; title: string; contentLocale: string };
-    customer: Record<string, unknown>;
-    playback: { userPace: number };
-    extensions?: Record<string, unknown>;
-    resources?: Record<string, any>;
-  };
   version: 1;
   contact: Contact;
+  attachments?: Attachment[];
   steps: Step[];
 }
 export interface ExpressionContext {
@@ -126,6 +132,7 @@ export interface ChatMessage {
   text: string;
   time: string;
   voiceDurationMs?: number;
+  attachment?: Attachment;
   flowStep?: FlowStep;
   completed?: boolean;
   interactive?: BusinessInteractive;

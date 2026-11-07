@@ -25,9 +25,11 @@ export function StepTiming({
             label={
               step.type !== 'user'
                 ? t('editor.replyDelay')
-                : step.voiceDurationSeconds === undefined
-                  ? t('editor.typingDelay')
-                  : t('editor.recordingDelay')
+                : step.media
+                  ? t('attachments.delay')
+                  : step.voiceDurationSeconds === undefined
+                    ? t('editor.typingDelay')
+                    : t('editor.recordingDelay')
             }
             type="number"
             min={0}

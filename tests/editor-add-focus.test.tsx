@@ -31,7 +31,7 @@ it.each([
   ['＋ Flow', 'flow'],
 ] as const)('adiciona %s no final e foca o campo de texto', async (label, type) => {
   const project = createDefaultProject();
-  project.contact.avatar = '';
+
   const originalIds = project.steps.map((step) => step.id);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
   render(<App />);

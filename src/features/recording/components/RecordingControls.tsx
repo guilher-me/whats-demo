@@ -8,9 +8,11 @@ import { RecordingDialogs } from './RecordingDialogs';
 export function RecordingControls({
   controller: recording,
   disabled,
+  autoDisabled = false,
 }: {
   controller: RecordingController;
   disabled: boolean;
+  autoDisabled?: boolean;
 }) {
   const t = useT();
 
@@ -70,7 +72,12 @@ export function RecordingControls({
               ? t('recording.finishing')
               : ''}
       </span>
-      <RecordingDialogs open={open} onOpenChange={setOpen} controller={recording} />
+      <RecordingDialogs
+        open={open}
+        onOpenChange={setOpen}
+        controller={recording}
+        autoDisabled={autoDisabled}
+      />
     </>
   );
 }

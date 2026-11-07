@@ -25,6 +25,7 @@ export function ConversationOverview({
             <MessageBubble
               key={message.id}
               message={message}
+              phoneRef={phoneRef}
               running={false}
               pendingId={null}
               onOpen={noAction}

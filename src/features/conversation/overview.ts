@@ -10,6 +10,7 @@ import type {
 } from '../../core/types';
 import { advance, createSession, getComponents } from '../flows/model';
 import { t } from '../../i18n';
+import { stepAttachment } from '../../core/attachments';
 
 function answerText(field: FlowComponent, value: Value, session: FlowSession): string {
   if (['RadioButtonsGroup', 'CheckboxGroup', 'Dropdown'].includes(field.type)) {
@@ -71,7 +72,8 @@ export function conversationOverviewMessages(project: Project): ChatMessage[] {
     const message: ChatMessage = {
       id: `overview:${index}:message`,
       direction: step.type === 'user' ? 'user' : 'business',
-      text: step.text,
+      text: step.type !== 'flow' && step.media ? (step.media.caption ?? '') : step.text,
+      attachment: stepAttachment(step, project.attachments ?? []),
       time: '12:00',
       ...(step.type === 'user' && step.voiceDurationSeconds !== undefined
         ? { voiceDurationMs: step.voiceDurationSeconds * 1000 }

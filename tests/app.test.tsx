@@ -27,7 +27,7 @@ async function tick(ms: number) {
 describe('editor e reprodução React', () => {
   it('completes the Luma Home showcase with buttons, a list and the two-screen Flow', async () => {
     const project = createLumaProject();
-    project.contact.avatar = '';
+
     project.steps.forEach((step) => (step.delay = 0));
     localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
     await start();
@@ -46,9 +46,9 @@ describe('editor e reprodução React', () => {
     expect(messages.at(-1)?.text).toContain('LH-1042');
     expect(document.querySelector('.bubble strong')).toBeInTheDocument();
   }, 10000);
-  it('Só celular inicia o modo manual a partir da prévia de edição e permite responder', async () => {
+  it('inicia o modo manual a partir da prévia de edição e permite responder', async () => {
     const project = createDefaultProject();
-    project.contact.avatar = '';
+
     project.steps = [
       { id: 'user', type: 'user', text: 'oi', delay: 0 },
       { id: 'reply', type: 'business', text: 'Olá, podemos ajudar?', delay: 0 },
@@ -56,23 +56,20 @@ describe('editor e reprodução React', () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
     await start();
     fireEvent.click(screen.getByRole('article', { name: 'Etapa 1' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Só celular ↗' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Iniciar manual' }));
     await tick(1);
-    expect(document.querySelector('.focus-mode')).toBeInTheDocument();
     expect(window.whatsappFakeFlows!.getState().running).toBe(true);
     expect(document.querySelector('.bubble.user')).toBeNull();
     fireEvent.change(screen.getByLabelText('Mensagem'), { target: { value: 'oi' } });
     fireEvent.click(screen.getByRole('button', { name: 'Enviar mensagem' }));
     await tick(1);
     expect(document.querySelector('.messages')).toHaveTextContent('Olá, podemos ajudar?');
-    fireEvent.keyDown(window, { key: 'Escape' });
-    expect(document.querySelector('.focus-mode')).toBeNull();
   });
   it.each(['Iniciar manual', 'Reproduzir automaticamente'])(
-    'Só celular preserva a jornada em andamento: %s',
+    'recolher Código e Editor preserva a jornada em andamento: %s',
     async (mode) => {
       const project = createDefaultProject();
-      project.contact.avatar = '';
+
       project.steps = [
         { id: 'hello', type: 'business', text: 'Mensagem inicial', delay: 0 },
         { id: 'user', type: 'user', text: 'oi', delay: 30 },
@@ -83,12 +80,12 @@ describe('editor e reprodução React', () => {
       await tick(1);
       const messages = window.whatsappFakeFlows!.getState().messages;
       expect(messages).toHaveLength(1);
-      fireEvent.click(screen.getByRole('button', { name: 'Só celular ↗' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Recolher Código' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Recolher Editor' }));
       await tick(1);
-      expect(document.querySelector('.focus-mode')).toBeInTheDocument();
       expect(window.whatsappFakeFlows!.getState().messages).toEqual(messages);
       expect(window.whatsappFakeFlows!.getState().running).toBe(true);
-      fireEvent.click(screen.getByRole('button', { name: 'Sair da visualização · Esc' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Expandir Editor' }));
       expect(window.whatsappFakeFlows!.getState().running).toBe(true);
     },
   );
@@ -103,7 +100,7 @@ describe('editor e reprodução React', () => {
   });
   it('não perde a mensagem manual durante o delay inicial e completa os dois Flows', async () => {
     const project = createDefaultProject();
-    project.contact.avatar = '';
+
     project.steps.forEach((s) => (s.delay = s.type === 'user' ? 5 : 0));
     localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
     await start();
@@ -137,7 +134,7 @@ describe('editor e reprodução React', () => {
   });
   it('informa componente não suportado sem quebrar a interface', async () => {
     const p = createDefaultProject();
-    p.contact.avatar = '';
+
     p.steps = [p.steps[1]];
     p.steps[0].delay = 0;
     if (p.steps[0].type === 'flow')
@@ -152,7 +149,7 @@ describe('editor e reprodução React', () => {
   });
   it('cancela e reinicia sem mensagens atrasadas', async () => {
     const project = createDefaultProject();
-    project.contact.avatar = '';
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
     await start();
     fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
@@ -165,7 +162,7 @@ describe('editor e reprodução React', () => {
   });
   it('executa a animação automática completa', async () => {
     const p = createDefaultProject();
-    p.contact.avatar = '';
+
     p.steps.forEach((s) => (s.delay = 0));
     localStorage.setItem(STORAGE_KEY, JSON.stringify(p));
     await start();

@@ -34,7 +34,7 @@ afterEach(() => {
 async function start() {
   const project = {
     version: 1,
-    contact: { name: 'Empresa teste', avatar: '', verified: false },
+    contact: { name: 'Empresa teste', verified: false },
     steps: [{ id: 'hello', type: 'user', text: 'oi', delay: 0 }],
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(project));

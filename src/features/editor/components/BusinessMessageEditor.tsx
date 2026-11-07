@@ -1,6 +1,6 @@
 import { buttonLabel, isReplyButton } from '../../../core/message-buttons';
 import { useT } from '../../../i18n';
-import type { BusinessInteractive, MessageStep } from '../../../core/types';
+import type { Attachment, BusinessInteractive, MessageStep } from '../../../core/types';
 import { createInteractive, businessMessageError, messageOptions } from '../../../core/interactive';
 import { TextField, FieldError } from '../../../components/ui/Field';
 import { MessageTextEditor } from './MessageTextEditor';
@@ -9,12 +9,17 @@ import { ReplyButtonsEditor } from './ReplyButtonsEditor';
 import { ListMessageEditor } from './ListMessageEditor';
 import { MessageFormatPicker } from './MessageFormatPicker';
 import { FormSection } from '../../../components/ui/FormSection';
+import { MessageAttachmentEditor } from './MessageAttachmentEditor';
 export function BusinessMessageEditor({
   step,
   onChange,
+  attachment,
+  onChooseAttachment,
 }: {
   step: MessageStep;
   onChange: (change: Partial<MessageStep>) => void;
+  attachment?: Attachment;
+  onChooseAttachment: (alternative?: boolean) => void;
 }) {
   const t = useT();
 
@@ -35,19 +40,30 @@ export function BusinessMessageEditor({
   return (
     <>
       <MessageFormatPicker
-        value={value?.kind ?? 'text'}
+        value={step.media?.kind ?? value?.kind ?? 'text'}
         onChange={(format) =>
           onChange({
-            interactive: format === 'text' ? undefined : createInteractive(format),
+            interactive:
+              format === 'buttons' || format === 'list' ? createInteractive(format) : undefined,
+            media: format === 'image' || format === 'document' ? { kind: format } : undefined,
           })
         }
       />
-      <MessageTextEditor
-        label={t('editor.messageText')}
-        value={step.text}
-        maxLength={value ? 1024 : undefined}
-        onChange={(text) => onChange({ text })}
-      />
+      {step.media ? (
+        <MessageAttachmentEditor
+          step={step}
+          onChange={onChange}
+          attachment={attachment}
+          onChoose={onChooseAttachment}
+        />
+      ) : (
+        <MessageTextEditor
+          label={t('editor.messageText')}
+          value={step.text}
+          maxLength={value ? 1024 : undefined}
+          onChange={(text) => onChange({ text })}
+        />
+      )}
       {value && (
         <>
           {value.kind === 'buttons' ? (

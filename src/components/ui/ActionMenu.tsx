@@ -14,9 +14,13 @@ export function ActionMenu({
   label,
   items,
   icon = 'more',
+  disabled,
+  showLabel = false,
 }: {
   label: string;
   items: MenuAction[];
+  disabled?: boolean;
+  showLabel?: boolean;
   icon?: ComponentProps<typeof ControlIcon>['name'];
 }) {
   return (
@@ -24,12 +28,14 @@ export function ActionMenu({
       <Menu.Trigger asChild>
         <button
           type="button"
-          className="ui-icon-button"
+          className={showLabel ? 'button button--primary button-with-icon' : 'ui-icon-button'}
           data-editor-action
+          disabled={disabled}
           aria-label={label}
           title={label}
         >
           <ControlIcon name={icon} />
+          {showLabel && <span>{label}</span>}
         </button>
       </Menu.Trigger>
       <Menu.Portal>

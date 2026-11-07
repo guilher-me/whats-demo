@@ -1,4 +1,4 @@
-import { useT } from '../../../i18n';
+import { useT, type MessageKey } from '../../../i18n';
 import { useId, type ReactNode } from 'react';
 import {
   DndContext,
@@ -22,10 +22,12 @@ import type { MessageOption } from '../../../core/types';
 function SortableOption({
   option,
   index,
+  handleLabel,
   children,
 }: {
   option: MessageOption;
   index: number;
+  handleLabel: MessageKey;
   children: (handle: ReactNode) => ReactNode;
 }) {
   const t = useT();
@@ -39,7 +41,7 @@ function SortableOption({
     transition,
     isDragging,
   } = useSortable({ id: option.id });
-  const label = t('dnd.handle', { v0: index + 1, v1: option.title || t('common.untitled') });
+  const label = t(handleLabel, { v0: index + 1, v1: option.title || t('common.untitled') });
   return (
     <div
       ref={setNodeRef}
@@ -71,10 +73,12 @@ function SortableOption({
 export function SortableOptions<T extends MessageOption>({
   options,
   onChange,
+  handleLabel = 'dnd.handle',
   children,
 }: {
   options: T[];
   onChange: (options: T[]) => void;
+  handleLabel?: MessageKey;
   children: (option: T, index: number, handle: ReactNode) => ReactNode;
 }) {
   const t = useT();
@@ -119,7 +123,7 @@ export function SortableOptions<T extends MessageOption>({
       >
         <div className="sortable-options">
           {options.map((option, index) => (
-            <SortableOption key={option.id} option={option} index={index}>
+            <SortableOption key={option.id} option={option} index={index} handleLabel={handleLabel}>
               {(handle) => children(option, index, handle)}
             </SortableOption>
           ))}
