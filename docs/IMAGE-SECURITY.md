@@ -16,7 +16,9 @@ The exact bundled Luma Home and legacy Prevent Senior assets are trusted applica
 
 ## Limits of this protection
 
-Conversation images and optional simulated-document covers use the same rasterization pipeline. The attachment library contains reprocessed PNGs and simulated document metadata. Imports, saved attachment libraries and asynchronous automation loads validate and process the library before exposing it to the UI. The limits are 50 attachment items per conversation and 8 MiB for the exported JSON. Attachment images accept embedded raster data and use the regular image decoder, with avatar-specific built-in aliases handled separately.
+Conversation images and simulated-document covers use the same rasterization pipeline. A local upload may be up to 12 MiB, 8192 pixels per edge and 32 million pixels. The browser creates a static WebP at up to 512 pixels per edge, with PNG as the encoder fallback. Only the reprocessed image enters the attachment library. Embedded images retain the stricter 2 MiB, 4096-pixel edge and 8-million-pixel input limits.
+
+Imports, saved attachment libraries and asynchronous automation loads validate and process the library before exposing it to the UI. The limits are 50 attachment items per conversation and 8 MiB for the exported JSON. Avatar-specific built-in aliases are handled separately.
 
 Rewriting reduces the attack surface and still relies on the browser decoder processing untrusted input. Keep browsers and dependencies updated and preserve limits before decoding. Render processed images through image elements. The image limits apply to contact photos, attachment images and document covers.
 

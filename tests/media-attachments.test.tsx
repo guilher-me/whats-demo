@@ -177,6 +177,59 @@ it('creates a simulated document in a business node and shows its usage in the l
   expect(screen.getByText(/Usado nas etapas 1/)).toBeVisible();
 });
 
+it('shows upload limits, rejects oversized inputs and stores a large photo as compact WebP', async () => {
+  render(<App />);
+  fireEvent.click(button('Adicionar anexo'));
+  fireEvent.click(sheet().getByRole('button', { name: 'Carregar imagem' }));
+  expect(sheet().getByText(/12 MiB, 8192 px por lado e 32 megapixels/)).toBeVisible();
+  const choose = (file: File) => {
+    fireEvent.change(sheet().getByLabelText(/Arquivo de imagem/), { target: { files: [file] } });
+    fireEvent.submit(screen.getByRole('dialog').querySelector('form')!);
+  };
+  const oversized = new File([], 'pesada.png', { type: 'image/png' });
+  const readOversized = vi.fn();
+  Object.defineProperties(oversized, {
+    size: { value: 13 * 1024 * 1024 },
+    arrayBuffer: { value: readOversized },
+  });
+  choose(oversized);
+  expect(await sheet().findByRole('alert')).toHaveTextContent(/13 MiB.*12 MiB/);
+  expect(readOversized).not.toHaveBeenCalled();
+
+  const pngWithDimensions = (width: number, height: number) => {
+    const bytes = new Uint8Array(3 * 1024 * 1024);
+    bytes.set(Uint8Array.from(atob(PNG.split(',')[1]), (char) => char.charCodeAt(0)));
+    const header = new DataView(bytes.buffer);
+    header.setUint32(16, width);
+    header.setUint32(20, height);
+    const file = new File([], 'foto.png', { type: 'image/png' });
+    Object.defineProperties(file, {
+      size: { value: bytes.length },
+      arrayBuffer: { value: async () => bytes.buffer },
+    });
+    return file;
+  };
+  choose(pngWithDimensions(8192, 8192));
+  expect(await sheet().findByRole('alert')).toHaveTextContent(/8192 × 8192 px.*32 megapixels/);
+  expect(createImageBitmap).not.toHaveBeenCalled();
+
+  const webp =
+    'data:image/webp;base64,UklGRjgAAABXRUJQVlA4ICwAAADQAQCdASoBAAEAAgA0JaACdLoB+AADsAD+8Oj3/yC5YXXI1/5sCua5+agAAA==';
+  vi.mocked(HTMLCanvasElement.prototype.toDataURL).mockReturnValue(webp);
+  vi.mocked(createImageBitmap).mockResolvedValue({
+    width: 4601,
+    height: 6662,
+    close: vi.fn(),
+  } as unknown as ImageBitmap);
+  choose(pngWithDimensions(4601, 6662));
+  await waitFor(() => expect(api().getProject().attachments?.[0]).toMatchObject({ source: webp }));
+  expect(HTMLCanvasElement.prototype.toDataURL).toHaveBeenCalledWith('image/webp', 0.78);
+  const doc = api().getDocument();
+  const asset = doc.resources.attachments?.[0].assetId;
+  expect(doc.resources.assets[asset]).toMatchObject({ mimeType: 'image/webp' });
+  expect(exportDocument(await prepareDocument(doc))).toEqual(doc);
+});
+
 it('stores a raster once, preserves per-step captions and rejects invalid media references', async () => {
   const p = project();
   p.steps.push({

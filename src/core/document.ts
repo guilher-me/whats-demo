@@ -77,10 +77,10 @@ export function exportDocument(project: Project): ExperienceDocument {
     const storeImage = (source: string, id: string) => {
       const existing = images.get(source);
       if (existing) return existing;
-      const match = /^data:image\/png;base64,([A-Za-z0-9+/]+=*)$/.exec(source);
+      const match = /^data:(image\/(?:png|webp));base64,([A-Za-z0-9+/]+=*)$/.exec(source);
       if (!match) return fail();
       const assetId = `attachment-${id}`;
-      resources.assets[assetId] = { mimeType: 'image/png', encoding: 'base64', data: match[1] };
+      resources.assets[assetId] = { mimeType: match[1], encoding: 'base64', data: match[2] };
       images.set(source, assetId);
       return assetId;
     };

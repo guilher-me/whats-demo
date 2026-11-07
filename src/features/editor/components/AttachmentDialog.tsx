@@ -1,13 +1,18 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { useT } from '../../../i18n';
+import { i18n, useT } from '../../../i18n';
 import type { Attachment, AttachmentKind } from '../../../core/types';
 import {
   MAX_ATTACHMENT_NAME,
   MAX_ATTACHMENTS,
   MAX_DOCUMENT_SIZE_LABEL,
 } from '../../../core/attachments';
-import { IMAGE_ACCEPT } from '../../../core/images/policy';
-import { sanitizePhotoFile } from '../../../core/images/sanitize';
+import {
+  ATTACHMENT_UPLOAD_LIMITS,
+  IMAGE_ACCEPT,
+  IMAGE_LIMITS,
+  InvalidImageError,
+} from '../../../core/images/policy';
+import { optimizeAttachmentFile } from '../../../core/images/sanitize';
 import { uid } from '../../../core/project';
 import { Dialog } from '../../../components/ui/Dialog';
 import { Button } from '../../../components/ui/Button';
@@ -32,6 +37,13 @@ export function AttachmentDialog({
   onCreate: (item: Attachment) => void;
 }) {
   const t = useT();
+  const MiB = 1024 * 1024;
+  const limits = {
+    maxMiB: ATTACHMENT_UPLOAD_LIMITS.bytes / MiB,
+    maxEdge: ATTACHMENT_UPLOAD_LIMITS.edge,
+    maxMP: ATTACHMENT_UPLOAD_LIMITS.pixels / 1_000_000,
+    outputEdge: IMAGE_LIMITS.outputEdge,
+  };
   const [mode, setMode] = useState<AttachmentKind | undefined>();
   const [name, setName] = useState('');
   const [sizeLabel, setSizeLabel] = useState('');
@@ -54,11 +66,22 @@ export function AttachmentDialog({
     setError('');
     let source: string | undefined;
     try {
-      if (file) source = await sanitizePhotoFile(file);
-    } catch {
-      if (attempt === request.current) {
-        setBusy(false);
-        setError(t('attachments.invalidImage', { v0: file?.name }));
+      if (file) source = await optimizeAttachmentFile(file);
+    } catch (failure) {
+      if (attempt !== request.current) return;
+      setBusy(false);
+      const v0 = file?.name;
+      if (failure instanceof InvalidImageError && failure.reason === 'size' && file) {
+        const size = new Intl.NumberFormat(i18n.resolvedLanguage, { maximumFractionDigits: 1 });
+        setError(
+          t('attachments.imageTooLarge', { v0, size: size.format(file.size / MiB), ...limits }),
+        );
+      } else if (failure instanceof InvalidImageError && failure.reason === 'dimensions') {
+        setError(t('attachments.imageTooManyPixels', { v0, ...failure.dimensions, ...limits }));
+      } else if (failure instanceof InvalidImageError && failure.reason === 'format') {
+        setError(t('attachments.imageFormat', { v0 }));
+      } else {
+        setError(t('attachments.imageDecode', { v0 }));
       }
       return;
     }
@@ -96,12 +119,18 @@ export function AttachmentDialog({
             label={t(mode === 'image' ? 'attachments.imageFile' : 'attachments.cover')}
             type="file"
             accept={IMAGE_ACCEPT}
+            hint={t('attachments.imageUploadHint', limits)}
             required={mode === 'image'}
             disabled={busy}
             onChange={(event) => {
               const selected = event.currentTarget.files?.[0];
               setFile(selected);
-              if (mode === 'image' && selected && !name)
+              setError('');
+              if (
+                mode === 'image' &&
+                selected &&
+                (!name || name === file?.name.slice(0, MAX_ATTACHMENT_NAME))
+              )
                 setName(selected.name.slice(0, MAX_ATTACHMENT_NAME));
             }}
           />
