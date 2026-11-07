@@ -9,32 +9,48 @@ import { FlowSheet } from '../../flows/components/FlowSheet';
 import { useFlowSession } from '../../flows/hooks/useFlowSession';
 import { advance, createSession, goBack } from '../../flows/model';
 
+export interface FlowPreviewRequest {
+  stepId: string;
+  screenId?: string;
+}
+
 /** Isolated draft preview: reuse actual renderers without running or modifying the journey. */
 export function MessagePreview({
   contact,
   step,
   phoneRef,
   attachment,
+  flowPreview,
 }: {
   contact: Contact;
   step: Step;
   phoneRef: RefObject<HTMLDivElement | null>;
   attachment?: Attachment;
+  flowPreview?: FlowPreviewRequest;
 }) {
   const t = useT();
 
   const [listOpen, setListOpen] = useState(false),
     [selected, setSelected] = useState(''),
-    [flowError, setFlowError] = useState('');
+    [flowError, setFlowError] = useState(''),
+    [completed, setCompleted] = useState(false);
   const flow = useFlowSession();
   const interactive = step.type === 'business' ? step.interactive : undefined;
   const selection =
     interactive && messageOptions(interactive).some((o) => o.id === selected) ? selected : '';
   const definition = step.type === 'flow' ? step.flow : null;
   useEffect(() => {
-    flow.set(null);
+    setCompleted(false);
     setFlowError('');
-  }, [definition, flow.set]);
+    try {
+      flow.set(
+        step.type === 'flow' && flowPreview ? createSession(step, flowPreview.screenId) : null,
+      );
+    } catch (error) {
+      flow.set(null);
+      setFlowError((error as Error).message);
+    }
+  }, [definition, flowPreview, flow.set]);
   const message: ChatMessage = {
     id: step.id,
     direction: step.type === 'user' ? 'user' : 'business',
@@ -61,13 +77,20 @@ export function MessagePreview({
             onReply={(_, id) => setSelected(id)}
             onList={() => setListOpen(true)}
             onOpen={(value) => {
+              setCompleted(false);
               flow.set(createSession(value));
               setFlowError('');
             }}
           />
         </div>
       </div>
-      <div className="draft-preview-note">{t('phone.draftNote')}</div>
+      <div className="draft-preview-note" role="status">
+        {completed
+          ? t('builder.testCompleted')
+          : !flow.session && flowError
+            ? flowError
+            : t('phone.draftNote')}
+      </div>
       {listOpen && interactive?.kind === 'list' && (
         <ListPicker
           message={interactive}
@@ -95,6 +118,7 @@ export function MessagePreview({
               if (!flow.current.current) return;
               const result = advance(flow.current.current);
               flow.set(result.session ?? null);
+              setCompleted(!result.session);
               setFlowError('');
             } catch (error) {
               setFlowError((error as Error).message);

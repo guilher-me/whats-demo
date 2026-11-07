@@ -30,6 +30,10 @@ Estilos globais e tokens ficam em `styles/base.css` e `styles/tokens.css`. Edito
 
 `Workbench` organiza Código, Editor e Preview e mantém os três componentes montados ao recolher. Os divisores redistribuem largura no desktop e altura em telas estreitas. Código mantém o texto pendente separado do projeto e aplica uma substituição validada ao editor. O diagnóstico de Flow usa o módulo local `flowso/validator` e as capacidades do simulador. A API de automação e o painel Código compartilham o mesmo diagnóstico.
 
+## Construtor de Flows
+
+As abas Visual e JSON editam a definição confirmada em `step.flow`. O rascunho pendente permanece na etapa até validar ou ser descartado. O catálogo do Flowso identifica os componentes disponíveis por versão, e a validação da jornada separa erros de definição, limites do simulador e respostas automáticas. O Preview usa o mesmo renderer e mantém uma sessão de teste isolada da reprodução da conversa.
+
 ## Persistência e evolução
 
 O editor usa a chave `whatsdemo-document-alpha1` do localStorage, com sufixos para desenvolvimento e cópias abertas por link. O projeto mantém `version: 1`. A recuperação de projetos antigos mantém os textos e as referências a anexos, descartando imagens reais e avatares personalizados.

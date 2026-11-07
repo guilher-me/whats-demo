@@ -9,12 +9,16 @@ import {
 } from '../../core/engine';
 import { clone } from '../../core/project';
 import type { FlowSession, FlowStep, Values } from '../../core/types';
-export function createSession(step: FlowStep): FlowSession {
+export function createSession(step: FlowStep, screenId?: string): FlowSession {
   validateFlow(step.flow);
+  const index = Math.max(
+    0,
+    step.flow.screens.findIndex((screen) => screen.id === screenId),
+  );
   return {
     step,
-    index: 0,
-    data: initialData(step.flow.screens[0]),
+    index,
+    data: initialData(step.flow.screens[index]),
     form: {},
     history: [],
     visible: true,

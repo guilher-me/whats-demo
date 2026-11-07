@@ -26,6 +26,7 @@ export interface FlowComponent {
   'helper-text'?: string;
   'min-chars'?: number;
   'max-chars'?: number;
+  'max-length'?: number;
   'min-selected-items'?: number;
   pattern?: string;
   'on-click-action'?: FlowAction;

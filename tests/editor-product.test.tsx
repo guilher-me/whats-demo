@@ -70,6 +70,7 @@ it('expands one step at a time, collapses it and preserves the project', async (
 it('keeps an invalid Flow draft and its validation when the step is collapsed', async () => {
   await start();
   fireEvent.click(screen.getByRole('button', { name: 'Editar etapa 3' }));
+  fireEvent.click(screen.getByRole('tab', { name: 'JSON' }));
   fireEvent.change(screen.getByLabelText('Flow JSON'), { target: { value: '{broken' } });
   expect(screen.getByRole('button', { name: 'Iniciar manual' })).toBeDisabled();
   fireEvent.click(screen.getByRole('button', { name: 'Editar etapa 1' }));

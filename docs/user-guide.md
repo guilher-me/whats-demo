@@ -48,7 +48,9 @@ Image captions belong to the message. The same preview can appear in several ste
 
 A Flow step combines a business invitation, an opening button, a Flow JSON definition, automatic answers and an optional customer completion message.
 
-- **Form structure** contains the advanced JSON editor. The renderer supports a subset of WhatsApp Flow components, including screen navigation and conditional fields.
+- **Form structure** opens on **Visual**. Select a screen to see it in the phone. Add or reorder components, then set the final button to **Next screen** or **Complete**. Connect a new screen by selecting it as the destination of an earlier screen's button.
+- **JSON** edits just the Flow definition. Valid edits update Visual and Preview immediately. Invalid edits stay in the step as a draft while the phone shows the previous valid version. Edit conditions, bindings and payloads in JSON.
+- **Test Flow** opens the first screen in the phone. Navigate, go back, complete and restart with test values kept in the preview session.
 - **Automatic answers** tell automatic playback what to enter and select.
 - In manual mode, open the invitation and fill the form yourself. Required fields must be completed before moving on.
 

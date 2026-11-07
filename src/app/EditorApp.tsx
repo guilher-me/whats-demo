@@ -16,7 +16,10 @@ import { Dialog } from '../components/ui/Dialog';
 import { businessMessageError } from '../core/interactive';
 import { createDefaultProject } from '../core/defaults';
 import { useAutomationAPI } from '../features/automation/useAutomationAPI';
-import { MessagePreview } from '../features/conversation/components/MessagePreview';
+import {
+  MessagePreview,
+  type FlowPreviewRequest,
+} from '../features/conversation/components/MessagePreview';
 import { createStep } from '../core/project';
 import { flushSync } from 'react-dom';
 import { useRecording } from '../features/recording/useRecording';
@@ -36,6 +39,7 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
   const [invalid, setInvalid] = useState<Record<string, boolean>>({}),
     [focusMode, setFocusMode] = useState(false),
     [selectedId, setSelectedId] = useState<string | null>(null),
+    [flowPreview, setFlowPreview] = useState<FlowPreviewRequest>(),
     [showOverview, setShowOverview] = useState(false),
     [restoreOpen, setRestoreOpen] = useState(false),
     [collapsed, setCollapsed] = useState<Partial<Record<Panel, boolean>>>({});
@@ -53,6 +57,7 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
   const selectStep = (id: string | null) => {
     setShowOverview(false);
     setSelectedId(id);
+    setFlowPreview((current) => (current?.stepId === id ? current : undefined));
   };
   const onValidity = useCallback(
     (id: string, valid: boolean) =>
@@ -205,6 +210,19 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
       onRestore={() => setRestoreOpen(true)}
       restoreLabel={restoreLabel}
       onValidity={onValidity}
+      onFlowPreview={(stepId, screenId) => {
+        edit(() => {
+          selectStep(stepId);
+          setFlowPreview({ stepId, screenId });
+          if (!screenId) {
+            setCollapsed((panels) => ({ ...panels, preview: false }));
+            if (window.matchMedia?.('(max-width: 959px)').matches)
+              window.requestAnimationFrame(() =>
+                phoneRef.current?.scrollIntoView?.({ block: 'nearest' }),
+              );
+          }
+        });
+      }}
       onAddAttachment={addAttachment}
     />
   );
@@ -215,11 +233,24 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
           <h2>{t('app.preview')}</h2>
           <p>{t('app.previewHint')}</p>
           {previewIssue && (
-            <p className="workspace-flow-issue" title={previewIssue.path}>
+            <p
+              className="workspace-flow-issue"
+              data-severity={previewIssue.severity}
+              title={previewIssue.path}
+            >
               {previewIssue.message}
             </p>
           )}
         </div>
+        {flowPreview?.stepId === selectedStep?.id && flowPreview && (
+          <Button
+            variant="ghost"
+            disabled={recorder.busy}
+            onClick={() => setFlowPreview({ ...flowPreview })}
+          >
+            {t('builder.restart')}
+          </Button>
+        )}
         <Button
           variant="ghost"
           disabled={recorder.busy || hasErrors || !editor.project.steps.length}
@@ -248,6 +279,7 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
               contact={editor.project.contact}
               step={selectedStep}
               phoneRef={phoneRef}
+              flowPreview={flowPreview?.stepId === selectedStep.id ? flowPreview : undefined}
               attachment={stepAttachment(selectedStep, attachments)}
             />
           </>
@@ -297,6 +329,7 @@ export function EditorApp({ copy }: { copy?: SharedCopy }) {
                 aria-pressed={showOverview}
                 onClick={() => {
                   setSelectedId(null);
+                  setFlowPreview(undefined);
                   setShowOverview(true);
                 }}
               >

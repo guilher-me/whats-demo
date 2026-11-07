@@ -160,7 +160,8 @@ export function validateField(c: FlowComponent, value: Value): string {
   if (typeof value === 'string') {
     if (c['min-chars'] && value.length < c['min-chars'])
       return t('errors.minChars', { v0: label, v1: c['min-chars'] });
-    if (c['max-chars'] && value.length > c['max-chars']) return t('errors.maxChars', { v0: label });
+    const max = c.type === 'TextArea' ? (c['max-length'] ?? c['max-chars']) : c['max-chars'];
+    if (max && value.length > max) return t('errors.maxChars', { v0: label });
     if (c['input-type'] === 'number' && !/^\d+$/.test(value))
       return t('errors.numbers', { v0: label });
     if (c['input-type'] === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
