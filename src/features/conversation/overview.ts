@@ -73,6 +73,9 @@ export function conversationOverviewMessages(project: Project): ChatMessage[] {
       direction: step.type === 'user' ? 'user' : 'business',
       text: step.text,
       time: '12:00',
+      ...(step.type === 'user' && step.voiceDurationSeconds !== undefined
+        ? { voiceDurationMs: step.voiceDurationSeconds * 1000 }
+        : {}),
       flowStep: step.type === 'flow' ? step : undefined,
       interactive: step.type === 'business' ? step.interactive : undefined,
     };

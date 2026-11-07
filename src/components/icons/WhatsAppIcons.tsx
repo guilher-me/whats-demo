@@ -5,10 +5,26 @@ const Base = ({ children, ...props }: Props) => (
     {children}
   </svg>
 );
-export function AddIcon(props: Props) {
+// Android composer symbols based on the WhatsApp Help Center illustrations.
+export function AttachmentIcon(props: Props) {
   return (
     <Base {...props}>
-      <path d="M11 13H6a1 1 0 0 1 0-2h5V6a1 1 0 0 1 2 0v5h5a1 1 0 0 1 0 2h-5v5a1 1 0 0 1-2 0v-5Z" />
+      <path
+        d="M17.5 6.8v10.3a5.5 5.5 0 0 1-11 0V6.8a3.7 3.7 0 0 1 7.4 0v9.5a1.8 1.8 0 0 1-3.6 0V7.1"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+    </Base>
+  );
+}
+export function CameraIcon(props: Props) {
+  return (
+    <Base {...props}>
+      <path
+        fillRule="evenodd"
+        d="M8.3 5 10 3.4h4L15.7 5H20a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4.3ZM12 18a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11Zm0-1.7a3.8 3.8 0 1 0 0-7.6 3.8 3.8 0 0 0 0 7.6Z"
+      />
     </Base>
   );
 }
@@ -16,6 +32,20 @@ export function SendIcon(props: Props) {
   return (
     <Base {...props}>
       <path d="M4.4 19.43a.99.99 0 0 1-.95-.1.93.93 0 0 1-.45-.83V14l8-2-8-2V5.5c0-.37.15-.65.45-.84a1 1 0 0 1 .95-.09l15.4 6.5c.42.19.63.5.63.93 0 .43-.21.74-.63.93l-15.4 6.5Z" />
+    </Base>
+  );
+}
+export function MicrophoneIcon(props: Props) {
+  return (
+    <Base {...props}>
+      <rect x="9" y="2.2" width="6" height="12" rx="3" />
+      <path
+        d="M6 11.7a6 6 0 0 0 12 0M12 17.7v4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+      />
     </Base>
   );
 }
@@ -29,11 +59,12 @@ export function DeliveredIcon(props: Props) {
 export function SmileyIcon(props: Props) {
   return (
     <Base {...props}>
-      <path d="M8.5 10.25a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm8.5-1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
+      <circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <ellipse cx="9.3" cy="9.9" rx="1.3" ry="1.7" />
+      <ellipse cx="14.7" cy="9.9" rx="1.3" ry="1.7" />
       <path
         fillRule="evenodd"
-        clipRule="evenodd"
-        d="M16.82 19.98A6.97 6.97 0 0 1 12 22H9.27A7.27 7.27 0 0 1 2 14.73V9.27A7.27 7.27 0 0 1 9.27 2h5.46A7.27 7.27 0 0 1 22 9.27v2.54c0 1.94-.77 3.8-2.15 5.17l-3.03 3ZM14.72 4H9.28A5.27 5.27 0 0 0 4 9.27v5.46A5.27 5.27 0 0 0 9.27 20h2.06a.9.9 0 0 0 .68-.88l-.02-2.26v-.11a5.5 5.5 0 0 1-4.65-2.6.6.6 0 0 1 .03-.6c.12-.2.3-.3.53-.3h5.7a4.8 4.8 0 0 1 3.22-1.23l2.26.01c.5 0 .9-.4.9-.9V9.07H20A5.27 5.27 0 0 0 14.73 4Zm-.71 15.11c0 .15-.01.3-.04.44a4.96 4.96 0 0 0 1.44-.99l3.03-3c.46-.46.83-.99 1.09-1.56-.15.02-.3.03-.46.03h-2.26A2.8 2.8 0 0 0 14 16.84l.02 2.26Z"
+        d="M6.5 13a26.2 26.2 0 0 0 11 0c-.4 3-2.5 4.8-5.5 4.8S6.9 16 6.5 13Zm1.4 1.1c.8 1 2.1 1.5 4.1 1.5s3.3-.5 4.1-1.5a24 24 0 0 1-8.2 0Z"
       />
     </Base>
   );

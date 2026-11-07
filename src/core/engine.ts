@@ -1,6 +1,7 @@
 import { t } from '../i18n';
 import { isAllowedAvatar } from './images/policy';
 import { interactiveError } from './interactive';
+import { MAX_VOICE_SECONDS } from './voice-message';
 import type {
   ExpressionContext,
   FlowComponent,
@@ -199,6 +200,16 @@ export function validateProject(input: unknown, { allowDrafts = false } = {}): P
       step.delay > 120
     )
       throw new Error(t('errors.invalidStep'));
+    const voiceSeconds = step.voiceDurationSeconds;
+    if (
+      voiceSeconds !== undefined &&
+      (step.type !== 'user' ||
+        typeof voiceSeconds !== 'number' ||
+        !Number.isInteger(voiceSeconds) ||
+        voiceSeconds < 1 ||
+        voiceSeconds > MAX_VOICE_SECONDS)
+    )
+      throw new Error(t('errors.invalidVoiceDuration', { v0: MAX_VOICE_SECONDS }));
     if (step.type === 'flow') {
       validateFlow(step.flow);
       if (!isObject(step.answers)) throw new Error(t('errors.answers'));

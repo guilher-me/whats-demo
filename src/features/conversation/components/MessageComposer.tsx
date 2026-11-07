@@ -1,5 +1,6 @@
 import { useT } from '../../../i18n';
-import { AddIcon, SmileyIcon, SendIcon } from '../../../components/icons/WhatsAppIcons';
+import { MicrophoneIcon, SendIcon } from '../../../components/icons/WhatsAppIcons';
+import { ComposerField } from './ComposerField';
 export function MessageComposer({
   value,
   onChange,
@@ -12,6 +13,7 @@ export function MessageComposer({
   disabled?: boolean;
 }) {
   const t = useT();
+  const empty = !value.trim();
 
   return (
     <form
@@ -22,27 +24,26 @@ export function MessageComposer({
         if (!disabled && value.trim()) onSend();
       }}
     >
-      <div className="composer-icons" aria-hidden="true">
-        <AddIcon />
-        <SmileyIcon />
-      </div>
-      <input
-        data-composer-input
-        aria-label={t('phone.message')}
-        placeholder={t('phone.message')}
-        maxLength={2000}
-        autoComplete="off"
-        disabled={disabled}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      />
+      <ComposerField empty={empty}>
+        <input
+          data-composer-input
+          aria-label={t('phone.message')}
+          placeholder={t('phone.message')}
+          maxLength={2000}
+          autoComplete="off"
+          disabled={disabled}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      </ComposerField>
       <button
         type="submit"
         data-send
+        className="composer-action"
         aria-label={t('phone.send')}
-        disabled={disabled || !value.trim()}
+        disabled={disabled || empty}
       >
-        <SendIcon />
+        {empty ? <MicrophoneIcon /> : <SendIcon />}
       </button>
     </form>
   );

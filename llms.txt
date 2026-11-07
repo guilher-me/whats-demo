@@ -1,6 +1,6 @@
 # WhatsDemo
 
-> Local WhatsApp conversation and Flows simulator. Build and preview linear journeys with user messages, business text, reply buttons, sectioned lists and WhatsApp Flow forms. No messages are sent to WhatsApp; no backend or database is required.
+> Local WhatsApp conversation and Flows simulator. Build and preview linear journeys with customer text and simulated voice messages, business text, reply buttons, sectioned lists and WhatsApp Flow forms. No messages are sent to WhatsApp; no backend or database is required.
 
 Use `window.whatsappFakeFlows` (apiVersion 1) when your tool permits JavaScript execution in the page. Read `getState().ready` before modifying the project. Read the current project first, build a JSON-compatible project, call `validateProject`, then `loadProject`. Use `createShareURL` to return a portable experience URL and `play('automatic')` to preview it. Do not edit React internals, generated HTML or localStorage directly.
 

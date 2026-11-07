@@ -12,7 +12,11 @@ export interface CursorState {
 export function useCursor(phone: RefObject<HTMLDivElement | null>, wait: typeof delay = delay) {
   const [cursor, setCursor] = useState<CursorState>({ x: 0, y: 0, visible: false, pressed: false });
   const hide = () => setCursor((c) => ({ ...c, visible: false, pressed: false }));
-  const touch = async (element: HTMLElement | null, signal: AbortSignal, action?: () => void) => {
+  const press = async (
+    element: HTMLElement | null,
+    signal: AbortSignal,
+    action: () => Promise<void>,
+  ) => {
     if (!element || !phone.current) throw new Error(t('errors.cursor'));
     element.scrollIntoView?.({ block: 'nearest' });
     const bounds = phone.current.getBoundingClientRect(),
@@ -30,11 +34,15 @@ export function useCursor(phone: RefObject<HTMLDivElement | null>, wait: typeof 
     }));
     await wait(380, signal);
     setCursor((c) => ({ ...c, pressed: true }));
-    await wait(100, signal);
-    action?.();
+    await action();
     setCursor((c) => ({ ...c, pressed: false }));
     await wait(300, signal);
   };
+  const touch = (element: HTMLElement | null, signal: AbortSignal, action?: () => void) =>
+    press(element, signal, async () => {
+      await wait(100, signal);
+      action?.();
+    });
   const type = async (
     element: HTMLElement | null,
     text: string,
@@ -59,5 +67,5 @@ export function useCursor(phone: RefObject<HTMLDivElement | null>, wait: typeof 
   };
   // Reading is a pause for the person, not an instruction to move the mouse.
   const read = (text: string, signal: AbortSignal) => wait(readingDuration(text), signal);
-  return { cursor, touch, type, read, hide };
+  return { cursor, touch, press, type, read, hide };
 }
