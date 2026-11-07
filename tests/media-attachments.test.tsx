@@ -91,15 +91,31 @@ it('lets the manual customer choose any visible photo, keeps the gallery and sho
   vi.useFakeTimers();
   fireEvent.click(button('Anexar'));
   fireEvent.click(sheet().getByRole('button', { name: 'Galeria' }));
+  expect(screen.getByRole('dialog', { name: 'Recentes' })).toBeVisible();
   expect(sheet().getAllByRole('button', { name: /Foto [ABC]/ })).toHaveLength(3);
-  fireEvent.click(sheet().getByRole('button', { name: 'Foto B' }));
+  expect(sheet().queryByLabelText('Legenda (opcional)')).toBeNull();
+  const photoB = sheet().getByRole('button', { name: 'Foto B' });
+  fireEvent.click(photoB);
+  expect(photoB).toHaveAttribute('aria-pressed', 'true');
+  fireEvent.click(photoB);
+  expect(photoB).toHaveAttribute('aria-pressed', 'false');
+  expect(sheet().queryByRole('button', { name: 'Enviar mensagem' })).toBeNull();
+  fireEvent.click(photoB);
+  fireEvent.change(sheet().getByLabelText('Legenda (opcional)'), { target: { value: 'Rascunho' } });
+  fireEvent.click(sheet().getByRole('button', { name: 'Revisar foto' }));
+  expect(screen.getByRole('dialog', { name: 'Prévia do anexo' })).toBeVisible();
+  expect(sheet().getByRole('img', { name: 'Foto B' })).toBeVisible();
   fireEvent.click(sheet().getByRole('button', { name: 'Voltar' }));
+  expect(sheet().getByLabelText('Legenda (opcional)')).toHaveValue('Rascunho');
+  expect(sheet().getByRole('button', { name: 'Foto B' })).toHaveAttribute('aria-pressed', 'true');
   fireEvent.click(sheet().getByRole('button', { name: 'Foto C' }));
+  expect(sheet().getByRole('button', { name: 'Foto B' })).toHaveAttribute('aria-pressed', 'false');
   fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
   expect(api().getState().messages).toHaveLength(0);
   fireEvent.click(button('Anexar'));
   fireEvent.click(sheet().getByRole('button', { name: 'Galeria' }));
   fireEvent.click(sheet().getByRole('button', { name: 'Foto C' }));
+  expect(sheet().getByLabelText('Legenda (opcional)')).toHaveValue('');
   fireEvent.change(sheet().getByLabelText('Legenda (opcional)'), {
     target: { value: 'Minha foto' },
   });

@@ -438,5 +438,14 @@
   "attachments.preview": "Prévia do anexo",
   "attachments.back": "Voltar",
   "attachments.wait": "Escolha e envie um anexo para continuar.",
-  "attachments.delay": "Pausa antes de anexar (s)"
+  "attachments.delay": "Pausa antes de anexar (s)",
+  "attachments.recents": "Recentes",
+  "attachments.addCaption": "Adicione uma legenda…",
+  "attachments.reviewPhoto": "Revisar foto",
+  "attachments.camera": "Câmera",
+  "attachments.location": "Localização",
+  "attachments.contact": "Contato",
+  "attachments.audio": "Áudio",
+  "attachments.poll": "Enquete",
+  "attachments.event": "Evento"
 }

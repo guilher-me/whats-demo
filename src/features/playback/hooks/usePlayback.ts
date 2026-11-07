@@ -192,7 +192,9 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     const done = waitingAttachment.current;
     const session = media.current.current;
     const selected = session?.selected;
-    if (!done || !selected || session.view !== 'preview' || clock.current?.paused) return;
+    if (!done || !selected || clock.current?.paused) return;
+    if (session.view !== 'preview' && !(session.view === 'items' && selected.kind === 'image'))
+      return;
     waitingAttachment.current = null;
     flushSync(() => {
       append(session.caption, 'user', { attachment: selected });

@@ -28,7 +28,7 @@ For a customer voice note, choose **Voice message (mock)** under **Format**. Set
 
 Use **Conversation attachments** above **Sequence** to add images and simulated documents. A document has a display name, an illustrative size and an optional image cover. Select **Image** or **Document** in a customer or business step and choose an attachment or add one there. Image captions belong to the step.
 
-In manual playback, tap the paper clip and choose an item from the conversation's simulated gallery or document picker. Items marked **Available to the customer** appear there. In automatic playback, the cursor selects the item configured for the step and types its caption. Opening a received document shows a simulated details card. Exporting the experience includes the processed images and document metadata.
+In manual playback, tap the paper clip and choose **Gallery** or **Document**. The picker shows items marked **Available to the customer**. In **Recents**, tap a photo to select it and reveal the caption field and send button. Tap its small preview to review the photo in full screen. In automatic playback, the cursor selects the configured item, types its caption and sends it. Opening a received document shows a simulated details card. Exporting the experience includes the processed images and document metadata. [WhatsApp for Android media reference](https://faq.whatsapp.com/759301289012856)
 
 ![Attachment library in the editor and the same three images in the simulated phone gallery](media/attachments-workbench.webp)
 

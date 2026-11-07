@@ -10,6 +10,9 @@ export function PhoneSheet({
   onClose,
   closeLabel,
   onReturnFocus,
+  className,
+  hideHeader,
+  backdrop,
 }: {
   container: HTMLElement | null;
   title: string;
@@ -18,6 +21,9 @@ export function PhoneSheet({
   onClose: () => void;
   closeLabel?: string;
   onReturnFocus?: () => void;
+  className?: string;
+  hideHeader?: boolean;
+  backdrop?: 'clear' | 'dimmed';
 }) {
   const t = useT();
 
@@ -30,9 +36,17 @@ export function PhoneSheet({
       }}
     >
       <Dialog.Portal container={container}>
-        <Dialog.Overlay className="phone-sheet-overlay" />
+        {backdrop ? (
+          <div
+            aria-hidden="true"
+            className={`phone-sheet-overlay${backdrop === 'clear' ? ' clear' : ''}`}
+            onClick={onClose}
+          />
+        ) : (
+          <Dialog.Overlay className="phone-sheet-overlay" />
+        )}
         <Dialog.Content
-          className="phone-sheet"
+          className={className ? `phone-sheet ${className}` : 'phone-sheet'}
           onInteractOutside={(event) => event.preventDefault()}
           onCloseAutoFocus={
             onReturnFocus
@@ -43,12 +57,16 @@ export function PhoneSheet({
               : undefined
           }
         >
-          <header>
-            <Dialog.Title>{title}</Dialog.Title>
-            <Dialog.Close asChild>
-              <IconButton label={closeLabel ?? t('common.closeList')}>×</IconButton>
-            </Dialog.Close>
-          </header>
+          {hideHeader ? (
+            <Dialog.Title className="visually-hidden">{title}</Dialog.Title>
+          ) : (
+            <header>
+              <Dialog.Title>{title}</Dialog.Title>
+              <Dialog.Close asChild>
+                <IconButton label={closeLabel ?? t('common.closeList')}>×</IconButton>
+              </Dialog.Close>
+            </header>
+          )}
           <Dialog.Description className="visually-hidden">{description}</Dialog.Description>
           {children}
         </Dialog.Content>

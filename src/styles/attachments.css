@@ -170,14 +170,273 @@
 .attachment-phone-content .attachment-details img {
   max-height: 260px;
 }
-.attachment-menu,
 .attachment-picker-footer {
   display: flex;
   gap: 8px;
 }
+.phone-sheet-overlay.clear {
+  background: transparent;
+}
+.phone-sheet.android-attachment-menu {
+  inset: auto 7px 57px;
+  border-radius: 16px;
+  padding: 15px 7px 12px;
+  background: #f7f8fa;
+}
+.attachment-menu {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  row-gap: 12px;
+}
 .attachment-menu button {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 0 2px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #33434a;
+  font:
+    11px/1.2 Arial,
+    sans-serif;
+  overflow-wrap: anywhere;
+}
+.attachment-menu button:disabled {
+  opacity: 1;
+}
+.attachment-menu-icon {
+  width: 49px;
+  height: 49px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e7eaed;
+  border-radius: 16px;
+  background: #fff;
+}
+.attachment-menu button:not(:disabled):hover .attachment-menu-icon {
+  background: #ebeff1;
+}
+.attachment-menu-icon.blue {
+  color: #0878c4;
+}
+.attachment-menu-icon.pink {
+  color: #c52362;
+}
+.attachment-menu-icon.green {
+  color: #008c6a;
+}
+.attachment-menu-icon.cyan {
+  color: #0084a7;
+}
+.attachment-menu-icon.purple {
+  color: #6747c3;
+}
+.attachment-menu-icon.orange {
+  color: #c65d32;
+}
+.attachment-menu-icon.yellow {
+  color: #a56a00;
+}
+.phone-sheet.android-photo-gallery {
+  height: 74%;
+  border-radius: 24px 24px 0 0;
+  overflow: hidden;
+}
+.android-photo-gallery::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: calc(50% - 14px);
+  width: 28px;
+  height: 3px;
+  border-radius: 2px;
+  background: #89949a;
+}
+.android-photo-gallery > header {
+  position: relative;
+  justify-content: center;
+  min-height: 62px;
+  padding: 16px 48px 0;
+  border-bottom: 0;
+}
+.android-photo-gallery h2 {
+  font-size: 17px;
+  font-weight: 600;
+}
+.android-photo-gallery > header button,
+.android-photo-review > header button {
+  position: absolute;
+  left: 6px;
+  width: 40px;
+  height: 40px;
+}
+.android-photo-gallery > header button {
+  top: 18px;
+  color: #111b21;
+}
+.photo-gallery-scroll {
   flex: 1;
-  min-height: 56px;
+  min-height: 0;
+  overflow-y: auto;
+}
+.photo-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.photo-gallery-grid button {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: #e9edef;
+  overflow: hidden;
+}
+.photo-gallery-grid button:focus-visible {
+  outline-offset: -3px;
+}
+.photo-gallery-grid button:disabled,
+.photo-send:disabled,
+.photo-review:disabled {
+  opacity: 1;
+}
+.photo-gallery-grid img,
+.photo-review img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.photo-gallery-grid button[aria-pressed='true'] img {
+  opacity: 0.62;
+}
+.photo-selection,
+.photo-send > span {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  background: #087b4b;
+  color: #fff;
+  width: 21px;
+  height: 21px;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  top: 5px;
+  right: 5px;
+  font:
+    600 12px Arial,
+    sans-serif;
+}
+.photo-send-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px;
+  background: #fff;
+}
+.photo-send-bar input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  border-radius: 24px;
+  background: #f0f2f5;
+  color: #111b21;
+  height: 42px;
+  padding: 0 12px;
+  font-size: 14px;
+}
+.photo-review,
+.photo-send {
+  position: relative;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+}
+.photo-review {
+  width: 37px;
+  height: 37px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #111b21;
+  color: #fff;
+}
+.photo-review img {
+  opacity: 0.58;
+}
+.photo-review svg {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+}
+.photo-send {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #008b50;
+  color: #fff;
+}
+.photo-send > span {
+  top: -3px;
+  right: -2px;
+  width: 17px;
+  height: 17px;
+  font-size: 10px;
+}
+.phone-sheet.android-photo-review {
+  inset: 0;
+  max-height: none;
+  border-radius: 0;
+  background: #111b21;
+  color: #fff;
+}
+.android-photo-review > header {
+  position: relative;
+  min-height: 53px;
+  justify-content: center;
+  border-bottom: 0;
+}
+.android-photo-review > header button {
+  color: #fff;
+}
+.android-photo-review h2 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  clip-path: inset(50%);
+  overflow: hidden;
+}
+.photo-review-canvas {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  grid-template-rows: minmax(0, 1fr);
+  overflow: hidden;
+}
+.photo-review-canvas img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.android-photo-review .photo-send-bar {
+  background: #111b21;
+}
+.android-photo-review .photo-send-bar input {
+  background: #26343c;
+  color: #fff;
+}
+.android-photo-review .photo-send-bar input::placeholder {
+  color: #bdc6cb;
 }
 .attachment-preview-name {
   margin: 0;

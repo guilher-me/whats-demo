@@ -28,15 +28,26 @@ export function useAttachmentPlayback() {
     showItems: () => update({ view: 'items' }),
     select: (id: string) => {
       const selected = current.current?.items.find((item) => item.id === id);
-      if (selected) update({ selected, view: 'preview', caption: '' });
+      if (!selected || current.current?.view !== 'items') return;
+      if (selected.kind === 'image')
+        update({ selected: current.current.selected?.id === id ? undefined : selected });
+      else update({ selected, view: 'preview' });
+    },
+    reviewPhoto: () => {
+      if (current.current?.view === 'items' && current.current.selected?.kind === 'image')
+        update({ view: 'preview' });
     },
     caption: (caption: string) => update({ caption }),
     close: () => update({ view: 'closed', selected: undefined, caption: '' }),
-    back: () =>
-      update({
-        view: current.current?.view === 'preview' ? 'items' : 'menu',
-        selected: undefined,
-        caption: '',
-      }),
+    back: () => {
+      const session = current.current;
+      if (session?.view === 'preview' && session.kind === 'image') update({ view: 'items' });
+      else
+        update({
+          view: session?.view === 'preview' ? 'items' : 'menu',
+          selected: undefined,
+          caption: '',
+        });
+    },
   };
 }

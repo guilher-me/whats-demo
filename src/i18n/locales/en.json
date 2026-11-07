@@ -438,5 +438,14 @@
   "attachments.preview": "Preview attachment",
   "attachments.back": "Back",
   "attachments.wait": "Choose and send an attachment to continue.",
-  "attachments.delay": "Delay before attaching (s)"
+  "attachments.delay": "Delay before attaching (s)",
+  "attachments.recents": "Recents",
+  "attachments.addCaption": "Add a caption…",
+  "attachments.reviewPhoto": "Review photo",
+  "attachments.camera": "Camera",
+  "attachments.location": "Location",
+  "attachments.contact": "Contact",
+  "attachments.audio": "Audio",
+  "attachments.poll": "Poll",
+  "attachments.event": "Event"
 }
