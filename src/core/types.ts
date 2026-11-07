@@ -52,6 +52,7 @@ export interface MessageStep {
   type: 'user' | 'business';
   text: string;
   delay: number;
+  voiceDurationSeconds?: number;
   typing?: boolean;
   typingMs?: number;
   resourceId?: string;
@@ -124,6 +125,7 @@ export interface ChatMessage {
   direction: 'user' | 'business';
   text: string;
   time: string;
+  voiceDurationMs?: number;
   flowStep?: FlowStep;
   completed?: boolean;
   interactive?: BusinessInteractive;

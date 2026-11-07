@@ -93,6 +93,7 @@
                   "type": {
                     "enum": [
                       "text",
+                      "voice_mock",
                       "interactive",
                       "template"
                     ]
@@ -100,10 +101,43 @@
                 }
               },
               "simulation": {
-                "type": "object"
+                "type": "object",
+                "properties": {
+                  "recordingSeconds": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 120
+                  }
+                }
               },
               "bindings": {
                 "type": "object"
+              }
+            },
+            "if": {
+              "properties": {
+                "message": {
+                  "properties": {
+                    "type": {
+                      "const": "voice_mock"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "simulation"
+              ],
+              "properties": {
+                "sender": {
+                  "const": "customer"
+                },
+                "simulation": {
+                  "required": [
+                    "recordingSeconds"
+                  ]
+                }
               }
             }
           }

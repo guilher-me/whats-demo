@@ -66,7 +66,10 @@ export function exportDocument(project: Project): ExperienceDocument {
       ...(step.typingMs !== undefined ? { typingMs: step.typingMs } : {}),
     };
     let bindings: ObjectValue | undefined;
-    if (step.type === 'flow') {
+    if (step.type === 'user' && step.voiceDurationSeconds !== undefined) {
+      message = { type: 'voice_mock' };
+      simulation.recordingSeconds = step.voiceDurationSeconds;
+    } else if (step.type === 'flow') {
       const name =
         step.resourceId ??
         'flow_' +
@@ -292,6 +295,10 @@ export function importDocument(input: unknown): Project {
         : {}),
     };
     if (m.type === 'text') return { ...base, text: str(obj(m.text).body) };
+    if (m.type === 'voice_mock') {
+      if (s.sender !== 'customer' || typeof sim.recordingSeconds !== 'number') fail();
+      return { ...base, type: 'user', voiceDurationSeconds: sim.recordingSeconds };
+    }
     if (s.sender !== 'business') fail();
     const auto = sim.autoResponse === undefined ? undefined : obj(sim.autoResponse);
     let interactive!: BusinessInteractive;

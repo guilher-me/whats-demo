@@ -22,7 +22,13 @@ export function StepTiming({
         <div className="timing-delay">
           <ControlIcon name="clock" />
           <TextField
-            label={step.type === 'user' ? t('editor.typingDelay') : t('editor.replyDelay')}
+            label={
+              step.type !== 'user'
+                ? t('editor.replyDelay')
+                : step.voiceDurationSeconds === undefined
+                  ? t('editor.typingDelay')
+                  : t('editor.recordingDelay')
+            }
             type="number"
             min={0}
             max={120}

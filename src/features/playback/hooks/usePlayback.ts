@@ -43,6 +43,8 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
   const [messages, setMessages] = useState<ChatMessage[]>([]),
     [typing, setTyping] = useState(false),
     [draft, setDraftState] = useState(''),
+    [voiceComposer, setVoiceComposer] = useState(false),
+    [recordingVoice, setRecordingVoice] = useState(false),
     [running, setRunning] = useState(false),
     [paused, setPaused] = useState(false),
     [activeStep, setActiveStep] = useState<string | null>(null),
@@ -60,6 +62,8 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     controller = useRef<AbortController | null>(null),
     draftRef = useRef(''),
     waitingUser = useRef<(() => void) | null>(null),
+    waitingVoice = useRef<(() => void) | null>(null),
+    voiceStartedAt = useRef<number | null>(null),
     waitingFlow = useRef<(() => void) | null>(null);
   const setDraft = (value: string) => {
     draftRef.current = value;
@@ -70,6 +74,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     direction: ChatMessage['direction'],
     step?: FlowStep,
     interactive?: BusinessInteractive,
+    voiceDurationMs?: number,
   ) => {
     const message: ChatMessage = {
       id: uid(),
@@ -80,6 +85,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
       ),
       flowStep: step,
       interactive,
+      ...(voiceDurationMs === undefined ? {} : { voiceDurationMs }),
       receipt: direction === 'user' ? 'delivered' : undefined,
     };
     setMessages((current) => [
@@ -100,6 +106,10 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
       ),
     );
   });
+  const cancelVoice = useCallback(() => {
+    voiceStartedAt.current = null;
+    setRecordingVoice(false);
+  }, []);
   const stop = useCallback(() => {
     controller.current?.abort();
     controller.current = null;
@@ -107,6 +117,9 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     setPaused(false);
     automaticMode.current = false;
     waitingUser.current = null;
+    waitingVoice.current = null;
+    setVoiceComposer(false);
+    cancelVoice();
     waitingFlow.current = null;
     setRunning(false);
     setTyping(false);
@@ -115,9 +128,10 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     interaction.reset();
     cursor.hide();
     setStatus('playback.stopped');
-  }, [flow.set, interaction.reset]);
+  }, [flow.set, interaction.reset, cancelVoice]);
   const pause = () => {
     if (!controller.current || clock.current?.paused) return;
+    if (!automaticMode.current) cancelVoice();
     clock.current?.pause();
     setPaused(true);
   };
@@ -141,12 +155,42 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
   );
   const send = () => {
     const text = draftRef.current.trim();
-    if (!text || clock.current?.paused) return;
+    if (!text || clock.current?.paused || waitingVoice.current) return;
     append(text, 'user');
     setDraft('');
     const done = waitingUser.current;
     waitingUser.current = null;
     done?.();
+  };
+  const beginVoice = () => {
+    const playbackClock = clock.current;
+    if (
+      !waitingVoice.current ||
+      !playbackClock ||
+      playbackClock.paused ||
+      voiceStartedAt.current !== null
+    )
+      return false;
+    voiceStartedAt.current = playbackClock.now();
+    setRecordingVoice(true);
+    return true;
+  };
+  const voiceElapsed = useCallback(() => {
+    const startedAt = voiceStartedAt.current;
+    return startedAt === null ? 0 : Math.max(0, (clock.current?.now() ?? startedAt) - startedAt);
+  }, []);
+  const sendVoice = (configuredMs?: number) => {
+    const done = waitingVoice.current;
+    if (!done || clock.current?.paused || voiceStartedAt.current === null) return;
+    waitingVoice.current = null;
+    const duration = configuredMs ?? Math.round(voiceElapsed());
+    // The following text step needs its composer mounted before the cursor can target it.
+    flushSync(() => {
+      append('', 'user', undefined, undefined, duration);
+      cancelVoice();
+      setVoiceComposer(false);
+    });
+    done();
   };
   const openFlow = (step: FlowStep) => {
     setFlowError('');
@@ -278,7 +322,11 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
       const openingMessage = !automatic ? initialMessage?.trim() : undefined;
       if (openingMessage) append(openingMessage, 'user');
       // The submitted text fulfills only an opening customer step; later replies still wait.
-      const startIndex = openingMessage && steps[0]?.type === 'user' ? 1 : 0;
+      const first = steps[0];
+      const startIndex =
+        openingMessage && first?.type === 'user' && first.voiceDurationSeconds === undefined
+          ? 1
+          : 0;
       for (let index = startIndex; index < steps.length; index++) {
         const step = steps[index];
         if (signal.aborted) return;
@@ -289,25 +337,46 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
           v2: steps.length,
         });
         if (step.type === 'user') {
-          // Install the listener immediately: a manual send during the configured delay must not be lost.
+          // Register the expected input before the composer can submit.
           const received = deferred(signal);
-          waitingUser.current = received.finish;
-          if (automatic) {
-            await wait(step.delay * 1000, signal);
-            await cursor.type(
-              phone.current?.querySelector<HTMLElement>('[data-composer-input]') ?? null,
-              step.text,
-              signal,
-              setDraft,
-            );
-            await cursor.touch(
-              phone.current?.querySelector<HTMLElement>('[data-send]') ?? null,
-              signal,
-              send,
-            );
+          if (step.voiceDurationSeconds !== undefined) {
+            const durationMs = step.voiceDurationSeconds * 1000;
+            waitingVoice.current = received.finish;
+            flushSync(() => setVoiceComposer(true));
+            if (automatic) {
+              await wait(step.delay * 1000, signal);
+              await cursor.press(
+                phone.current?.querySelector<HTMLElement>('[data-voice-mic]') ?? null,
+                signal,
+                async () => {
+                  beginVoice();
+                  await sleep(durationMs, signal);
+                  sendVoice(durationMs);
+                },
+              );
+            } else {
+              setStatus('playback.holdVoice');
+              phone.current?.querySelector<HTMLButtonElement>('[data-voice-mic]')?.focus();
+            }
           } else {
-            setStatus('playback.typeMessage');
-            phone.current?.querySelector<HTMLInputElement>('[data-composer-input]')?.focus();
+            waitingUser.current = received.finish;
+            if (automatic) {
+              await wait(step.delay * 1000, signal);
+              await cursor.type(
+                phone.current?.querySelector<HTMLElement>('[data-composer-input]') ?? null,
+                step.text,
+                signal,
+                setDraft,
+              );
+              await cursor.touch(
+                phone.current?.querySelector<HTMLElement>('[data-send]') ?? null,
+                signal,
+                send,
+              );
+            } else {
+              setStatus('playback.typeMessage');
+              phone.current?.querySelector<HTMLInputElement>('[data-composer-input]')?.focus();
+            }
           }
           await received.promise;
           await clock.current?.checkpoint();
@@ -410,6 +479,12 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>) {
     draft,
     setDraft,
     send,
+    voiceComposer,
+    recordingVoice,
+    voiceElapsed,
+    beginVoice,
+    sendVoice,
+    cancelVoice,
     running,
     paused,
     pause,
