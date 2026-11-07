@@ -15,6 +15,7 @@ import {
   footerAction,
   newScreen,
   nextId,
+  removeComponent,
   removeScreen,
   replaceScreen,
 } from '../../flows/visual-flow';
@@ -321,9 +322,10 @@ export function VisualFlow({
                   variant="danger"
                   onClick={() =>
                     onChange(
-                      replaceScreen(
+                      removeComponent(
                         flow,
                         toScreen(components.filter((item) => item !== component)),
+                        component,
                       ),
                     )
                   }

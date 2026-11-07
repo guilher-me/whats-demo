@@ -5,6 +5,7 @@ import { act, cleanup, fireEvent, render, screen, within } from '@testing-librar
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
 import { decode } from '../src/core/codec';
+import example from '../src/core/default-project.json';
 import { createStep, STORAGE_KEY } from '../src/core/project';
 import type { FlowDefinition, FlowStep, Project } from '../src/core/types';
 
@@ -150,6 +151,58 @@ it.each(['invitation', 'test'] as const)(
     expect(phone().queryByLabelText(label)).toBeNull();
   },
 );
+
+it('keeps the example Flow valid when removing an input forwarded to the next screen', () => {
+  const step = setup((step) => {
+    const request = example.steps.find((item) => item.type === 'flow')!;
+    step.flow = structuredClone(request.flow!);
+    step.answers = structuredClone(request.answers!);
+  });
+  fireEvent.click(button('Testar Flow'));
+  const sheet = phone().getByLabelText('Quantity').closest('.flow-sheet');
+  const summary = screen.getByText('quantity', { selector: 'summary > code' });
+  fireEvent.click(summary);
+  fireEvent.click(
+    within(summary.closest('details')!).getByRole('button', { name: 'Remover componente' }),
+  );
+
+  expect(screen.queryByText(/Há alterações pendentes no Flow/)).toBeNull();
+  expect(phone().queryByLabelText('Quantity')).toBeNull();
+  expect(phone().getByText('Your piece').closest('.flow-sheet')).toBe(sheet);
+
+  const flow = current().flow;
+  const [product, contact] = flow.screens;
+  expect(product.layout.children.at(-1)!['on-click-action']?.payload).toEqual({
+    product: '${form.product}',
+    color: '${form.color}',
+    quantity: contact.data!.quantity.__example__,
+  });
+  expect(contact).toEqual(step.flow.screens[1]);
+  expect(flow.routing_model).toEqual(step.flow.routing_model);
+  expect(button('Reproduzir automaticamente')).toBeEnabled();
+});
+
+it('removes only the deleted field bindings from a completion payload', () => {
+  setup((step) => {
+    const screen = step.flow.screens[0];
+    screen.layout.children.at(-1)!['on-click-action']!.payload = {
+      name: '${form.name}',
+      customer: '${screen.FORM_SCREEN.form.name}',
+      literal: 'name',
+    };
+  });
+  const summary = screen.getByText('name', { selector: 'summary > code' });
+  fireEvent.click(summary);
+  fireEvent.click(
+    within(summary.closest('details')!).getByRole('button', { name: 'Remover componente' }),
+  );
+
+  expect(screen.queryByText(/Há alterações pendentes no Flow/)).toBeNull();
+  expect(current().flow.screens[0].layout.children).toHaveLength(1);
+  expect(current().flow.screens[0].layout.children[0]['on-click-action']?.payload).toEqual({
+    literal: 'name',
+  });
+});
 
 it('preserves JSON formatting and keeps invalid changes out of the phone and the saved journey', () => {
   const step = setup();

@@ -1,4 +1,5 @@
 import { findCatalogEntry } from 'flowso/catalog';
+import { isWholeReference, parseReference } from 'flowso/runtime';
 import { walkComponents } from '../../core/engine';
 import type { FlowAction, FlowComponent, FlowDefinition, FlowScreen } from '../../core/types';
 
@@ -124,6 +125,67 @@ export function addComponent(screen: FlowScreen, component: FlowComponent): Flow
           )
         : insert(children),
     },
+  };
+}
+
+/** Apply a component deletion and repair direct bindings in Footer payloads. */
+export function removeComponent(
+  flow: FlowDefinition,
+  screen: FlowScreen,
+  component: FlowComponent,
+): FlowDefinition {
+  const next = replaceScreen(flow, screen);
+  const name = component.name;
+  if (!name || walkComponents(screen.layout.children).some((item) => item.name === name))
+    return next;
+
+  const update = (item: FlowComponent, screenId: string): FlowComponent => {
+    if (item.type === 'Form' && item.children) {
+      const children = item.children.map((child) => update(child, screenId));
+      return children.some((child, index) => child !== item.children![index])
+        ? { ...item, children }
+        : item;
+    }
+    const action = item['on-click-action'];
+    if (item.type !== 'Footer' || !action?.payload) return item;
+
+    const destination =
+      action.name === 'navigate'
+        ? next.screens.find((target) => target.id === action.next?.name)
+        : undefined;
+    const payload = { ...action.payload };
+    let changed = false;
+    for (const [key, value] of Object.entries(action.payload)) {
+      const reference = isWholeReference(value) ? parseReference(value) : null;
+      if (reference?.path[0] !== name) continue;
+      const matches =
+        (reference.scope === 'form' && screenId === screen.id) ||
+        (reference.scope === 'screen' &&
+          reference.screenScope === 'form' &&
+          reference.screenId === screen.id);
+      if (!matches) continue;
+
+      // Navigation must still supply fields declared by its destination.
+      const data = destination?.data;
+      const declaration = data && Object.hasOwn(data, key) ? data[key] : undefined;
+      if (declaration) {
+        const example = declaration._example_ ?? declaration.__example__;
+        if (example === undefined) continue;
+        payload[key] = example;
+      } else delete payload[key];
+      changed = true;
+    }
+    return changed ? { ...item, 'on-click-action': { ...action, payload } } : item;
+  };
+
+  return {
+    ...next,
+    screens: next.screens.map((item) => {
+      const children = item.layout.children.map((child) => update(child, item.id));
+      return children.some((child, index) => child !== item.layout.children[index])
+        ? { ...item, layout: { ...item.layout, children } }
+        : item;
+    }),
   };
 }
 
