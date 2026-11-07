@@ -1,5 +1,5 @@
-import { useRef, useState, type CSSProperties } from 'react';
-import { useT, type Locale } from '../i18n';
+import { useMemo, useRef, useState, type CSSProperties } from 'react';
+import { currentLocale, useT, type Locale } from '../i18n';
 import type { Project } from '../core/types';
 import { createShareURL, shareHash } from '../core/codec';
 import { Button } from '../components/ui/Button';
@@ -7,6 +7,7 @@ import { JourneyPhone } from '../features/conversation/components/JourneyPhone';
 import { PlaybackControls } from '../features/playback/components/PlaybackControls';
 import { PlaybackSpeedControl } from '../features/playback/components/PlaybackSpeedControl';
 import { usePlayback } from '../features/playback/hooks/usePlayback';
+import { journeyDiagnostics } from '../features/flows/diagnostics';
 
 export function DemoApp({
   project,
@@ -21,6 +22,8 @@ export function DemoApp({
   const phoneRef = useRef<HTMLDivElement>(null);
   const playback = usePlayback(phoneRef, false);
   const [error, setError] = useState('');
+  const diagnostics = useMemo(() => journeyDiagnostics(project), [project, currentLocale()]);
+  const automaticIssue = diagnostics.find((issue) => issue.kind === 'automatic');
   const run = (automatic: boolean) => void playback.run(project, automatic);
   const editLegacy = async () => {
     try {
@@ -42,6 +45,7 @@ export function DemoApp({
         )}
       </header>
       {error && <p role="alert">{error}</p>}
+      {automaticIssue && <p className="demo-flow-issue">{automaticIssue.message}</p>}
       <p className="play-status" role="status" aria-live="polite">
         {playback.status}
       </p>
@@ -60,6 +64,7 @@ export function DemoApp({
         <div className="phone-tools">
           <PlaybackControls
             disabled={false}
+            autoDisabled={!!automaticIssue}
             running={playback.running}
             paused={playback.paused}
             onManual={() => run(false)}

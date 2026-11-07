@@ -6,7 +6,7 @@ Build a version 1 project from the user's description and validate it in the edi
 
 ## Generate a link
 
-- Open the hosted editor. With authorization, use `window.whatsappFakeFlows.loadProject(project)` to configure the journey, or build it through the named editor controls.
+- Open the hosted editor. With authorization, use `window.whatsappFakeFlows.loadProject(project)` to configure the journey, or paste the whole project into **Code** and use **Validate** and **Apply**.
 - Use `await window.whatsappFakeFlows.createShareURL(project)` for an editor link. Pass `'demo'` as the second argument for the interactive preview.
 - With browser controls, select **Copy link** and choose **Editor** or **Preview**. The link is copied immediately in the current interface language.
 - In a JavaScript runtime with browser compression APIs, use `createShareURL` from the official static [generator module](share.mjs).

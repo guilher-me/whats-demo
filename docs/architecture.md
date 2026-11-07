@@ -26,6 +26,10 @@ O editor também usa `ActionMenu` (Radix Dropdown Menu), `SelectField` (Radix Se
 
 Estilos globais e tokens ficam em `styles/base.css` e `styles/tokens.css`. Editor, conversa e Flows têm folhas próprias. Prefira classes e amplie os tokens quando houver uma variação compartilhada.
 
+## Painéis da jornada
+
+`Workbench` organiza Código, Editor e Preview e mantém os três componentes montados ao recolher. Os divisores redistribuem largura no desktop e altura em telas estreitas. Código mantém o texto pendente separado do projeto e aplica uma substituição validada ao editor. O diagnóstico de Flow usa o módulo local `flowso/validator` e as capacidades do simulador. A API de automação e o painel Código compartilham o mesmo diagnóstico.
+
 ## Persistência e evolução
 
 O editor usa a chave `whatsdemo-document-alpha1` do localStorage, com sufixos para desenvolvimento e cópias abertas por link. O projeto mantém `version: 1`. A recuperação de projetos antigos mantém os textos e as referências a anexos, descartando imagens reais e avatares personalizados.

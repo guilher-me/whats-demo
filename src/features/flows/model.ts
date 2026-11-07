@@ -42,6 +42,13 @@ export function advance(
 ): { session: FlowSession; complete?: never } | { complete: Values; session?: never } {
   const errors = validation(session);
   if (errors.length) throw new Error(errors[0]);
+  return followFooter(session);
+}
+
+/** Resolve navigation independently of field validation for preflight inspection. */
+export function followFooter(
+  session: FlowSession,
+): { session: FlowSession; complete?: never } | { complete: Values; session?: never } {
   const action = getComponents(session).find((c) => c.type === 'Footer')?.['on-click-action'];
   if (action?.name === 'complete')
     return {

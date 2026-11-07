@@ -6,6 +6,7 @@ export function PlaybackControls({
   running,
   paused,
   locked = false,
+  autoDisabled = false,
   onManual,
   onAuto,
   onPause,
@@ -16,6 +17,7 @@ export function PlaybackControls({
   running: boolean;
   paused: boolean;
   locked?: boolean;
+  autoDisabled?: boolean;
   onManual: () => void;
   onAuto: () => void;
   onPause: () => void;
@@ -43,7 +45,7 @@ export function PlaybackControls({
         label={running ? t('playback.reset') : t('playback.automatic')}
         description={running ? t('playback.resetHint') : t('playback.autoHint')}
         className="playback-auto"
-        disabled={locked || (!running && disabled)}
+        disabled={locked || (!running && (disabled || autoDisabled))}
         aria-controls="phone-preview"
         onClick={running ? onReset : onAuto}
       >
