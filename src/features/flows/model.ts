@@ -6,9 +6,10 @@ import {
   validateField,
   validateFlow,
   visibleComponents,
+  walkComponents,
 } from '../../core/engine';
 import { clone } from '../../core/project';
-import type { FlowSession, FlowStep, Values } from '../../core/types';
+import type { FlowHistory, FlowSession, FlowStep, Values } from '../../core/types';
 export function createSession(step: FlowStep, screenId?: string): FlowSession {
   validateFlow(step.flow);
   const index = Math.max(
@@ -25,6 +26,46 @@ export function createSession(step: FlowStep, screenId?: string): FlowSession {
     closing: false,
   };
 }
+/** Update an open preview by screen ID and retain compatible test inputs. */
+export function refreshPreviewSession(session: FlowSession, step: FlowStep): FlowSession {
+  const refresh = (snapshot: FlowHistory, startingScreen: boolean): FlowHistory | undefined => {
+    const previous = session.step.flow.screens[snapshot.index];
+    const index = step.flow.screens.findIndex((screen) => screen.id === previous.id);
+    if (index < 0) return undefined;
+
+    const screen = step.flow.screens[index];
+    const previousTypes = new Map(
+      walkComponents(previous.layout.children).map((component) => [component.name, component.type]),
+    );
+    const fields = walkComponents(screen.layout.children).flatMap((component) => {
+      const { name, type } = component;
+      if (!name || previousTypes.get(name) !== type || !Object.hasOwn(snapshot.form, name))
+        return [];
+      const value = snapshot.form[name];
+      const options = component['data-source'];
+      if (Array.isArray(options)) {
+        const accepts = (id: unknown) => options.some((option) => option?.id === id);
+        if (type === 'CheckboxGroup' && Array.isArray(value))
+          return [[name, value.filter(accepts)] as const];
+        if (!accepts(value)) return [];
+      }
+      return [[name, value] as const];
+    });
+    return {
+      index,
+      data: startingScreen ? initialData(screen) : snapshot.data,
+      form: Object.fromEntries(fields),
+    };
+  };
+
+  const current = refresh(session, session.history.length === 0);
+  if (!current) return createSession(step);
+  const history = session.history.flatMap(
+    (snapshot, index) => refresh(snapshot, index === 0) ?? [],
+  );
+  return { ...session, ...current, step, history };
+}
+
 export function getComponents(session: FlowSession) {
   return visibleComponents(session.step.flow.screens[session.index], {
     data: session.data,

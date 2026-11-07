@@ -1,5 +1,5 @@
 import { useT } from '../../../i18n';
-import { useEffect, useState, type RefObject } from 'react';
+import { useEffect, useRef, useState, type RefObject } from 'react';
 import type { Attachment, ChatMessage, Contact, Step } from '../../../core/types';
 import { messageOptions } from '../../../core/interactive';
 import { PhoneFrame } from './PhoneFrame';
@@ -7,7 +7,7 @@ import { MessageBubble } from './MessageBubble';
 import { ListPicker } from './ListPicker';
 import { FlowSheet } from '../../flows/components/FlowSheet';
 import { useFlowSession } from '../../flows/hooks/useFlowSession';
-import { advance, createSession, goBack } from '../../flows/model';
+import { advance, createSession, goBack, refreshPreviewSession } from '../../flows/model';
 
 export interface FlowPreviewRequest {
   stepId: string;
@@ -38,19 +38,26 @@ export function MessagePreview({
   const interactive = step.type === 'business' ? step.interactive : undefined;
   const selection =
     interactive && messageOptions(interactive).some((o) => o.id === selected) ? selected : '';
-  const definition = step.type === 'flow' ? step.flow : null;
+  const flowStep = step.type === 'flow' ? step : null;
+  const previousRequest = useRef<FlowPreviewRequest | undefined>(undefined);
   useEffect(() => {
-    setCompleted(false);
+    const current = flow.current.current;
+    const requested = previousRequest.current !== flowPreview;
+    previousRequest.current = flowPreview;
+    if (!flowStep || (!requested && (!current || current.step.flow === flowStep.flow))) return;
+
     setFlowError('');
     try {
-      flow.set(
-        step.type === 'flow' && flowPreview ? createSession(step, flowPreview.screenId) : null,
-      );
+      if (requested) {
+        setCompleted(false);
+        flow.set(flowPreview ? createSession(flowStep, flowPreview.screenId) : null);
+      } else if (current) {
+        flow.set(refreshPreviewSession(current, flowStep));
+      }
     } catch (error) {
-      flow.set(null);
       setFlowError((error as Error).message);
     }
-  }, [definition, flowPreview, flow.set]);
+  }, [flowStep, flowPreview, flow.current, flow.set]);
   const message: ChatMessage = {
     id: step.id,
     direction: step.type === 'user' ? 'user' : 'business',

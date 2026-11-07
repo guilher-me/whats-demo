@@ -100,6 +100,10 @@ it('builds two screens, connects a route and tests it in an isolated phone sessi
   fill();
   advance();
   expect(phone().getByText('Tela 2', { selector: '.flow-header strong' })).toBeVisible();
+  fireEvent.keyDown(button('Adicionar componente'), { key: 'Enter' });
+  fireEvent.click(screen.getByRole('menuitem', { name: 'Parágrafo' }));
+  expect(phone().getByText('Tela 2', { selector: '.flow-header strong' })).toBeVisible();
+  expect(phone().getByText('Parágrafo')).toBeVisible();
   fireEvent.click(phone().getByRole('button', { name: 'Voltar' }));
   expect(phone().getByDisplayValue('Cliente de teste')).toBeVisible();
   advance();
@@ -110,6 +114,42 @@ it('builds two screens, connects a route and tests it in an isolated phone sessi
   expect(current().answers).toEqual(initial.answers);
   expect(api().getState().messages).toEqual([]);
 });
+
+it.each(['invitation', 'test'] as const)(
+  'keeps a Flow opened through %s in the phone while adding and removing components',
+  (entry) => {
+    const step = setup();
+    if (entry === 'test') fireEvent.click(button('Testar Flow'));
+    else {
+      fireEvent.click(screen.getByRole('article', { name: 'Etapa 1' }));
+      fireEvent.click(phone().getByRole('button', { name: step.label }));
+    }
+
+    const label = step.flow.screens[0].layout.children[0].label!;
+    const input = phone().getByLabelText(label);
+    const sheet = input.closest('.flow-sheet');
+    fireEvent.change(input, { target: { value: 'Valor de teste' } });
+
+    fireEvent.keyDown(button('Adicionar componente'), { key: 'Enter' });
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Parágrafo' }));
+    expect(phone().getByText('Parágrafo')).toBeVisible();
+    expect(phone().getByLabelText(label)).toHaveValue('Valor de teste');
+    expect(phone().getByLabelText(label).closest('.flow-sheet')).toBe(sheet);
+
+    const summary = screen.getByText('Parágrafo', { selector: 'summary > span' });
+    fireEvent.click(summary);
+    fireEvent.click(
+      within(summary.closest('details')!).getByRole('button', { name: 'Remover componente' }),
+    );
+    expect(phone().queryByText('Parágrafo')).toBeNull();
+    expect(phone().getByLabelText(label)).toHaveValue('Valor de teste');
+
+    fireEvent.click(phone().getByRole('button', { name: /Fechar/ }));
+    fireEvent.keyDown(button('Adicionar componente'), { key: 'Enter' });
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Título' }));
+    expect(phone().queryByLabelText(label)).toBeNull();
+  },
+);
 
 it('preserves JSON formatting and keeps invalid changes out of the phone and the saved journey', () => {
   const step = setup();

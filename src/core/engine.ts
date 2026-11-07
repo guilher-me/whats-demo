@@ -85,6 +85,15 @@ export function condition(
       return false;
   }
 }
+export function walkComponents(components: FlowComponent[]): FlowComponent[] {
+  return components.flatMap((component) => [
+    component,
+    ...walkComponents(component.children ?? []),
+    ...walkComponents(component.then ?? []),
+    ...walkComponents(component.else ?? []),
+  ]);
+}
+
 export function flatten(children: FlowComponent[], context: ExpressionContext): FlowComponent[] {
   return children.flatMap((component) =>
     component.type === 'If'

@@ -1,4 +1,5 @@
 import { findCatalogEntry } from 'flowso/catalog';
+import { walkComponents } from '../../core/engine';
 import type { FlowAction, FlowComponent, FlowDefinition, FlowScreen } from '../../core/types';
 
 export const catalogIds = [
@@ -20,15 +21,6 @@ export function nextId(prefix: string, existing: Iterable<string>) {
   let number = 1;
   while (used.has(prefix + number)) number++;
   return prefix + number;
-}
-
-export function walkComponents(components: FlowComponent[]): FlowComponent[] {
-  return components.flatMap((component) => [
-    component,
-    ...walkComponents(component.children ?? []),
-    ...walkComponents(component.then ?? []),
-    ...walkComponents(component.else ?? []),
-  ]);
 }
 
 export function createComponent(
