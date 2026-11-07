@@ -88,6 +88,7 @@ Messages include `id`, `direction` (`user` or `business`), `text` and `time`; in
 Every step has a unique string `id`, `type`, `text` and a numeric `delay` between 0 and 120 seconds. The maximum is 200 steps. Use deterministic IDs when generating a journey. Missing or duplicate step IDs are normalized, but explicit unique IDs make later updates easier.
 
 - `type: 'user'`: user message; automatic mode types `text` and sends it. Manual mode waits for a user to send a message.
+- A customer step with `voiceDurationSeconds` uses the simulated voice composer. Set `text` to `''` and use an integer from 1 to 120. Automatic playback holds the microphone for that many seconds after moving the simulated cursor to it. Manual playback uses the actual hold time. A sent voice bubble has `voiceDurationMs` in `getState().messages`.
 - `type: 'business'`: company message; optional `typing` boolean defaults to true. With no `interactive` field it is plain text.
 - `type: 'flow'`: a Flow invitation; additionally requires `label`, `flow`, `answers` and optionally `completion` and `typing`.
 
