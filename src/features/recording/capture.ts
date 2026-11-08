@@ -32,7 +32,7 @@ export function capturePhone(
       preserveScroll: true,
       disableEmbedFonts: true,
       styleCaching: 'strict',
-      style: { margin: '0', boxShadow: 'none' },
+      style: { margin: '0', filter: 'none' },
       filter: (child) =>
         !(child instanceof Element && child.hasAttribute('data-recording-exclude')),
       adjustClonedNode: copyLiveField,
