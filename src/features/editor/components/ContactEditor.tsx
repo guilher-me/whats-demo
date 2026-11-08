@@ -59,6 +59,7 @@ export function ContactEditor({
       <div className="contact-fields">
         <TextField
           label={t('contact.name')}
+          data-journey-contact
           value={contact.name}
           maxLength={80}
           onChange={(event) => onChange({ ...contact, name: event.target.value })}

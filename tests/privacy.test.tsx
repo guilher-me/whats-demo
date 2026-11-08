@@ -21,7 +21,7 @@ it('opens the privacy notice without changing stored data and restores keyboard 
   const trigger = screen.getByRole('button', { name: 'Privacidade' });
   await user.click(trigger);
   const dialog = screen.getByRole('dialog', { name: 'Privacidade no WhatsDemo' });
-  expect(dialog).toHaveTextContent('localStorage');
+  expect(dialog).toHaveTextContent('ficam neste navegador');
   expect(dialog).toHaveTextContent('Qualquer pessoa com ele pode ler a conversa.');
   expect(dialog).toHaveTextContent('configurações de privacidade ou armazenamento');
   expect(localStorage.getItem(STORAGE_KEY)).toBe(before);

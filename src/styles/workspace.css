@@ -208,3 +208,51 @@
     flex-basis: 24px;
   }
 }
+
+.workspace-toolbar {
+  justify-content: space-between;
+}
+.journey-controls,
+.workspace-panel-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.journey-controls .button {
+  padding: 5px 9px;
+  font-size: 12px;
+}
+.journey-menu {
+  min-width: min(220px, calc(100vw - 24px));
+  max-width: min(340px, calc(100vw - 24px));
+  max-height: min(60vh, var(--radix-dropdown-menu-content-available-height));
+  overflow-y: auto;
+}
+.journey-item {
+  padding-inline-start: 23px;
+  position: relative;
+}
+.journey-item > [data-state] {
+  position: absolute;
+  inset-inline-start: 5px;
+  color: var(--accent);
+}
+.journey-item > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.journey-menu-note {
+  padding: 6px;
+  color: var(--muted);
+}
+.journey-menu-separator {
+  border-top: 1px solid var(--line);
+  margin-block: 4px;
+}
+@media (max-width: 600px) {
+  .workspace-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

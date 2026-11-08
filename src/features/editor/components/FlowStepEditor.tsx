@@ -6,15 +6,12 @@ import { Button } from '../../../components/ui/Button';
 import { TextField, FieldError } from '../../../components/ui/Field';
 import { FormSection } from '../../../components/ui/FormSection';
 import { JsonEditor } from '../../../components/ui/JsonEditor';
-import {
-  flowDefinitionDiagnostics,
-  flowDiagnostics,
-  type JourneyDiagnostic,
-} from '../../flows/diagnostics';
+import { flowDefinitionDiagnostics, flowDiagnostics } from '../../flows/diagnostics';
 import { VisualFlow } from './VisualFlow';
 import { AutomaticAnswers } from './AutomaticAnswers';
 import { BuilderTabs, type BuilderTab } from './BuilderTabs';
 import { answerFields, fillMissingAnswers } from '../../flows/answers';
+import type { AnswersDraft, FlowDraft } from '../../journeys/storage';
 
 export function FlowStepEditor({
   step,
@@ -22,7 +19,15 @@ export function FlowStepEditor({
   onChange,
   onValidity,
   onPreview,
+  draft,
+  answersDraft,
+  onDraft,
+  onAnswersDraft,
 }: {
+  draft?: FlowDraft;
+  answersDraft?: AnswersDraft;
+  onDraft: (draft?: FlowDraft) => void;
+  onAnswersDraft: (draft?: AnswersDraft) => void;
   step: FlowStep;
   expanded: boolean;
   onChange: (change: Partial<FlowStep>) => void;
@@ -31,11 +36,10 @@ export function FlowStepEditor({
 }) {
   const t = useT();
   const id = useId();
-  const [tab, setTab] = useState<BuilderTab>('visual');
-  const [jsonOpened, setJsonOpened] = useState(false);
+  const [tab, setTab] = useState<BuilderTab>(draft && !draft.visual ? 'json' : 'visual');
+  const [jsonOpened, setJsonOpened] = useState(!!draft && !draft.visual);
   const [screenId, setScreenId] = useState(step.flow.screens[0].id);
-  const [source, setSource] = useState(() => JSON.stringify(step.flow, null, 2));
-  const [draft, setDraft] = useState<{ visual?: FlowDefinition; issues: JourneyDiagnostic[] }>();
+  const [source, setSource] = useState(() => draft?.text ?? JSON.stringify(step.flow, null, 2));
   const committedIssues = useMemo(
     () => (expanded ? flowDiagnostics(step) : []),
     [expanded, step, currentLocale()],
@@ -51,13 +55,14 @@ export function FlowStepEditor({
     onValidity(!draft);
   }, [draft, onValidity]);
 
-  const accept = (input: unknown, visual?: FlowDefinition, selectedId?: string) => {
+  const accept = (input: unknown, text: string, visual?: FlowDefinition, selectedId?: string) => {
     let next: FlowDefinition;
     try {
       next = validateFlow(input);
     } catch (error) {
       const issues = flowDefinitionDiagnostics(input);
-      setDraft({
+      onDraft({
+        text,
         visual,
         issues: issues.some((issue) => issue.severity === 'error')
           ? issues
@@ -75,17 +80,16 @@ export function FlowStepEditor({
     }
     const issues = flowDefinitionDiagnostics(next);
     if (issues.some((issue) => issue.kind === 'definition' && issue.severity === 'error')) {
-      setDraft({ visual, issues });
+      onDraft({ text, visual, issues });
       return;
     }
-    setDraft(undefined);
     if (JSON.stringify(next) !== JSON.stringify(step.flow)) {
       const previous = answerFields(step.flow);
       const fields = answerFields(next);
       const added = new Set([...fields.keys()].filter((name) => !previous.has(name)));
       const answers = fillMissingAnswers(fields, step.answers, added);
       onChange({ flow: next, answers });
-    }
+    } else onDraft(undefined);
     if (selectedId) onPreview(selectedId);
   };
 
@@ -134,8 +138,9 @@ export function FlowStepEditor({
               onSelect={selectScreen}
               onChange={(value, selectedId) => {
                 if (selectedId) setScreenId(selectedId);
-                setSource(JSON.stringify(value, null, 2));
-                accept(value, value, selectedId);
+                const raw = JSON.stringify(value, null, 2);
+                setSource(raw);
+                accept(value, raw, value, selectedId);
               }}
             />
           )}
@@ -158,7 +163,8 @@ export function FlowStepEditor({
                 try {
                   input = JSON.parse(raw) as unknown;
                 } catch (error) {
-                  setDraft({
+                  onDraft({
+                    text: raw,
                     issues: [
                       {
                         kind: 'definition',
@@ -170,7 +176,7 @@ export function FlowStepEditor({
                   });
                   return;
                 }
-                accept(input);
+                accept(input, raw);
               }}
             />
           )}
@@ -182,7 +188,7 @@ export function FlowStepEditor({
               variant="ghost"
               onClick={() => {
                 setSource(JSON.stringify(step.flow, null, 2));
-                setDraft(undefined);
+                onDraft(undefined);
               }}
             >
               {t('builder.discard')}
@@ -211,6 +217,8 @@ export function FlowStepEditor({
         mountOnOpen
       >
         <AutomaticAnswers
+          draft={answersDraft}
+          onDraft={onAnswersDraft}
           step={step}
           issues={committedIssues.filter((issue) => issue.kind === 'automatic')}
           onChange={(answers) => onChange({ answers })}

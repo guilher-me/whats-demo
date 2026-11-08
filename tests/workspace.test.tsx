@@ -3,10 +3,10 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
+import { savedJourney } from './fixtures/journey-library';
 import { readJsonEditor, writeJsonEditor } from './fixtures/json-editor';
 import { createLumaProject } from './fixtures/luma-project';
 import type { FlowStep } from '../src/core/types';
-import { STORAGE_KEY } from '../src/core/project';
 
 const button = (name: string) => screen.getByRole('button', { name });
 const code = () => screen.getByRole('textbox', { name: 'JSON da jornada' });
@@ -83,7 +83,8 @@ it('applies valid journey JSON atomically and preserves the editor on failure', 
   fireEvent.click(button('Aplicar'));
   expect(screen.getByRole('alert')).toHaveTextContent('JSON inválido.');
   expect(api().getProject()).toEqual(previous);
-  expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+  expect(savedJourney()?.project).toEqual(previous);
+  expect(savedJourney()?.code?.text).toBe('{invalid');
 
   const next = { ...previous, contact: { ...previous.contact, name: 'Empresa do código' } };
   writeJsonEditor(code(), JSON.stringify(next));
@@ -93,7 +94,7 @@ it('applies valid journey JSON atomically and preserves the editor on failure', 
   fireEvent.click(button('Aplicar'));
   expect(screen.getByLabelText('Nome do contato')).toHaveValue('Empresa do código');
   expect(screen.getByTitle('Empresa do código')).toBeVisible();
-  expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).contact.name).toBe('Empresa do código');
+  expect(savedJourney()?.project.contact.name).toBe('Empresa do código');
 });
 
 it('keeps newer visual edits separate from a pending code draft', () => {

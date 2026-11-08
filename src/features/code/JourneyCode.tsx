@@ -4,6 +4,7 @@ import { FieldError } from '../../components/ui/Field';
 import { JsonEditor } from '../../components/ui/JsonEditor';
 import type { Project } from '../../core/types';
 import { useT } from '../../i18n';
+import type { CodeDraft } from '../journeys/storage';
 import { reviewJourney, type JourneyDiagnostic } from '../flows/diagnostics';
 
 export function JourneyCode({
@@ -11,7 +12,11 @@ export function JourneyCode({
   diagnostics,
   disabled,
   onApply,
+  draft,
+  onDraftChange,
 }: {
+  draft?: CodeDraft;
+  onDraftChange: (draft?: CodeDraft) => void;
   project: Project;
   diagnostics: JourneyDiagnostic[];
   disabled: boolean;
@@ -19,7 +24,6 @@ export function JourneyCode({
 }) {
   const t = useT();
   const current = useMemo(() => JSON.stringify(project, null, 2), [project]);
-  const [draft, setDraft] = useState<{ base: string; text: string }>();
   const [result, setResult] = useState<{
     diagnostics?: JourneyDiagnostic[];
     error?: string;
@@ -47,7 +51,7 @@ export function JourneyCode({
       }
       if (apply) {
         onApply(next);
-        setDraft(undefined);
+        onDraftChange(undefined);
       }
       setResult({
         diagnostics,
@@ -84,7 +88,9 @@ export function JourneyCode({
         readOnly={disabled}
         invalid={!!result?.error}
         onChange={(value) => {
-          setDraft(value === current ? undefined : { text: value, base: draft?.base ?? current });
+          onDraftChange(
+            value === current ? undefined : { text: value, base: draft?.base ?? current },
+          );
           setResult(undefined);
         }}
       />
@@ -123,7 +129,7 @@ export function JourneyCode({
             variant="ghost"
             disabled={disabled}
             onClick={() => {
-              setDraft(undefined);
+              onDraftChange(undefined);
               setResult(undefined);
             }}
           >

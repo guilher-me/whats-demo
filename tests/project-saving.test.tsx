@@ -3,8 +3,9 @@ import '@testing-library/jest-dom/vitest';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
+import { savedJourney } from './fixtures/journey-library';
 import { createLumaProject } from './fixtures/luma-project';
-import { projectStorageKey, STORAGE_KEY } from '../src/core/project';
+import { STORAGE_KEY } from '../src/core/project';
 import { createShareURL } from '../src/core/codec';
 import { Blob as NativeBlob } from 'node:buffer';
 beforeEach(() => {
@@ -32,9 +33,7 @@ it('keeps development edits separate from the existing production draft', async 
     target: { value: 'Development contact' },
   });
   expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).contact.name).toBe('Production contact');
-  expect(JSON.parse(localStorage.getItem(projectStorageKey(location))!).contact.name).toBe(
-    'Development contact',
-  );
+  expect(savedJourney()?.project.contact.name).toBe('Development contact');
   cleanup();
   history.replaceState(null, '', '/whats-demo/');
   await start();
@@ -61,7 +60,7 @@ it('shows success only after writing and restores the saved draft on reopening',
   fireEvent.change(screen.getByLabelText('Nome do contato'), {
     target: { value: 'Contato de teste' },
   });
-  expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).contact.name).toBe('Contato de teste');
+  expect(savedJourney()?.project.contact.name).toBe('Contato de teste');
   expect(indicator()).toHaveAttribute('data-state', 'saved');
   expect(indicator()).toHaveTextContent('Todas as alterações salvas');
   cleanup();
@@ -146,6 +145,38 @@ it('restores the journey from the link while keeping the main draft', async () =
   fireEvent.click(within(dialog).getByRole('button', { name: 'Restaurar do link' }));
   expect(screen.getByLabelText('Nome do contato')).toHaveValue('Jornada compartilhada');
   expect(localStorage.getItem(STORAGE_KEY)).toBe(JSON.stringify(draft));
+});
+
+it('migrates a legacy link draft alongside the primary journey', async () => {
+  vi.stubGlobal('Blob', NativeBlob);
+  const main = oneMessageProject('Rascunho original');
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(main));
+  const link = new URL(await createShareURL(oneMessageProject('Do link'), 'editor', location.href));
+  const token = link.hash.slice('#editor='.length).split('&')[0];
+  localStorage.setItem(
+    STORAGE_KEY + ':copy:' + token,
+    JSON.stringify(oneMessageProject('Cópia antiga')),
+  );
+  history.replaceState(null, '', link.hash);
+  await start();
+  expect(await screen.findByLabelText('Nome do contato')).toHaveValue('Cópia antiga');
+  fireEvent.keyDown(screen.getByRole('button', { name: 'Minhas jornadas' }), { key: 'Enter' });
+  expect(screen.getAllByRole('menuitemradio')).toHaveLength(2);
+  expect(localStorage.getItem(STORAGE_KEY)).toBe(JSON.stringify(main));
+});
+
+it('reopens the same shared address after creating a different local journey', async () => {
+  vi.stubGlobal('Blob', NativeBlob);
+  const link = new URL(await createShareURL(oneMessageProject('Do link'), 'editor', location.href));
+  history.replaceState(null, '', link.hash);
+  await start();
+  expect(await screen.findByLabelText('Nome do contato')).toHaveValue('Do link');
+  fireEvent.click(screen.getByRole('button', { name: /Nova jornada/ }));
+  expect(screen.getByLabelText('Nome do contato')).toHaveValue('');
+
+  history.replaceState(null, '', link.hash);
+  await act(async () => window.dispatchEvent(new HashChangeEvent('hashchange')));
+  expect(await screen.findByLabelText('Nome do contato')).toHaveValue('Do link');
 });
 
 it('reports a truncated share link and preserves the local draft', async () => {

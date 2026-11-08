@@ -1,6 +1,14 @@
 import { catalogError, commercePreview, commerceStepError } from '../core/commerce';
 import { currentLocale, useT } from '../i18n';
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from 'react';
 import { AppHeader } from './AppHeader';
 import { Workbench, type Panel } from './Workbench';
 import { JourneyCode } from '../features/code/JourneyCode';
@@ -28,12 +36,39 @@ import { TooltipIconButton } from '../components/ui/TooltipIconButton';
 import { ControlIcon } from '../components/icons/ControlIcon';
 import { ConversationOverview } from '../features/conversation/components/ConversationOverview';
 import { stepAttachment } from '../core/attachments';
-export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnly?: boolean }) {
+import { JourneyControls } from '../features/journeys/JourneyControls';
+import { useLiveJourneyLink } from '../features/journeys/live-link';
+export function EditorApp({
+  copy,
+  previewOnly,
+  localId,
+}: {
+  copy?: SharedCopy;
+  previewOnly?: boolean;
+  localId?: string;
+}) {
   const t = useT();
+  const editor = useProject(copy, localId);
+  return editor.ready ? (
+    <EditorWorkspace editor={editor} previewOnly={previewOnly} />
+  ) : (
+    <p className="link-loading" role="status">
+      {t('errors.loading')}
+    </p>
+  );
+}
 
-  const editor = useProject(copy),
-    phoneRef = useRef<HTMLDivElement>(null),
-    playback = usePlayback(phoneRef);
+function EditorWorkspace({
+  editor,
+  previewOnly,
+}: {
+  editor: ReturnType<typeof useProject>;
+  previewOnly?: boolean;
+}) {
+  const t = useT();
+  const phoneRef = useRef<HTMLDivElement>(null);
+  const playback = usePlayback(phoneRef);
+  const focusContact = useRef(false);
   const [invalid, setInvalid] = useState<Record<string, boolean>>({}),
     [selectedId, setSelectedId] = useState<string | null>(null),
     [flowPreview, setFlowPreview] = useState<FlowPreviewRequest>(),
@@ -74,6 +109,23 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
             ? !!businessMessageError(step)
             : step.type === 'flow' && invalid[step.id]),
     );
+  const { journey } = editor;
+  useLiveJourneyLink(
+    journey,
+    editor.live && editor.items.some((item) => item.id === journey.id),
+    hasErrors ||
+      !!journey.code ||
+      !!Object.keys(journey.flows ?? {}).length ||
+      !!Object.keys(journey.answers ?? {}).length ||
+      diagnostics.some((issue) => issue.kind === 'definition' && issue.severity === 'error'),
+    currentLocale(),
+  );
+  useLayoutEffect(() => {
+    if (!focusContact.current) return;
+    focusContact.current = false;
+    document.querySelector<HTMLInputElement>('[data-journey-contact]')?.focus();
+  }, [editor.revision]);
+
   const selectedStep = !playback.running
     ? editor.project.steps.find((step) => step.id === selectedId)
     : undefined;
@@ -159,6 +211,12 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
   };
   const editorPanel = (
     <EditorPanel
+      title={journey.title}
+      onTitle={editor.rename}
+      flowDrafts={journey.flows}
+      answersDrafts={journey.answers}
+      onFlowDraft={editor.setFlowDraft}
+      onAnswersDraft={editor.setAnswersDraft}
       saveState={editor.saveState}
       disabled={recorder.busy}
       project={editor.project}
@@ -191,7 +249,7 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
         });
         return addedId;
       }}
-      onRestore={copy ? () => setRestoreOpen(true) : undefined}
+      onRestore={journey.source ? () => setRestoreOpen(true) : undefined}
       onValidity={onValidity}
       onFlowPreview={(stepId, screenId) => {
         edit(() => {
@@ -329,9 +387,43 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
         collapsed={collapsed}
         onToggle={togglePanel}
         locked={recorder.busy}
+        journeyControls={
+          <>
+            <JourneyControls
+              active={journey}
+              items={editor.items}
+              disabled={recorder.busy}
+              onCreate={() => {
+                playback.reset();
+                focusContact.current = true;
+                setCollapsed((panels) => ({ ...panels, editor: false, preview: false }));
+                editor.create();
+              }}
+              onOpen={(item) => {
+                playback.reset();
+                setCollapsed((panels) => ({ ...panels, editor: false, preview: false }));
+                editor.select(item);
+              }}
+              onRename={editor.rename}
+              onDuplicate={(item) => {
+                playback.reset();
+                setCollapsed((panels) => ({ ...panels, editor: false, preview: false }));
+                editor.duplicate(item);
+              }}
+            />
+            {collapsed.editor && editor.saveState === 'failed' && (
+              <p className="save-warning" role="alert">
+                {t('storage.failureHelp')}
+              </p>
+            )}
+          </>
+        }
         contents={{
           code: (
             <JourneyCode
+              key={journey.id}
+              draft={journey.code}
+              onDraftChange={editor.setCodeDraft}
               project={editor.project}
               diagnostics={diagnostics}
               disabled={recorder.busy}
@@ -342,7 +434,7 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
           preview,
         }}
       />
-      {copy && (
+      {journey.source && (
         <Dialog
           open={restoreOpen}
           onOpenChange={setRestoreOpen}
@@ -354,7 +446,10 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
             <Button
               variant="primary"
               onClick={() => {
-                edit(() => replaceProject(copy.project));
+                edit(() => {
+                  playback.reset();
+                  void editor.restore();
+                });
                 setRestoreOpen(false);
               }}
             >
