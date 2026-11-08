@@ -22,7 +22,7 @@ The header status describes saving for the **entire project**, including contact
 
 ## Messages, buttons and lists
 
-For a customer voice note, choose **Voice message (mock)** under **Format**. Set **Recording duration** from 1 to 120 seconds for automatic playback. In manual playback, hold the microphone and release it to send. The preview animates a waveform and adds a voice bubble with the elapsed time. The entire interaction is silent.
+For a customer voice note, choose **Voice message (mock)** under **Format**. Set **Recording duration** from 1 to 120 seconds for automatic playback. While recording, the composer shows the elapsed time. In manual playback, hold the microphone and release it to send, or slide left to cancel. The sent voice bubble shows a simulated waveform and the recorded duration. The entire interaction is silent.
 
 For text-based Business messages, choose one of these formats.
 
