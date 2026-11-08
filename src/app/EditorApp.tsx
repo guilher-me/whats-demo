@@ -117,9 +117,13 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
       pendingMessageId:
         playback.interaction.pendingId ??
         (playback.running ? (playback.commerce.session?.messageId ?? null) : null),
-      messages: playback.messages.map(({ attachment, ...message }) =>
-        attachment ? { ...message, attachmentId: attachment.id } : message,
-      ),
+      messages: playback.messages.map(({ attachment, ...message }) => {
+        if (!attachment) return message;
+        const entry = { ...message, attachmentId: attachment.id };
+        if (attachment.kind !== 'location') return entry;
+        const { name, address } = attachment;
+        return { ...entry, location: { name, address } };
+      }),
     }),
     hasErrors: () => hasErrors,
     replace: replaceProject,

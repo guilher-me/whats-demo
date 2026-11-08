@@ -59,12 +59,14 @@ The sequence is linear. Reply buttons and lists wait for a choice and append tha
 
 ## Simulated attachments
 
-Configure a simulated file in the step’s `media.file`. Use `text: ''` for media steps.
+Use `text: ''` for media steps. Images and documents use `media.file`, and locations use `media.place`.
 
-- An image uses `media: { kind: 'image', file: { extension: 'jpg', name: 'IMG 01' }, caption: 'Optional caption' }`. Supported extensions are `png` and `jpg`. The name appears on the image preview and can contain up to 48 characters. Use an empty string for the default label.
+- An image uses `media: { kind: 'image', file: { extension: 'jpg', name: 'IMG 01' }, caption: 'Optional caption' }`. Supported extensions are `png` and `jpg` (JPEG). The Meta limit of 5 MB applies to actual uploads. WhatsDemo stores simulated image metadata. The name appears on the image preview and can contain up to 48 characters. Use an empty string for the default label.
 - A document uses `media: { kind: 'document', file: { extension: 'pdf', name: 'Estimate', size: 240, unit: 'KB' } }`. Supported extensions are `pdf`, `txt`, `doc`, `docx`, `xls`, `xlsx`, `ppt` and `pptx`. Use a positive number and the unit `KB` or `MB`. The maximum is 100 MB or 100,000 KB. Use a name of up to 60 characters. The selected extension is appended to the filename.
 
-Automatic playback sends the configured file. Manual playback lists the matching files from all steps. Inline files use `media:<step-id>` as the recorded `attachmentId`. Omit media sources, document covers and avatars.
+- A fixed location uses `media: { kind: 'location', place: { name: 'Demo store', address: '123 Example Avenue' } }`. Both customer and business steps accept this shape. Use a place name of up to 60 characters and an optional address of up to 160. The phone draws an illustrative map locally.
+
+Automatic playback sends the configured attachment. Manual playback lists matching attachments from other steps. In a location step, **Send my current location** simulates sending the configured point. The recorded `attachmentId` uses `media:<step-id>` for the attachment actually sent. For a location, `getState().messages` also includes `location: { name, address? }`.
 
 ## Reply buttons
 

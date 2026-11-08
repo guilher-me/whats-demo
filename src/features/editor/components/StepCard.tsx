@@ -119,8 +119,7 @@ export function StepCard({
             {step.type !== 'flow' && step.commerce
               ? t(`commerce.${step.commerce.kind}`)
               : media
-                ? (attachment?.name ??
-                  t(media.kind === 'image' ? 'attachments.image' : 'attachments.document'))
+                ? (attachment?.name ?? t(`attachments.${media.kind}`))
                 : voiceSeconds === undefined
                   ? step.text.replace(/[*_~]/g, '').replace(/\s+/g, ' ').slice(0, 110) ||
                     t('common.untitled')

@@ -11,6 +11,8 @@ import {
   MAX_CAPTION,
   MAX_DOCUMENT_MB,
   MAX_IMAGE_LABEL,
+  MAX_LOCATION_NAME,
+  MAX_LOCATION_ADDRESS,
 } from '../../../core/attachments';
 import { ControlIcon } from '../../../components/icons/ControlIcon';
 import { FieldError, TextField } from '../../../components/ui/Field';
@@ -26,7 +28,7 @@ function ExtensionPicker<T extends string>({
 }: {
   extensions: readonly T[];
   value: T;
-  kind: MediaStep['kind'];
+  kind: Exclude<MediaStep['kind'], 'location'>;
   onChange: (extension: T) => void;
 }) {
   const t = useT();
@@ -64,6 +66,36 @@ export function MessageAttachmentEditor({
 }) {
   const t = useT();
   const errorId = useId();
+  if (media.kind === 'location') {
+    const { place } = media;
+    const missingName = !place.name.trim();
+    return (
+      <>
+        <TextField
+          label={t('attachments.locationName')}
+          maxLength={MAX_LOCATION_NAME}
+          value={place.name}
+          aria-invalid={missingName || undefined}
+          aria-describedby={missingName ? errorId : undefined}
+          onChange={(event) =>
+            onChange({ ...media, place: { ...place, name: event.currentTarget.value } })
+          }
+        />
+        <TextField
+          label={t('attachments.locationAddress')}
+          maxLength={MAX_LOCATION_ADDRESS}
+          value={place.address ?? ''}
+          onChange={(event) =>
+            onChange({
+              ...media,
+              place: { ...place, address: event.currentTarget.value || undefined },
+            })
+          }
+        />
+        <FieldError id={errorId}>{missingName && t('attachments.locationNameRequired')}</FieldError>
+      </>
+    );
+  }
   if (media.kind === 'image') {
     const { file } = media;
     return (

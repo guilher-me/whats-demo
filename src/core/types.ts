@@ -59,14 +59,21 @@ export type ImageExtension = 'png' | 'jpg';
 export type DocumentExtension = 'pdf' | 'txt' | 'doc' | 'docx' | 'xls' | 'xlsx' | 'ppt' | 'pptx';
 export type DocumentUnit = 'KB' | 'MB';
 
+export interface LocationPlace {
+  name: string;
+  address?: string;
+}
+
 export type Attachment = { id: string; name: string } & (
   | { kind: 'image'; extension: ImageExtension }
   | { kind: 'document'; extension: DocumentExtension; sizeLabel: string }
+  | ({ kind: 'location' } & LocationPlace)
 );
 export type AttachmentKind = Attachment['kind'];
 
 export type MediaStep =
   | { kind: 'image'; file: { extension: ImageExtension; name: string }; caption?: string }
+  | { kind: 'location'; place: LocationPlace; caption?: never }
   | {
       kind: 'document';
       file: { extension: DocumentExtension; name: string; size?: number; unit: DocumentUnit };

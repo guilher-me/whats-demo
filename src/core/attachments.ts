@@ -27,8 +27,15 @@ export const DOCUMENT_EXTENSIONS = [
 export const DOCUMENT_UNITS = ['KB', 'MB'] as const satisfies readonly DocumentUnit[];
 export const MAX_DOCUMENT_MB = 100;
 export const MAX_IMAGE_LABEL = 48;
+export const MAX_LOCATION_NAME = 60;
+export const MAX_LOCATION_ADDRESS = 160;
+
+export function isAttachmentKind(kind: unknown): kind is AttachmentKind {
+  return kind === 'image' || kind === 'document' || kind === 'location';
+}
 
 export function createMedia(kind: AttachmentKind): MediaStep {
+  if (kind === 'location') return { kind, place: { name: '' } };
   return kind === 'image'
     ? { kind, file: { extension: 'png', name: '' } }
     : { kind, file: { extension: 'pdf', name: '', unit: 'KB' } };
@@ -67,6 +74,11 @@ export function stepAttachment(step: Step): Attachment | undefined {
   if (step.type === 'flow' || !step.media) return undefined;
   const media = step.media;
   const id = 'media:' + step.id;
+  if (media.kind === 'location') {
+    const name = media.place.name.trim();
+    const address = media.place.address?.trim();
+    return name ? { id, kind: media.kind, name, ...(address ? { address } : {}) } : undefined;
+  }
   if (media.kind === 'image')
     return {
       id,
@@ -94,7 +106,11 @@ export function conversationAttachments(project: Project): Attachment[] {
   });
 }
 
-function validateFile(kind: AttachmentKind, file: unknown, allowDrafts: boolean) {
+function validateFile(
+  kind: Exclude<AttachmentKind, 'location'>,
+  file: unknown,
+  allowDrafts: boolean,
+) {
   if (!object(file) || !text(file.name, kind === 'image' ? MAX_IMAGE_LABEL : MAX_DOCUMENT_NAME))
     throw new Error(t('attachments.invalid'));
 
@@ -127,8 +143,7 @@ export function validateMediaSteps(project: Project, allowDrafts = false) {
     if (
       step.type === 'flow' ||
       !object(media) ||
-      (media.kind !== 'image' && media.kind !== 'document') ||
-      Object.keys(media).some((key) => !['kind', 'caption', 'file'].includes(key)) ||
+      !isAttachmentKind(media.kind) ||
       step.interactive !== undefined ||
       step.voiceDurationSeconds !== undefined ||
       (media.caption !== undefined &&
@@ -137,6 +152,22 @@ export function validateMediaSteps(project: Project, allowDrafts = false) {
           media.caption.length > MAX_CAPTION))
     )
       throw new Error(t('attachments.invalid'));
-    validateFile(media.kind, media.file, allowDrafts);
+    if (media.kind === 'location') {
+      const place = media.place;
+      if (
+        Object.keys(media).some((key) => key !== 'kind' && key !== 'place') ||
+        !object(place) ||
+        Object.keys(place).some((key) => key !== 'name' && key !== 'address') ||
+        !text(place.name, MAX_LOCATION_NAME) ||
+        (place.address !== undefined && !text(place.address, MAX_LOCATION_ADDRESS))
+      )
+        throw new Error(t('attachments.invalid'));
+      if (!allowDrafts && !place.name.trim())
+        throw new Error(t('attachments.locationNameRequired'));
+    } else {
+      if (Object.keys(media).some((key) => !['kind', 'caption', 'file'].includes(key)))
+        throw new Error(t('attachments.invalid'));
+      validateFile(media.kind, media.file, allowDrafts);
+    }
   }
 }

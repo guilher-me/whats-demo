@@ -59,7 +59,7 @@ A URL também depende de um endereço de hospedagem estável. Preservar o codec 
 
 ## Anexos simulados
 
-A etapa guarda a extensão e o texto da imagem simulada, com legenda separada. Para documentos, guarda o nome, a extensão e o tamanho numérico com unidade. `stepAttachment` prepara o item usado nos balões e `conversationAttachments` percorre a sequência para compor a galeria e o seletor de documentos. O avatar fixo e os previews são componentes reutilizados nas mensagens e na gravação.
+A etapa guarda a extensão e o texto da imagem simulada, com legenda separada. Para documentos, guarda o nome, a extensão e o tamanho numérico com unidade. `stepAttachment` prepara o item usado nos balões e `conversationAttachments` percorre a sequência para compor a galeria e o seletor de documentos. Localizações usam nome e endereço opcional em `media.place`, com mapa vetorial embutido. Os previews são reutilizados nas mensagens e na gravação.
 
 ## Build portátil
 

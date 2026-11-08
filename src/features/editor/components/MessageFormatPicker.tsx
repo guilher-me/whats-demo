@@ -2,7 +2,8 @@ import { useId } from 'react';
 import { useT } from '../../../i18n';
 import { MessageButtonIcon } from '../../../components/icons/MessageButtonIcon';
 import { ControlIcon } from '../../../components/icons/ControlIcon';
-type Format = 'text' | 'buttons' | 'list' | 'image' | 'document' | 'product' | 'showcase' | 'pix';
+type Format =
+  'text' | 'buttons' | 'list' | 'image' | 'document' | 'product' | 'showcase' | 'pix' | 'location';
 export function MessageFormatPicker({
   value,
   onChange,
@@ -26,6 +27,7 @@ export function MessageFormatPicker({
             { value: 'showcase', label: t('commerce.showcase'), icon: 'flow' },
             { value: 'pix', label: t('commerce.pix'), icon: 'file' },
             { value: 'document', label: t('attachments.document'), icon: 'file' },
+            { value: 'location', label: t('attachments.location'), icon: 'pin' },
           ] as const
         ).map((option) => (
           <label key={option.value} className={value === option.value ? 'is-selected' : ''}>

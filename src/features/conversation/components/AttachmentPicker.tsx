@@ -12,7 +12,7 @@ import { useEffect, useRef } from 'react';
 const choices = [
   { icon: 'photo', label: 'attachments.gallery', kind: 'image', color: 'blue' },
   { icon: 'camera', label: 'attachments.camera', color: 'pink' },
-  { icon: 'pin', label: 'attachments.location', color: 'green' },
+  { icon: 'pin', label: 'attachments.location', kind: 'location', color: 'green' },
   { icon: 'user', label: 'attachments.contact', color: 'cyan' },
   { icon: 'file', label: 'attachments.document', kind: 'document', color: 'purple' },
   { icon: 'headphones', label: 'attachments.audio', color: 'orange' },
@@ -84,11 +84,13 @@ export function AttachmentPicker({
   container,
   disabled,
   onSend,
+  onSendLocation,
 }: {
   media: Playback['media'];
   container: HTMLElement | null;
   disabled: boolean;
   onSend: () => void;
+  onSendLocation: (id: string) => void;
 }) {
   const t = useT();
   const session = media.session;
@@ -104,16 +106,22 @@ export function AttachmentPicker({
   }, [view, disabled]);
   if (!session || session.view === 'closed') return null;
   const menu = session.view === 'menu';
+  const location = session.kind === 'location' && session.view === 'items';
+  const point = location
+    ? session.items.find((item) => item.kind === 'location' && item.id === session.configuredId)
+    : undefined;
   const gallery = session.kind === 'image' && session.view === 'items';
   const photo = session.selected?.kind === 'image' ? session.selected : undefined;
   const review = !!photo && session.view === 'preview';
   const title = menu
     ? t('attachments.attach')
-    : gallery
-      ? t('attachments.recents')
-      : session.view === 'items'
-        ? t('attachments.document')
-        : t('attachments.preview');
+    : location
+      ? t('attachments.sendLocation')
+      : gallery
+        ? t('attachments.recents')
+        : session.view === 'items'
+          ? t('attachments.document')
+          : t('attachments.preview');
   return (
     <PhoneSheet
       container={container}
@@ -122,14 +130,16 @@ export function AttachmentPicker({
       className={
         menu
           ? 'android-attachment-menu'
-          : gallery
-            ? 'android-photo-gallery'
-            : review
-              ? 'android-photo-review'
-              : undefined
+          : location
+            ? 'location-picker'
+            : gallery
+              ? 'android-photo-gallery'
+              : review
+                ? 'android-photo-review'
+                : undefined
       }
       hideHeader={menu}
-      backdrop={menu ? 'clear' : gallery || review ? 'dimmed' : undefined}
+      backdrop={menu ? 'clear' : gallery || review || location ? 'dimmed' : undefined}
       closeLabel={t(review ? 'attachments.back' : 'common.closeDialog')}
       onClose={() => {
         if (disabled) return;
@@ -159,6 +169,53 @@ export function AttachmentPicker({
               </button>
             );
           })}
+        </div>
+      ) : location && point ? (
+        <div className="location-picker-content" ref={content}>
+          <AttachmentVisual item={point} />
+          <button
+            type="button"
+            className="location-choice current-location"
+            data-attachment-item={point.id}
+            disabled={disabled}
+            onClick={() => onSendLocation(point.id)}
+          >
+            <ControlIcon name="pin" />
+            <span>
+              <strong>{t('attachments.sendCurrentLocation')}</strong>
+              <small>
+                {t('attachments.simulatedLocation')} · {point.name}
+              </small>
+            </span>
+          </button>
+          {session.items.length > 1 && (
+            <section>
+              <h3>{t('attachments.demoPlaces')}</h3>
+              <ul className="location-list">
+                {session.items.map(
+                  (item) =>
+                    item.kind === 'location' &&
+                    item.id !== point.id && (
+                      <li key={item.id}>
+                        <button
+                          type="button"
+                          className="location-choice"
+                          data-attachment-item={item.id}
+                          disabled={disabled}
+                          onClick={() => onSendLocation(item.id)}
+                        >
+                          <ControlIcon name="pin" />
+                          <span>
+                            <strong>{item.name}</strong>
+                            {item.address && <small>{item.address}</small>}
+                          </span>
+                        </button>
+                      </li>
+                    ),
+                )}
+              </ul>
+            </section>
+          )}
         </div>
       ) : gallery ? (
         <div className="photo-gallery-scroll" ref={content}>
@@ -224,7 +281,7 @@ export function AttachmentPicker({
           onSend={onSend}
         />
       )}
-      {!menu && session.kind === 'document' && (
+      {!menu && (session.kind === 'document' || location) && (
         <footer className="attachment-picker-footer">
           <Button variant="ghost" onClick={media.back} disabled={disabled}>
             {t('attachments.back')}
