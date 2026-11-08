@@ -1,5 +1,5 @@
 import { useT } from '../../../i18n';
-import type { Contact, Project, Step } from '../../../core/types';
+import type { CartItem, Contact, Project, Step } from '../../../core/types';
 import { useRef, useState, useEffect } from 'react';
 import { useAddedStepFocus } from '../hooks/useAddedStepFocus';
 import { ContactEditor } from './ContactEditor';
@@ -34,6 +34,7 @@ interface Props {
   onCatalog: (catalog: Product[]) => void;
   onContact: (contact: Contact) => void;
   onChange: (id: string, change: Partial<Step>) => void;
+  onCartChange: (offerId: string, cartId?: string, items?: CartItem[]) => void;
   onReorder: (steps: Step[]) => void;
   onAction: (id: string, action: StepAction) => void;
   onAdd: (type: Step['type']) => string | undefined;
@@ -128,6 +129,7 @@ export function EditorPanel(props: Props) {
                 props.onSelect(step.id);
               }}
               onChange={(change) => props.onChange(step.id, change)}
+              onCartChange={(cartId, items) => props.onCartChange(step.id, cartId, items)}
               onAction={(action) => props.onAction(step.id, action)}
               onValidity={props.onValidity}
               onFlowPreview={(screenId) => props.onFlowPreview(step.id, screenId)}

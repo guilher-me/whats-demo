@@ -1,8 +1,12 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { hasTransparentCorners } from '../src/features/recording/alpha';
 import { capturePhone } from '../src/features/recording/capture';
 import { preparePhoneRecording, recordingSupport } from '../src/features/recording/session';
 import fixWebmDuration from 'fix-webm-duration';
+vi.mock('../src/features/recording/alpha', () => ({
+  hasTransparentCorners: vi.fn(async () => true),
+}));
 vi.mock('../src/features/recording/capture', () => ({ capturePhone: vi.fn() }));
 vi.mock('fix-webm-duration', () => ({ default: vi.fn(async (blob: Blob) => blob) }));
 class FakeMediaRecorder {
@@ -31,7 +35,11 @@ class FakeMediaRecorder {
 }
 const stopTrack = vi.fn();
 const captureStream = vi.fn(
-  () => ({ getTracks: () => [{ stop: stopTrack }] }) as unknown as MediaStream,
+  () =>
+    ({
+      getTracks: () => [{ stop: stopTrack }],
+      getVideoTracks: () => [],
+    }) as unknown as MediaStream,
 );
 const pixels = vi.fn(() => ({ data: new Uint8ClampedArray(4) }));
 beforeEach(() => {
@@ -45,12 +53,14 @@ beforeEach(() => {
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
     fillStyle: '',
     fillRect: vi.fn(),
+    clearRect: vi.fn(),
     drawImage: vi.fn(),
     getImageData: pixels,
   } as unknown as CanvasRenderingContext2D);
   vi.mocked(capturePhone).mockResolvedValue(document.createElement('canvas'));
 });
 afterEach(() => {
+  vi.useRealTimers();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
   delete (HTMLCanvasElement.prototype as Partial<HTMLCanvasElement>).captureStream;
@@ -72,6 +82,35 @@ it('gera MP4 nativo e libera todas as tracks ao finalizar', async () => {
   expect(stopTrack).toHaveBeenCalled();
   expect(fixWebmDuration).not.toHaveBeenCalled();
 });
+it('keeps publishing frames while the screen is unchanged and holds the last snapshot before stopping', async () => {
+  vi.useFakeTimers();
+  const stop = vi.spyOn(FakeMediaRecorder.prototype, 'stop');
+  const node = phone();
+  const cursor = document.createElement('div');
+  cursor.setAttribute('data-recording-cursor', '');
+  const input = document.createElement('input');
+  node.append(cursor, input);
+  const session = await preparePhoneRecording(node, vi.fn());
+  const draw = document.createElement('canvas').getContext('2d')!.drawImage;
+  session.start();
+  await vi.advanceTimersByTimeAsync(500);
+  cursor.style.left = '20px';
+  input.name = 'composer';
+  await vi.advanceTimersByTimeAsync(500);
+  expect(capturePhone).toHaveBeenCalledTimes(2);
+  expect(vi.mocked(draw).mock.calls.length).toBeGreaterThanOrEqual(30);
+  const final = document.createElement('canvas');
+  vi.mocked(capturePhone).mockResolvedValueOnce(final);
+  const finish = session.finish();
+  await vi.advanceTimersByTimeAsync(100);
+  expect(draw).toHaveBeenLastCalledWith(final, 0, 0, 720, 1440);
+  expect(stop).not.toHaveBeenCalled();
+  await vi.advanceTimersByTimeAsync(400);
+  const clip = await finish;
+  expect(clip.durationMs).toBeCloseTo(1400);
+  expect(stop).toHaveBeenCalledOnce();
+});
+
 it('uses the theme backdrop selected when preparing every frame of a recording', async () => {
   const node = phone();
   node.style.setProperty('--recording-backdrop', '#213c35');
@@ -93,6 +132,29 @@ it('usa WebM quando MP4 não está disponível e corrige a duração', async () 
   expect(clip.extension).toBe('webm');
   expect(fixWebmDuration).toHaveBeenCalledOnce();
 });
+it('exports verified transparent WebM even when MP4 is available', async () => {
+  FakeMediaRecorder.supported.add('video/webm;codecs=vp8');
+  const node = phone();
+  const context = document.createElement('canvas').getContext('2d')!;
+  const session = await preparePhoneRecording(node, vi.fn(), true);
+  session.start();
+  const clip = await session.finish();
+  expect(clip).toMatchObject({ extension: 'webm', transparent: true });
+  expect(clip.blob.type).toBe('video/webm;codecs=vp8');
+  expect(capturePhone).toHaveBeenLastCalledWith(node, 360, 720, 'transparent');
+  expect(context.clearRect).toHaveBeenCalledWith(0, 0, 720, 1440);
+  expect(context.fillRect).not.toHaveBeenCalled();
+  expect(hasTransparentCorners).toHaveBeenCalledOnce();
+});
+
+it('rejects a transparent export when the browser drops the alpha channel', async () => {
+  FakeMediaRecorder.supported.add('video/webm;codecs=vp8');
+  vi.mocked(hasTransparentCorners).mockResolvedValueOnce(false);
+  const session = await preparePhoneRecording(phone(), vi.fn(), true);
+  session.start();
+  await expect(session.finish()).rejects.toThrow('cantos transparentes');
+});
+
 it('cancela uma sessão preparada antes do início sem deixar tracks abertas', async () => {
   const session = await preparePhoneRecording(phone(), vi.fn());
   session.cancel();

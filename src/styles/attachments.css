@@ -403,6 +403,10 @@
   text-align: left;
   color: inherit;
 }
+.message-attachment-preview:disabled,
+.location-choice:disabled {
+  opacity: 1;
+}
 .message-attachment-preview.image {
   display: block;
   width: 248px;

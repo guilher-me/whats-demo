@@ -9,6 +9,7 @@ import { preparePhoneRecording } from '../src/features/recording/session';
 vi.mock('../src/features/recording/session', () => ({
   preparePhoneRecording: vi.fn(),
   recordingSupport: () => '',
+  supportsTransparentRecording: () => true,
 }));
 const revoke = vi.fn();
 beforeEach(() => {
@@ -44,6 +45,7 @@ async function start() {
     finish: vi.fn(async () => ({
       blob: new Blob(['video'], { type: 'video/webm' }),
       extension: 'webm' as const,
+      transparent: false,
       width: 720,
       height: 1440,
       durationMs: 4000,
@@ -70,6 +72,7 @@ it('grava manualmente, bloqueia alterações e oferece download acessível com e
   expect(preparePhoneRecording).toHaveBeenCalledWith(
     document.querySelector('.phone-device'),
     expect.any(Function),
+    false,
   );
   expect(document.querySelector('.editor')).toHaveAttribute('inert');
   expect(() => window.whatsappFakeFlows!.loadProject(project)).toThrow('gravação');
@@ -94,6 +97,29 @@ it('grava manualmente, bloqueia alterações e oferece download acessível com e
   expect(revoke).toHaveBeenCalledWith('blob:recording-test');
   expect(document.querySelector('.editor')).not.toHaveAttribute('inert');
 });
+it('requests transparent corners and labels the resulting WebM preview', async () => {
+  const { session } = await start();
+  const clip = await session.finish();
+  session.finish.mockResolvedValue({ ...clip, transparent: true });
+  fireEvent.click(screen.getByRole('button', { name: 'REC · Gravar celular' }));
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Cantos transparentes (WebM)' }));
+  fireEvent.click(screen.getByRole('button', { name: /^Gravar manualmente/ }));
+  await tick(3001);
+  expect(preparePhoneRecording).toHaveBeenCalledWith(
+    document.querySelector('.phone-device'),
+    expect.any(Function),
+    true,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Finalizar gravação' }));
+  await tick(0);
+  const result = screen.getByRole('dialog', { name: 'Gravação pronta' });
+  expect(within(result).getByLabelText('Vídeo da jornada gravada')).toHaveClass('is-transparent');
+  expect(within(result).getByRole('link', { name: 'Baixar vídeo' })).toHaveAttribute(
+    'download',
+    expect.stringMatching(/\.webm$/),
+  );
+});
+
 it('cancela a contagem pela interface e volta a liberar a edição', async () => {
   const { session } = await start();
   fireEvent.click(screen.getByRole('button', { name: 'REC · Gravar celular' }));

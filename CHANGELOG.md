@@ -6,17 +6,30 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-08
+
 ### Added
 
 - Create and reopen journeys in a local library, with a live address for each shareable edit.
 - Copy a link, rename, or delete any journey directly from the library.
 - Choose the business icon color independently with presets, a visual color picker, or automatic contrast.
+- Record the phone with transparent corners for presentations that support WebM alpha.
 
 ### Changed
 
 - Keep the save indicator steady while editing and confirm after a short pause.
 - Choose from 40 business icons and preview background colors in an avatar dialog before applying.
 - Prevent accidental text selection in the interface while keeping fields, JSON and diagnostics copyable.
+
+### Fixed
+
+- Keep location choices and sent attachment previews at full opacity during automatic playback.
+- Keep phone recording timestamps running and hold the last frame before finalizing the video.
+- Configure automatic cart quantities from the product showcase editor.
+- Keep available product and cart controls at full contrast during automatic playback.
+- Keep phone control tooltip titles legible in dark mode.
+- Use the same circular playback speed slider in both themes.
+- Capture smoother automatic cursor movement in phone videos.
 
 ## [0.3.0] - 2026-11-08
 
