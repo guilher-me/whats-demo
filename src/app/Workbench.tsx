@@ -41,7 +41,9 @@ export function Workbench({
   collapsed,
   onToggle,
   locked,
+  journeyControls,
 }: {
+  journeyControls: ReactNode;
   contents: Record<Panel, ReactNode>;
   collapsed: Partial<Record<Panel, boolean>>;
   onToggle: (panel: Panel) => void;
@@ -93,28 +95,31 @@ export function Workbench({
 
   return (
     <main className="workspace">
-      <div className="workspace-toolbar" role="group" aria-label={t('workspace.panels')}>
-        {panels.map((panel) => {
-          const name = t(labels[panel]);
-          const open = !collapsed[panel];
-          const action = t(open ? 'workspace.collapse' : 'workspace.expand', { name });
-          return (
-            <Button
-              key={panel}
-              variant="ghost"
-              className="workspace-toggle"
-              aria-label={action}
-              title={action}
-              aria-expanded={open}
-              aria-controls={'workspace-' + panel}
-              disabled={locked || (open && visible.length === 1)}
-              onClick={() => onToggle(panel)}
-            >
-              {name}
-              <ControlIcon name="chevron" width="14" height="14" />
-            </Button>
-          );
-        })}
+      <div className="workspace-toolbar">
+        {journeyControls}
+        <div className="workspace-panel-controls" role="group" aria-label={t('workspace.panels')}>
+          {panels.map((panel) => {
+            const name = t(labels[panel]);
+            const open = !collapsed[panel];
+            const action = t(open ? 'workspace.collapse' : 'workspace.expand', { name });
+            return (
+              <Button
+                key={panel}
+                variant="ghost"
+                className="workspace-toggle"
+                aria-label={action}
+                title={action}
+                aria-expanded={open}
+                aria-controls={'workspace-' + panel}
+                disabled={locked || (open && visible.length === 1)}
+                onClick={() => onToggle(panel)}
+              >
+                {name}
+                <ControlIcon name="chevron" width="14" height="14" />
+              </Button>
+            );
+          })}
+        </div>
       </div>
       <div className="workspace-panels">
         {panels.map((panel) => {

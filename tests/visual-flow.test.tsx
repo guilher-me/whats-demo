@@ -4,6 +4,7 @@ import { Blob as NativeBlob } from 'node:buffer';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
+import { savedJourney } from './fixtures/journey-library';
 import { readJsonEditor, writeJsonEditor } from './fixtures/json-editor';
 import { decode } from '../src/core/codec';
 import example from './fixtures/luma-project.json';
@@ -236,11 +237,14 @@ it('preserves JSON formatting and keeps invalid changes out of the phone and the
   fireEvent.click(tab('Visual'));
   expect(screen.getByLabelText('Título da tela')).toBeDisabled();
   expect(phone().getByText('Título aplicado pelo JSON')).toBeVisible();
-  expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).steps[0].flow.screens[0].title).toBe(
-    'Título aplicado pelo JSON',
-  );
+  expect(savedJourney()?.project.steps[0]).toMatchObject({
+    flow: { screens: [{ title: 'Título aplicado pelo JSON' }] },
+  });
   fireEvent.click(tab('JSON'));
   expect(readJsonEditor(input)).toBe('{truncated');
+  cleanup();
+  render(<App />);
+  expect(readJsonEditor(screen.getByLabelText('Flow JSON'))).toBe('{truncated');
   fireEvent.click(button('Descartar rascunho'));
   fireEvent.click(tab('Visual'));
   expect(screen.getByLabelText('Título da tela')).toBeEnabled();

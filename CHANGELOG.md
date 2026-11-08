@@ -6,6 +6,15 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 
 ## [Unreleased]
 
+### Added
+
+- Create and reopen journeys in a local library, with a live address for each shareable edit.
+- Copy a link, rename, or delete any journey directly from the library.
+
+### Changed
+
+- Keep the save indicator steady while editing and confirm after a short pause.
+
 ## [0.3.0] - 2026-11-08
 
 ### Added

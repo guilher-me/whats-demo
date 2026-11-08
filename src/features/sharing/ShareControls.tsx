@@ -19,15 +19,7 @@ async function writeLink(link: Promise<string>) {
   }
 }
 
-export function ShareControls({
-  project,
-  disabled,
-  hasErrors,
-}: {
-  project: Project;
-  disabled: boolean;
-  hasErrors: boolean;
-}) {
+export function useShareLink() {
   const t = useT();
   const pending = useRef(false);
   const [notice, setNotice] = useState<{ text: string; error?: boolean }>();
@@ -38,7 +30,7 @@ export function ShareControls({
     return () => window.clearTimeout(timer);
   }, [notice]);
 
-  const copy = async () => {
+  const copy = async (project: Project, hasErrors: boolean) => {
     if (pending.current) return;
     if (!project.steps.length) {
       setNotice({ text: t('sharing.empty'), error: true });
@@ -60,13 +52,28 @@ export function ShareControls({
     else setNotice({ text: t('sharing.copied') });
   };
 
+  return { copy, notice };
+}
+
+export function ShareControls({
+  project,
+  disabled,
+  hasErrors,
+}: {
+  project: Project;
+  disabled: boolean;
+  hasErrors: boolean;
+}) {
+  const t = useT();
+  const { copy, notice } = useShareLink();
+
   return (
     <div className="share-control">
       <Button
         variant="primary"
         className="button-with-icon"
         disabled={disabled}
-        onClick={() => void copy()}
+        onClick={() => void copy(project, hasErrors)}
       >
         <ControlIcon name="link" />
         {t('sharing.copy')}

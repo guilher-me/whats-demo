@@ -13,7 +13,16 @@ import { CatalogEditor } from '../../commerce/CommerceEditor';
 import { catalogError, commerceStepError } from '../../../core/commerce';
 import type { Product } from '../../../core/types';
 import { SortableSteps } from './SortableSteps';
+import { TextField } from '../../../components/ui/Field';
+import { JOURNEY_TITLE_LIMIT } from '../../journeys/JourneyControls';
+import type { AnswersDraft, FlowDraft } from '../../journeys/storage';
 interface Props {
+  title: string;
+  onTitle: (title: string) => void;
+  flowDrafts?: Record<string, FlowDraft>;
+  answersDrafts?: Record<string, AnswersDraft>;
+  onFlowDraft: (id: string, draft?: FlowDraft) => void;
+  onAnswersDraft: (id: string, draft?: AnswersDraft) => void;
   saveState: SaveState;
   project: Project;
   revision: number;
@@ -60,6 +69,13 @@ export function EditorPanel(props: Props) {
             </Button>
           )}
         </div>
+        <TextField
+          label={t('journeys.title')}
+          placeholder={t('journeys.untitled')}
+          value={props.title}
+          maxLength={JOURNEY_TITLE_LIMIT}
+          onChange={(event) => props.onTitle(event.currentTarget.value)}
+        />
         <ContactEditor
           key={props.revision}
           contact={props.project.contact}
@@ -82,6 +98,18 @@ export function EditorPanel(props: Props) {
             <StepCard
               key={`${props.revision}:${step.id}`}
               step={step}
+              flowDraft={
+                Object.hasOwn(props.flowDrafts ?? {}, step.id)
+                  ? props.flowDrafts?.[step.id]
+                  : undefined
+              }
+              answersDraft={
+                Object.hasOwn(props.answersDrafts ?? {}, step.id)
+                  ? props.answersDrafts?.[step.id]
+                  : undefined
+              }
+              onFlowDraft={(draft) => props.onFlowDraft(step.id, draft)}
+              onAnswersDraft={(draft) => props.onAnswersDraft(step.id, draft)}
               project={props.project}
               commerceError={commerceStepError(props.project, index)}
               index={index}

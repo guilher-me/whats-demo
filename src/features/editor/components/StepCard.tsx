@@ -12,7 +12,12 @@ import { CustomerMessageEditor } from './CustomerMessageEditor';
 import { businessMessageError } from '../../../core/interactive';
 import { formatVoiceTime } from '../../../core/voice-message';
 import { MicrophoneIcon } from '../../../components/icons/WhatsAppIcons';
+import type { AnswersDraft, FlowDraft } from '../../journeys/storage';
 export function StepCard({
+  flowDraft,
+  answersDraft,
+  onFlowDraft,
+  onAnswersDraft,
   step,
   project,
   commerceError,
@@ -30,6 +35,10 @@ export function StepCard({
   onFlowPreview,
 }: {
   step: Step;
+  flowDraft?: FlowDraft;
+  answersDraft?: AnswersDraft;
+  onFlowDraft: (draft?: FlowDraft) => void;
+  onAnswersDraft: (draft?: AnswersDraft) => void;
   project: Project;
   commerceError: string;
   index: number;
@@ -157,6 +166,10 @@ export function StepCard({
         )}
         {step.type === 'flow' && (
           <FlowStepEditor
+            draft={flowDraft}
+            answersDraft={answersDraft}
+            onDraft={onFlowDraft}
+            onAnswersDraft={onAnswersDraft}
             step={step}
             expanded={expanded}
             onChange={onChange}

@@ -5,6 +5,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { Blob as NativeBlob } from 'node:buffer';
 import { App } from '../src/app/App';
+import { savedJourney } from './fixtures/journey-library';
 import type { AutomationState } from '../src/features/automation/api';
 beforeEach(() => {
   vi.stubGlobal('Blob', NativeBlob);
@@ -42,7 +43,7 @@ it('carrega e reproduz o exemplo completo da documentação sem cliques', async 
   expect(document.querySelector('.messages')).toHaveTextContent('Seu protocolo de exemplo');
   expect(new URL(output.shareURL).hash).toMatch(/^#demo=v3z\./);
   expect(api.getProject().steps).toHaveLength(4);
-  expect(JSON.parse(localStorage.getItem('whatsdemo-document-alpha1')!)).toEqual(api.getProject());
+  expect(savedJourney()?.project).toEqual(api.getProject());
 });
 it('atualiza o editor imediatamente, limpa a prévia e remove a API ao desmontar', async () => {
   render(<App />);

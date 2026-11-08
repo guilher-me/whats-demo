@@ -16,6 +16,7 @@ import {
 } from '../../flows/answers';
 import type { JourneyDiagnostic } from '../../flows/diagnostics';
 import { BuilderTabs, type BuilderTab } from './BuilderTabs';
+import type { AnswersDraft } from '../../journeys/storage';
 
 function AnswerControl({
   field,
@@ -180,23 +181,26 @@ export function AutomaticAnswers({
   step,
   issues,
   onChange,
+  draft,
+  onDraft,
 }: {
+  draft?: AnswersDraft;
+  onDraft: (draft?: AnswersDraft) => void;
   step: FlowStep;
   issues: JourneyDiagnostic[];
   onChange: (answers: Values) => void;
 }) {
   const t = useT();
   const id = useId();
-  const [tab, setTab] = useState<BuilderTab>('visual');
-  const [jsonOpened, setJsonOpened] = useState(false);
-  const [source, setSource] = useState<{ text: string; base?: Values; error?: string }>();
+  const [tab, setTab] = useState<BuilderTab>(draft ? 'json' : 'visual');
+  const [jsonOpened, setJsonOpened] = useState(!!draft);
+  const [source, setSource] = useState<{ text: string; base: Values }>();
   const fields = useMemo(() => answerFields(step.flow), [step.flow]);
-  const error = source?.error;
+  const error = draft?.error;
   const filled = fillMissingAnswers(fields, step.answers);
   const text =
-    source && (error || source.base === step.answers)
-      ? source.text
-      : JSON.stringify(step.answers, null, 2);
+    draft?.text ??
+    (source?.base === step.answers ? source.text : JSON.stringify(step.answers, null, 2));
 
   const selectTab = (next: BuilderTab) => {
     setTab(next);
@@ -212,7 +216,7 @@ export function AutomaticAnswers({
       setSource({ text: raw, base: answers });
       onChange(answers);
     } catch (failure) {
-      setSource({ text: raw, error: (failure as Error).message });
+      onDraft({ text: raw, error: (failure as Error).message });
     }
   };
   const updateAnswer = (name: string, value: Value) => {
@@ -297,7 +301,7 @@ export function AutomaticAnswers({
       {error && (
         <div className="builder-draft">
           <FieldError id={id + '-error'}>{error}</FieldError>
-          <Button variant="ghost" onClick={() => setSource(undefined)}>
+          <Button variant="ghost" onClick={() => onDraft(undefined)}>
             {t('answers.discard')}
           </Button>
         </div>
