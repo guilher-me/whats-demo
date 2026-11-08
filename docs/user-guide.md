@@ -92,6 +92,10 @@ The download is MP4 where supported, otherwise WebM. Recording captures only the
 
 The recording in the project README is an MP4 demonstration supplied by the maintainer. The app's recording feature exports video, not GIF.
 
+## Version and release notes
+
+Select the version badge in the header to open the release history. Shared previews and the portable app include the notes from their own build.
+
 ## Interface languages
 
 Choose a round flag in the header for **English**, **Spanish** or **Brazilian Portuguese**. English is the default. The preference is stored in the current browser.
