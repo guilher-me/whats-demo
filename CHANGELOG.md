@@ -18,6 +18,10 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 - Choose from 40 business icons and preview background colors in an avatar dialog before applying.
 - Prevent accidental text selection in the interface while keeping fields, JSON and diagnostics copyable.
 
+### Fixed
+
+- Keep location choices and sent attachment previews at full opacity during automatic playback.
+
 ## [0.3.0] - 2026-11-08
 
 ### Added
