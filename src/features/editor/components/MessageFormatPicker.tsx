@@ -1,5 +1,6 @@
 import { useId } from 'react';
 import { useT } from '../../../i18n';
+import { MessageButtonIcon } from '../../../components/icons/MessageButtonIcon';
 import { ControlIcon } from '../../../components/icons/ControlIcon';
 type Format = 'text' | 'buttons' | 'list' | 'image' | 'document' | 'product' | 'showcase' | 'pix';
 export function MessageFormatPicker({
@@ -19,7 +20,7 @@ export function MessageFormatPicker({
           [
             { value: 'text', label: t('editor.plainText'), icon: 'message' },
             { value: 'buttons', label: t('editor.buttons'), icon: 'manual' },
-            { value: 'list', label: t('editor.list'), icon: 'flow' },
+            { value: 'list', label: t('editor.list'), icon: 'list' },
             { value: 'image', label: t('attachments.image'), icon: 'photo' },
             { value: 'product', label: t('commerce.product'), icon: 'photo' },
             { value: 'showcase', label: t('commerce.showcase'), icon: 'flow' },
@@ -35,7 +36,11 @@ export function MessageFormatPicker({
               checked={value === option.value}
               onChange={() => onChange(option.value)}
             />
-            <ControlIcon name={option.icon} />
+            {option.icon === 'list' ? (
+              <MessageButtonIcon type="list" />
+            ) : (
+              <ControlIcon name={option.icon} />
+            )}
             <span>{option.label}</span>
           </label>
         ))}

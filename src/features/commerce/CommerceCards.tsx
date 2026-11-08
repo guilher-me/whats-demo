@@ -1,6 +1,7 @@
 import { useT } from '../../i18n';
 import { money, subtotal } from '../../core/commerce';
 import type { CommerceMessage, Product } from '../../core/types';
+import { MessageAction } from '../conversation/components/MessageAction';
 import { AttachmentVisual } from '../conversation/components/AttachmentVisual';
 import { ControlIcon } from '../../components/icons/ControlIcon';
 
@@ -81,16 +82,17 @@ export function CommerceAction({
   const pix = value.kind === 'pix';
   const single = value.kind === 'offer' && value.single;
   return (
-    <button
-      type="button"
-      className="message-action commerce-message-action"
-      data-commerce-action
-      disabled={!enabled}
-      onClick={onClick}
-    >
-      <ControlIcon name={pix ? 'copy' : 'photo'} />
-      {t(pix ? 'commerce.copyPix' : single ? 'commerce.viewProduct' : 'commerce.viewProducts')}
-      {!!count && <span className="commerce-count">{count}</span>}
-    </button>
+    <div className="message-actions">
+      <MessageAction
+        className="commerce-message-action"
+        data-commerce-action
+        disabled={!enabled}
+        onClick={onClick}
+      >
+        <ControlIcon name={pix ? 'copy' : 'photo'} />
+        {t(pix ? 'commerce.copyPix' : single ? 'commerce.viewProduct' : 'commerce.viewProducts')}
+        {!!count && <span className="commerce-count">{count}</span>}
+      </MessageAction>
+    </div>
   );
 }
