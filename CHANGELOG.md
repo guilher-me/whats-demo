@@ -24,6 +24,7 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 - Keep phone recording timestamps running and hold the last frame before finalizing the video.
 - Configure automatic cart quantities from the product showcase editor.
 - Keep available product and cart controls at full contrast during automatic playback.
+- Keep phone control tooltip titles legible in dark mode.
 
 ## [0.3.0] - 2026-11-08
 
