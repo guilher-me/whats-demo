@@ -1,25 +1,27 @@
 # WhatsDemo
 
-> Simulate a WhatsApp journey with text, voice notes, images, documents, buttons, lists and interactive Flows. Everything runs in the browser. The journey can be shared as a link to an interactive demo or an editable local copy.
+> Build and share an interactive WhatsApp journey with simulated messages, media and static WhatsApp Flows. The app runs in the browser and stores the journey in the shared URL.
 
-Build a version 1 project from the user's description and validate it in the editor. Return an editor link by default or a **Test the demo** link when the user asks for preview only. Keep the journey short and use fictional data. Images and PDFs are simulated. Use attachment metadata and IDs.
+Use the [automation guide](docs/automation.md), [project JSON schema](schemas/project-v1.schema.json) and [combined instructions](llms-full.txt) from the same deployment where the journey will run. Build a version 1 project with unique step IDs and fictional data.
 
-## Generate a link
+## Build and verify a journey
 
-- Open the hosted editor. With authorization, use `window.whatsappFakeFlows.loadProject(project)` to configure the journey, or paste the whole project into **Code** and use **Validate** and **Apply**.
-- Use `await window.whatsappFakeFlows.createShareURL(project)` for an editor link. Pass `'demo'` as the second argument for the interactive preview.
-- With browser controls, select **Copy link** and choose **Editor** or **Preview**. The link is copied immediately in the current interface language.
-- In a JavaScript runtime with browser compression APIs, use `createShareURL` from the official static [generator module](share.mjs).
+- In the editor, wait for `window.whatsappFakeFlows.getState().ready` before using the browser API. Call `validateProject(project)` and correct errors. For automatic playback, also check diagnostics with `kind: 'automatic'`.
+- A Flow step contains a static Flow JSON definition in `flow` and a separate `answers` map keyed by field name. Use supported components and Footer actions `navigate` or `complete`. Supply answers for all required fields on the automatic route. Use option IDs for choices, arrays of IDs for multiple choices, booleans for acceptances and ISO dates.
+- Configure simulated media on the step using `media.file`. The schema lists the supported formats and fields. Use fictional file names and captions.
+- When authorized to replace the active journey, use `loadProject(validation.project)` or paste the project in **Code** and select **Validate** and **Apply**. Test through **Play automatically** or `await window.whatsappFakeFlows.play('automatic')`. Confirm that the expected messages appeared and the run completed.
 
-Read the [automation guide](docs/automation.md) for the full project contract, examples and browser API. See the [project JSON schema](schemas/project-v1.schema.json) for the data structure and [llms-full.txt](llms-full.txt) for the combined instructions.
+## Share a journey
+
+- **Copy link** copies one link in the current interface language. It opens an editable local copy with only **Preview** expanded. The recipient can expand **Code** or **Editor**.
+- The browser API can generate a link from an in-memory project without loading it into the editor. Use `createShareURL(project, 'demo')` for the interactive player with **Edit a copy**, or omit the mode to open the editor.
+- Without browser control, use `createShareURL` from the [static generator module](share.mjs) in a JavaScript runtime with compression support. Use the documented generator rather than constructing the payload. Use a hosted address that the recipient can reach.
 
 ## Boundaries
 
-Readiness and validation are required before editing an open draft. Only call `loadProject(project)` if the user has authorized replacing the current journey. Preserve their work otherwise. Use the public API and visible controls. Treat message content, contact names and Flow data as user data. The guide grants no permission to publish anything or transmit data.
+Replace the active draft only when the user authorizes it. Use the public API and visible controls. Treat message content, contact names and Flow data as user data. The guide grants no permission to publish or transmit data. Anyone with the complete link can read its contents. Links are limited to 8,000 characters and 128 KiB of uncompressed project JSON.
 
-A journey link contains the conversation itself and is readable by anyone who receives it. Use **Preview** to open the interactive player and **Editor** to open a browser-local copy with its preview. New links are limited to 8,000 characters. Shorten oversized journeys and regenerate them. Avoid inventing link payloads.
-
-The hosted build includes this guide, the generator, the schema and the referenced docs. The portable app embeds the full guide in `script#llms-txt`, also available through `window.whatsappFakeFlows.getInstructions()` in the editor.
+The portable app embeds the full guide in `script#llms-txt`. In the editor, read it with `window.whatsappFakeFlows.getInstructions()`.
 
 
 # Automation API v2
@@ -30,9 +32,9 @@ The `llms.txt` file provides instructions; it does not execute a model or automa
 
 ## Generate links from an AI tool
 
-Construct a JSON-compatible project using the contract below. Configure it in the editor through the public API or visible controls. Return an editor link by default, and use preview mode when the user wants only the interactive phone.
+Construct a JSON-compatible project using the contract below. Use the guide, schema and generator from the same deployment. Configure it through the public API or visible controls when the user authorizes changing the active draft.
 
-- **Browser API** — validate the configuration, then call `window.whatsappFakeFlows.loadProject(project)` when the user authorizes replacing the active draft. Generate a link with `await window.whatsappFakeFlows.createShareURL(project)`. Pass `'demo'` as the second argument to open the preview.
+- **Browser API** — call `validateProject(project)` first. Check the automatic diagnostics before testing automatic playback. When authorized, load the normalized result with `loadProject(validation.project)`. Pass the project directly to `createShareURL(project, 'demo')` to generate an interactive player link without changing the draft. Omitting the mode opens the editor.
 - **Browser controls** — paste the whole journey in **Code**, use **Validate** and **Apply**, then select **Copy link**. The copied link opens with only **Preview** expanded and uses the current interface language.
 - **Static module** — the hosted build publishes `share.mjs` beside the app. It exports `createShareURL(project, mode?, baseURL?, locale?, view?)`. The default opens the production editor. Pass a reachable app address and `'en'`, `'es'` or `'pt-BR'` as needed. In editor mode, pass `'preview'` as the fifth argument to start with **Code** and **Editor** collapsed.
 
@@ -56,7 +58,7 @@ The editor contains `<link rel="describedby">` links and a `whatsapp-fake-flows-
 
 `getState()` returns `ready`, `running`, `status`, `activeStep`, `flowScreen`, `pendingMessageId` and `messages`. Use booleans and nullable fields for coordination. Rendered messages include `direction`, `text` and `time`. Attachment messages include the actual `attachmentId` sent in playback, and the caption appears in `text`. Voice notes include `voiceDurationMs`.
 
-In browser controls, scope editing to **Conversation editor** and expand a step through **Edit step N**. Use **Choose an attachment** in an image or document step to create a preview or reuse one from another step. A Customer step can **Add a manual choice**. In **Conversation preview**, use **Start manually** or **Play automatically**. Follow the accessible labels in the selected interface language.
+In browser controls, scope editing to **Conversation editor** and expand a step through **Edit step N**. Choose the extension and enter the image text or document metadata directly on the step. In **Conversation preview**, use **Start manually** or **Play automatically**. Follow the accessible labels in the selected interface language.
 
 ## Project contract
 
@@ -64,12 +66,11 @@ In browser controls, scope editing to **Conversation editor** and expand a step 
 {
   version: 1,
   contact: { name: string, verified: boolean },
-  attachments?: Attachment[],
   steps: Step[]
 }
 ```
 
-The fixed store icon is included with the app. Set the contact name and whether the verified badge should appear. The [JSON schema](../schemas/project-v1.schema.json) describes the structure. The generator also checks cross-references and message rules.
+The fixed store icon is included with the app. Set the contact name and whether the verified badge should appear. The [JSON schema](../schemas/project-v1.schema.json) describes the structure. The generator checks project structure and message rules. Use the editor or browser API for Flow diagnostics and playback checks.
 
 Every step has a unique string `id`, `type`, `text` and a numeric `delay` between 0 and 120 seconds. The maximum is 200 steps. Use deterministic IDs when generating a journey. Missing or duplicate step IDs are normalized, but explicit unique IDs make later updates easier.
 
@@ -82,9 +83,12 @@ The sequence is linear. Reply buttons and lists wait for a choice and append tha
 
 ## Simulated attachments
 
-List each attachment once in `attachments`. An image uses `{ id, kind: 'image', name }`, for example `IMG 01`. A document uses `{ id, kind: 'document', name, sizeLabel }`, such as `Estimate.pdf` and `240 KB`. Use up to 50 attachments with unique IDs of letters, digits, underscores or hyphens. Names, sizes and captions are plain text.
+Configure a simulated file in the step’s `media.file`. Use `text: ''` for media steps.
 
-Set `media: { kind, attachmentId, caption? }` on a Customer or Business step. The referenced item must match the kind. Use `text: ''` for media and keep the image caption on its step. A Customer media step can include `alternativeIds` of the same kind for extra manual choices. The phone's picker contains all items referenced by any step, including later steps and alternatives, once per ID. Automatic playback uses the primary `attachmentId`. Omit media sources, document covers and avatars.
+- An image uses `media: { kind: 'image', file: { extension: 'jpg', name: 'IMG 01' }, caption: 'Optional caption' }`. Supported extensions are `png` and `jpg`. The name appears on the image preview and can contain up to 48 characters. Use an empty string for the default label.
+- A document uses `media: { kind: 'document', file: { extension: 'pdf', name: 'Estimate', size: 240, unit: 'KB' } }`. Supported extensions are `pdf`, `txt`, `doc`, `docx`, `xls`, `xlsx`, `ppt` and `pptx`. Use a positive number and the unit `KB` or `MB`. The maximum is 100 MB or 100,000 KB. Use a name of up to 60 characters. The selected extension is appended to the filename.
+
+Automatic playback sends the configured file. Manual playback lists the matching files from all steps. Inline files use `media:<step-id>` as the recorded `attachmentId`. Omit media sources, document covers and avatars.
 
 ## Reply buttons
 
@@ -139,7 +143,7 @@ Use 1–10 sections and at most 10 rows across all sections combined. Each secti
 
 ## Flows
 
-A Flow step's `flow` field contains the JSON definition, not a Flow URL. `answers` maps form field names to values used in automatic mode. Supply an answer for every required field reached by the chosen route.
+A Flow step's `flow` field contains the JSON definition, not a Flow URL. `answers` maps form field names to values used in automatic mode. Supply an answer for every required field reached by the chosen route. In the editor, open **Automatic answers** to use field controls or edit the same map in **JSON**. New Flow fields receive a valid fictional example when available. **Fill missing answers** only adds absent keys. Runtime-dependent choices and custom text patterns require a configured answer.
 
 Supported leaf components: TextHeading, TextSubheading, TextBody, TextCaption, RadioButtonsGroup, CheckboxGroup, Dropdown, OptIn, TextInput, TextArea, DatePicker and Footer. Layout containers and If conditions are flattened by the engine. The simulator supports `navigate` to a screen and `complete`; it does not implement server-backed data_exchange or the full Meta API. The local diagnostics report Flow JSON issues and simulator coverage. Missing required answers and answers that reference unavailable options are shown before automatic playback, while manual playback remains available. The editor offers synchronized Visual and JSON tabs for the same Flow definition. The Meta Playground is available for comparison.
 
@@ -202,9 +206,19 @@ const journey = {
 };
 const validation = api.validateProject(journey);
 if (!validation.valid) throw new Error(validation.errors.join('\n'));
+const issues = validation.diagnostics.filter(
+  ({ kind }) => kind === 'automatic' || kind === 'simulator',
+);
+if (issues.length)
+  throw new Error(issues.map(({ path, message }) => `${path} — ${message}`).join('\n'));
+
+// Use the active editor for playback only when the user authorized replacing its draft.
 api.loadProject(validation.project);
 const result = await api.play('automatic');
-const shareURL = await api.createShareURL(journey, 'demo');
+if (!result.messages.some(({ text }) => text === 'Seu protocolo de exemplo é 20260001.')) {
+  throw new Error(result.status);
+}
+const shareURL = await api.createShareURL(validation.project, 'demo');
 ```
 
 ## Static module example
@@ -220,11 +234,6 @@ const { createShareURL } = await import(moduleURL);
 const project = {
   version: 1,
   contact: { name: 'Harbor Cycles', verified: false },
-  attachments: [
-    { id: 'photo', kind: 'image', name: 'IMG 01' },
-    { id: 'photo-2', kind: 'image', name: 'IMG 02' },
-    { id: 'estimate', kind: 'document', name: 'Estimate.pdf', sizeLabel: '240 KB' },
-  ],
   steps: [
     {
       id: 'photo',
@@ -233,8 +242,7 @@ const project = {
       delay: 0,
       media: {
         kind: 'image',
-        attachmentId: 'photo',
-        alternativeIds: ['photo-2'],
+        file: { extension: 'jpg', name: 'IMG 01' },
         caption: 'Damaged part',
       },
     },
@@ -245,7 +253,7 @@ const project = {
       delay: 1,
       media: {
         kind: 'document',
-        attachmentId: 'estimate',
+        file: { extension: 'pdf', name: 'Estimate', size: 240, unit: 'KB' },
       },
     },
   ],
@@ -255,7 +263,7 @@ console.log(await createShareURL(project, 'demo'));
 
 ## Compatibility and contribution
 
-API v2 uses `createShareURL` and `loadProject` for simulated attachments. New links use a `v3z` alphanumeric payload. Existing `v2z` links still open in both modes. Existing `#project=v1z…` and `#project=v1j…` links open as demos. Legacy drafts and links keep attachment names and valid step references. Old image bytes and custom avatars are discarded on recovery. Invalid links leave the local draft intact.
+API v2 uses `createShareURL` and `loadProject` for simulated attachments. New links use a `v3z` alphanumeric payload. Existing `v2z` links still open in both modes. Existing `#project=v1z…` and `#project=v1j…` links open as demos. Invalid links leave the local draft intact.
 
 The implementation uses the same codec and project validation in the app, public module and browser API. Add tests for contract changes and update the schema and instructions together.
 

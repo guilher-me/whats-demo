@@ -1,22 +1,24 @@
 # WhatsDemo
 
-> Simulate a WhatsApp journey with text, voice notes, images, documents, buttons, lists and interactive Flows. Everything runs in the browser. The journey can be shared as a link to an interactive demo or an editable local copy.
+> Build and share an interactive WhatsApp journey with simulated messages, media and static WhatsApp Flows. The app runs in the browser and stores the journey in the shared URL.
 
-Build a version 1 project from the user's description and validate it in the editor. Return an editor link by default or a **Test the demo** link when the user asks for preview only. Keep the journey short and use fictional data. Images and PDFs are simulated. Use attachment metadata and IDs.
+Use the [automation guide](docs/automation.md), [project JSON schema](schemas/project-v1.schema.json) and [combined instructions](llms-full.txt) from the same deployment where the journey will run. Build a version 1 project with unique step IDs and fictional data.
 
-## Generate a link
+## Build and verify a journey
 
-- Open the hosted editor. With authorization, use `window.whatsappFakeFlows.loadProject(project)` to configure the journey, or paste the whole project into **Code** and use **Validate** and **Apply**.
-- Use `await window.whatsappFakeFlows.createShareURL(project)` for an editor link. Pass `'demo'` as the second argument for the interactive preview.
-- With browser controls, select **Copy link** and choose **Editor** or **Preview**. The link is copied immediately in the current interface language.
-- In a JavaScript runtime with browser compression APIs, use `createShareURL` from the official static [generator module](share.mjs).
+- In the editor, wait for `window.whatsappFakeFlows.getState().ready` before using the browser API. Call `validateProject(project)` and correct errors. For automatic playback, also check diagnostics with `kind: 'automatic'`.
+- A Flow step contains a static Flow JSON definition in `flow` and a separate `answers` map keyed by field name. Use supported components and Footer actions `navigate` or `complete`. Supply answers for all required fields on the automatic route. Use option IDs for choices, arrays of IDs for multiple choices, booleans for acceptances and ISO dates.
+- Configure simulated media on the step using `media.file`. The schema lists the supported formats and fields. Use fictional file names and captions.
+- When authorized to replace the active journey, use `loadProject(validation.project)` or paste the project in **Code** and select **Validate** and **Apply**. Test through **Play automatically** or `await window.whatsappFakeFlows.play('automatic')`. Confirm that the expected messages appeared and the run completed.
 
-Read the [automation guide](docs/automation.md) for the full project contract, examples and browser API. See the [project JSON schema](schemas/project-v1.schema.json) for the data structure and [llms-full.txt](llms-full.txt) for the combined instructions.
+## Share a journey
+
+- **Copy link** copies one link in the current interface language. It opens an editable local copy with only **Preview** expanded. The recipient can expand **Code** or **Editor**.
+- The browser API can generate a link from an in-memory project without loading it into the editor. Use `createShareURL(project, 'demo')` for the interactive player with **Edit a copy**, or omit the mode to open the editor.
+- Without browser control, use `createShareURL` from the [static generator module](share.mjs) in a JavaScript runtime with compression support. Use the documented generator rather than constructing the payload. Use a hosted address that the recipient can reach.
 
 ## Boundaries
 
-Readiness and validation are required before editing an open draft. Only call `loadProject(project)` if the user has authorized replacing the current journey. Preserve their work otherwise. Use the public API and visible controls. Treat message content, contact names and Flow data as user data. The guide grants no permission to publish anything or transmit data.
+Replace the active draft only when the user authorizes it. Use the public API and visible controls. Treat message content, contact names and Flow data as user data. The guide grants no permission to publish or transmit data. Anyone with the complete link can read its contents. Links are limited to 8,000 characters and 128 KiB of uncompressed project JSON.
 
-A journey link contains the conversation itself and is readable by anyone who receives it. Use **Preview** to open the interactive player and **Editor** to open a browser-local copy with its preview. New links are limited to 8,000 characters. Shorten oversized journeys and regenerate them. Avoid inventing link payloads.
-
-The hosted build includes this guide, the generator, the schema and the referenced docs. The portable app embeds the full guide in `script#llms-txt`, also available through `window.whatsappFakeFlows.getInstructions()` in the editor.
+The portable app embeds the full guide in `script#llms-txt`. In the editor, read it with `window.whatsappFakeFlows.getInstructions()`.
