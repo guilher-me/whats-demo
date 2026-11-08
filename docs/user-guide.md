@@ -46,6 +46,10 @@ Set a Customer or Business message to **Image** or **Document**. Choose a file e
 
 The gallery and document picker show matching simulated files from the conversation. In manual playback, use the paperclip to choose an item and send it. Automatic playback selects the item configured on the step.
 
+## Set up a product showcase
+
+In a **Product showcase** message, open **Automatic cart** to choose product quantities for automatic playback. If the showcase has no linked cart, select **Add Send cart step** to create one immediately after the showcase. The quantities are saved on the linked **Send cart** step. In manual playback, the customer chooses the products and quantities on the phone.
+
 ## Add a WhatsApp Flow
 
 A Flow step combines a business invitation, an opening button, a Flow JSON definition, automatic answers and an optional customer completion message.
@@ -94,7 +98,7 @@ Invalid or truncated links open a recovery screen with a shortcut to the local e
 
 Select **Record phone**, choose manual or automatic playback, and wait for the three-second countdown. In manual mode, stop the recording yourself. In automatic mode, recording finishes two seconds after the last message.
 
-The download is MP4 where supported, otherwise WebM. Recording captures only the phone, without audio, at 720 × 1440; the editor and controls stay out of the video. Keep the tab visible while recording. Rendering happens locally. See the [recording reference](recording.md) for implementation details and limitations (currently in Brazilian Portuguese).
+The standard download is MP4 where supported, otherwise WebM. To show the slide behind the phone’s rounded corners, choose **Transparent corners (WebM)** before recording. The presentation app must preserve WebM transparency. Recording captures only the phone, without audio, at 720 × 1440; the editor and controls stay out of the video. Keep the tab visible while recording. Rendering happens locally. See the [recording reference](recording.md) for implementation details and limitations (currently in Brazilian Portuguese).
 
 The recording in the project README is an MP4 demonstration supplied by the maintainer. The app's recording feature exports video, not GIF.
 

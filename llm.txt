@@ -2,7 +2,7 @@
 
 > Build and share an interactive WhatsApp journey with simulated messages, media and static WhatsApp Flows. The app runs in the browser and stores the journey in the shared URL.
 
-App version: 0.3.0.
+App version: 0.4.0.
 
 Use the [automation guide](docs/automation.md), [project JSON schema](schemas/project-v1.schema.json) and [combined instructions](llms-full.txt) from the same deployment where the journey will run. Build a version 1 project with unique step IDs and fictional data. The [app version manifest](version.json) identifies the build and the [changelog](CHANGELOG.md) lists product changes. The app version is separate from the browser API and project schema versions.
 
