@@ -25,7 +25,7 @@ a.button:hover {
 a.button--primary {
   border-color: var(--accent);
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 a.button--primary:hover {
   background: var(--accent-hover);

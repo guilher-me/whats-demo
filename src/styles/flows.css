@@ -12,17 +12,12 @@
   background: #0005;
 }
 .flow-sheet {
-  --flow-ink: #111b21;
-  --flow-muted: #54656f;
-  --flow-line: #8696a0;
-  --flow-accent: #008069;
-  --flow-field-fill: #f5f6f7;
   position: absolute;
   inset: 43px 0 0;
   display: flex;
   flex-direction: column;
-  background: #fff;
-  color: var(--flow-ink);
+  background: var(--phone-panel);
+  color: var(--phone-ink);
   border-radius: 20px 20px 0 0;
   overflow: hidden;
   font-family: Roboto, Arial, sans-serif;
@@ -36,7 +31,7 @@
   justify-items: center;
   min-height: 74px;
   padding: 20px 5px 0;
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid var(--phone-line-subtle);
 }
 .flow-header::before {
   content: '';
@@ -46,7 +41,7 @@
   width: 30px;
   height: 4px;
   border-radius: 999px;
-  background: var(--flow-line);
+  background: var(--phone-meta);
   transform: translateX(-50%);
 }
 .flow-header button {
@@ -59,7 +54,7 @@
 }
 .flow-header button,
 .flow-header-more {
-  color: var(--flow-muted);
+  color: var(--phone-muted);
 }
 .flow-header button:focus-visible {
   outline-offset: -3px;
@@ -103,7 +98,7 @@
 }
 .flow-content .flow-caption {
   font-size: 13px;
-  color: var(--flow-muted);
+  color: var(--phone-muted);
 }
 .flow-content fieldset {
   min-width: 0;
@@ -115,7 +110,7 @@
   margin-bottom: 4px;
   padding: 0;
   font-size: 14px;
-  color: var(--flow-muted);
+  color: var(--phone-muted);
 }
 .flow-option {
   display: flex;
@@ -126,7 +121,7 @@
   font-size: 16px;
   font-weight: 400;
   line-height: 1.4;
-  color: var(--flow-ink);
+  color: var(--phone-ink);
   cursor: pointer;
 }
 .flow-option > span {
@@ -141,24 +136,24 @@
   height: 20px;
   margin: 0;
   padding: 0;
-  accent-color: var(--flow-accent);
+  accent-color: var(--phone-action);
   cursor: inherit;
 }
 .flow-option > input[type='radio'] {
   appearance: none;
-  border: 2px solid var(--flow-line);
+  border: 2px solid var(--phone-meta);
   border-radius: 50%;
-  background: #fff;
+  background: var(--phone-panel);
 }
 .flow-option > input[type='radio']:checked {
-  border-color: var(--flow-accent);
-  background-image: radial-gradient(circle, var(--flow-accent) 4px, transparent 4.5px);
+  border-color: var(--phone-action);
+  background-image: radial-gradient(circle, var(--phone-action) 4px, transparent 4.5px);
 }
 .flow-option > input:focus {
   outline: none;
 }
 .flow-option > input:focus-visible {
-  outline: 2px solid var(--flow-accent);
+  outline: 2px solid var(--phone-action);
   outline-offset: 3px;
 }
 @media (forced-colors: active) {
@@ -174,7 +169,7 @@
 }
 .flow-field {
   margin: 0 0 20px;
-  color: var(--flow-muted);
+  color: var(--phone-muted);
   font-size: 13px;
   font-weight: 400;
   line-height: 1.4;
@@ -188,10 +183,10 @@
   margin: 0;
   padding: 6px 0;
   border: 0;
-  border-bottom: 1px solid var(--flow-line);
+  border-bottom: 1px solid var(--phone-meta);
   border-radius: 0;
-  background: #fff;
-  color: var(--flow-ink);
+  background: var(--phone-panel);
+  color: var(--phone-ink);
   font-size: 16px;
   line-height: 1.4;
 }
@@ -202,10 +197,10 @@
   cursor: pointer;
 }
 .flow-field .flow-select-empty {
-  color: var(--flow-muted);
+  color: var(--phone-muted);
 }
 .flow-field :is(input, select, textarea):focus {
-  border-color: var(--flow-accent);
+  border-color: var(--phone-action);
 }
 .flow-field--textarea .flow-field-label {
   padding: 12px 8px 0;
@@ -229,31 +224,31 @@
 }
 .flow-optin {
   margin-bottom: 18px;
-  color: var(--flow-muted);
+  color: var(--phone-muted);
   font-size: 14px;
 }
 .flow-sheet footer {
   padding: 12px 14px 14px;
-  border-top: 1px solid #f0f2f5;
-  background: #fff;
+  border-top: 1px solid var(--phone-line-subtle);
+  background: var(--phone-panel);
 }
 .flow-sheet footer > button {
   width: 100%;
   min-height: 40px;
   border-radius: 999px;
   border-color: transparent;
-  background: var(--flow-accent);
-  color: #fff;
+  background: var(--phone-action);
+  color: var(--phone-on-action);
   font-size: 14px;
   font-weight: 600;
 }
 .flow-sheet footer > button:hover:not(:disabled) {
-  background: #006b59;
+  background: var(--phone-action-hover);
 }
 .flow-sheet footer > button:disabled {
   opacity: 1;
-  background: #e9edef;
-  color: var(--flow-muted);
+  background: var(--phone-line);
+  color: var(--phone-muted);
 }
 .flow-sheet footer small {
   display: flex;
@@ -261,7 +256,7 @@
   justify-content: center;
   gap: 5px;
   margin-top: 10px;
-  color: var(--flow-muted);
+  color: var(--phone-muted);
   font-size: 11px;
   text-align: center;
   overflow-wrap: anywhere;
@@ -272,10 +267,10 @@
   flex: 0 0 15px;
 }
 .flow-learn-more {
-  color: #006e9e;
+  color: var(--phone-link);
 }
 .flow-error {
   margin: 0 0 8px;
-  color: #b13c30;
+  color: var(--flow-error);
   font-size: 11px;
 }

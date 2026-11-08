@@ -1,4 +1,5 @@
 {
+  "app.darkMode": "Modo escuro",
   "app.playgroundLink": "Playground de WhatsApp Flows (abre em nova guia)",
   "app.tagline": "Crie conversas. Mostre experiências.",
   "app.corrections": "Há campos que precisam de correção",
@@ -311,7 +312,7 @@
   "privacy.title": "Privacidade no WhatsDemo",
   "privacy.description": "Como sua jornada é armazenada e compartilhada.",
   "privacy.storageTitle": "Dados salvos neste navegador",
-  "privacy.storageBody": "O nome do contato, o selo, as mensagens, os anexos simulados, os Flows e as respostas automáticas ficam neste navegador usando localStorage. O idioma da interface e a velocidade também são preferências locais.",
+  "privacy.storageBody": "O nome do contato, o selo, as mensagens, os anexos simulados, os Flows e as respostas automáticas ficam neste navegador usando localStorage. O idioma da interface, o tema e a velocidade também são preferências locais.",
   "privacy.sharingTitle": "O link contém a jornada",
   "privacy.sharingBody": "Copie um link para compartilhar a conversa. Qualquer pessoa com ele pode ler a conversa. Use dados de exemplo.",
   "privacy.deleteTitle": "Como apagar os dados salvos",

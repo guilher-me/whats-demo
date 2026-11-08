@@ -327,7 +327,7 @@
 }
 
 .catalog-product[open] {
-  border-color: #b7dacf;
+  border-color: var(--field-hover-line);
 }
 
 .catalog-product > summary {

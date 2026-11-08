@@ -2,6 +2,7 @@ import { useT } from '../i18n';
 import type { ReactNode } from 'react';
 import brandIcon from '../../assets/whatsdemo-icon.svg';
 import { LanguageSwitcher } from '../i18n/LanguageSwitcher';
+import { ThemeSwitch } from '../features/theme/Theme';
 import { PrivacyNotice } from '../features/privacy/PrivacyNotice';
 import { AgentGuideLink } from '../features/automation/AgentGuideLink';
 import { ControlIcon } from '../components/icons/ControlIcon';
@@ -63,6 +64,9 @@ export function AppHeader({
       </nav>
       <div className="header-actions">
         <LanguageSwitcher disabled={disabled} />
+        <div className="header-theme">
+          <ThemeSwitch disabled={disabled} />
+        </div>
         {children}
       </div>
     </header>
