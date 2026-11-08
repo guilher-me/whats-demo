@@ -4,10 +4,10 @@
 
 Describe the journey to the AI tool you already use. Give it the [WhatsDemo instructions](../llms.txt), a fictional business, a goal and the steps you want people to test.
 
-> Read the WhatsDemo guide and build a demo for a bike shop called Harbor Cycles. Ask the customer to send an image of a damaged part, offer three simulated images and select the first for automatic playback. Send a simulated estimate PDF from the shop and offer a button to schedule a repair. Use fictional data. Generate a **Test the demo** link and leave my editor draft intact.
+> Read the WhatsDemo guide and build a demo for a bike shop called Harbor Cycles. Ask the customer to send a simulated photo of a damaged part. Send a simulated estimate PDF and use a Flow to collect the customer’s name and preferred repair date. Include fictional automatic answers for the Flow. Use fictional data. Generate a **Test the demo** link and leave my editor draft intact.
 
-Use an AI tool with access to the browser and point it to the WhatsDemo editor. It can paste the whole JSON in **Code** and choose **Validate** and **Apply**, use the visual editor controls, or call the public API. Ask it to test the result and use **Copy link** to return the link.
+Give a browser-capable AI tool the WhatsDemo editor URL. It can validate the whole JSON in **Code** or through the public API. Authorize **Apply** or `loadProject` only when you want to replace the active draft. To keep your draft intact, ask for a link generated directly from the project and test the link in its own tab.
 
-**Editor** opens a browser-local copy with the editor and phone preview. **Preview** opens the interactive phone and offers **Edit a copy**. Both links carry the interface language selected in the editor.
+**Copy link** opens a browser-local copy with only **Preview** expanded and carries the selected interface language. Expand **Code** or **Editor** to edit the copy. An AI tool can also generate a standalone demo link through the public API or the static generator without loading the journey into your editor.
 
 Use fictional details because anyone with the link can read the conversation. The site runs locally in the browser and uses your AI tool only through the workflow above. See the [project contract and runnable examples](automation.md).

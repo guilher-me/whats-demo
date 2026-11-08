@@ -15,11 +15,6 @@
         "verified": { "type": "boolean" }
       }
     },
-    "attachments": {
-      "type": "array",
-      "maxItems": 50,
-      "items": { "$ref": "#/$defs/attachment" }
-    },
     "steps": {
       "type": "array",
       "minItems": 1,
@@ -29,36 +24,46 @@
   },
   "$defs": {
     "id": { "type": "string", "minLength": 1 },
-    "attachment": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "name", "kind"],
-      "properties": {
-        "id": { "type": "string", "pattern": "^[a-zA-Z0-9_-]{1,100}$" },
-        "name": { "type": "string", "minLength": 1, "maxLength": 120 },
-        "kind": { "enum": ["image", "document"] },
-        "sizeLabel": { "type": "string", "minLength": 1, "maxLength": 24 }
-      },
-      "if": { "properties": { "kind": { "const": "document" } } },
-      "then": { "required": ["sizeLabel"] },
-      "else": { "properties": { "sizeLabel": false } }
-    },
     "media": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "attachmentId"],
+      "required": ["kind", "file"],
       "properties": {
         "kind": { "enum": ["image", "document"] },
-        "attachmentId": { "$ref": "#/$defs/id" },
-        "alternativeIds": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": { "$ref": "#/$defs/id" }
-        },
+        "file": { "type": "object" },
         "caption": { "type": "string", "maxLength": 1024 }
       },
       "if": { "properties": { "kind": { "const": "document" } } },
-      "then": { "properties": { "caption": false } }
+      "then": {
+        "properties": {
+          "caption": false,
+          "file": { "$ref": "#/$defs/documentFile" }
+        }
+      },
+      "else": { "properties": { "file": { "$ref": "#/$defs/imageFile" } } }
+    },
+    "imageFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["extension", "name"],
+      "properties": {
+        "extension": { "enum": ["png", "jpg"] },
+        "name": { "type": "string", "maxLength": 48 }
+      }
+    },
+    "documentFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["extension", "name", "size", "unit"],
+      "properties": {
+        "extension": { "enum": ["pdf", "txt", "doc", "docx", "xls", "xlsx", "ppt", "pptx"] },
+        "name": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "size": { "type": "number", "exclusiveMinimum": 0 },
+        "unit": { "enum": ["KB", "MB"] }
+      },
+      "if": { "properties": { "unit": { "const": "MB" } } },
+      "then": { "properties": { "size": { "maximum": 100 } } },
+      "else": { "properties": { "size": { "maximum": 100000 } } }
     },
     "step": {
       "type": "object",
@@ -98,10 +103,7 @@
           "if": { "properties": { "type": { "const": "user" } } },
           "then": { "properties": { "interactive": false } },
           "else": {
-            "properties": {
-              "voiceDurationSeconds": false,
-              "media": { "properties": { "alternativeIds": false } }
-            }
+            "properties": { "voiceDurationSeconds": false }
           }
         },
         {

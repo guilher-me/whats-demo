@@ -1,6 +1,5 @@
 import { currentLocale, isLocale, t, type Locale } from '../i18n';
 import { normalizeProject } from './project';
-import { recoverProject } from './legacy-project';
 
 export type ShareMode = 'demo' | 'editor';
 export const MAX_LINK_LENGTH = 8000;
@@ -201,9 +200,7 @@ export async function loadSharedProject(
   if (!(route.legacy ? /^v1[zj]\./ : /^v[23]z\./).test(route.token))
     throw new Error(t('errors.linkVersion'));
   const input = await decode(route.token);
-  const project = route.legacy
-    ? recoverProject(input)
-    : normalizeProject(input, { strictIds: true });
+  const project = normalizeProject(input, { strictIds: !route.legacy });
   if (!project.steps.length) throw new Error(t('sharing.empty'));
   return project;
 }

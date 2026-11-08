@@ -1,6 +1,7 @@
+import { createMedia } from '../../../core/attachments';
 import { buttonLabel, isReplyButton } from '../../../core/message-buttons';
 import { useT } from '../../../i18n';
-import type { Attachment, BusinessInteractive, MessageStep } from '../../../core/types';
+import type { BusinessInteractive, MessageStep } from '../../../core/types';
 import { createInteractive, businessMessageError, messageOptions } from '../../../core/interactive';
 import { TextField, FieldError } from '../../../components/ui/Field';
 import { MessageTextEditor } from './MessageTextEditor';
@@ -13,13 +14,9 @@ import { MessageAttachmentEditor } from './MessageAttachmentEditor';
 export function BusinessMessageEditor({
   step,
   onChange,
-  attachment,
-  onChooseAttachment,
 }: {
   step: MessageStep;
   onChange: (change: Partial<MessageStep>) => void;
-  attachment?: Attachment;
-  onChooseAttachment: (alternative?: boolean) => void;
 }) {
   const t = useT();
 
@@ -45,17 +42,12 @@ export function BusinessMessageEditor({
           onChange({
             interactive:
               format === 'buttons' || format === 'list' ? createInteractive(format) : undefined,
-            media: format === 'image' || format === 'document' ? { kind: format } : undefined,
+            media: format === 'image' || format === 'document' ? createMedia(format) : undefined,
           })
         }
       />
       {step.media ? (
-        <MessageAttachmentEditor
-          step={step}
-          onChange={onChange}
-          attachment={attachment}
-          onChoose={onChooseAttachment}
-        />
+        <MessageAttachmentEditor media={step.media} onChange={(media) => onChange({ media })} />
       ) : (
         <MessageTextEditor
           label={t('editor.messageText')}

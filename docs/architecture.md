@@ -36,7 +36,7 @@ As abas Visual e JSON editam a definição confirmada em `step.flow`. O rascunho
 
 ## Persistência e evolução
 
-O editor usa a chave `whatsdemo-document-alpha1` do localStorage, com sufixos para desenvolvimento e cópias abertas por link. O projeto mantém `version: 1`. A recuperação de projetos antigos mantém os textos e as referências a anexos, descartando imagens reais e avatares personalizados.
+O editor usa a chave `whatsdemo-document-alpha1` do localStorage, com sufixos para desenvolvimento e cópias abertas por link. O projeto mantém `version: 1`.
 
 O codec de `core/codec.ts` cria `#demo=v3z.…` e `#editor=v3z.…` com o mesmo payload UTF-8, Deflate e Base62 em blocos. O conteúdo comprimido usa apenas letras e números para resistir à formatação do WhatsApp. O idioma da interface fica em `lang`. O botão Copiar link acrescenta `view=preview` à rota do editor para abrir a cópia com Código e Editor recolhidos. O navegador valida o tamanho antes e durante a descompressão. Links `v2z` continuam legíveis nos dois modos. Os formatos legados `#project=v1z.…` e `#project=v1j.…` abrem no simulador.
 
@@ -59,7 +59,7 @@ A URL também depende de um endereço de hospedagem estável. Preservar o codec 
 
 ## Anexos simulados
 
-A etapa guarda o ID do anexo, a legenda da imagem e, para Cliente, os IDs de opções manuais. A coleção do projeto deduplica os metadados por ID. `conversationAttachments` percorre a sequência para compor a galeria e o seletor de documentos. O editor remove metadados sem referência ao editar etapas. O avatar fixo e os previews são componentes reutilizados no editor, nas mensagens e na gravação.
+A etapa guarda a extensão e o texto da imagem simulada, com legenda separada. Para documentos, guarda o nome, a extensão e o tamanho numérico com unidade. `stepAttachment` prepara o item usado nos balões e `conversationAttachments` percorre a sequência para compor a galeria e o seletor de documentos. O avatar fixo e os previews são componentes reutilizados nas mensagens e na gravação.
 
 ## Build portátil
 

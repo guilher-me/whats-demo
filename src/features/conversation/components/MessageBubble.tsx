@@ -66,7 +66,9 @@ export function MessageBubble({
             {attachment.kind === 'document' && (
               <span className="message-document-name">
                 <strong>{attachment.name}</strong>
-                <small>PDF · {attachment.sizeLabel}</small>
+                <small>
+                  {attachment.extension.toUpperCase()} · {attachment.sizeLabel}
+                </small>
               </span>
             )}
           </button>

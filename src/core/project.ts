@@ -1,6 +1,5 @@
 import { t } from '../i18n';
 import { validateProject } from './engine';
-import { pruneAttachments } from './attachments';
 import type { Project, Step } from './types';
 export const STORAGE_KEY = 'whatsdemo-document-alpha1';
 export function projectStorageKey(url: { protocol: string; pathname: string }): string {
@@ -22,7 +21,6 @@ export function normalizeProject(
   const project = clone({
     version: validated.version,
     contact: { name: validated.contact.name, verified: Boolean(validated.contact.verified) },
-    attachments: validated.attachments,
     steps: validated.steps.map((step) => {
       const { id, type, text, delay, typing, typingMs } = step;
       const fields = { id, type, text, delay, typing, typingMs };
@@ -43,7 +41,7 @@ export function normalizeProject(
     used.add(step.id);
     if (step.type === 'flow') step.label ||= t('seed.openFlow');
   }
-  return pruneAttachments(project);
+  return project;
 }
 export function createStep(type: Step['type']): Step {
   const base = {

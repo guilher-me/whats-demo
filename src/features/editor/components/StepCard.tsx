@@ -1,6 +1,7 @@
 import { useT } from '../../../i18n';
+import { stepAttachment } from '../../../core/attachments';
 import { useCallback, useId, useState, type ReactNode } from 'react';
-import type { Attachment, Step } from '../../../core/types';
+import type { Step } from '../../../core/types';
 import { MessageTextEditor } from './MessageTextEditor';
 import { StepTiming } from './StepTiming';
 import { ControlIcon } from '../../../components/icons/ControlIcon';
@@ -25,9 +26,6 @@ export function StepCard({
   onAction,
   onValidity,
   onFlowPreview,
-  attachment,
-  alternatives,
-  onChooseAttachment,
 }: {
   step: Step;
   index: number;
@@ -42,15 +40,13 @@ export function StepCard({
   onAction: (action: StepAction) => void;
   onValidity: (id: string, valid: boolean) => void;
   onFlowPreview: (screenId?: string) => void;
-  attachment?: Attachment;
-  alternatives: Attachment[];
-  onChooseAttachment: (alternative?: boolean) => void;
 }) {
   const t = useT();
   const id = useId();
   const [flowInvalid, setFlowInvalid] = useState(false);
   const voiceSeconds = step.type === 'user' ? step.voiceDurationSeconds : undefined;
   const media = step.type === 'flow' ? undefined : step.media;
+  const attachment = stepAttachment(step);
   const invalid = media
     ? !attachment
     : step.type === 'business'
@@ -130,20 +126,9 @@ export function StepCard({
       </div>
       <div className="step-body" id={id} hidden={!expanded}>
         {step.type === 'business' ? (
-          <BusinessMessageEditor
-            step={step}
-            onChange={onChange}
-            attachment={attachment}
-            onChooseAttachment={onChooseAttachment}
-          />
+          <BusinessMessageEditor step={step} onChange={onChange} />
         ) : step.type === 'user' ? (
-          <CustomerMessageEditor
-            step={step}
-            onChange={onChange}
-            attachment={attachment}
-            alternatives={alternatives}
-            onChooseAttachment={onChooseAttachment}
-          />
+          <CustomerMessageEditor step={step} onChange={onChange} />
         ) : (
           <MessageTextEditor
             label={t('editor.flowInvitation')}

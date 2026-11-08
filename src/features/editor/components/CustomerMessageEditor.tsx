@@ -1,5 +1,6 @@
+import { createMedia } from '../../../core/attachments';
 import { useT } from '../../../i18n';
-import type { Attachment, MessageStep } from '../../../core/types';
+import type { MessageStep } from '../../../core/types';
 import { DEFAULT_VOICE_SECONDS, MAX_VOICE_SECONDS } from '../../../core/voice-message';
 import { TextField } from '../../../components/ui/Field';
 import { SelectField } from '../../../components/ui/SelectField';
@@ -9,15 +10,9 @@ import { MessageAttachmentEditor } from './MessageAttachmentEditor';
 export function CustomerMessageEditor({
   step,
   onChange,
-  attachment,
-  alternatives,
-  onChooseAttachment,
 }: {
   step: MessageStep;
   onChange: (change: Partial<MessageStep>) => void;
-  attachment?: Attachment;
-  alternatives: Attachment[];
-  onChooseAttachment: (alternative?: boolean) => void;
 }) {
   const t = useT();
   const seconds = step.voiceDurationSeconds;
@@ -36,18 +31,12 @@ export function CustomerMessageEditor({
         onValueChange={(format) =>
           onChange({
             voiceDurationSeconds: format === 'voice' ? DEFAULT_VOICE_SECONDS : undefined,
-            media: format === 'image' || format === 'document' ? { kind: format } : undefined,
+            media: format === 'image' || format === 'document' ? createMedia(format) : undefined,
           })
         }
       />
       {step.media ? (
-        <MessageAttachmentEditor
-          step={step}
-          onChange={onChange}
-          attachment={attachment}
-          alternatives={alternatives}
-          onChoose={onChooseAttachment}
-        />
+        <MessageAttachmentEditor media={step.media} onChange={(media) => onChange({ media })} />
       ) : seconds === undefined ? (
         <MessageTextEditor
           label={t('editor.messageText')}
