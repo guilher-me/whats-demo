@@ -1,4 +1,5 @@
 import { createContext, useContext, useLayoutEffect, useState, type ReactNode } from 'react';
+import { flushSync } from 'react-dom';
 import { useT } from '../../i18n';
 
 type Theme = 'light' | 'dark';
@@ -26,12 +27,24 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   const toggle = () => {
-    const next = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    try {
-      localStorage.setItem(THEME_KEY, next);
-    } catch {
-      // The current session still uses the selected theme.
+    const changeTheme = () => {
+      const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      setTheme(next);
+      try {
+        localStorage.setItem(THEME_KEY, next);
+      } catch {
+        // The current session still uses the selected theme.
+      }
+    };
+
+    if (
+      document.startViewTransition &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      // React must commit the new palette before the browser captures the next view.
+      document.startViewTransition(() => flushSync(changeTheme));
+    } else {
+      changeTheme();
     }
   };
 

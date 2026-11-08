@@ -1,3 +1,12 @@
+/* Fade the complete palette, including gradients and the phone wallpaper. */
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-group(root) {
+  animation-duration: 320ms;
+  animation-timing-function: ease-in-out;
+}
+
 .theme-switch {
   flex: none;
   display: grid;
