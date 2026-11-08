@@ -40,9 +40,17 @@ The reusable workflow stores validated static snapshots in the generated **`page
 
 Publishing is serialized per environment. The final Pages job uses one shared concurrency group and reads the latest pair of stored snapshots, then places production at the root and development under `development/`. A pending GitHub concurrency job may be superseded; the surviving job still includes both persisted environments. Production updates therefore preserve development and vice versa. Repository/authentication failures stop composition rather than treating an existing environment as empty.
 
-Every environment includes `index.html`, `whats-demo.html` (with `whatsapp-fake-flows.html` retained as a hosted alias for existing links), the static `share.mjs` generator, the project schema and the AI guides. `deployment.json` identifies its environment and source commit. The single-file app can still be downloaded and opened independently.
+Every environment includes `index.html`, `whats-demo.html` (with `whatsapp-fake-flows.html` retained as a hosted alias for existing links), the static `share.mjs` generator, the project schema, the AI guides, `CHANGELOG.md` and `version.json`. The version manifest identifies the app version from `package.json`. `deployment.json` identifies its environment and source commit. The single-file app can still be downloaded and opened independently.
 
 The snapshot is pushed before the Pages deployment. If the deployment fails, the previous live site remains; retry the workflow to compose and publish the stored pair. Snapshots are retained in Git rather than relying on expiring Actions artifacts.
+
+## Prepare a release
+
+- Accumulate user-visible changes under **Unreleased** in [CHANGELOG.md](../CHANGELOG.md) on `development`. The version badge opens the changelog from the current build.
+- Choose the next [semantic version](https://semver.org/) when preparing a production release. Use a patch for compatible fixes, a minor for compatible functionality and a major for breaking changes once the public contract is stable. During alpha, stay in `0.x` and call out any breaking changes in the notes.
+- In a PR to `development`, run `npm version patch --no-git-tag-version` (or use `minor` or `major`) to update the package and lockfile together. Move the pending notes into a heading of the form `## [0.3.0] - YYYY-MM-DD` with the release date. Keep **Unreleased** at the top for subsequent development.
+- Open the promotion PR from `development` to `main`. CI verifies that the package version matches the latest changelog entry and that the **Unreleased** section is empty. After Pages is live, verify the version against `version.json` and the source commit against `deployment.json`.
+- Tag the deployed commit on `main` as `v<version>` and publish a GitHub Release using the matching changelog section. The browser API and journey schema retain their own compatibility versions.
 
 ## Repository setup
 
