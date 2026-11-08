@@ -53,7 +53,7 @@ A URL também depende de um endereço de hospedagem estável. Preservar o codec 
 
 ## Salvamento local e compartilhamento
 
-`useProject` expõe um estado de persistência explícito: `example`, `recovered`, `saving`, `saved`, `failed` ou `shared`. O exemplo inicial não é anunciado como salvo; `recovered` requer um projeto local válido, e `saved` só é confirmado após `localStorage.setItem` concluir. Um link carregado é identificado separadamente e só passa a rascunho local após uma edição. Falhas mantêm as alterações em memória.
+`useProject` expõe um estado de persistência explícito: `example`, `recovered`, `saving`, `saved`, `failed` ou `shared`. Uma jornada inicial vazia aparece como não salva; `recovered` requer um projeto local válido, e `saved` só é confirmado após `localStorage.setItem` concluir. Um link carregado é identificado separadamente e só passa a rascunho local após uma edição. Falhas mantêm as alterações em memória.
 
 `SaveIndicator`, abaixo do nome WhatsDemo no cabeçalho, apresenta o estado do projeto inteiro com ajuda por hover ou foco e fechamento por Escape. Seu tooltip explica que o perfil do contato e toda a conversa são salvos somente neste navegador. Ele substitui o subtítulo da marca e fica separado dos idiomas e da ação Copiar link. Uma falha também produz um alerta persistente no rodapé fixo do editor, mesmo quando o usuário está no fim da lista. Os textos usam os três catálogos de tradução.
 

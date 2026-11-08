@@ -4,7 +4,11 @@
 
 ## Start a journey
 
-Open the editor to start with an empty conversation or recover a draft saved in this browser. Open a shared link to work with a specific journey. In an editable copy, **Restore from link** replaces local edits in that copy with the journey encoded in its link.
+Select **＋ New journey** in the workspace toolbar to start with an empty contact, catalog and conversation. The editor focuses the contact name. Name the journey using **Journey title**, which is separate from the contact name shown in the phone.
+
+Open **My journeys** to switch between titles saved in this browser. The list shows the most recently edited journeys first and marks the current one. Each item has controls to copy its preview link, rename it, or delete it from this browser. Deleting the current journey opens the most recently edited remaining journey or a blank editor. Changes save automatically, including incomplete journeys and pending JSON drafts, without an account. If saving fails, the edits remain available in the open tab.
+
+Open a shared link to try a specific journey. Editing it saves a separate local copy. **Restore from link** resets that copy to the original shared snapshot.
 
 ## Build the conversation
 
@@ -18,7 +22,7 @@ The workspace opens with **Code**, **Editor** and **Preview**. Drag a divider to
 4. Open **Behavior** to set the delay and, for business replies, the typing indicator.
 5. Reorder steps with the drag handle or keyboard. Use the step action menu to duplicate, move or remove a step.
 
-The header status describes saving for the **entire project**, including contact details and the conversation. Hover or focus it for details. Changes are stored in the current browser, not in an online account. Clearing browser storage removes that local draft.
+The header status describes saving for the **entire project**, including contact details and the conversation. Hover or focus it for details. Clearing the site’s browser storage removes the local library.
 
 ## Messages, buttons and lists
 
@@ -76,7 +80,9 @@ The composer is disabled during automatic playback. Use the pause button to susp
 
 ## Share a demo
 
-Select **Copy link** to copy the link in the current interface language. The link opens a browser-local copy with only **Preview** expanded. Recipients can play the journey immediately or expand **Code** and **Editor** to edit their copy.
+The address of the editing tab updates shortly after a valid change. Pending invalid edits leave the last shareable snapshot in the address. Reload the same tab to resume the newer local draft, including pending JSON.
+
+Select **Copy link** to copy the current applied journey in the interface language. Recipients open it with only **Preview** expanded and can expand **Code** and **Editor** to edit. Each copied link keeps the snapshot it carried at the time of copying. Journey titles stay in the local library.
 
 An AI tool with browser access can build the journey in the editor and copy the result. See [the AI guide](ai-guide.md).
 
