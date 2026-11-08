@@ -20,6 +20,7 @@
   <a href="docs/getting-started.md">Install & run</a> ·
   <a href="docs/user-guide.md">User guide</a> ·
   <a href="docs/ai-guide.md">Build with an LLM</a> ·
+  <a href="CHANGELOG.md">Changelog</a> ·
   <a href="CONTRIBUTING.md">Contribute</a> ·
   <a href="LICENSE">License</a>
 </p>

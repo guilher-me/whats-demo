@@ -593,5 +593,16 @@
   "commerce.invalidStep": "Este formato de comercio no es válido para el paso.",
   "commerce.invalidOffer": "Selecciona productos del catálogo. Cada sección de la vitrina necesita un título y al menos un producto. Usa cada producto una vez por oferta.",
   "commerce.invalidCart": "Selecciona una oferta anterior y configura al menos un producto válido para el carrito automático.",
-  "commerce.invalidAmount": "Introduce un importe positivo en céntimos o selecciona un carrito anterior."
+  "commerce.invalidAmount": "Introduce un importe positivo en céntimos o selecciona un carrito anterior.",
+  "changelog.title": "Novedades",
+  "changelog.open": "v{{v0}} · Novedades",
+  "changelog.description": "Historial de versiones de WhatsDemo. Versión actual v{{v0}}.",
+  "changelog.unreleased": "Sin publicar",
+  "changelog.added": "Añadido",
+  "changelog.changed": "Cambios",
+  "changelog.deprecated": "Obsoleto",
+  "changelog.removed": "Eliminado",
+  "changelog.fixed": "Correcciones",
+  "changelog.security": "Seguridad",
+  "changelog.github": "Historial en GitHub"
 }

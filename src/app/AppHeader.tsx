@@ -5,7 +5,7 @@ import { LanguageSwitcher } from '../i18n/LanguageSwitcher';
 import { PrivacyNotice } from '../features/privacy/PrivacyNotice';
 import { AgentGuideLink } from '../features/automation/AgentGuideLink';
 import { ControlIcon } from '../components/icons/ControlIcon';
-import { version } from '../../package.json';
+import { ReleaseNotes } from '../features/releases/ReleaseNotes';
 import { SaveIndicator } from '../features/editor/components/SaveIndicator';
 import type { SaveState } from '../features/editor/hooks/useProject';
 export function AppHeader({
@@ -30,7 +30,7 @@ export function AppHeader({
             <h1>
               Whats<span>Demo</span>
             </h1>
-            <span className="app-version">v{version}</span>
+            <ReleaseNotes disabled={disabled} />
           </div>
           <div className="brand-meta">
             <SaveIndicator state={saveState} />

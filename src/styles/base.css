@@ -112,7 +112,8 @@ label select {
   align-items: center;
   gap: 8px;
 }
-.app-version {
+.app-version,
+.app-version:hover {
   position: relative;
   display: inline-block;
   padding: 4px 9px;
@@ -551,6 +552,34 @@ h3 {
 .dialog-content p {
   color: var(--muted);
   font-size: 13px;
+}
+.release-notes-entry {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.release-notes-entry h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 12px;
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+.release-notes-entry time {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+.release-notes-entry h4 {
+  margin: 8px 0 4px;
+  font-size: 13px;
+}
+.release-notes-entry ul {
+  margin: 0;
+  padding-inline-start: 20px;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
 }
 .dialog-close {
   position: absolute;
