@@ -7,11 +7,12 @@ export function AttachmentVisual({ item }: { item: Attachment }) {
     <span className="attachment-image-placeholder" aria-hidden="true">
       <ControlIcon name="photo" />
       <span>{item.name}</span>
+      <small className="attachment-image-extension">{item.extension.toUpperCase()}</small>
     </span>
   ) : (
     <span className="attachment-file-icon" aria-hidden="true">
       <ControlIcon name="file" />
-      PDF
+      {item.extension.toUpperCase()}
     </span>
   );
 }

@@ -747,3 +747,60 @@
 .preview-heading .workspace-flow-issue[data-severity='warning'] {
   color: #865100;
 }
+
+.automatic-answers,
+.answer-fields,
+.answers-screen,
+.answer-row,
+.answer-details {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.automatic-answers > [hidden] {
+  display: none;
+}
+.answer-fields,
+.answers-choices {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.answers-screen h4,
+.answer-details p {
+  margin: 0;
+}
+.answer-row {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.answer-row .field,
+.step-body details .answer-row label {
+  margin: 0;
+}
+.answer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.answer-details,
+.answer-row small {
+  overflow-wrap: anywhere;
+}
+.answer-fields .button {
+  justify-self: start;
+}
+.answers-choices {
+  display: grid;
+  gap: 6px;
+}
+.answers-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

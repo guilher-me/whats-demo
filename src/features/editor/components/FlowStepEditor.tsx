@@ -1,6 +1,6 @@
 import { currentLocale, useT } from '../../../i18n';
 import { useEffect, useId, useMemo, useState } from 'react';
-import type { FlowDefinition, FlowStep, Values } from '../../../core/types';
+import type { FlowDefinition, FlowStep } from '../../../core/types';
 import { validateFlow } from '../../../core/engine';
 import { Button } from '../../../components/ui/Button';
 import { TextField, FieldError } from '../../../components/ui/Field';
@@ -12,9 +12,9 @@ import {
   type JourneyDiagnostic,
 } from '../../flows/diagnostics';
 import { VisualFlow } from './VisualFlow';
-
-const tabs = ['visual', 'json'] as const;
-type Tab = (typeof tabs)[number];
+import { AutomaticAnswers } from './AutomaticAnswers';
+import { BuilderTabs, type BuilderTab } from './BuilderTabs';
+import { answerFields, fillMissingAnswers } from '../../flows/answers';
 
 export function FlowStepEditor({
   step,
@@ -31,13 +31,11 @@ export function FlowStepEditor({
 }) {
   const t = useT();
   const id = useId();
-  const [tab, setTab] = useState<Tab>('visual');
+  const [tab, setTab] = useState<BuilderTab>('visual');
   const [jsonOpened, setJsonOpened] = useState(false);
   const [screenId, setScreenId] = useState(step.flow.screens[0].id);
   const [source, setSource] = useState(() => JSON.stringify(step.flow, null, 2));
   const [draft, setDraft] = useState<{ visual?: FlowDefinition; issues: JourneyDiagnostic[] }>();
-  const [answers, setAnswers] = useState(() => JSON.stringify(step.answers, null, 2));
-  const [answersError, setAnswersError] = useState('');
   const committedIssues = useMemo(
     () => (expanded ? flowDiagnostics(step) : []),
     [expanded, step, currentLocale()],
@@ -50,8 +48,8 @@ export function FlowStepEditor({
   const readOnly = draft ? !draft.visual : hasDefinitionError;
 
   useEffect(() => {
-    onValidity(!draft && !answersError);
-  }, [draft, answersError, onValidity]);
+    onValidity(!draft);
+  }, [draft, onValidity]);
 
   const accept = (input: unknown, visual?: FlowDefinition, selectedId?: string) => {
     let next: FlowDefinition;
@@ -75,17 +73,23 @@ export function FlowStepEditor({
       });
       return;
     }
-    const issues = flowDiagnostics({ ...step, flow: next });
+    const issues = flowDefinitionDiagnostics(next);
     if (issues.some((issue) => issue.kind === 'definition' && issue.severity === 'error')) {
       setDraft({ visual, issues });
       return;
     }
     setDraft(undefined);
-    if (JSON.stringify(next) !== JSON.stringify(step.flow)) onChange({ flow: next });
+    if (JSON.stringify(next) !== JSON.stringify(step.flow)) {
+      const previous = answerFields(step.flow);
+      const fields = answerFields(next);
+      const added = new Set([...fields.keys()].filter((name) => !previous.has(name)));
+      const answers = fillMissingAnswers(fields, step.answers, added);
+      onChange({ flow: next, answers });
+    }
     if (selectedId) onPreview(selectedId);
   };
 
-  const selectTab = (next: Tab) => {
+  const selectTab = (next: BuilderTab) => {
     setTab(next);
     if (next === 'json') setJsonOpened(true);
     document.getElementById(id + '-' + next)?.focus();
@@ -93,18 +97,6 @@ export function FlowStepEditor({
   const selectScreen = (selectedId: string) => {
     setScreenId(selectedId);
     if (step.flow.screens.some((screen) => screen.id === selectedId)) onPreview(selectedId);
-  };
-  const editAnswers = (raw: string) => {
-    setAnswers(raw);
-    try {
-      const value: unknown = JSON.parse(raw);
-      if (!value || typeof value !== 'object' || Array.isArray(value))
-        throw new Error(t('errors.answerObject'));
-      onChange({ answers: value as Values });
-      setAnswersError('');
-    } catch (error) {
-      setAnswersError((error as Error).message);
-    }
   };
 
   return (
@@ -121,35 +113,7 @@ export function FlowStepEditor({
         className="flow-json"
       >
         <div className="builder-toolbar">
-          <div role="tablist" aria-label={t('editor.flowStructure')} className="builder-tabs">
-            {tabs.map((item) => (
-              <Button
-                key={item}
-                variant="ghost"
-                role="tab"
-                id={id + '-' + item}
-                aria-controls={id + '-panel-' + item}
-                aria-selected={tab === item}
-                tabIndex={tab === item ? 0 : -1}
-                onClick={() => selectTab(item)}
-                onKeyDown={(event) => {
-                  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-                  event.preventDefault();
-                  selectTab(
-                    event.key === 'Home'
-                      ? 'visual'
-                      : event.key === 'End'
-                        ? 'json'
-                        : item === 'visual'
-                          ? 'json'
-                          : 'visual',
-                  );
-                }}
-              >
-                {t(item === 'visual' ? 'builder.visual' : 'builder.json')}
-              </Button>
-            ))}
-          </div>
+          <BuilderTabs id={id} label={t('editor.flowStructure')} tab={tab} onSelect={selectTab} />
           <Button variant="ghost" onClick={() => onPreview()}>
             {t('builder.test')}
           </Button>
@@ -246,13 +210,10 @@ export function FlowStepEditor({
         className="flow-answers"
         mountOnOpen
       >
-        <JsonEditor
-          label={t('editor.answers')}
-          value={answers}
-          className="answers-code"
-          invalid={!!answersError}
-          describedBy={answersError ? id + '-answers-error' : undefined}
-          onChange={editAnswers}
+        <AutomaticAnswers
+          step={step}
+          issues={committedIssues.filter((issue) => issue.kind === 'automatic')}
+          onChange={(answers) => onChange({ answers })}
         />
         <TextField
           label={t('editor.completion')}
@@ -260,7 +221,6 @@ export function FlowStepEditor({
           onChange={(event) => onChange({ completion: event.currentTarget.value })}
         />
       </FormSection>
-      <FieldError id={id + '-answers-error'}>{answersError}</FieldError>
     </>
   );
 }

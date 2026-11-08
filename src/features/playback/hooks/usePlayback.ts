@@ -1,9 +1,9 @@
 import { t, useT, type MessageKey } from '../../../i18n';
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { flushSync } from 'react-dom';
-import type { ChatMessage, FlowStep, Project, Value } from '../../../core/types';
+import type { ChatMessage, FlowComponent, FlowStep, Project, Value } from '../../../core/types';
 import { clone, uid } from '../../../core/project';
-import { resolve, validateProject } from '../../../core/engine';
+import { validateProject } from '../../../core/engine';
 import { deferred, delay } from '../../../core/async';
 import { advance, createSession, getComponents, goBack, validation } from '../../flows/model';
 import { useFlowSession } from '../../flows/hooks/useFlowSession';
@@ -14,6 +14,7 @@ import { messageOptions } from '../../../core/interactive';
 import { usePlaybackSpeed } from './usePlaybackSpeed';
 import { PlaybackClock } from '../playbackClock';
 import { flowReadingText } from '../../flows/reading';
+import { automaticAnswer } from '../../flows/answers';
 import { conversationAttachments, stepAttachment } from '../../../core/attachments';
 import { useAttachmentPlayback } from './useAttachmentPlayback';
 
@@ -248,48 +249,46 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
     for (let turn = 0; flow.current.current && turn < 30; turn++) {
       const session = flow.current.current;
       await sleep(250, signal);
-      const components = getComponents(session);
+      const visited = new Set<FlowComponent>();
       await cursor.read(session.step.flow.screens[session.index].title, signal);
-      for (const c of components.filter((component) => component.type !== 'Footer')) {
-        const context = { data: session.data, form: flow.current.current?.form ?? {} };
+      for (;;) {
+        const active = flow.current.current;
+        if (!active || signal.aborted) return;
+        const c = getComponents(active).find(
+          (component) => component.type !== 'Footer' && !visited.has(component),
+        );
+        if (!c) break;
+        visited.add(c);
+        const context = { data: active.data, form: active.form };
         if (c.name) find(c.name)?.scrollIntoView?.({ block: 'nearest' });
         const reading = flowReadingText(c, context);
         if (reading) await cursor.read(reading, signal);
         if (!c.name) continue;
-        const name = c.name!,
-          value = resolve(session.step.answers[name], {
-            data: session.data,
-            form: flow.current.current?.form ?? {},
-          });
-        if (value === undefined) {
-          if (c.required) throw new Error(t('errors.autoAnswer', { v0: name }));
-          continue;
-        }
+        const name = c.name;
+        const { value, error, options } = automaticAnswer(c, active.step.answers, context);
+        if (error) throw new Error(error);
+        if (value === undefined) continue;
+
         if (c.type === 'RadioButtonsGroup') {
           const target = find(name, String(value));
           if (!target) throw new Error(t('errors.missingAnswer', { v0: name }));
           await cursor.touch(target, signal, () => flow.update(name, value));
-        } else if (c.type === 'CheckboxGroup') {
-          const values = Array.isArray(value) ? value : [value];
-          const source = resolve(c['data-source'] as Value, {
-            data: session.data,
-            form: session.form,
-          });
-          if (!Array.isArray(source)) throw new Error(t('errors.source'));
-          for (const option of source as { id: string }[]) {
-            if (values.includes(option.id)) {
-              const previous = flow.current.current?.form[name];
-              const selected = Array.isArray(previous) ? previous : [];
-              await cursor.touch(find(name, option.id), signal, () =>
-                flow.update(name, [...selected, option.id]),
-              );
-            }
+        } else if (c.type === 'CheckboxGroup' && Array.isArray(value)) {
+          const selected: string[] = [];
+          for (const option of options ?? []) {
+            if (!value.includes(option.id)) continue;
+            selected.push(option.id);
+            await cursor.touch(find(name, option.id), signal, () =>
+              flow.update(name, [...selected]),
+            );
           }
-        } else if (c.type === 'OptIn')
-          await cursor.touch(find(name), signal, () => flow.update(name, Boolean(value)));
-        else if (c.type === 'Dropdown')
-          await cursor.touch(find(name), signal, () => flow.update(name, String(value)));
-        else
+          if (!selected.length) flow.update(name, []);
+        } else if (c.type === 'OptIn') {
+          if (value === true) await cursor.touch(find(name), signal, () => flow.update(name, true));
+          else flow.update(name, false);
+        } else if (c.type === 'Dropdown') {
+          await cursor.touch(find(name), signal, () => flow.update(name, value));
+        } else {
           await cursor.type(
             find(name),
             String(value),
@@ -297,6 +296,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
             (text) => flow.update(name, text),
             c.type === 'DatePicker',
           );
+        }
       }
       const current = flow.current.current;
       if (!current) return;
@@ -355,7 +355,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
           // Register the expected input before the composer can submit.
           const received = deferred(signal);
           if (step.media) {
-            const item = stepAttachment(step, attachments);
+            const item = stepAttachment(step);
             if (!item) throw new Error(t('attachments.required'));
             waitingAttachment.current = received.finish;
             flushSync(() =>
@@ -374,7 +374,10 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
               await cursor.touch(target('[data-attachment-kind]'), signal, () =>
                 flushSync(media.showItems),
               );
-              await cursor.touch(target(`[data-attachment-item="${item.id}"]`), signal, () =>
+              const tile = Array.from(
+                phone.current?.querySelectorAll<HTMLElement>('[data-attachment-item]') ?? [],
+              ).find((tile) => tile.dataset.attachmentItem === item.id);
+              await cursor.touch(tile ?? null, signal, () =>
                 flushSync(() => media.select(item.id)),
               );
               if (step.media.caption)
@@ -449,7 +452,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
             const message = append(text, 'business', {
               flowStep: step.type === 'flow' ? step : undefined,
               interactive: step.type === 'business' ? step.interactive : undefined,
-              attachment: stepAttachment(step, attachments),
+              attachment: stepAttachment(step),
             });
             messageId = message.id;
           });

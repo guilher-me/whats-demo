@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
 import type { Project, Step } from '../../../core/types';
 import { createDefaultProject } from '../../../core/defaults';
-import { clone, projectStorageKey, uid } from '../../../core/project';
-import { recoverProject } from '../../../core/legacy-project';
-import { pruneAttachments } from '../../../core/attachments';
+import { clone, normalizeProject, projectStorageKey, uid } from '../../../core/project';
 import { t } from '../../../i18n';
 
 export type SaveState = 'example' | 'recovered' | 'saving' | 'saved' | 'failed' | 'shared';
@@ -27,7 +25,11 @@ export function useProject(copy?: SharedCopy) {
         };
     try {
       const raw = localStorage.getItem(storageKey);
-      if (raw) return { project: recoverProject(JSON.parse(raw), true), state: 'recovered' };
+      if (raw)
+        return {
+          project: normalizeProject(JSON.parse(raw), { allowDrafts: true }),
+          state: 'recovered',
+        };
     } catch {
       return { ...fallback, error: t('storage.recoveryError') };
     }
@@ -51,7 +53,7 @@ export function useProject(copy?: SharedCopy) {
     edited.current = true;
     setSaveState('saving');
     setError('');
-    setProject((value) => pruneAttachments(change(value)));
+    setProject(change);
   }, []);
   const updateStep = (id: string, change: Partial<Step>) =>
     update((project) => ({

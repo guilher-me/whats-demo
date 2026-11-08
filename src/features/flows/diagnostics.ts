@@ -1,9 +1,10 @@
 import { validateFlowJson } from 'flowso/validator';
-import { resolve, resolveOptions, SUPPORTED_COMPONENTS } from '../../core/engine';
+import { SUPPORTED_COMPONENTS } from '../../core/engine';
 import { normalizeProject } from '../../core/project';
 import type { FlowComponent, FlowStep, Project } from '../../core/types';
 import { t } from '../../i18n';
 import { createSession, followFooter, getComponents } from './model';
+import { automaticAnswer } from './answers';
 
 export interface JourneyDiagnostic {
   kind: 'definition' | 'simulator' | 'automatic';
@@ -34,28 +35,19 @@ function automaticAnswerIssue(step: FlowStep): { name: string; message: string }
   const seen = new Set<number>();
   while (seen.size < 30 && !seen.has(session.index)) {
     seen.add(session.index);
-    for (const field of getComponents(session)) {
-      if (!field.name) continue;
-      const context = { data: session.data, form: session.form };
-      const value = resolve(step.answers[field.name], context);
-      if (value === undefined) continue;
-      if (['RadioButtonsGroup', 'CheckboxGroup', 'Dropdown'].includes(field.type)) {
-        const options = resolveOptions(field['data-source'], context);
-        const selected = field.type === 'CheckboxGroup' && Array.isArray(value) ? value : [value];
-        if (selected.some((id) => !options.some((option) => option.id === String(id))))
-          return { name: field.name, message: t('errors.missingAnswer', { v0: field.name }) };
-      }
-      session = { ...session, form: { ...session.form, [field.name]: value } };
+    const visited = new Set<FlowComponent>();
+    for (;;) {
+      const field = getComponents(session).find((item) => item.name && !visited.has(item));
+      if (!field?.name) break;
+      visited.add(field);
+      const { value, error } = automaticAnswer(field, step.answers, {
+        data: session.data,
+        form: session.form,
+      });
+      if (error) return { name: field.name, message: error };
+      if (value !== undefined)
+        session = { ...session, form: { ...session.form, [field.name]: value } };
     }
-    const missing = getComponents(session).find((field) => {
-      if (!field.required || !field.name) return false;
-      const value = session.form[field.name];
-      return (
-        value == null || value === '' || value === false || (Array.isArray(value) && !value.length)
-      );
-    });
-    if (missing?.name)
-      return { name: missing.name, message: t('errors.autoAnswer', { v0: missing.name }) };
 
     const result = followFooter(session);
     if (!result.session) return undefined;

@@ -6,9 +6,9 @@ The `llms.txt` file provides instructions; it does not execute a model or automa
 
 ## Generate links from an AI tool
 
-Construct a JSON-compatible project using the contract below. Configure it in the editor through the public API or visible controls. Return an editor link by default, and use preview mode when the user wants only the interactive phone.
+Construct a JSON-compatible project using the contract below. Use the guide, schema and generator from the same deployment. Configure it through the public API or visible controls when the user authorizes changing the active draft.
 
-- **Browser API** — validate the configuration, then call `window.whatsappFakeFlows.loadProject(project)` when the user authorizes replacing the active draft. Generate a link with `await window.whatsappFakeFlows.createShareURL(project)`. Pass `'demo'` as the second argument to open the preview.
+- **Browser API** — call `validateProject(project)` first. Check the automatic diagnostics before testing automatic playback. When authorized, load the normalized result with `loadProject(validation.project)`. Pass the project directly to `createShareURL(project, 'demo')` to generate an interactive player link without changing the draft. Omitting the mode opens the editor.
 - **Browser controls** — paste the whole journey in **Code**, use **Validate** and **Apply**, then select **Copy link**. The copied link opens with only **Preview** expanded and uses the current interface language.
 - **Static module** — the hosted build publishes `share.mjs` beside the app. It exports `createShareURL(project, mode?, baseURL?, locale?, view?)`. The default opens the production editor. Pass a reachable app address and `'en'`, `'es'` or `'pt-BR'` as needed. In editor mode, pass `'preview'` as the fifth argument to start with **Code** and **Editor** collapsed.
 
@@ -32,7 +32,7 @@ The editor contains `<link rel="describedby">` links and a `whatsapp-fake-flows-
 
 `getState()` returns `ready`, `running`, `status`, `activeStep`, `flowScreen`, `pendingMessageId` and `messages`. Use booleans and nullable fields for coordination. Rendered messages include `direction`, `text` and `time`. Attachment messages include the actual `attachmentId` sent in playback, and the caption appears in `text`. Voice notes include `voiceDurationMs`.
 
-In browser controls, scope editing to **Conversation editor** and expand a step through **Edit step N**. Use **Choose an attachment** in an image or document step to create a preview or reuse one from another step. A Customer step can **Add a manual choice**. In **Conversation preview**, use **Start manually** or **Play automatically**. Follow the accessible labels in the selected interface language.
+In browser controls, scope editing to **Conversation editor** and expand a step through **Edit step N**. Choose the extension and enter the image text or document metadata directly on the step. In **Conversation preview**, use **Start manually** or **Play automatically**. Follow the accessible labels in the selected interface language.
 
 ## Project contract
 
@@ -40,12 +40,11 @@ In browser controls, scope editing to **Conversation editor** and expand a step 
 {
   version: 1,
   contact: { name: string, verified: boolean },
-  attachments?: Attachment[],
   steps: Step[]
 }
 ```
 
-The fixed store icon is included with the app. Set the contact name and whether the verified badge should appear. The [JSON schema](../schemas/project-v1.schema.json) describes the structure. The generator also checks cross-references and message rules.
+The fixed store icon is included with the app. Set the contact name and whether the verified badge should appear. The [JSON schema](../schemas/project-v1.schema.json) describes the structure. The generator checks project structure and message rules. Use the editor or browser API for Flow diagnostics and playback checks.
 
 Every step has a unique string `id`, `type`, `text` and a numeric `delay` between 0 and 120 seconds. The maximum is 200 steps. Use deterministic IDs when generating a journey. Missing or duplicate step IDs are normalized, but explicit unique IDs make later updates easier.
 
@@ -58,9 +57,12 @@ The sequence is linear. Reply buttons and lists wait for a choice and append tha
 
 ## Simulated attachments
 
-List each attachment once in `attachments`. An image uses `{ id, kind: 'image', name }`, for example `IMG 01`. A document uses `{ id, kind: 'document', name, sizeLabel }`, such as `Estimate.pdf` and `240 KB`. Use up to 50 attachments with unique IDs of letters, digits, underscores or hyphens. Names, sizes and captions are plain text.
+Configure a simulated file in the step’s `media.file`. Use `text: ''` for media steps.
 
-Set `media: { kind, attachmentId, caption? }` on a Customer or Business step. The referenced item must match the kind. Use `text: ''` for media and keep the image caption on its step. A Customer media step can include `alternativeIds` of the same kind for extra manual choices. The phone's picker contains all items referenced by any step, including later steps and alternatives, once per ID. Automatic playback uses the primary `attachmentId`. Omit media sources, document covers and avatars.
+- An image uses `media: { kind: 'image', file: { extension: 'jpg', name: 'IMG 01' }, caption: 'Optional caption' }`. Supported extensions are `png` and `jpg`. The name appears on the image preview and can contain up to 48 characters. Use an empty string for the default label.
+- A document uses `media: { kind: 'document', file: { extension: 'pdf', name: 'Estimate', size: 240, unit: 'KB' } }`. Supported extensions are `pdf`, `txt`, `doc`, `docx`, `xls`, `xlsx`, `ppt` and `pptx`. Use a positive number and the unit `KB` or `MB`. The maximum is 100 MB or 100,000 KB. Use a name of up to 60 characters. The selected extension is appended to the filename.
+
+Automatic playback sends the configured file. Manual playback lists the matching files from all steps. Inline files use `media:<step-id>` as the recorded `attachmentId`. Omit media sources, document covers and avatars.
 
 ## Reply buttons
 
@@ -115,7 +117,7 @@ Use 1–10 sections and at most 10 rows across all sections combined. Each secti
 
 ## Flows
 
-A Flow step's `flow` field contains the JSON definition, not a Flow URL. `answers` maps form field names to values used in automatic mode. Supply an answer for every required field reached by the chosen route.
+A Flow step's `flow` field contains the JSON definition, not a Flow URL. `answers` maps form field names to values used in automatic mode. Supply an answer for every required field reached by the chosen route. In the editor, open **Automatic answers** to use field controls or edit the same map in **JSON**. New Flow fields receive a valid fictional example when available. **Fill missing answers** only adds absent keys. Runtime-dependent choices and custom text patterns require a configured answer.
 
 Supported leaf components: TextHeading, TextSubheading, TextBody, TextCaption, RadioButtonsGroup, CheckboxGroup, Dropdown, OptIn, TextInput, TextArea, DatePicker and Footer. Layout containers and If conditions are flattened by the engine. The simulator supports `navigate` to a screen and `complete`; it does not implement server-backed data_exchange or the full Meta API. The local diagnostics report Flow JSON issues and simulator coverage. Missing required answers and answers that reference unavailable options are shown before automatic playback, while manual playback remains available. The editor offers synchronized Visual and JSON tabs for the same Flow definition. The Meta Playground is available for comparison.
 
@@ -178,9 +180,19 @@ const journey = {
 };
 const validation = api.validateProject(journey);
 if (!validation.valid) throw new Error(validation.errors.join('\n'));
+const issues = validation.diagnostics.filter(
+  ({ kind }) => kind === 'automatic' || kind === 'simulator',
+);
+if (issues.length)
+  throw new Error(issues.map(({ path, message }) => `${path} — ${message}`).join('\n'));
+
+// Use the active editor for playback only when the user authorized replacing its draft.
 api.loadProject(validation.project);
 const result = await api.play('automatic');
-const shareURL = await api.createShareURL(journey, 'demo');
+if (!result.messages.some(({ text }) => text === 'Seu protocolo de exemplo é 20260001.')) {
+  throw new Error(result.status);
+}
+const shareURL = await api.createShareURL(validation.project, 'demo');
 ```
 
 ## Static module example
@@ -196,11 +208,6 @@ const { createShareURL } = await import(moduleURL);
 const project = {
   version: 1,
   contact: { name: 'Harbor Cycles', verified: false },
-  attachments: [
-    { id: 'photo', kind: 'image', name: 'IMG 01' },
-    { id: 'photo-2', kind: 'image', name: 'IMG 02' },
-    { id: 'estimate', kind: 'document', name: 'Estimate.pdf', sizeLabel: '240 KB' },
-  ],
   steps: [
     {
       id: 'photo',
@@ -209,8 +216,7 @@ const project = {
       delay: 0,
       media: {
         kind: 'image',
-        attachmentId: 'photo',
-        alternativeIds: ['photo-2'],
+        file: { extension: 'jpg', name: 'IMG 01' },
         caption: 'Damaged part',
       },
     },
@@ -221,7 +227,7 @@ const project = {
       delay: 1,
       media: {
         kind: 'document',
-        attachmentId: 'estimate',
+        file: { extension: 'pdf', name: 'Estimate', size: 240, unit: 'KB' },
       },
     },
   ],
@@ -231,7 +237,7 @@ console.log(await createShareURL(project, 'demo'));
 
 ## Compatibility and contribution
 
-API v2 uses `createShareURL` and `loadProject` for simulated attachments. New links use a `v3z` alphanumeric payload. Existing `v2z` links still open in both modes. Existing `#project=v1z…` and `#project=v1j…` links open as demos. Legacy drafts and links keep attachment names and valid step references. Old image bytes and custom avatars are discarded on recovery. Invalid links leave the local draft intact.
+API v2 uses `createShareURL` and `loadProject` for simulated attachments. New links use a `v3z` alphanumeric payload. Existing `v2z` links still open in both modes. Existing `#project=v1z…` and `#project=v1j…` links open as demos. Invalid links leave the local draft intact.
 
 The implementation uses the same codec and project validation in the app, public module and browser API. Add tests for contract changes and update the schema and instructions together.
 
