@@ -15,6 +15,7 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 
 - Keep the save indicator steady while editing and confirm after a short pause.
 - Choose from 40 business icons and preview background colors in an avatar dialog before applying.
+- Prevent accidental text selection in the interface while keeping fields, JSON and diagnostics copyable.
 
 ## [0.3.0] - 2026-11-08
 

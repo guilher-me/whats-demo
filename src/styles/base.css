@@ -3,6 +3,31 @@
 }
 body {
   margin: 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Keep editable values and technical text available for copying. */
+:where(
+  input:not([type]),
+  input:is(
+    [type='text'],
+    [type='search'],
+    [type='email'],
+    [type='url'],
+    [type='tel'],
+    [type='password'],
+    [type='number']
+  ),
+  textarea,
+  code,
+  pre,
+  [role='alert'],
+  .code-feedback li,
+  .builder-issues li
+) {
+  -webkit-user-select: text;
+  user-select: text;
 }
 button,
 input,
