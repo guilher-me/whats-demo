@@ -1,10 +1,12 @@
 import { t } from '../../i18n';
 import fixWebmDuration from 'fix-webm-duration';
 import { delay } from '../../core/async';
+import { hasTransparentCorners } from './alpha';
 import { capturePhone } from './capture';
 import { paintRecordingCursor, readRecordingCursor } from './cursor';
 import type { PhoneRecording, RecordedClip } from './types';
 
+const ALPHA_FORMAT = 'video/webm;codecs=vp8';
 const FRAME_INTERVAL = 1000 / 30;
 const SNAPSHOT_INTERVAL = 1000 / 15;
 const FINAL_FRAME_HOLD = 400;
@@ -19,22 +21,33 @@ export function recordingSupport(): string {
     return t('errors.recordUnsupported');
   return '';
 }
-export function recordingMimeTypes(): string[] {
-  return ['video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'].filter(
-    (type) => MediaRecorder.isTypeSupported(type),
-  );
+export function supportsTransparentRecording(): boolean {
+  return !recordingSupport() && MediaRecorder.isTypeSupported(ALPHA_FORMAT);
+}
+
+export function recordingMimeTypes(transparent = false): string[] {
+  const candidates = transparent
+    ? [ALPHA_FORMAT]
+    : ['video/mp4', 'video/webm;codecs=vp9', ALPHA_FORMAT, 'video/webm'];
+  return candidates.filter((type) => MediaRecorder.isTypeSupported(type));
 }
 
 export async function preparePhoneRecording(
   node: HTMLElement,
   onError: (error: Error) => void,
+  transparent = false,
 ): Promise<PhoneRecording> {
   const unsupported = recordingSupport();
   if (unsupported) throw new Error(unsupported);
+  const formats = recordingMimeTypes(transparent);
+  const formatError = t(transparent ? 'errors.recordTransparency' : 'errors.videoFormat');
+  if (!formats.length) throw new Error(formatError);
   const width = node.offsetWidth,
     height = node.offsetHeight;
   if (!width || !height) throw new Error(t('errors.phoneVisible'));
-  const backdrop = getComputedStyle(node).getPropertyValue('--recording-backdrop').trim() || '#fff';
+  const backdrop = transparent
+    ? 'transparent'
+    : getComputedStyle(node).getPropertyValue('--recording-backdrop').trim() || '#fff';
   let frame = await capturePhone(node, width, height, backdrop);
   const cursor = node.querySelector<HTMLElement>('[data-recording-cursor]');
   const canvas = document.createElement('canvas');
@@ -43,8 +56,12 @@ export async function preparePhoneRecording(
   const context = canvas.getContext('2d');
   if (!context) throw new Error(t('errors.prepareImage'));
   const paint = () => {
-    context.fillStyle = backdrop;
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    if (transparent) {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+    } else {
+      context.fillStyle = backdrop;
+      context.fillRect(0, 0, canvas.width, canvas.height);
+    }
     context.drawImage(frame, 0, 0, canvas.width, canvas.height);
   };
   paint();
@@ -61,7 +78,7 @@ export async function preparePhoneRecording(
     if (cursorFrame) paintRecordingCursor(context, cursorFrame);
   };
   let media: MediaRecorder | undefined;
-  for (const mimeType of recordingMimeTypes()) {
+  for (const mimeType of formats) {
     try {
       media = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 2_500_000 });
       break;
@@ -71,7 +88,7 @@ export async function preparePhoneRecording(
   }
   if (!media) {
     stream.getTracks().forEach((track) => track.stop());
-    throw new Error(t('errors.videoFormat'));
+    throw new Error(formatError);
   }
   const recorder = media;
   const chunks: Blob[] = [];
@@ -134,7 +151,15 @@ export async function preparePhoneRecording(
       if (!blob.size) throw new Error(t('errors.recordEmpty'));
       const extension = recorder.mimeType.startsWith('video/mp4') ? 'mp4' : 'webm';
       if (extension === 'webm') blob = await fixWebmDuration(blob, durationMs, { logger: false });
-      resolve({ blob, extension, width: canvas.width, height: canvas.height, durationMs });
+      if (transparent && !(await hasTransparentCorners(blob))) throw new Error(formatError);
+      resolve({
+        blob,
+        extension,
+        transparent,
+        width: canvas.width,
+        height: canvas.height,
+        durationMs,
+      });
     } catch (error) {
       fail(error);
     }

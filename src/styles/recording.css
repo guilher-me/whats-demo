@@ -90,6 +90,14 @@
   font-weight: 400;
   opacity: 0.8;
 }
+.record-transparent-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.record-transparent-option input {
+  margin: 0;
+}
 .record-format-note {
   font-size: 12px;
 }
@@ -102,6 +110,10 @@
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--surface);
+}
+.recorded-video.is-transparent {
+  background: repeating-conic-gradient(var(--surface-hover) 0 25%, var(--surface) 0 50%) 0 0 / 16px
+    16px;
 }
 .download-recording {
   display: inline-flex;

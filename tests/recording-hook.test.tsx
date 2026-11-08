@@ -30,6 +30,7 @@ function setup() {
     finish: vi.fn(async () => ({
       blob: new Blob(['clip']),
       extension: 'webm' as const,
+      transparent: false,
       width: 720,
       height: 1440,
       durationMs: 5000,

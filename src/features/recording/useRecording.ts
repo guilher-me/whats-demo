@@ -85,7 +85,7 @@ export function useRecording(options: Options) {
       fail(active, reason);
     }
   };
-  const start = async (mode: RecordingMode) => {
+  const start = async (mode: RecordingMode, transparent = false) => {
     if (operation.current) return;
     discard();
     setError('');
@@ -100,7 +100,11 @@ export function useRecording(options: Options) {
       const screen = latest.current.phone.current;
       const node = screen?.closest<HTMLElement>('.phone-device') ?? screen;
       if (!node) throw new Error(t('errors.phoneUnavailable'));
-      const recorder = await preparePhoneRecording(node, (reason) => fail(active, reason));
+      const recorder = await preparePhoneRecording(
+        node,
+        (reason) => fail(active, reason),
+        transparent,
+      );
       if (active.signal.aborted || operation.current !== active) {
         recorder.cancel();
         return;

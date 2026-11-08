@@ -7,7 +7,7 @@ O botão **Gravar celular**, à direita da prévia, gera um vídeo local sem áu
 A gravação automática usa o ritmo de usuário selecionado ao lado dos controles de reprodução: leitura, digitação e cliques. Os delays da empresa e as transições do sistema não são acelerados. Escolha entre 0,5× e 3× antes de gravar; o controle fica bloqueado durante a captura. A contagem inicial de 3 segundos, o cronômetro e os 2 segundos finais continuam usando tempo real. A gravação manual mantém os tempos originais.
 
 1. Clique em **Gravar celular**.
-2. Escolha **Gravar manualmente** ou **Gravar automaticamente**.
+2. Se precisar do aparelho recortado para uma apresentação, marque **Cantos transparentes (WebM)**. Escolha **Gravar manualmente** ou **Gravar automaticamente**.
 3. Aguarde a preparação e a contagem de 3 segundos. A jornada começa do início.
 4. No modo manual, interaja com o celular e clique em **Finalizar gravação**. A gravação continua mesmo que a jornada já tenha terminado.
 5. No modo automático, a gravação termina 2 segundos depois da última mensagem. É possível finalizar antes pelo mesmo botão.
@@ -18,6 +18,8 @@ Durante a preparação e a contagem, o botão permite cancelar sem gerar um arqu
 ## Formato e compatibilidade
 
 O aplicativo testa os codificadores nativos e tenta MP4 primeiro; caso não esteja disponível, usa WebM. A extensão do download corresponde ao formato efetivamente produzido. Para WebM, `fix-webm-duration` adiciona a duração ausente quando necessário.
+
+A opção de cantos transparentes grava em WebM com VP8 e verifica se o arquivo preserva o canal alfa. O aplicativo de apresentações precisa reproduzir o WebM com transparência para mostrar o fundo do slide nos cantos. A prévia usa um quadriculado para destacar as áreas transparentes. [Transparência em WebM no Chromium](https://developer.chrome.com/blog/alpha-transparency-in-chrome-video)
 
 O celular é mantido em 360 × 720 pixels durante a gravação, e os quadros são gerados em 720 × 1440. A captura busca 30 quadros por segundo. O cursor automático é desenhado sobre o quadro mais recente usando sua posição na tela. O conteúdo do celular é rasterizado separadamente, com até 15 atualizações por segundo quando há mudanças. A rasterização ignora as mensagens fora da área visível e mantém a posição de rolagem. O quadro final permanece na captura até o codificador ter tempo de recebê-lo. A taxa efetiva depende do navegador e do dispositivo.
 

@@ -11,6 +11,7 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 - Create and reopen journeys in a local library, with a live address for each shareable edit.
 - Copy a link, rename, or delete any journey directly from the library.
 - Choose the business icon color independently with presets, a visual color picker, or automatic contrast.
+- Record the phone with transparent corners for presentations that support WebM alpha.
 
 ### Changed
 

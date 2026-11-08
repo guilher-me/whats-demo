@@ -1,8 +1,12 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { hasTransparentCorners } from '../src/features/recording/alpha';
 import { capturePhone } from '../src/features/recording/capture';
 import { preparePhoneRecording, recordingSupport } from '../src/features/recording/session';
 import fixWebmDuration from 'fix-webm-duration';
+vi.mock('../src/features/recording/alpha', () => ({
+  hasTransparentCorners: vi.fn(async () => true),
+}));
 vi.mock('../src/features/recording/capture', () => ({ capturePhone: vi.fn() }));
 vi.mock('fix-webm-duration', () => ({ default: vi.fn(async (blob: Blob) => blob) }));
 class FakeMediaRecorder {
@@ -49,6 +53,7 @@ beforeEach(() => {
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
     fillStyle: '',
     fillRect: vi.fn(),
+    clearRect: vi.fn(),
     drawImage: vi.fn(),
     getImageData: pixels,
   } as unknown as CanvasRenderingContext2D);
@@ -127,6 +132,29 @@ it('usa WebM quando MP4 não está disponível e corrige a duração', async () 
   expect(clip.extension).toBe('webm');
   expect(fixWebmDuration).toHaveBeenCalledOnce();
 });
+it('exports verified transparent WebM even when MP4 is available', async () => {
+  FakeMediaRecorder.supported.add('video/webm;codecs=vp8');
+  const node = phone();
+  const context = document.createElement('canvas').getContext('2d')!;
+  const session = await preparePhoneRecording(node, vi.fn(), true);
+  session.start();
+  const clip = await session.finish();
+  expect(clip).toMatchObject({ extension: 'webm', transparent: true });
+  expect(clip.blob.type).toBe('video/webm;codecs=vp8');
+  expect(capturePhone).toHaveBeenLastCalledWith(node, 360, 720, 'transparent');
+  expect(context.clearRect).toHaveBeenCalledWith(0, 0, 720, 1440);
+  expect(context.fillRect).not.toHaveBeenCalled();
+  expect(hasTransparentCorners).toHaveBeenCalledOnce();
+});
+
+it('rejects a transparent export when the browser drops the alpha channel', async () => {
+  FakeMediaRecorder.supported.add('video/webm;codecs=vp8');
+  vi.mocked(hasTransparentCorners).mockResolvedValueOnce(false);
+  const session = await preparePhoneRecording(phone(), vi.fn(), true);
+  session.start();
+  await expect(session.finish()).rejects.toThrow('cantos transparentes');
+});
+
 it('cancela uma sessão preparada antes do início sem deixar tracks abertas', async () => {
   const session = await preparePhoneRecording(phone(), vi.fn());
   session.cancel();

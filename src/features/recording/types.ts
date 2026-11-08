@@ -3,6 +3,7 @@ export type RecordingPhase = 'idle' | 'preparing' | 'countdown' | 'recording' | 
 export interface RecordedClip {
   blob: Blob;
   extension: 'mp4' | 'webm';
+  transparent: boolean;
   width: number;
   height: number;
   durationMs: number;
