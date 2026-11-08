@@ -3,10 +3,9 @@ import '@testing-library/jest-dom/vitest';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
-import { createLumaProject } from './fixtures/luma-project';
 import { createInteractive } from '../src/core/interactive';
 import { createStep, STORAGE_KEY } from '../src/core/project';
-import type { Step } from '../src/core/types';
+import type { Project, Step } from '../src/core/types';
 beforeEach(() => {
   localStorage.clear();
   history.replaceState(null, '', '/');
@@ -16,10 +15,12 @@ afterEach(() => {
   cleanup();
   vi.useRealTimers();
 });
-async function start(steps?: Step[]) {
-  const project = createLumaProject();
-
-  if (steps) project.steps = steps;
+async function start(steps: Step[]) {
+  const project: Project = {
+    version: 1,
+    contact: { name: 'Loja teste', verified: false },
+    steps,
+  };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
   render(<App />);
   await act(async () => {});
@@ -27,7 +28,7 @@ async function start(steps?: Step[]) {
 const draft = () =>
   screen.getByLabelText('Prévia da mensagem em edição', { selector: '.draft-chat' });
 it('seleciona pelo teclado e atualiza o texto sem enviar mensagens', async () => {
-  await start();
+  await start([{ id: 'initial', type: 'user', text: 'Hi! I’m looking for a new lamp.', delay: 0 }]);
   const card = screen.getByRole('article', { name: 'Etapa 1' });
   fireEvent.focus(within(card).getByLabelText('Texto da mensagem'));
   expect(draft()).toHaveTextContent('Hi! I’m looking for a new lamp.');
