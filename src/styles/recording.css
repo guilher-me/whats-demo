@@ -35,6 +35,21 @@
 .record-control .icon-button:hover {
   background: #fee4e2;
 }
+.record-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+.record-label::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
 .record-control.recording-active .icon-button {
   color: var(--surface);
   background: var(--danger);
@@ -108,7 +123,7 @@
   width: 428px;
   max-width: none;
 }
-.is-capturing .phone-stage .phone {
+.is-capturing .phone-stage .phone-device {
   width: 360px;
-  flex-shrink: 0;
+  max-width: none;
 }

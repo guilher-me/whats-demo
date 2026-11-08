@@ -1,6 +1,7 @@
 import type { RefObject } from 'react';
 import type { Project } from '../../../core/types';
 import { useT } from '../../../i18n';
+import { usePhoneTime } from '../phone-time';
 import { PhoneFrame } from './PhoneFrame';
 import { MessageBubble } from './MessageBubble';
 import { conversationOverviewMessages } from '../overview';
@@ -16,12 +17,13 @@ export function ConversationOverview({
   phoneRef: RefObject<HTMLDivElement | null>;
 }) {
   const t = useT();
+  const time = usePhoneTime();
   return (
-    <PhoneFrame contact={project.contact} phoneRef={phoneRef}>
+    <PhoneFrame time={time} contact={project.contact} phoneRef={phoneRef}>
       <div className="chat-body overview-chat" aria-label={t('app.viewConversation')}>
         <div className="day">{t('phone.today')}</div>
         <div className="messages">
-          {conversationOverviewMessages(project).map((message) => (
+          {conversationOverviewMessages(project, time).map((message) => (
             <MessageBubble
               key={message.id}
               message={message}

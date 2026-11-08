@@ -2,6 +2,8 @@ import type { SVGProps } from 'react';
 const paths = {
   more: 'M12 5h.01M12 12h.01M12 19h.01',
   chevron: 'm6 9 6 6 6-6',
+  back: 'M20 12H4m7-7-7 7 7 7',
+  close: 'm6 6 12 12M18 6 6 18',
   copy: 'M9 9h11v12H9zM5 16H3V3h12v2',
   trash: 'M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7',
   up: 'm5 12 7-7 7 7M12 5v15',

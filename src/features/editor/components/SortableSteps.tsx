@@ -1,9 +1,11 @@
-import { useId, type ReactNode } from 'react';
+import { useId, useRef, type ReactNode } from 'react';
 import {
   DndContext,
   PointerSensor,
   KeyboardSensor,
-  closestCenter,
+  pointerWithin,
+  type KeyboardCoordinateGetter,
+  type UniqueIdentifier,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
@@ -11,7 +13,6 @@ import {
   SortableContext,
   useSortable,
   arrayMove,
-  sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis, restrictToParentElement } from '@dnd-kit/modifiers';
@@ -76,15 +77,34 @@ export function SortableSteps({
 }) {
   const id = useId();
   const t = useT();
+  const keyboardTarget = useRef<UniqueIdentifier | null>(null);
+  const stepIds = steps.map((step) => step.id);
+  const keyboardCoordinates: KeyboardCoordinateGetter = (event, { active, context }) => {
+    if (event.code !== 'ArrowUp' && event.code !== 'ArrowDown') return;
+    event.preventDefault();
+    const activeIndex = stepIds.findIndex((id) => id === active);
+    const currentIndex = stepIds.findIndex((id) => id === (keyboardTarget.current ?? active));
+    const nextIndex = currentIndex + (event.code === 'ArrowUp' ? -1 : 1);
+    const next = stepIds[nextIndex];
+    const rect = context.droppableRects.get(next);
+    if (!rect || !context.collisionRect) return;
+    keyboardTarget.current = next;
+    const offset = nextIndex > activeIndex ? rect.height - context.collisionRect.height : 0;
+    return { x: rect.left, y: rect.top + offset };
+  };
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(KeyboardSensor, { coordinateGetter: keyboardCoordinates }),
   );
   return (
     <DndContext
       id={id}
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={(args) =>
+        args.pointerCoordinates
+          ? pointerWithin(args)
+          : [{ id: keyboardTarget.current ?? args.active.id }]
+      }
       modifiers={[restrictToVerticalAxis, restrictToParentElement]}
       accessibility={{
         screenReaderInstructions: { draggable: t('editor.dragStepsHint') },
@@ -102,7 +122,11 @@ export function SortableSteps({
           onDragCancel: () => t('editor.dragCancelled'),
         },
       }}
+      onDragCancel={() => {
+        keyboardTarget.current = null;
+      }}
       onDragEnd={({ active, over }) => {
+        keyboardTarget.current = null;
         if (over && active.id !== over.id)
           onChange(
             arrayMove(
@@ -113,7 +137,7 @@ export function SortableSteps({
           );
       }}
     >
-      <SortableContext items={steps.map((step) => step.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext items={stepIds} strategy={verticalListSortingStrategy}>
         <div className="journey-list">
           {steps.map((step, index) => (
             <SortableStep key={step.id} step={step} index={index}>

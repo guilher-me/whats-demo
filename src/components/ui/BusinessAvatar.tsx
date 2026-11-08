@@ -28,8 +28,7 @@ export function BusinessAvatar({
   iconBackground?: string;
 }) {
   const background = iconBackground.toUpperCase();
-  const stockStore = icon === DEFAULT_BUSINESS_ICON && background === DEFAULT_ICON_BACKGROUND;
-  const foreground = stockStore ? '#fff' : iconForeground(background);
+  const foreground = background === DEFAULT_ICON_BACKGROUND ? '#fff' : iconForeground(background);
   return (
     <svg
       className="avatar"
