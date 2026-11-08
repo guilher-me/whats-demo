@@ -404,11 +404,12 @@ function EditorWorkspace({
                 setCollapsed((panels) => ({ ...panels, editor: false, preview: false }));
                 editor.select(item);
               }}
-              onRename={editor.rename}
-              onDuplicate={(item) => {
-                playback.reset();
-                setCollapsed((panels) => ({ ...panels, editor: false, preview: false }));
-                editor.duplicate(item);
+              onRename={editor.renameItem}
+              onDelete={async (item) => {
+                if (await editor.remove(item)) {
+                  playback.reset();
+                  setCollapsed((panels) => ({ ...panels, editor: false, preview: false }));
+                }
               }}
             />
             {collapsed.editor && editor.saveState === 'failed' && (

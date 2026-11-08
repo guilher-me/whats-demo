@@ -224,12 +224,29 @@
   font-size: 12px;
 }
 .journey-menu {
-  min-width: min(220px, calc(100vw - 24px));
+  min-width: min(300px, calc(100vw - 24px));
   max-width: min(340px, calc(100vw - 24px));
   max-height: min(60vh, var(--radix-dropdown-menu-content-available-height));
   overflow-y: auto;
 }
+.journey-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(3, 44px);
+  align-items: center;
+}
+.journey-row + .journey-row {
+  border-top: 1px solid var(--line);
+}
+.journey-item-action {
+  width: 44px;
+  min-height: 44px;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
 .journey-item {
+  min-height: 44px;
   padding-inline-start: 23px;
   position: relative;
 }
@@ -243,12 +260,9 @@
   overflow-wrap: anywhere;
 }
 .journey-menu-note {
+  margin: 0;
   padding: 6px;
   color: var(--muted);
-}
-.journey-menu-separator {
-  border-top: 1px solid var(--line);
-  margin-block: 4px;
 }
 @media (max-width: 600px) {
   .workspace-toolbar {

@@ -6,7 +6,7 @@
 
 Select **＋ New journey** in the workspace toolbar to start with an empty contact, catalog and conversation. The editor focuses the contact name. Name the journey using **Journey title**, which is separate from the contact name shown in the phone.
 
-Open **My journeys** to switch between titles saved in this browser. The list shows the most recently edited journeys first and marks the current one. Select the current journey to rename or duplicate it from the menu. Changes save automatically, including incomplete journeys and pending JSON drafts, without an account. If saving fails, the edits remain available in the open tab.
+Open **My journeys** to switch between titles saved in this browser. The list shows the most recently edited journeys first and marks the current one. Each item has controls to copy its preview link, rename it, or delete it from this browser. Deleting the current journey opens the most recently edited remaining journey or a blank editor. Changes save automatically, including incomplete journeys and pending JSON drafts, without an account. If saving fails, the edits remain available in the open tab.
 
 Open a shared link to try a specific journey. Editing it saves a separate local copy. **Restore from link** resets that copy to the original shared snapshot.
 

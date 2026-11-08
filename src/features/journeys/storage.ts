@@ -19,6 +19,7 @@ export interface Journey {
 export interface Library {
   items: Journey[];
   active?: string;
+  deleted?: string[];
 }
 
 export const libraryKey = (location: Location) => projectStorageKey(location) + ':library';
@@ -32,18 +33,27 @@ export function readLocalLibrary(key: string): Library {
   return JSON.parse(localStorage.getItem(key) ?? '{"items":[]}') as Library;
 }
 
-type WriteMode = 'save' | 'migrate' | 'activate';
+export type WriteMode = 'save' | 'migrate' | 'activate' | 'rename';
+
+function renamed(journey: Journey, current?: Journey) {
+  return { ...(current ?? journey), title: journey.title, updatedAt: journey.updatedAt };
+}
 
 function writeLocal(key: string, journey: Journey, mode: WriteMode) {
   const current = readLocalLibrary(key);
-  if (mode === 'save') {
-    current.items = [...current.items.filter((item) => item.id !== journey.id), journey];
-  } else if (mode === 'migrate' && !current.items.some((item) => item.id === journey.id)) {
+  if (current.deleted?.includes(journey.id)) throw new Error('Journey was deleted');
+  const existing = current.items.find((item) => item.id === journey.id);
+  if (mode === 'save' || mode === 'rename') {
+    const next = mode === 'rename' ? renamed(journey, existing) : journey;
+    current.items = [...current.items.filter((item) => item.id !== journey.id), next];
+  } else if (mode === 'migrate' && !existing) {
     current.items.push(journey);
   }
-  if (mode !== 'migrate') current.active = journey.id;
+  if (mode === 'save' || mode === 'activate') current.active = journey.id;
   localStorage.setItem(key, JSON.stringify(current));
 }
+
+const deletedKey = (id: string) => 'deleted:' + id;
 
 function openDatabase(key: string) {
   return new Promise<IDBDatabase>((resolve, reject) => {
@@ -77,8 +87,17 @@ export function journeyStorage(key: string) {
     return new Promise<Library>((resolve, reject) => {
       const transaction = db.transaction(['journeys', 'settings']);
       const items = transaction.objectStore('journeys').getAll();
-      const active = transaction.objectStore('settings').get('active');
-      transaction.oncomplete = () => resolve({ items: items.result, active: active.result });
+      const settings = transaction.objectStore('settings');
+      const active = settings.get('active');
+      const keys = settings.getAllKeys();
+      transaction.oncomplete = () =>
+        resolve({
+          items: items.result,
+          active: active.result,
+          deleted: keys.result.flatMap((key) =>
+            typeof key === 'string' && key.startsWith('deleted:') ? [key.slice(8)] : [],
+          ),
+        });
       transaction.onabort = () => reject(transaction.error);
     });
   };
@@ -90,18 +109,55 @@ export function journeyStorage(key: string) {
         new Promise<void>((resolve, reject) => {
           const transaction = db.transaction(['journeys', 'settings'], 'readwrite');
           const items = transaction.objectStore('journeys');
-          if (mode === 'save') items.put(journey);
-          if (mode === 'migrate') {
-            const existing = items.getKey(journey.id);
-            existing.onsuccess = () => {
-              if (existing.result === undefined) items.add(journey);
-            };
-          } else transaction.objectStore('settings').put(journey.id, 'active');
+          const settings = transaction.objectStore('settings');
+          const deleted = settings.getKey(deletedKey(journey.id));
+          deleted.onsuccess = () => {
+            if (deleted.result !== undefined) {
+              transaction.abort();
+              return;
+            }
+            if (mode === 'save') items.put(journey);
+            if (mode === 'migrate' || mode === 'rename') {
+              const existing = items.get(journey.id);
+              existing.onsuccess = () => {
+                if (mode === 'rename') items.put(renamed(journey, existing.result));
+                else if (existing.result === undefined) items.add(journey);
+              };
+            }
+            if (mode === 'save' || mode === 'activate') settings.put(journey.id, 'active');
+          };
           transaction.oncomplete = () => resolve();
           transaction.onabort = () => reject(transaction.error);
         }),
     );
   };
 
-  return { indexed, read, write };
+  const remove = async (id: string, replacement?: string) => {
+    if (!indexed) {
+      const library = readLocalLibrary(key);
+      library.items = library.items.filter((item) => item.id !== id);
+      library.deleted = [...new Set([...(library.deleted ?? []), id])];
+      if (!library.active || library.active === id) library.active = replacement;
+      localStorage.setItem(key, JSON.stringify(library));
+      return;
+    }
+    const db = await open();
+    return new Promise<void>((resolve, reject) => {
+      const transaction = db.transaction(['journeys', 'settings'], 'readwrite');
+      transaction.objectStore('journeys').delete(id);
+      const settings = transaction.objectStore('settings');
+      // Keep IDs from pending writes and legacy migrations from restoring a deleted item.
+      settings.put(true, deletedKey(id));
+      const active = settings.get('active');
+      active.onsuccess = () => {
+        if (active.result && active.result !== id) return;
+        if (replacement) settings.put(replacement, 'active');
+        else settings.delete('active');
+      };
+      transaction.oncomplete = () => resolve();
+      transaction.onabort = () => reject(transaction.error);
+    });
+  };
+
+  return { indexed, read, write, remove };
 }

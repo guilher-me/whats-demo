@@ -1,9 +1,20 @@
 // @vitest-environment jsdom
 import '@testing-library/jest-dom/vitest';
-import { act, cleanup, fireEvent, render, renderHook, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+  within,
+} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Blob as NativeBlob } from 'node:buffer';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
 import type { Project } from '../src/core/types';
+import { STORAGE_KEY } from '../src/core/project';
 import * as codec from '../src/core/codec';
 import {
   localJourneyId,
@@ -20,6 +31,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.useRealTimers();
+  vi.unstubAllGlobals();
 });
 
 function project(name: string): Project {
@@ -50,6 +62,63 @@ it('creates an empty journey and reopens the prior titled record without merging
   cleanup();
   render(<App />);
   expect(screen.getByLabelText('Nome do contato')).toHaveValue('Empresa A');
+});
+
+it('copies and renames an inactive journey, then removes local records without restoring legacy drafts', async () => {
+  vi.stubGlobal('Blob', NativeBlob);
+  vi.stubGlobal('ClipboardItem', undefined);
+  const user = userEvent.setup();
+  const write = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(project('Empresa A')));
+  render(<App />);
+  fireEvent.change(screen.getByLabelText('Título da jornada'), { target: { value: 'Primeira' } });
+  fireEvent.click(screen.getByRole('button', { name: /Nova jornada/ }));
+  fireEvent.change(screen.getByLabelText('Título da jornada'), { target: { value: 'Segunda' } });
+
+  const menu = () =>
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Minhas jornadas' }), { key: 'Enter' });
+  menu();
+  const first = screen.getByRole('menuitemradio', { name: 'Primeira' });
+  expect(
+    within(first.closest('.journey-row') as HTMLElement).getAllByRole('menuitem'),
+  ).toHaveLength(3);
+  await user.click(screen.getByRole('menuitem', { name: 'Copiar link de Primeira' }));
+  await screen.findByText('Link copiado.');
+  const hash = new URL(write.mock.calls[0][0]).hash;
+  expect(codec.sharedRoute(hash)).toMatchObject({ previewOnly: true, locale: 'pt-BR' });
+  expect(await codec.decode(hash)).toMatchObject({ contact: { name: 'Empresa A' } });
+  expect(screen.getByLabelText('Título da jornada')).toHaveValue('Segunda');
+
+  await user.click(screen.getByRole('menuitem', { name: 'Renomear Primeira' }));
+  let dialog = screen.getByRole('dialog');
+  fireEvent.change(within(dialog).getByLabelText('Título da jornada'), {
+    target: { value: 'Renomeada' },
+  });
+  await user.click(within(dialog).getByRole('button', { name: 'Salvar título' }));
+  expect(screen.getByLabelText('Título da jornada')).toHaveValue('Segunda');
+
+  menu();
+  await user.click(screen.getByRole('menuitem', { name: 'Excluir Renomeada' }));
+  await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancelar' }));
+  menu();
+  expect(screen.getByRole('menuitemradio', { name: 'Renomeada' })).toBeVisible();
+  await user.click(screen.getByRole('menuitem', { name: 'Excluir Renomeada' }));
+  dialog = screen.getByRole('dialog');
+  await user.click(within(dialog).getByRole('button', { name: 'Excluir jornada' }));
+  expect(screen.getByLabelText('Título da jornada')).toHaveValue('Segunda');
+
+  menu();
+  expect(screen.queryByRole('menuitemradio', { name: 'Renomeada' })).toBeNull();
+  await user.click(screen.getByRole('menuitem', { name: 'Excluir Segunda' }));
+  await user.click(
+    within(screen.getByRole('dialog')).getByRole('button', { name: 'Excluir jornada' }),
+  );
+  expect(screen.getByLabelText('Título da jornada')).toHaveValue('');
+  expect(location.hash).toBe('');
+  cleanup();
+  render(<App />);
+  expect(screen.getByLabelText('Nome do contato')).toHaveValue('');
+  expect(await codec.decode(hash)).toMatchObject({ contact: { name: 'Empresa A' } });
 });
 
 it('keeps a late compression result from replacing a different journey address', async () => {

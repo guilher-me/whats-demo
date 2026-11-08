@@ -8,7 +8,8 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 
 ### Added
 
-- Create, name and reopen journeys in a local library, with a live address for each shareable edit.
+- Create and reopen journeys in a local library, with a live address for each shareable edit.
+- Copy a link, rename, or delete any journey directly from the library.
 
 ## [0.3.0] - 2026-11-08
 

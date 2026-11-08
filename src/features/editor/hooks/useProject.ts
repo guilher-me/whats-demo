@@ -10,6 +10,7 @@ import {
   readLocalLibrary,
   type Journey,
   type Library,
+  type WriteMode,
 } from '../../journeys/storage';
 import { setJourneyAddress } from '../../journeys/live-link';
 
@@ -79,7 +80,7 @@ export function useProject(copy?: SharedCopy, localId?: string) {
     let local = items.find((item) => item.id === 'legacy-local');
     const migrations: Journey[] = [];
     let failed = false;
-    if (!local) {
+    if (!local && !library.deleted?.includes('legacy-local')) {
       try {
         const legacy = readLegacy(base);
         if (legacy) {
@@ -94,11 +95,12 @@ export function useProject(copy?: SharedCopy, localId?: string) {
     let selected = localId ? items.find((item) => item.id === localId) : undefined;
     if (!selected && copy) {
       selected = items.find((item) => item.source === copy.token);
-      if (!selected) {
+      const legacyId = 'legacy-copy:' + copy.token;
+      if (!selected && !library.deleted?.includes(legacyId)) {
         try {
           const legacy = readLegacy(base + ':copy:' + copy.token);
           if (legacy) {
-            selected = { ...newJourney(legacy, copy.token), id: 'legacy-copy:' + copy.token };
+            selected = { ...newJourney(legacy, copy.token), id: legacyId };
             items.push(selected);
             migrations.push(selected);
           }
@@ -112,7 +114,7 @@ export function useProject(copy?: SharedCopy, localId?: string) {
   }
 
   const persist = useCallback(
-    (next: Journey, mode: 'save' | 'migrate' | 'activate' = 'save') => {
+    (next: Journey, mode: WriteMode = 'save') => {
       const operation = Symbol();
       pending.current.set(next.id, operation);
       if (current.current.id === next.id) setSaveState('saving');
@@ -125,14 +127,23 @@ export function useProject(copy?: SharedCopy, localId?: string) {
       try {
         const write = storage.write(next, mode);
         const success = mode === 'migrate' ? 'recovered' : 'saved';
-        if (write)
-          void write.then(
-            () => finish(success),
-            () => finish('failed'),
+        if (write) {
+          return write.then(
+            () => {
+              finish(success);
+              return true;
+            },
+            () => {
+              finish('failed');
+              return false;
+            },
           );
-        else finish(success);
+        }
+        finish(success);
+        return Promise.resolve(true);
       } catch {
         finish('failed');
+        return Promise.resolve(false);
       }
     },
     [storage],
@@ -236,12 +247,10 @@ export function useProject(copy?: SharedCopy, localId?: string) {
     setRevision((value) => value + 1);
   };
 
-  const select = (next: Journey) => {
-    if (current.current.id === next.id) return;
-    setLive(true);
+  const activate = (next: Journey, local: boolean) => {
+    setLive(local);
     current.current = next;
     setJourney(next);
-    setItems((items) => [...items.filter((item) => item.id !== next.id), next]);
     setRevision((value) => value + 1);
     setError('');
     try {
@@ -249,7 +258,13 @@ export function useProject(copy?: SharedCopy, localId?: string) {
     } catch {
       // A storage or history failure leaves the active journey available in this tab.
     }
-    persist(
+  };
+
+  const select = (next: Journey) => {
+    if (current.current.id === next.id) return;
+    activate(next, true);
+    setItems((items) => [...items.filter((item) => item.id !== next.id), next]);
+    void persist(
       next,
       items.some((item) => item.id === next.id) &&
         !pending.current.has(next.id) &&
@@ -257,6 +272,44 @@ export function useProject(copy?: SharedCopy, localId?: string) {
         ? 'activate'
         : 'save',
     );
+  };
+
+  const renameItem = (item: Journey, title: string) => {
+    const target = current.current.id === item.id ? current.current : item;
+    const next = { ...target, title, updatedAt: Date.now() };
+    if (current.current.id === item.id) {
+      current.current = next;
+      setJourney(next);
+    }
+    setItems((items) => items.map((entry) => (entry.id === next.id ? next : entry)));
+    return persist(next, 'rename');
+  };
+
+  const remove = async (item: Journey) => {
+    const remaining = items.filter((entry) => entry.id !== item.id);
+    const replacement = remaining.reduce<Journey | undefined>(
+      (latest, entry) => (!latest || entry.updatedAt > latest.updatedAt ? entry : latest),
+      undefined,
+    );
+    await storage.remove(item.id, replacement?.id);
+    // Legacy source values are optional after migration. The tombstone still prevents recovery
+    // when this cleanup is blocked by browser storage restrictions.
+    try {
+      const base = projectStorageKey(location);
+      if (item.id === 'legacy-local') localStorage.removeItem(base);
+      else if (item.source) localStorage.removeItem(base + ':copy:' + item.source);
+    } catch {
+      // The library transaction already completed.
+    }
+    pending.current.delete(item.id);
+    outcomes.current.delete(item.id);
+    setItems((items) => items.filter((entry) => entry.id !== item.id));
+    if (current.current.id === item.id) {
+      activate(replacement ?? newJourney(), !!replacement);
+      setSaveState(replacement ? (outcomes.current.get(replacement.id) ?? 'recovered') : 'empty');
+      return true;
+    }
+    return false;
   };
 
   const setFlowDraft = (id: string, draft?: NonNullable<Journey['flows']>[string]) => {
@@ -286,14 +339,8 @@ export function useProject(copy?: SharedCopy, localId?: string) {
     select,
     rename: (title: string) => change((item) => ({ ...item, title })),
     create: () => select(newJourney()),
-    duplicate: (item: Journey) =>
-      select({
-        ...clone(item),
-        id: uid(),
-        source: undefined,
-        title: t('journeys.copyTitle', { title: item.title.trim() || t('journeys.untitled') }),
-        updatedAt: Date.now(),
-      }),
+    renameItem,
+    remove,
     restore: async () => {
       const { source, id } = current.current;
       if (!source) return;
