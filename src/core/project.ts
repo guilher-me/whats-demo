@@ -19,7 +19,7 @@ export function normalizeProject(
   options?: { allowDrafts?: boolean; strictIds?: boolean },
 ): Project {
   const validated = validateProject(input, options);
-  const { name, verified, icon, iconBackground } = validated.contact;
+  const { name, verified, icon, iconBackground, iconForeground } = validated.contact;
   const background = iconBackground?.toUpperCase();
   const project = clone({
     version: validated.version,
@@ -29,6 +29,7 @@ export function normalizeProject(
       verified: Boolean(verified),
       icon: icon === DEFAULT_BUSINESS_ICON ? undefined : icon,
       iconBackground: background === DEFAULT_ICON_BACKGROUND ? undefined : background,
+      iconForeground: iconForeground?.toUpperCase(),
     },
     steps: validated.steps.map((step) => {
       const { id, type, text, delay, typing, typingMs } = step;

@@ -109,7 +109,6 @@
 }
 .tooltip-title {
   display: block;
-  color: var(--surface);
   font-size: 12px;
   font-weight: 600;
   margin-bottom: 3px;
@@ -163,27 +162,27 @@
   cursor: pointer;
 }
 @media (forced-colors: none) {
-  :root[data-theme='dark'] .speed-panel input[type='range'] {
+  .speed-panel input[type='range'] {
     appearance: none;
     height: 24px;
     border: 0;
     background: transparent;
   }
-  :root[data-theme='dark'] .speed-panel input[type='range']:focus-visible {
+  .speed-panel input[type='range']:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
-  :root[data-theme='dark'] .speed-panel input::-webkit-slider-runnable-track {
+  .speed-panel input::-webkit-slider-runnable-track {
     height: 6px;
     border-radius: 999px;
     background: var(--field-hover-line);
   }
-  :root[data-theme='dark'] .speed-panel input::-moz-range-track {
+  .speed-panel input::-moz-range-track {
     height: 6px;
     border-radius: 999px;
     background: var(--field-hover-line);
   }
-  :root[data-theme='dark'] .speed-panel input::-webkit-slider-thumb {
+  .speed-panel input::-webkit-slider-thumb {
     appearance: none;
     width: 16px;
     height: 16px;
@@ -191,7 +190,7 @@
     border-radius: 50%;
     background: var(--accent);
   }
-  :root[data-theme='dark'] .speed-panel input::-moz-range-thumb {
+  .speed-panel input::-moz-range-thumb {
     width: 16px;
     height: 16px;
     border: 0;

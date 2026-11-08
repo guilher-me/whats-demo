@@ -54,6 +54,8 @@
 
 .json-editor .cm-content {
   caret-color: var(--ink);
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 .json-editor .cm-content ::selection {

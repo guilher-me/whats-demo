@@ -1,8 +1,9 @@
+import { useId, useState } from 'react';
 import { useT } from '../../../i18n';
 import { Dialog } from '../../../components/ui/Dialog';
 import { Button } from '../../../components/ui/Button';
 import { ControlIcon } from '../../../components/icons/ControlIcon';
-import { recordingSupport } from '../session';
+import { recordingSupport, supportsTransparentRecording } from '../session';
 import { formatElapsed } from '../types';
 import type { RecordingController } from '../useRecording';
 export function RecordingDialogs({
@@ -19,9 +20,12 @@ export function RecordingDialogs({
   const t = useT();
 
   const unsupported = recordingSupport();
+  const supportsTransparency = supportsTransparentRecording();
+  const [transparent, setTransparent] = useState(false);
+  const formatNote = useId();
   const choose = (mode: 'manual' | 'automatic') => {
     onOpenChange(false);
-    void recording.start(mode);
+    void recording.start(mode, transparent && supportsTransparency);
   };
   return (
     <>
@@ -31,26 +35,45 @@ export function RecordingDialogs({
         title={t('recording.title')}
         description={t('recording.description')}
       >
-        <p className="record-format-note">{t('recording.formatHint')}</p>
         {unsupported ? (
           <p role="alert">{unsupported}</p>
         ) : (
-          <div className="record-mode-options">
-            <Button onClick={() => choose('manual')}>
-              <ControlIcon name="manual" />
-              <span>
-                {t('recording.manual')}
-                <small>{t('recording.manualHint')}</small>
-              </span>
-            </Button>
-            <Button variant="primary" disabled={autoDisabled} onClick={() => choose('automatic')}>
-              <ControlIcon name="play" />
-              <span>
-                {t('recording.automatic')}
-                <small>{t('recording.autoHint')}</small>
-              </span>
-            </Button>
-          </div>
+          <>
+            <label className="record-transparent-option">
+              <input
+                type="checkbox"
+                checked={transparent && supportsTransparency}
+                disabled={!supportsTransparency}
+                aria-describedby={formatNote}
+                onChange={(event) => setTransparent(event.currentTarget.checked)}
+              />
+              {t('recording.transparent')}
+            </label>
+            <p id={formatNote} className="record-format-note">
+              {t(
+                transparent && supportsTransparency
+                  ? 'recording.transparentHint'
+                  : 'recording.formatHint',
+              )}
+              {!supportsTransparency && ' ' + t('recording.transparentUnavailable')}
+            </p>
+            <div className="record-mode-options">
+              <Button onClick={() => choose('manual')}>
+                <ControlIcon name="manual" />
+                <span>
+                  {t('recording.manual')}
+                  <small>{t('recording.manualHint')}</small>
+                </span>
+              </Button>
+              <Button variant="primary" disabled={autoDisabled} onClick={() => choose('automatic')}>
+                <ControlIcon name="play" />
+                <span>
+                  {t('recording.automatic')}
+                  <small>{t('recording.autoHint')}</small>
+                </span>
+              </Button>
+            </div>
+          </>
         )}
       </Dialog>
       <Dialog
@@ -73,7 +96,7 @@ export function RecordingDialogs({
         {recording.result && (
           <>
             <video
-              className="recorded-video"
+              className={`recorded-video${recording.result.transparent ? ' is-transparent' : ''}`}
               controls
               muted
               playsInline

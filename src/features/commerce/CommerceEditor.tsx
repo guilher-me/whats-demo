@@ -16,7 +16,7 @@ import {
   offerOf,
   offerSkus,
 } from '../../core/commerce';
-import type { CommerceStep, Product, Project } from '../../core/types';
+import type { CartItem, CommerceStep, OfferStep, Product, Project } from '../../core/types';
 
 export function CatalogEditor({
   project,
@@ -197,18 +197,60 @@ function CentsField({
   );
 }
 
+function AutomaticCartFields({
+  offer,
+  catalog,
+  autoItems,
+  onChange,
+}: {
+  offer: OfferStep;
+  catalog: Product[];
+  autoItems?: CartItem[];
+  onChange: (items?: CartItem[]) => void;
+}) {
+  const t = useT();
+  const items = autoCart(offer, autoItems);
+  const skus = Array.from(new Set([...offerSkus(offer), ...items.map(({ sku }) => sku)]));
+  return (
+    <>
+      {skus.map((sku) => (
+        <TextField
+          key={sku}
+          type="number"
+          min={0}
+          max={MAX_CART_QUANTITY}
+          step={1}
+          label={catalog.find((product) => product.sku === sku)?.name || sku}
+          value={items.find((item) => item.sku === sku)?.quantity ?? 0}
+          onChange={(event) => {
+            const next = event.currentTarget.valueAsNumber || 0;
+            if (!Number.isInteger(next) || next < 0 || next > MAX_CART_QUANTITY) return;
+            const others = items.filter((item) => item.sku !== sku);
+            onChange(next ? [...others, { sku, quantity: next }] : others);
+          }}
+        />
+      ))}
+      <Button variant="ghost" disabled={!autoItems} onClick={() => onChange()}>
+        {t('commerce.resetCart')}
+      </Button>
+    </>
+  );
+}
+
 export function CommerceFields({
   value,
   project,
   index,
   error,
   onChange,
+  onCartChange,
 }: {
   value: CommerceStep;
   project: Project;
   index: number;
   error: string;
   onChange: (value: CommerceStep) => void;
+  onCartChange?: (cartId?: string, items?: CartItem[]) => void;
 }) {
   const t = useT();
   const catalog = project.catalog ?? [];
@@ -240,6 +282,15 @@ export function CommerceFields({
       break;
     case 'showcase': {
       const allSkus = offerSkus(value);
+      const offerId = project.steps[index]?.id;
+      const carts = project.steps.flatMap((step, position) =>
+        position > index &&
+        step.type === 'user' &&
+        step.commerce?.kind === 'cart' &&
+        step.commerce.offerId === offerId
+          ? [{ id: step.id, position, items: step.commerce.autoItems }]
+          : [],
+      );
       const update = (at: number, section: (typeof value.sections)[number]) =>
         onChange({
           ...value,
@@ -326,6 +377,33 @@ export function CommerceFields({
           >
             {t('commerce.addSection')}
           </Button>
+          {onCartChange && (
+            <FormSection title={t('commerce.autoCart')} summary={t('commerce.autoCartHelp')}>
+              {carts.length ? (
+                carts.map(({ id, position, items }) => (
+                  <fieldset key={id} className="commerce-section">
+                    <legend>{t('commerce.linkedCartStep', { v0: position + 1 })}</legend>
+                    <AutomaticCartFields
+                      offer={value}
+                      catalog={catalog}
+                      autoItems={items}
+                      onChange={(next) => onCartChange(id, next)}
+                    />
+                  </fieldset>
+                ))
+              ) : (
+                <Button
+                  disabled={!allSkus.length || project.steps.length >= 200}
+                  onClick={(event) => {
+                    event.currentTarget.closest('details')?.querySelector('summary')?.focus();
+                    onCartChange();
+                  }}
+                >
+                  {t('commerce.addCartStep')}
+                </Button>
+              )}
+            </FormSection>
+          )}
         </>
       );
       break;
@@ -333,8 +411,6 @@ export function CommerceFields({
     case 'cart': {
       const offers = prior.filter((step) => !!offerOf(step));
       const offer = offerOf(offers.find(({ id }) => id === value.offerId));
-      const skus = offer ? offerSkus(offer) : [];
-      const items = offer ? autoCart(offer, value.autoItems) : [];
       fields = (
         <>
           <SelectField
@@ -345,33 +421,12 @@ export function CommerceFields({
           />
           {offer && (
             <FormSection title={t('commerce.autoCart')} summary={t('commerce.autoCartHelp')}>
-              {Array.from(new Set([...skus, ...items.map(({ sku }) => sku)])).map((sku) => (
-                <TextField
-                  key={sku}
-                  type="number"
-                  min={0}
-                  max={MAX_CART_QUANTITY}
-                  step={1}
-                  label={catalog.find((product) => product.sku === sku)?.name || sku}
-                  value={items.find((item) => item.sku === sku)?.quantity ?? 0}
-                  onChange={(event) => {
-                    const next = event.currentTarget.valueAsNumber || 0;
-                    if (!Number.isInteger(next) || next < 0 || next > MAX_CART_QUANTITY) return;
-                    const others = items.filter((item) => item.sku !== sku);
-                    onChange({
-                      ...value,
-                      autoItems: next ? [...others, { sku, quantity: next }] : others,
-                    });
-                  }}
-                />
-              ))}
-              <Button
-                variant="ghost"
-                disabled={!value.autoItems}
-                onClick={() => onChange({ kind: 'cart', offerId: value.offerId })}
-              >
-                {t('commerce.resetCart')}
-              </Button>
+              <AutomaticCartFields
+                offer={offer}
+                catalog={catalog}
+                autoItems={value.autoItems}
+                onChange={(autoItems) => onChange({ ...value, autoItems })}
+              />
             </FormSection>
           )}
         </>

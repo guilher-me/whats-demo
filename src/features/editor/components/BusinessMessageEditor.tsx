@@ -2,7 +2,7 @@ import { CommerceFields } from '../../commerce/CommerceEditor';
 import { createMedia, isAttachmentKind } from '../../../core/attachments';
 import { buttonLabel, isReplyButton } from '../../../core/message-buttons';
 import { useT } from '../../../i18n';
-import type { BusinessInteractive, MessageStep, Project } from '../../../core/types';
+import type { BusinessInteractive, CartItem, MessageStep, Project } from '../../../core/types';
 import { createInteractive, businessMessageError, messageOptions } from '../../../core/interactive';
 import { TextField, FieldError } from '../../../components/ui/Field';
 import { MessageTextEditor } from './MessageTextEditor';
@@ -18,12 +18,14 @@ export function BusinessMessageEditor({
   index,
   commerceError,
   onChange,
+  onCartChange,
 }: {
   step: MessageStep;
   project: Project;
   index: number;
   commerceError: string;
   onChange: (change: Partial<MessageStep>) => void;
+  onCartChange: (cartId?: string, items?: CartItem[]) => void;
 }) {
   const t = useT();
 
@@ -86,6 +88,7 @@ export function BusinessMessageEditor({
           index={index}
           error={commerceError}
           onChange={(commerce) => onChange({ commerce })}
+          onCartChange={onCartChange}
         />
       )}
       {value && (

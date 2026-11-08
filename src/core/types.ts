@@ -54,6 +54,7 @@ export interface Contact {
   verified: boolean;
   icon?: BusinessIcon;
   iconBackground?: string;
+  iconForeground?: string;
 }
 export type ImageExtension = 'png' | 'jpg';
 export type DocumentExtension = 'pdf' | 'txt' | 'doc' | 'docx' | 'xls' | 'xlsx' | 'ppt' | 'pptx';

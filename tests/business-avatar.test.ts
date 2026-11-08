@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { BUSINESS_ICONS, iconForeground } from '../src/core/business-avatar';
 import { createShareURL, loadSharedProject, sharedRoute } from '../src/core/codec';
 import { normalizeProject } from '../src/core/project';
+import schema from '../schemas/project-v1.schema.json';
 
 const project = {
   version: 1,
@@ -10,14 +11,27 @@ const project = {
 };
 
 describe('business avatar configuration', () => {
+  it('publishes one distinct schema ID for each bundled icon', () => {
+    expect(new Set(BUSINESS_ICONS).size).toBe(BUSINESS_ICONS.length);
+    expect(schema.properties.contact.properties.icon.enum).toEqual(BUSINESS_ICONS);
+  });
+
   it.each(BUSINESS_ICONS)('accepts the %s icon', (icon) => {
     const normalized = normalizeProject({ ...project, contact: { ...project.contact, icon } });
     expect(normalized.contact.icon ?? 'commerce').toBe(icon);
   });
 
-  it('round-trips the chosen icon and canonical HEX through an editable preview link', async () => {
+  it('round-trips the chosen icon and both canonical HEX colors through an editable preview link', async () => {
     const url = await createShareURL(
-      { ...project, contact: { ...project.contact, icon: 'health', iconBackground: '#f0f5aa' } },
+      {
+        ...project,
+        contact: {
+          ...project.contact,
+          icon: 'tooth',
+          iconBackground: '#f0f5aa',
+          iconForeground: '#123abc',
+        },
+      },
       'editor',
       'https://example.test/',
       'pt-BR',
@@ -27,8 +41,9 @@ describe('business avatar configuration', () => {
     expect(route.previewOnly).toBe(true);
     expect((await loadSharedProject(route)).contact).toEqual({
       ...project.contact,
-      icon: 'health',
+      icon: 'tooth',
       iconBackground: '#F0F5AA',
+      iconForeground: '#123ABC',
     });
   });
 
@@ -44,10 +59,12 @@ describe('business avatar configuration', () => {
     expect(() =>
       normalizeProject({ ...project, contact: { ...project.contact, icon: 'constructor' } }),
     ).toThrow('contact.icon');
-    for (const iconBackground of ['red', '#FFF', '#12345678', '123456', '#123456\n']) {
-      expect(() =>
-        normalizeProject({ ...project, contact: { ...project.contact, iconBackground } }),
-      ).toThrow('contact.iconBackground');
+    for (const color of ['red', '#FFF', '#12345678', '123456', '#123456\n']) {
+      for (const field of ['iconBackground', 'iconForeground']) {
+        expect(() =>
+          normalizeProject({ ...project, contact: { ...project.contact, [field]: color } }),
+        ).toThrow('contact.' + field);
+      }
     }
   });
 

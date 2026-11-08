@@ -172,6 +172,7 @@ export function PhonePreview({
         />
       )}
       <div
+        data-recording-cursor
         className={`touch-cursor ${p.cursor.pressed ? 'pressed' : ''}`}
         style={{
           left: p.cursor.x,

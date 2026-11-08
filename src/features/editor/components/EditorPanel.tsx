@@ -1,5 +1,5 @@
 import { useT } from '../../../i18n';
-import type { Contact, Project, Step } from '../../../core/types';
+import type { CartItem, Contact, Project, Step } from '../../../core/types';
 import { useRef, useState, useEffect } from 'react';
 import { useAddedStepFocus } from '../hooks/useAddedStepFocus';
 import { ContactEditor } from './ContactEditor';
@@ -13,7 +13,16 @@ import { CatalogEditor } from '../../commerce/CommerceEditor';
 import { catalogError, commerceStepError } from '../../../core/commerce';
 import type { Product } from '../../../core/types';
 import { SortableSteps } from './SortableSteps';
+import { TextField } from '../../../components/ui/Field';
+import { JOURNEY_TITLE_LIMIT } from '../../journeys/JourneyControls';
+import type { AnswersDraft, FlowDraft } from '../../journeys/storage';
 interface Props {
+  title: string;
+  onTitle: (title: string) => void;
+  flowDrafts?: Record<string, FlowDraft>;
+  answersDrafts?: Record<string, AnswersDraft>;
+  onFlowDraft: (id: string, draft?: FlowDraft) => void;
+  onAnswersDraft: (id: string, draft?: AnswersDraft) => void;
   saveState: SaveState;
   project: Project;
   revision: number;
@@ -25,6 +34,7 @@ interface Props {
   onCatalog: (catalog: Product[]) => void;
   onContact: (contact: Contact) => void;
   onChange: (id: string, change: Partial<Step>) => void;
+  onCartChange: (offerId: string, cartId?: string, items?: CartItem[]) => void;
   onReorder: (steps: Step[]) => void;
   onAction: (id: string, action: StepAction) => void;
   onAdd: (type: Step['type']) => string | undefined;
@@ -60,6 +70,13 @@ export function EditorPanel(props: Props) {
             </Button>
           )}
         </div>
+        <TextField
+          label={t('journeys.title')}
+          placeholder={t('journeys.untitled')}
+          value={props.title}
+          maxLength={JOURNEY_TITLE_LIMIT}
+          onChange={(event) => props.onTitle(event.currentTarget.value)}
+        />
         <ContactEditor
           key={props.revision}
           contact={props.project.contact}
@@ -82,6 +99,18 @@ export function EditorPanel(props: Props) {
             <StepCard
               key={`${props.revision}:${step.id}`}
               step={step}
+              flowDraft={
+                Object.hasOwn(props.flowDrafts ?? {}, step.id)
+                  ? props.flowDrafts?.[step.id]
+                  : undefined
+              }
+              answersDraft={
+                Object.hasOwn(props.answersDrafts ?? {}, step.id)
+                  ? props.answersDrafts?.[step.id]
+                  : undefined
+              }
+              onFlowDraft={(draft) => props.onFlowDraft(step.id, draft)}
+              onAnswersDraft={(draft) => props.onAnswersDraft(step.id, draft)}
               project={props.project}
               commerceError={commerceStepError(props.project, index)}
               index={index}
@@ -100,6 +129,7 @@ export function EditorPanel(props: Props) {
                 props.onSelect(step.id);
               }}
               onChange={(change) => props.onChange(step.id, change)}
+              onCartChange={(cartId, items) => props.onCartChange(step.id, cartId, items)}
               onAction={(action) => props.onAction(step.id, action)}
               onValidity={props.onValidity}
               onFlowPreview={(screenId) => props.onFlowPreview(step.id, screenId)}

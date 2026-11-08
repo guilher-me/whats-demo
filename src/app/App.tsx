@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useState, useSyncExternalStore } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
+import { localJourneyId } from '../features/journeys/live-link';
 import { loadSharedProject, sharedRoute } from '../core/codec';
 import type { Project } from '../core/types';
 import { i18n, initialLocale, useT } from '../i18n';
@@ -7,12 +8,11 @@ import { EditorApp } from './EditorApp';
 
 type SharedRoute = NonNullable<ReturnType<typeof sharedRoute>>;
 
-function subscribe(listener: () => void) {
-  window.addEventListener('hashchange', listener);
-  return () => window.removeEventListener('hashchange', listener);
+function navigation() {
+  return { hash: location.hash, localId: localJourneyId() };
 }
 
-function SharedExperience({ route }: { route: SharedRoute }) {
+function SharedExperience({ route, localId }: { route: SharedRoute; localId?: string }) {
   const t = useT();
   const [result, setResult] = useState<{ project: Project } | { error: string }>();
   const { mode, legacy, token, locale, previewOnly } = route;
@@ -58,14 +58,38 @@ function SharedExperience({ route }: { route: SharedRoute }) {
       </main>
     );
   return mode === 'editor' ? (
-    <EditorApp copy={{ project: result.project, token }} previewOnly={previewOnly} />
+    <EditorApp
+      copy={{ project: result.project, token }}
+      localId={localId}
+      previewOnly={previewOnly}
+    />
   ) : (
     <DemoApp project={result.project} token={legacy ? undefined : token} locale={locale} />
   );
 }
 
 export function App() {
-  const hash = useSyncExternalStore(subscribe, () => location.hash);
+  // Publishing a snapshot with replaceState must not change the mounted editor.
+  const [{ hash, localId, revision }, setNavigation] = useState(() => ({
+    ...navigation(),
+    revision: 0,
+  }));
+  useEffect(() => {
+    const onNavigate = () => {
+      const destination = navigation();
+      setNavigation((entry) => ({ ...destination, revision: entry.revision + 1 }));
+    };
+    window.addEventListener('hashchange', onNavigate);
+    window.addEventListener('popstate', onNavigate);
+    return () => {
+      window.removeEventListener('hashchange', onNavigate);
+      window.removeEventListener('popstate', onNavigate);
+    };
+  }, []);
   const route = sharedRoute(hash);
-  return route ? <SharedExperience key={hash} route={route} /> : <EditorApp />;
+  return route ? (
+    <SharedExperience key={revision} route={route} localId={localId} />
+  ) : (
+    <EditorApp key={revision} localId={localId} />
+  );
 }

@@ -33,6 +33,9 @@ export function CommerceSheet({
   const lines = orderLines(active.items, products);
   const count = lines.reduce((total, line) => total + line.quantity, 0);
   const isProduct = active.view === 'product' && product;
+  const canAddProduct =
+    !!isProduct &&
+    (lines.find(({ sku }) => sku === product.sku)?.quantity ?? 0) < MAX_CART_QUANTITY;
   const isCart = active.view === 'cart';
   const title = isProduct ? product.name : t(isCart ? 'commerce.cartTitle' : 'commerce.showcase');
   return (
@@ -132,10 +135,8 @@ export function CommerceSheet({
             <Button
               variant="primary"
               data-commerce-add
-              disabled={
-                locked ||
-                (lines.find(({ sku }) => sku === product.sku)?.quantity ?? 0) >= MAX_CART_QUANTITY
-              }
+              data-playback-locked={(locked && canAddProduct) || undefined}
+              disabled={locked || !canAddProduct}
               onClick={controls.add}
             >
               {t('commerce.addToCart')}
@@ -145,13 +146,19 @@ export function CommerceSheet({
             <Button
               variant="primary"
               data-commerce-send
+              data-playback-locked={(locked && count > 0) || undefined}
               disabled={locked || !count}
               onClick={controls.submit}
             >
               {t('commerce.cart')}
             </Button>
           ) : (
-            <Button data-commerce-review disabled={locked || !count} onClick={controls.showCart}>
+            <Button
+              data-commerce-review
+              data-playback-locked={(locked && count > 0) || undefined}
+              disabled={locked || !count}
+              onClick={controls.showCart}
+            >
               {t('commerce.viewCart', { v0: count })}
             </Button>
           )}

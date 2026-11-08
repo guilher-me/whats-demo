@@ -3,6 +3,31 @@
 }
 body {
   margin: 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Keep editable values and technical text available for copying. */
+:where(
+  input:not([type]),
+  input:is(
+    [type='text'],
+    [type='search'],
+    [type='email'],
+    [type='url'],
+    [type='tel'],
+    [type='password'],
+    [type='number']
+  ),
+  textarea,
+  code,
+  pre,
+  [role='alert'],
+  .code-feedback li,
+  .builder-issues li
+) {
+  -webkit-user-select: text;
+  user-select: text;
 }
 button,
 input,
@@ -156,6 +181,30 @@ label select {
   color: var(--muted);
   font-size: 11px;
   cursor: help;
+}
+.save-indicator-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.save-indicator-mark {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 10px;
+  width: 10px;
+  height: 10px;
+  line-height: 1;
+}
+.save-indicator[data-state='saving'] .save-indicator-mark {
+  border: 1px solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: 50%;
+  animation: save-indicator-spin 800ms linear infinite;
+}
+@keyframes save-indicator-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 .save-indicator:focus-visible {
   outline: 2px solid var(--accent);

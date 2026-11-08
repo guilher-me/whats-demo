@@ -420,6 +420,8 @@
   flex: 1;
 }
 .touch-cursor {
+  --cursor-halo-size: 7px;
+  --cursor-halo-color: #00a88412;
   position: absolute;
   z-index: 10;
   left: 50%;
@@ -429,7 +431,7 @@
   border: 2px solid var(--phone-action);
   border-radius: 50%;
   background: #00a88422;
-  box-shadow: 0 0 0 7px #00a88412;
+  box-shadow: 0 0 0 var(--cursor-halo-size) var(--cursor-halo-color);
   opacity: 0;
   transform: translate(-50%, -50%);
   pointer-events: none;
