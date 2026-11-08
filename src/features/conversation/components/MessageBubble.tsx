@@ -1,3 +1,4 @@
+import { CommerceAction, CommerceCard } from '../../commerce/CommerceCards';
 import type { ChatMessage, FlowStep } from '../../../core/types';
 import { MessageFrame } from './MessageFrame';
 import { BusinessMessageActions } from './BusinessMessageActions';
@@ -16,6 +17,8 @@ export function MessageBubble({
   onList,
   phoneRef,
   attachmentDisabled,
+  onCommerce,
+  cartCount,
 }: {
   message: ChatMessage;
   running: boolean;
@@ -25,6 +28,8 @@ export function MessageBubble({
   onList: (messageId: string) => void;
   phoneRef?: RefObject<HTMLDivElement | null>;
   attachmentDisabled?: boolean;
+  onCommerce?: () => void;
+  cartCount?: number;
 }) {
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -37,21 +42,31 @@ export function MessageBubble({
       time={message.time}
       receipt={message.receipt}
       voice={message.voiceDurationMs !== undefined}
-      interactive={!!message.flowStep || !!message.interactive}
+      interactive={!!message.flowStep || !!message.interactive || !!message.commerce}
       actions={
-        <BusinessMessageActions
-          message={message}
-          running={running}
-          pendingId={pendingId}
-          onOpen={onOpen}
-          onReply={onReply}
-          onList={onList}
-        />
+        message.commerce ? (
+          <CommerceAction
+            value={message.commerce}
+            count={cartCount}
+            enabled={!!onCommerce}
+            onClick={onCommerce}
+          />
+        ) : (
+          <BusinessMessageActions
+            message={message}
+            running={running}
+            pendingId={pendingId}
+            onOpen={onOpen}
+            onReply={onReply}
+            onList={onList}
+          />
+        )
       }
     >
       {message.interactive?.header && (
         <div className="message-header">{message.interactive.header}</div>
       )}
+      {message.commerce && <CommerceCard value={message.commerce} />}
       {attachment ? (
         <div className="message-attachment">
           <button
@@ -93,9 +108,11 @@ export function MessageBubble({
           )}
         </div>
       ) : message.voiceDurationMs === undefined ? (
-        <p>
-          <FormattedMessageText text={message.text} />
-        </p>
+        (!message.commerce || message.text) && (
+          <p>
+            <FormattedMessageText text={message.text} />
+          </p>
+        )
       ) : (
         <VoiceMessage durationMs={message.voiceDurationMs} />
       )}

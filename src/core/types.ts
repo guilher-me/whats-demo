@@ -68,6 +68,34 @@ export type MediaStep =
       file: { extension: DocumentExtension; name: string; size?: number; unit: DocumentUnit };
       caption?: never;
     };
+export interface Product {
+  sku: string;
+  name: string;
+  description: string;
+  priceCents: number;
+}
+
+export interface CartItem {
+  sku: string;
+  quantity: number;
+}
+
+export type CommerceStep =
+  | { kind: 'product'; sku: string }
+  | { kind: 'showcase'; sections: { title: string; skus: string[] }[] }
+  | { kind: 'cart'; offerId: string; autoItems?: CartItem[] }
+  | { kind: 'pix'; amount: { cents: number } | { cartId: string } };
+
+export type OfferStep = Extract<CommerceStep, { kind: 'product' | 'showcase' }>;
+export interface OrderLine extends Product {
+  quantity: number;
+}
+
+export type CommerceMessage =
+  | { kind: 'offer'; single: boolean; sections: { title: string; products: Product[] }[] }
+  | { kind: 'order'; lines: OrderLine[] }
+  | { kind: 'pix'; cents: number; reference: string };
+
 export interface MessageStep {
   id: string;
   type: 'user' | 'business';
@@ -78,6 +106,7 @@ export interface MessageStep {
   typing?: boolean;
   typingMs?: number;
   interactive?: BusinessInteractive;
+  commerce?: CommerceStep;
 }
 export interface MessageOption extends Option {
   description?: string;
@@ -127,6 +156,7 @@ export type Step = MessageStep | FlowStep;
 export interface Project {
   version: 1;
   contact: Contact;
+  catalog?: Product[];
   steps: Step[];
 }
 export interface ExpressionContext {
@@ -143,6 +173,7 @@ export interface ChatMessage {
   flowStep?: FlowStep;
   completed?: boolean;
   interactive?: BusinessInteractive;
+  commerce?: CommerceMessage;
   selection?: string;
   receipt?: 'delivered' | 'read';
 }

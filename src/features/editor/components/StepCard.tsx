@@ -1,7 +1,7 @@
 import { useT } from '../../../i18n';
 import { stepAttachment } from '../../../core/attachments';
 import { useCallback, useId, useState, type ReactNode } from 'react';
-import type { Step } from '../../../core/types';
+import type { Project, Step } from '../../../core/types';
 import { MessageTextEditor } from './MessageTextEditor';
 import { StepTiming } from './StepTiming';
 import { ControlIcon } from '../../../components/icons/ControlIcon';
@@ -14,6 +14,8 @@ import { formatVoiceTime } from '../../../core/voice-message';
 import { MicrophoneIcon } from '../../../components/icons/WhatsAppIcons';
 export function StepCard({
   step,
+  project,
+  commerceError,
   index,
   total,
   active,
@@ -28,6 +30,8 @@ export function StepCard({
   onFlowPreview,
 }: {
   step: Step;
+  project: Project;
+  commerceError: string;
   index: number;
   total: number;
   active: boolean;
@@ -47,11 +51,13 @@ export function StepCard({
   const voiceSeconds = step.type === 'user' ? step.voiceDurationSeconds : undefined;
   const media = step.type === 'flow' ? undefined : step.media;
   const attachment = stepAttachment(step);
-  const invalid = media
-    ? !attachment
-    : step.type === 'business'
-      ? !!businessMessageError(step)
-      : step.type === 'flow' && flowInvalid;
+  const invalid =
+    commerceError ||
+    (media
+      ? !attachment
+      : step.type === 'business'
+        ? !!businessMessageError(step)
+        : step.type === 'flow' && flowInvalid);
 
   const valid = useCallback(
     (value: boolean) => {
@@ -110,13 +116,15 @@ export function StepCard({
                 : t('editor.businessMessage')}
           </span>
           <span className="step-summary">
-            {media
-              ? (attachment?.name ??
-                t(media.kind === 'image' ? 'attachments.image' : 'attachments.document'))
-              : voiceSeconds === undefined
-                ? step.text.replace(/[*_~]/g, '').replace(/\s+/g, ' ').slice(0, 110) ||
-                  t('common.untitled')
-                : `${t('editor.voiceMock')} · ${formatVoiceTime(voiceSeconds * 1000)}`}
+            {step.type !== 'flow' && step.commerce
+              ? t(`commerce.${step.commerce.kind}`)
+              : media
+                ? (attachment?.name ??
+                  t(media.kind === 'image' ? 'attachments.image' : 'attachments.document'))
+                : voiceSeconds === undefined
+                  ? step.text.replace(/[*_~]/g, '').replace(/\s+/g, ' ').slice(0, 110) ||
+                    t('common.untitled')
+                  : `${t('editor.voiceMock')} · ${formatVoiceTime(voiceSeconds * 1000)}`}
           </span>
           <ControlIcon name="chevron" className="step-chevron" />
         </button>
@@ -126,9 +134,21 @@ export function StepCard({
       </div>
       <div className="step-body" id={id} hidden={!expanded}>
         {step.type === 'business' ? (
-          <BusinessMessageEditor step={step} onChange={onChange} />
+          <BusinessMessageEditor
+            step={step}
+            project={project}
+            index={index}
+            commerceError={commerceError}
+            onChange={onChange}
+          />
         ) : step.type === 'user' ? (
-          <CustomerMessageEditor step={step} onChange={onChange} />
+          <CustomerMessageEditor
+            step={step}
+            project={project}
+            index={index}
+            commerceError={commerceError}
+            onChange={onChange}
+          />
         ) : (
           <MessageTextEditor
             label={t('editor.flowInvitation')}

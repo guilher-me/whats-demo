@@ -20,6 +20,7 @@ export function normalizeProject(
   const validated = validateProject(input, options);
   const project = clone({
     version: validated.version,
+    catalog: validated.catalog,
     contact: { name: validated.contact.name, verified: Boolean(validated.contact.verified) },
     steps: validated.steps.map((step) => {
       const { id, type, text, delay, typing, typingMs } = step;
@@ -28,8 +29,8 @@ export function normalizeProject(
         const { label, completion, flow, answers } = step;
         return { ...fields, type: step.type, label, completion, flow, answers };
       }
-      const { interactive, voiceDurationSeconds, media } = step;
-      return { ...fields, type: step.type, interactive, voiceDurationSeconds, media };
+      const { interactive, voiceDurationSeconds, media, commerce } = step;
+      return { ...fields, type: step.type, interactive, voiceDurationSeconds, media, commerce };
     }),
   });
   const used = new Set<string>();

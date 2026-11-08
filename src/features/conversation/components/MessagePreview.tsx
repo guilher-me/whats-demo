@@ -1,6 +1,8 @@
+import { CommerceSheet } from '../../commerce/CommerceSheet';
+import { useCommercePlayback } from '../../commerce/useCommercePlayback';
 import { useT } from '../../../i18n';
 import { useEffect, useRef, useState, type RefObject } from 'react';
-import type { Attachment, ChatMessage, Contact, Step } from '../../../core/types';
+import type { Attachment, ChatMessage, CommerceMessage, Contact, Step } from '../../../core/types';
 import { messageOptions } from '../../../core/interactive';
 import { PhoneFrame } from './PhoneFrame';
 import { MessageBubble } from './MessageBubble';
@@ -20,12 +22,14 @@ export function MessagePreview({
   step,
   phoneRef,
   attachment,
+  commerce,
   flowPreview,
 }: {
   contact: Contact;
   step: Step;
   phoneRef: RefObject<HTMLDivElement | null>;
   attachment?: Attachment;
+  commerce?: CommerceMessage;
   flowPreview?: FlowPreviewRequest;
 }) {
   const t = useT();
@@ -35,6 +39,11 @@ export function MessagePreview({
     [flowError, setFlowError] = useState(''),
     [completed, setCompleted] = useState(false);
   const flow = useFlowSession();
+  const commercePlayback = useCommercePlayback();
+  const openCommerce = () => {
+    if (commerce?.kind === 'offer') commercePlayback.openOffer(step.id, commerce, true);
+    if (commerce?.kind === 'pix') commercePlayback.copyPix(step.id);
+  };
   const interactive = step.type === 'business' ? step.interactive : undefined;
   const selection =
     interactive && messageOptions(interactive).some((o) => o.id === selected) ? selected : '';
@@ -61,8 +70,14 @@ export function MessagePreview({
   const message: ChatMessage = {
     id: step.id,
     direction: step.type === 'user' ? 'user' : 'business',
-    text: step.type !== 'flow' && step.media ? (step.media.caption ?? '') : step.text,
+    text:
+      step.type === 'user' && step.commerce
+        ? ''
+        : step.type !== 'flow' && step.media
+          ? (step.media.caption ?? '')
+          : step.text,
     attachment,
+    commerce,
     time: '12:00',
     ...(step.type === 'user' && step.voiceDurationSeconds !== undefined
       ? { voiceDurationMs: step.voiceDurationSeconds * 1000 }
@@ -72,7 +87,7 @@ export function MessagePreview({
     selection,
   };
   return (
-    <PhoneFrame contact={contact} phoneRef={phoneRef}>
+    <PhoneFrame contact={contact} phoneRef={phoneRef} pixCopied={commercePlayback.pixCopied}>
       <div className="chat-body draft-chat" aria-label={t('app.draft')}>
         <div className="day">{t('phone.today')}</div>
         <div className="messages">
@@ -80,6 +95,13 @@ export function MessagePreview({
             message={message}
             phoneRef={phoneRef}
             running
+            onCommerce={
+              commerce?.kind === 'pix' ||
+              (commerce?.kind === 'offer' &&
+                commerce.sections.some(({ products }) => products.length))
+                ? openCommerce
+                : undefined
+            }
             pendingId={step.id}
             onReply={(_, id) => setSelected(id)}
             onList={() => setListOpen(true)}
@@ -98,6 +120,14 @@ export function MessagePreview({
             ? flowError
             : t('phone.draftNote')}
       </div>
+      <CommerceSheet
+        controls={commercePlayback}
+        container={phoneRef.current}
+        locked={false}
+        returnFocus={() =>
+          phoneRef.current?.querySelector<HTMLElement>('[data-commerce-action]')?.focus()
+        }
+      />
       {listOpen && interactive?.kind === 'list' && (
         <ListPicker
           message={interactive}

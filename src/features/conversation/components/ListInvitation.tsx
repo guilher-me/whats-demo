@@ -1,3 +1,4 @@
+import { MessageButtonIcon } from '../../../components/icons/MessageButtonIcon';
 import { MessageAction } from './MessageAction';
 export function ListInvitation({
   label,
@@ -11,7 +12,10 @@ export function ListInvitation({
   return (
     <div className="message-actions">
       <MessageAction data-open-list disabled={disabled} onClick={onOpen}>
-        <span aria-hidden="true">☷</span> {label}
+        <span className="message-button-content">
+          <MessageButtonIcon type="list" />
+          <span>{label}</span>
+        </span>
       </MessageAction>
     </div>
   );

@@ -107,6 +107,33 @@ it.each(['buttons', 'list'] as const)(
     expect(document.querySelector('.bubble.user')).toHaveTextContent('Falar com atendente');
   },
 );
+it.each(['buttons', 'list'] as const)(
+  'libera %s assim que a mensagem aparece, inclusive durante a leitura automática',
+  async (kind) => {
+    await start(kind);
+    fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
+    await tick(1);
+
+    const button = screen.getByRole('button', {
+      name: kind === 'list' ? 'Ver opções' : 'Agendamento',
+    });
+    expect(button).toBeEnabled();
+    expect(document.querySelectorAll('.bubble.user')).toHaveLength(0);
+    fireEvent.click(button);
+    if (kind === 'list') {
+      const picker = screen.getByRole('dialog', { name: 'Ver opções' });
+      fireEvent.click(within(picker).getByRole('radio', { name: 'Agendamento' }));
+      fireEvent.click(within(picker).getByRole('button', { name: 'Enviar' }));
+    }
+
+    await tick(1);
+    expect(document.querySelector('.messages')).toHaveTextContent('Resposta recebida.');
+    await tick(8000);
+    expect(document.querySelector('.play-status')).toHaveTextContent('Conversa concluída.');
+    expect(document.querySelectorAll('.bubble.user')).toHaveLength(1);
+    expect(document.querySelector('.bubble.user')).toHaveTextContent('Agendamento');
+  },
+);
 it('pauses and resumes with an open list without losing the selected option', async () => {
   await start('list');
   fireEvent.click(screen.getByRole('button', { name: 'Iniciar manual' }));
