@@ -80,12 +80,20 @@ it('gera MP4 nativo e libera todas as tracks ao finalizar', async () => {
 it('keeps publishing frames while the screen is unchanged and holds the last snapshot before stopping', async () => {
   vi.useFakeTimers();
   const stop = vi.spyOn(FakeMediaRecorder.prototype, 'stop');
-  const session = await preparePhoneRecording(phone(), vi.fn());
+  const node = phone();
+  const cursor = document.createElement('div');
+  cursor.setAttribute('data-recording-cursor', '');
+  const input = document.createElement('input');
+  node.append(cursor, input);
+  const session = await preparePhoneRecording(node, vi.fn());
   const draw = document.createElement('canvas').getContext('2d')!.drawImage;
   session.start();
-  await vi.advanceTimersByTimeAsync(1000);
+  await vi.advanceTimersByTimeAsync(500);
+  cursor.style.left = '20px';
+  input.name = 'composer';
+  await vi.advanceTimersByTimeAsync(500);
   expect(capturePhone).toHaveBeenCalledTimes(2);
-  expect(vi.mocked(draw).mock.calls.length).toBeGreaterThan(10);
+  expect(vi.mocked(draw).mock.calls.length).toBeGreaterThanOrEqual(30);
   const final = document.createElement('canvas');
   vi.mocked(capturePhone).mockResolvedValueOnce(final);
   const finish = session.finish();

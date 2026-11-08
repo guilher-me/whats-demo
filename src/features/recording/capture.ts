@@ -55,8 +55,10 @@ export function capturePhone(
       styleCaching: 'strict',
       style: { margin: '0', filter: 'none' },
       filter: (child) =>
-        !(child instanceof Element && child.hasAttribute('data-recording-exclude')) &&
-        !(chat?.children.has(child) && !chat.visible.has(child)),
+        !(
+          child instanceof Element &&
+          child.matches('[data-recording-exclude], [data-recording-cursor]')
+        ) && !(chat?.children.has(child) && !chat.visible.has(child)),
       adjustClonedNode: copyLiveField,
       onclone: (clone) => {
         restoreTextAreas(clone);

@@ -26,6 +26,7 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 - Keep available product and cart controls at full contrast during automatic playback.
 - Keep phone control tooltip titles legible in dark mode.
 - Use the same circular playback speed slider in both themes.
+- Capture smoother automatic cursor movement in phone videos.
 
 ## [0.3.0] - 2026-11-08
 

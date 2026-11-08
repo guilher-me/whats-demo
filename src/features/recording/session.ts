@@ -2,10 +2,12 @@ import { t } from '../../i18n';
 import fixWebmDuration from 'fix-webm-duration';
 import { delay } from '../../core/async';
 import { capturePhone } from './capture';
+import { paintRecordingCursor, readRecordingCursor } from './cursor';
 import type { PhoneRecording, RecordedClip } from './types';
 
-const FRAME_RATE = 15;
-const FRAME_INTERVAL = 1000 / FRAME_RATE;
+const FRAME_INTERVAL = 1000 / 30;
+const SNAPSHOT_INTERVAL = 1000 / 15;
+const FINAL_FRAME_HOLD = 400;
 const visualEvents = ['input', 'change', 'scroll', 'focusin', 'focusout'];
 
 export function recordingSupport(): string {
@@ -34,6 +36,7 @@ export async function preparePhoneRecording(
   if (!width || !height) throw new Error(t('errors.phoneVisible'));
   const backdrop = getComputedStyle(node).getPropertyValue('--recording-backdrop').trim() || '#fff';
   let frame = await capturePhone(node, width, height, backdrop);
+  const cursor = node.querySelector<HTMLElement>('[data-recording-cursor]');
   const canvas = document.createElement('canvas');
   canvas.width = width * 2;
   canvas.height = height * 2;
@@ -49,9 +52,13 @@ export async function preparePhoneRecording(
   context.getImageData(0, 0, 1, 1);
   const stream = canvas.captureStream();
   const track = stream.getVideoTracks()[0] as CanvasCaptureMediaStreamTrack | undefined;
+  let cursorFrame: ReturnType<typeof readRecordingCursor> = null;
+  let holdFinalFrame = false;
   const publishFrame = () => {
     track?.requestFrame?.();
     paint();
+    if (!holdFinalFrame) cursorFrame = readRecordingCursor(node, cursor);
+    if (cursorFrame) paintRecordingCursor(context, cursorFrame);
   };
   let media: MediaRecorder | undefined;
   for (const mimeType of recordingMimeTypes()) {
@@ -86,7 +93,16 @@ export async function preparePhoneRecording(
   const invalidate = () => {
     changed = true;
   };
-  const observer = new MutationObserver(invalidate);
+  const observer = new MutationObserver((records) => {
+    // React can rewrite an input's name during an update that leaves its appearance unchanged.
+    if (
+      records.some(
+        ({ target, attributeName }) =>
+          target !== cursor && !(target instanceof HTMLInputElement && attributeName === 'name'),
+      )
+    )
+      invalidate();
+  });
   const finalFrame = new AbortController();
   const release = () => {
     clearTimeout(snapshotTimer);
@@ -131,7 +147,13 @@ export async function preparePhoneRecording(
     const began = performance.now();
     const wasAnimating = animating;
     animating =
-      node.getAnimations?.({ subtree: true }).some((a) => a.playState === 'running') ?? false;
+      node
+        .getAnimations?.({ subtree: true })
+        .some(
+          (animation) =>
+            animation.playState === 'running' &&
+            (animation.effect as KeyframeEffect | null)?.target !== cursor,
+        ) ?? false;
     const needsSnapshot = changed || animating || wasAnimating;
     changed = false;
     inFlight = (needsSnapshot ? snapshot() : Promise.resolve())
@@ -139,7 +161,7 @@ export async function preparePhoneRecording(
         if (!ended)
           snapshotTimer = setTimeout(
             pump,
-            Math.max(0, FRAME_INTERVAL - (performance.now() - began)),
+            Math.max(0, SNAPSHOT_INTERVAL - (performance.now() - began)),
           );
       })
       .catch(fail);
@@ -177,7 +199,8 @@ export async function preparePhoneRecording(
         // A drawn canvas frame reaches the encoder on a later browser paint.
         // Hold the final image across several capture ticks before flushing the encoder.
         publishFrame();
-        await delay(6 * FRAME_INTERVAL, finalFrame.signal);
+        holdFinalFrame = true;
+        await delay(FINAL_FRAME_HOLD, finalFrame.signal);
         if (discarded) return result;
         clearInterval(frameTimer);
         durationMs = Math.max(1, performance.now() - startedAt);
