@@ -193,6 +193,7 @@
   "playback.stop": "Parar reprodução",
   "playback.reset": "Reiniciar prévia",
   "playback.manualHint": "Preencha os campos e escolha as opções no celular.",
+  "playback.firstVisitHint": "Selecione o botão de play para ver esta jornada do começo.",
   "playback.autoHint": "Executa a jornada com cursor e respostas animados.",
   "playback.stopHint": "Interrompe a conversa e mantém as mensagens exibidas.",
   "playback.resetHint": "Interrompe a reprodução e limpa o histórico da prévia.",

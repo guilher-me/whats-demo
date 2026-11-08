@@ -22,3 +22,5 @@ As bandeiras redondas em `flags/` são do [Circle Flags / HatScripts](https://gi
 O ícone padrão de loja é renderizado como SVG no componente de avatar, com o desenho fornecido pelo usuário. [Ícone de loja do WhatsApp](https://static.xx.fbcdn.net/rsrc.php/yW/r/ILX1T5nokOb.svg)
 
 O fundo usa um PNG indexado sem perdas (760 × 1396). O build incorpora as imagens no HTML como data URLs; não há download dessas imagens durante o uso do arquivo portátil.
+
+O padrão vetorial `preview-doodle.svg` é uma ilustração original do WhatsDemo. Ele se repete no painel de prévia e fica fora da área do celular.

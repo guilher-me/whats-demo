@@ -353,6 +353,9 @@ function EditorWorkspace({
         )}
         <div className="phone-tools">
           <PlaybackControls
+            showFirstVisitHint={
+              previewOnly && collapsed.code && collapsed.editor && !collapsed.preview
+            }
             locked={recorder.busy}
             autoDisabled={!!automaticIssue}
             disabled={hasErrors || !editor.project.steps.length}
