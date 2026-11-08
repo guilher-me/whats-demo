@@ -1,6 +1,6 @@
 # Automation API v3
 
-WhatsDemo exposes `window.whatsappFakeFlows` to tools allowed to execute JavaScript in the current page. This is a browser API, not an HTTP endpoint or MCP server. A tool restricted to read-only JavaScript must use its normal UI controls for mutations.
+WhatsDemo exposes `window.whatsDemo` to tools allowed to execute JavaScript in the current page. This is a browser API, not an HTTP endpoint or MCP server. A tool restricted to read-only JavaScript must use its normal UI controls for mutations.
 
 The `llms.txt` file provides instructions; it does not execute a model or automatically connect an agent. There is no API key, external LLM dependency or server in this integration.
 
@@ -16,7 +16,7 @@ The two modes use the same compressed payload. The link includes the interface l
 
 ## Browser API and readiness
 
-The editor contains `<link rel="describedby">` links, a `whatsapp-fake-flows-api` meta tag and a separate `whatsdemo-version` meta tag for the product version. Wait for the API and `getState().ready` before working with the editor. The `whatsapp-fake-flows:ready` event reports the API version. The demo view exposes the interactive phone and offers **Edit a copy**.
+The editor advertises the API in `<meta name="whatsdemo-api">`. The `whatsdemo-version` tag reports the app release, and the `describedby` links point to the agent instructions. Wait until `window.whatsDemo?.getState().ready` is true. The `whatsdemo:ready` event provides `event.detail.apiVersion` when the editor mounts. The standalone demo view offers **Edit a copy** to open the editor and expose its API.
 
 | Member                          | Contract                                                                                                                                                            |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -30,7 +30,7 @@ The editor contains `<link rel="describedby">` links, a `whatsapp-fake-flows-api
 | `play(mode?)`                   | Runs the project and resolves with the final state. Defaults to `automatic`; use `void api.play('manual')` to start without waiting for user interaction to finish. |
 | `stop()`, `reset()`             | Interrupt playback. Reset also clears rendered messages.                                                                                                            |
 
-`getState()` returns `ready`, `running`, `status`, `activeStep`, `flowScreen`, `pendingMessageId` and `messages`. Use booleans and nullable fields for coordination. Rendered messages include `direction`, `text` and `time`. Attachment messages include the actual `attachmentId` sent in playback, and the caption appears in `text`. Voice notes include `voiceDurationMs`.
+`getState()` returns `ready`, `running`, `status`, `activeStep`, `flowScreen`, `pendingMessageId` and `messages`. `status` is localized. Use the boolean and nullable fields for coordination, and check for the expected messages to distinguish completion from an interrupted run. Rendered messages include `id`, `direction`, `text` and `time`, with `receipt` on customer messages. Attachment messages include the actual `attachmentId` sent in playback, and the caption appears in `text`. Voice notes include `voiceDurationMs`. Commerce messages expose the offer, actual cart or calculated Pix amount in `commerce`.
 
 In browser controls, scope editing to **Conversation editor** and expand a step through **Edit step N**. Choose the extension and enter the image text or document metadata directly on the step. In **Conversation preview**, use **Start manually** or **Play automatically**. Follow the accessible labels in the selected interface language.
 
@@ -42,6 +42,7 @@ The browser editor starts with an empty journey on a fresh browser. Supply a pro
 {
   version: 1,
   contact: { name: string, verified: boolean },
+  catalog?: Product[],
   steps: Step[]
 }
 ```
@@ -52,7 +53,7 @@ Every step has a unique string `id`, `type`, `text` and a numeric `delay` betwee
 
 - `type: 'user'`: user message; automatic mode types `text` and sends it. Manual mode waits for a user to send a message.
 - A customer step with `voiceDurationSeconds` uses the simulated voice composer. Set `text` to `''` and use an integer from 1 to 120. Automatic playback holds the microphone for that many seconds after moving the simulated cursor to it. Manual playback uses the actual hold time. A sent voice bubble has `voiceDurationMs` in `getState().messages`.
-- `type: 'business'`: company message; optional `typing` boolean defaults to true. With no `interactive` field it is plain text.
+- `type: 'business'`: company message; optional `typing` boolean defaults to true. Plain text omits `interactive`, `media` and `commerce`. Use `typing: false` for a silent wait. For business and Flow steps, optional `typingMs` separates the initial delay from the typing interval, in milliseconds.
 - `type: 'flow'`: a Flow invitation; additionally requires `label`, `flow`, `answers` and optionally `completion` and `typing`.
 
 The sequence is linear. Reply buttons and lists wait for a choice and append that choice as a user response; they do not branch to different steps. Do not add a separate user step just to repeat the selected option.
@@ -61,7 +62,7 @@ The sequence is linear. Reply buttons and lists wait for a choice and append tha
 
 Use `text: ''` for media steps. Images and documents use `media.file`, and locations use `media.place`.
 
-- An image uses `media: { kind: 'image', file: { extension: 'jpg', name: 'IMG 01' }, caption: 'Optional caption' }`. Supported extensions are `png` and `jpg` (JPEG). The Meta limit of 5 MB applies to actual uploads. WhatsDemo stores simulated image metadata. The name appears on the image preview and can contain up to 48 characters. Use an empty string for the default label.
+- An image uses `media: { kind: 'image', file: { extension: 'jpg', name: 'IMG 01' }, caption: 'Optional caption' }`. Supported extensions are `png` and `jpg` (JPEG). The Meta limit of 5 MB applies to actual uploads. WhatsDemo stores simulated image metadata. The name appears on the image preview and can contain up to 48 characters. Use an empty string for the default label. The optional caption accepts up to 1024 characters.
 - A document uses `media: { kind: 'document', file: { extension: 'pdf', name: 'Estimate', size: 240, unit: 'KB' } }`. Supported extensions are `pdf`, `txt`, `doc`, `docx`, `xls`, `xlsx`, `ppt` and `pptx`. Use a positive number and the unit `KB` or `MB`. The maximum is 100 MB or 100,000 KB. Use a name of up to 60 characters. The selected extension is appended to the filename.
 
 - A fixed location uses `media: { kind: 'location', place: { name: 'Demo store', address: '123 Example Avenue' } }`. Both customer and business steps accept this shape. Use a place name of up to 60 characters and an optional address of up to 160. The phone draws an illustrative map locally.
@@ -90,7 +91,7 @@ Automatic playback sends the configured attachment. Manual playback lists matchi
 }
 ```
 
-Use 1–3 buttons. Each title must be nonempty, distinct and at most 20 characters; each ID must be unique within the message and at most 256 characters. Optional header and footer accept up to 60 characters. Interactive body text must be nonempty and at most 1024 characters in this simulator. If autoReplyId is omitted or empty, automatic mode chooses the first option.
+For a default interactive quick-reply message, use 1–3 buttons. Each title must be nonempty, distinct and at most 20 characters; each ID must be unique within the message and at most 256 characters. Optional header and footer accept up to 60 characters. Interactive body text must be nonempty and at most 1024 characters in this simulator. If `autoReplyId` is omitted or empty, automatic mode chooses the first eligible option. See [typed message buttons](#typed-message-buttons) for template and action limits.
 
 ## Lists
 
@@ -125,14 +126,16 @@ A Flow step's `flow` field contains the JSON definition, not a Flow URL. `answer
 
 Supported leaf components: TextHeading, TextSubheading, TextBody, TextCaption, RadioButtonsGroup, CheckboxGroup, Dropdown, OptIn, TextInput, TextArea, DatePicker and Footer. Layout containers and If conditions are flattened by the engine. The simulator supports `navigate` to a screen and `complete`; it does not implement server-backed data_exchange or the full Meta API. The local diagnostics report Flow JSON issues and simulator coverage. Missing required answers and answers that reference unavailable options are shown before automatic playback, while manual playback remains available. The editor offers synchronized Visual and JSON tabs for the same Flow definition. The Meta Playground is available for comparison.
 
-Use ISO dates (YYYY-MM-DD), option IDs for single choice fields, arrays of IDs for checkbox groups, booleans for OptIn and strings for text fields. Expressions reference `${form.field}` and `${data.field}`. Preserve the Meta Flow field names such as `data-source` and `on-click-action`.
+Use ISO dates (YYYY-MM-DD), option IDs for single choice fields, arrays of IDs for checkbox groups, booleans for OptIn and strings for text fields. Expressions reference `${form.field}` and `${data.field}`. The first screen is the entry point. Route to the destination screen ID and declare matching edges in `routing_model` when present. Use **Test Flow** to try the form with independent manual inputs. Preserve the Meta Flow field names such as `data-source` and `on-click-action`.
+
+For a button that advances to an `ADDRESS` screen, use `{"name":"navigate","next":{"type":"screen","name":"ADDRESS"},"payload":{}}`. If the source screen is `START`, the corresponding route entry is `"routing_model": {"START":["ADDRESS"],"ADDRESS":[]}`. Use a terminal screen with a `complete` footer to finish the Flow.
 
 ## Complete runnable example
 
 Once `api.getState().ready` is true:
 
 ```js
-const api = window.whatsappFakeFlows;
+const api = window.whatsDemo;
 const journey = {
   version: 1,
   contact: { name: 'Empresa exemplo', verified: false },
@@ -241,17 +244,27 @@ console.log(await createShareURL(project, 'demo'));
 
 ## Compatibility and contribution
 
-API v2 uses `createShareURL` and `loadProject` for simulated attachments. New links use a `v3z` alphanumeric payload. Existing `v2z` links still open in both modes. Existing `#project=v1z…` and `#project=v1j…` links open as demos. Invalid links leave the local draft intact.
+New integrations should use `window.whatsDemo` and `whatsdemo:ready`. The legacy browser API alias and readiness event still work with the same API v3 object. New links use a `v3z` alphanumeric payload. Existing `v2z` links still open in both modes. Existing `#project=v1z…` and `#project=v1j…` links open as demos. Invalid links leave the local draft intact.
 
 The implementation uses the same codec and project validation in the app, public module and browser API. Add tests for contract changes and update the schema and instructions together.
 
-## Durante uma gravação
+## Workspace and recording controls
 
-A gravação de vídeo é iniciada pelos controles da interface. Enquanto está ativa, `loadProject`, `play`, `stop` e `reset` rejeitam operações que poderiam interromper a captura. Consultas, validação e criação de links continuam disponíveis. Finalize ou cancele a gravação pela interface antes de alterar a jornada pela API. O link carrega somente a configuração da jornada.
+These operations use the visible interface. They are separate from the project JSON and the browser API.
 
-## Formatação do texto
+| Area            | How to use it                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Local journeys  | **New journey** opens an empty editor. Set **Journey title** independently of the phone contact name. **My journeys** lists saved drafts and offers copy link, rename and delete. A received link becomes a separate local draft when edited. **Restore from link** reloads its original snapshot.                                                                                                                              |
+| Code and Editor | Resize, collapse or reopen **Code**, **Editor** and **Preview**. Use **Copy JSON** for the displayed code. **Validate** checks the draft and **Apply** changes the active journey. Reorder steps by drag or keyboard, and open the action menu to duplicate or remove a step.                                                                                                                                                   |
+| Phone preview   | Select a step to inspect it or open **View conversation** for a static overview. Use **Start manually**, **Play automatically**, **Pause playback**, **Resume playback** and **Reset preview**. The 0.5× to 3× pace changes simulated reading, typing and clicks while business delays keep their configured values. Preview links can show a one-time hint pointing to automatic playback.                                     |
+| Appearance      | Flags set the interface language without translating the journey. The theme switch changes the workspace and phone, including Flow screens. The seasonal snow control affects the page outside the phone. The preview background is decorative and stays outside the capture.                                                                                                                                                   |
+| Phone video     | Select **Record phone** and choose manual or automatic playback. For transparent corners, select **Transparent corners (WebM)** before starting. The clip is 720 × 1440, silent and generated locally. The standard format is MP4 when available, with WebM as fallback. Automatic recording holds the result after completion before finalizing. The destination app must preserve WebM alpha to show the transparent corners. |
 
-O campo `text` das etapas aceita `*negrito*`, `_itálico_` e `~tachado~`, inclusive combinados, por exemplo `*_texto_*`. Envie e preserve os marcadores no JSON; o aplicativo os interpreta apenas na apresentação do corpo da mensagem. Não envie HTML para obter estilos. Rótulos de botões e definições de campos do Flow não passam por esse interpretador.
+During a recording, `loadProject`, `play`, `stop` and `reset` reject actions that could interrupt capture. Queries, validation and link generation remain available. Use the recording controls to finish or cancel. Links carry the project configuration and language. Local titles, unapplied drafts, preferences, playback history and recordings are separate. See the [user guide](user-guide.md) and [recording reference](recording.md).
+
+## Message body formatting
+
+Use `*bold*`, `_italic_` and `~strikethrough~` in step `text`. Combinations such as `*_text_*` are supported. Preserve the markers in JSON. The phone renders formatting only in message bodies. Button labels and Flow definitions keep their own rules.
 
 ## Typed message buttons
 
@@ -259,10 +272,10 @@ For `interactive.kind: "buttons"`, set optional `context` to `"interactive"` (de
 
 ## Simulated commerce
 
-Add a top-level `catalog` array with up to 200 products. Each product has a unique `sku`, a `name`, a `description` and a positive integer `priceCents` in BRL. Product images are generated from the name. Each commerce step uses `commerce` in place of `interactive`, `media` and `voiceDurationSeconds`.
+Add a top-level `catalog` array with up to 200 products. Each product has a unique `sku`, a `name`, a `description` and a positive integer `priceCents` in BRL. Product images are generated from the name. The **Product catalog** editor manages these products. Each commerce step uses `commerce` in place of `interactive`, `media` and `voiceDurationSeconds`.
 
 - A business step uses `{ "kind": "product", "sku": "TV-01" }` for a single product or `{ "kind": "showcase", "sections": [{ "title": "Electronics", "skus": ["TV-01"] }] }` for a grouped offer. A showcase supports up to 10 sections and 30 distinct products.
-- A user step uses `{ "kind": "cart", "offerId": "offer" }` to wait for the customer to send a cart from a preceding offer. Set `autoItems` to an array of `{ "sku": "TV-01", "quantity": 2 }` records to configure the automatic cart. Omit the array to select one unit of the first product. Quantities range from 1 to 99.
+- A user step uses `{ "kind": "cart", "offerId": "offer" }` to wait for the customer to send a cart from a preceding offer. Set `autoItems` to an array of `{ "sku": "TV-01", "quantity": 2 }` records to configure the automatic cart. Omit the array to select one unit of the first product. Quantities range from 1 to 99. In the showcase editor, **Automatic cart** edits the linked cart or offers to add a **Send cart** step.
 - A business step uses `{ "kind": "pix", "amount": { "cartId": "cart" } }` for a simulated Pix charge based on a preceding cart. Use `{ "cents": 249900 }` as the amount for a standalone fixed charge. The phone simulates copying the key and briefly shows **Pix key copied**. The journey advances on that tap while the payment stays pending.
 - In `getState().messages`, inspect `commerce.kind === "order"` for the actual order lines and `commerce.kind === "pix"` for the resulting charge in cents. Shared links carry the authored catalog and automatic choices. Each playback starts with an empty cart.
 

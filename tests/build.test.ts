@@ -46,11 +46,18 @@ it('gera um HTML com React, estilos, foto e licenças incorporados', async () =>
       readFileSync(new URL('../CHANGELOG.md', import.meta.url), 'utf8'),
     );
     expect(readFileSync(join(directory, 'llms.txt'), 'utf8')).toContain(`App version: ${version}.`);
-    expect(readFileSync(join(directory, 'llms.txt'), 'utf8')).toContain('window.whatsappFakeFlows');
+    expect(readFileSync(join(directory, 'llms.txt'), 'utf8')).toContain('window.whatsDemo');
     expect(readFileSync(join(directory, 'llm.txt'), 'utf8')).toBe(
       readFileSync(join(directory, 'llms.txt'), 'utf8'),
     );
     expect(readFileSync(join(directory, 'docs/automation.md'), 'utf8')).toContain('loadProject');
+    expect(html).toContain(
+      '<meta name="whatsdemo-api" content="window.whatsDemo; apiVersion=3" />',
+    );
+    const instructions = readFileSync(join(directory, 'llms-full.txt'), 'utf8');
+    expect(instructions).toContain('(docs/messages.md#button-types-and-contexts)');
+    expect(instructions).toContain('(docs/recording.md)');
+    expect(instructions).toContain('(schemas/project-v1.schema.json)');
     expect(html).not.toMatch(/<link\b[^>]*stylesheet/i);
     const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
     expect(scripts).toHaveLength(1);

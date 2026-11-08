@@ -78,6 +78,7 @@ export function createAutomationAPI(bindings: AutomationBindings) {
 export type AutomationAPI = ReturnType<typeof createAutomationAPI>;
 declare global {
   interface Window {
+    whatsDemo?: AutomationAPI;
     whatsappFakeFlows?: AutomationAPI;
   }
 }

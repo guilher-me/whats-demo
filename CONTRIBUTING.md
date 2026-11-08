@@ -34,7 +34,7 @@ To add a Flow field, update validation in `core/engine.ts`, rendering in `featur
 
 Do not change the meaning of the `v1z` and `v1j` link prefixes or reuse existing fields for incompatible behavior. Keep the legacy fixtures and compatibility tests. An incompatible schema change needs an explicit new version and migration.
 
-The public browser API uses `window.whatsappFakeFlows` with `apiVersion: 3`. Preserve that contract, including synchronous methods. Update [automation documentation](docs/automation.md) and the `llms.txt` index when tool-facing behavior changes.
+The public browser API uses `window.whatsDemo` with `apiVersion: 3`. Keep the legacy browser API alias available to existing integrations. Preserve that contract, including synchronous methods. Update [automation documentation](docs/automation.md) and the `llms.txt` index when tool-facing behavior changes.
 
 Render simulated attachments from metadata with the shared preview component. Use bundled images for the fixed business icon and wallpaper. Keep journey data as text and validate shared links before loading them.
 
