@@ -27,7 +27,7 @@
   gap: 10px;
   border-bottom: 1px solid #e3e7e5;
 }
-.chat-header img {
+.chat-header .avatar {
   width: 37px;
   height: 37px;
   border-radius: 50%;

@@ -64,7 +64,7 @@
   width: 58px;
   position: relative;
 }
-.contact-image img {
+.contact-image .avatar {
   display: block;
   width: 54px;
   height: 54px;

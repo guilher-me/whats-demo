@@ -17,7 +17,8 @@ As bandeiras redondas em `flags/` são do [Circle Flags / HatScripts](https://gi
 
 | Arquivo                   | Uso                                                      | Origem                                                                                                                               |
 | ------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `whatsapp-store.svg`      | Ícone fixo da empresa na conversa e no editor            | [Ícone de loja do WhatsApp indicado pelo usuário](https://static.xx.fbcdn.net/rsrc.php/yW/r/ILX1T5nokOb.svg)                         |
 | `whatsapp-background.png` | Fundo do celular, também usado na prévia e nas gravações | [Imagem indicada pelo usuário](https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png) |
+
+O ícone padrão de loja é renderizado como SVG no componente de avatar, com o desenho fornecido pelo usuário. [Ícone de loja do WhatsApp](https://static.xx.fbcdn.net/rsrc.php/yW/r/ILX1T5nokOb.svg)
 
 O fundo é mantido em seu PNG original (760 × 1396). O build incorpora as imagens no HTML como data URLs; não há download dessas imagens durante o uso do arquivo portátil.

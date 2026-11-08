@@ -25,3 +25,5 @@ import './styles/attachments.css';
 import './styles/workspace.css';
 import './styles/json-editor.css';
 import './styles/commerce.css';
+
+import './styles/business-avatar.css';
