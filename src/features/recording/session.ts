@@ -1,7 +1,12 @@
 import { t } from '../../i18n';
 import fixWebmDuration from 'fix-webm-duration';
+import { delay } from '../../core/async';
 import { capturePhone } from './capture';
 import type { PhoneRecording, RecordedClip } from './types';
+
+const FRAME_RATE = 15;
+const FRAME_INTERVAL = 1000 / FRAME_RATE;
+const visualEvents = ['input', 'change', 'scroll', 'focusin', 'focusout'];
 
 export function recordingSupport(): string {
   if (
@@ -28,21 +33,26 @@ export async function preparePhoneRecording(
     height = node.offsetHeight;
   if (!width || !height) throw new Error(t('errors.phoneVisible'));
   const backdrop = getComputedStyle(node).getPropertyValue('--recording-backdrop').trim() || '#fff';
-  const first = await capturePhone(node, width, height, backdrop);
+  let frame = await capturePhone(node, width, height, backdrop);
   const canvas = document.createElement('canvas');
   canvas.width = width * 2;
   canvas.height = height * 2;
   const context = canvas.getContext('2d');
   if (!context) throw new Error(t('errors.prepareImage'));
-  const paint = (frame: HTMLCanvasElement) => {
+  const paint = () => {
     context.fillStyle = backdrop;
     context.fillRect(0, 0, canvas.width, canvas.height);
     context.drawImage(frame, 0, 0, canvas.width, canvas.height);
   };
-  paint(first);
+  paint();
   // Detect a tainted canvas before starting a countdown or accumulating a video.
   context.getImageData(0, 0, 1, 1);
-  const stream = canvas.captureStream(24);
+  const stream = canvas.captureStream();
+  const track = stream.getVideoTracks()[0] as CanvasCaptureMediaStreamTrack | undefined;
+  const publishFrame = () => {
+    track?.requestFrame?.();
+    paint();
+  };
   let media: MediaRecorder | undefined;
   for (const mimeType of recordingMimeTypes()) {
     try {
@@ -58,10 +68,14 @@ export async function preparePhoneRecording(
   }
   const recorder = media;
   const chunks: Blob[] = [];
-  let timer: ReturnType<typeof setTimeout> | undefined,
+  let snapshotTimer: ReturnType<typeof setTimeout> | undefined,
+    frameTimer: ReturnType<typeof setInterval> | undefined,
+    changed = true,
+    animating = false,
     ended = false,
     discarded = false,
-    startedAt = 0;
+    startedAt: number | undefined,
+    durationMs = 0;
   let inFlight: Promise<void> = Promise.resolve();
   let resolve!: (clip: RecordedClip) => void, reject!: (error: Error) => void;
   const result = new Promise<RecordedClip>((done, fail) => {
@@ -69,8 +83,17 @@ export async function preparePhoneRecording(
     reject = fail;
   });
   void result.catch(() => {});
+  const invalidate = () => {
+    changed = true;
+  };
+  const observer = new MutationObserver(invalidate);
+  const finalFrame = new AbortController();
   const release = () => {
-    clearTimeout(timer);
+    clearTimeout(snapshotTimer);
+    clearInterval(frameTimer);
+    observer.disconnect();
+    finalFrame.abort();
+    for (const event of visualEvents) node.removeEventListener(event, invalidate, true);
     stream.getTracks().forEach((track) => track.stop());
   };
   const fail = (error: unknown) => {
@@ -93,7 +116,6 @@ export async function preparePhoneRecording(
     try {
       let blob = new Blob(chunks, { type: recorder.mimeType });
       if (!blob.size) throw new Error(t('errors.recordEmpty'));
-      const durationMs = Math.max(1, performance.now() - startedAt);
       const extension = recorder.mimeType.startsWith('video/mp4') ? 'mp4' : 'webm';
       if (extension === 'webm') blob = await fixWebmDuration(blob, durationMs, { logger: false });
       resolve({ blob, extension, width: canvas.width, height: canvas.height, durationMs });
@@ -101,37 +123,64 @@ export async function preparePhoneRecording(
       fail(error);
     }
   };
-  const draw = async () => {
-    const frame = await capturePhone(node, width, height, backdrop);
-    if (!discarded) paint(frame);
+  const snapshot = async () => {
+    frame = await capturePhone(node, width, height, backdrop);
   };
   const pump = () => {
     if (ended) return;
     const began = performance.now();
-    inFlight = draw()
+    const wasAnimating = animating;
+    animating =
+      node.getAnimations?.({ subtree: true }).some((a) => a.playState === 'running') ?? false;
+    const needsSnapshot = changed || animating || wasAnimating;
+    changed = false;
+    inFlight = (needsSnapshot ? snapshot() : Promise.resolve())
       .then(() => {
-        if (!ended) timer = setTimeout(pump, Math.max(0, 1000 / 12 - (performance.now() - began)));
+        if (!ended)
+          snapshotTimer = setTimeout(
+            pump,
+            Math.max(0, FRAME_INTERVAL - (performance.now() - began)),
+          );
       })
       .catch(fail);
   };
   let finishing: Promise<RecordedClip> | undefined;
   return {
     start() {
-      if (ended || recorder.state !== 'inactive' || startedAt)
+      if (ended || recorder.state !== 'inactive' || startedAt !== undefined)
         throw new Error(t('errors.recordAlreadyStarted'));
       startedAt = performance.now();
       recorder.start(1000);
+      // Keep sending the latest image even when there is no new DOM snapshot yet.
+      publishFrame();
+      frameTimer = setInterval(publishFrame, FRAME_INTERVAL);
+      observer.observe(node, {
+        subtree: true,
+        childList: true,
+        attributes: true,
+        characterData: true,
+      });
+      for (const event of visualEvents) node.addEventListener(event, invalidate, true);
       pump();
     },
     finish() {
       if (finishing) return finishing;
       finishing = (async () => {
         ended = true;
-        clearTimeout(timer);
+        clearTimeout(snapshotTimer);
         await inFlight;
         if (discarded) return result;
-        if (recorder.state === 'inactive') throw new Error(t('errors.recordNotStarted'));
-        await draw();
+        if (startedAt === undefined || recorder.state === 'inactive')
+          throw new Error(t('errors.recordNotStarted'));
+        await snapshot();
+        if (discarded) return result;
+        // A drawn canvas frame reaches the encoder on a later browser paint.
+        // Hold the final image across several capture ticks before flushing the encoder.
+        publishFrame();
+        await delay(6 * FRAME_INTERVAL, finalFrame.signal);
+        if (discarded) return result;
+        clearInterval(frameTimer);
+        durationMs = Math.max(1, performance.now() - startedAt);
         recorder.stop();
         return result;
       })().catch((error) => {

@@ -21,6 +21,7 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 ### Fixed
 
 - Keep location choices and sent attachment previews at full opacity during automatic playback.
+- Keep phone recording timestamps running and hold the last frame before finalizing the video.
 
 ## [0.3.0] - 2026-11-08
 

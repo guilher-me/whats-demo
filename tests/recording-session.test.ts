@@ -31,7 +31,11 @@ class FakeMediaRecorder {
 }
 const stopTrack = vi.fn();
 const captureStream = vi.fn(
-  () => ({ getTracks: () => [{ stop: stopTrack }] }) as unknown as MediaStream,
+  () =>
+    ({
+      getTracks: () => [{ stop: stopTrack }],
+      getVideoTracks: () => [],
+    }) as unknown as MediaStream,
 );
 const pixels = vi.fn(() => ({ data: new Uint8ClampedArray(4) }));
 beforeEach(() => {
@@ -51,6 +55,7 @@ beforeEach(() => {
   vi.mocked(capturePhone).mockResolvedValue(document.createElement('canvas'));
 });
 afterEach(() => {
+  vi.useRealTimers();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
   delete (HTMLCanvasElement.prototype as Partial<HTMLCanvasElement>).captureStream;
@@ -72,6 +77,27 @@ it('gera MP4 nativo e libera todas as tracks ao finalizar', async () => {
   expect(stopTrack).toHaveBeenCalled();
   expect(fixWebmDuration).not.toHaveBeenCalled();
 });
+it('keeps publishing frames while the screen is unchanged and holds the last snapshot before stopping', async () => {
+  vi.useFakeTimers();
+  const stop = vi.spyOn(FakeMediaRecorder.prototype, 'stop');
+  const session = await preparePhoneRecording(phone(), vi.fn());
+  const draw = document.createElement('canvas').getContext('2d')!.drawImage;
+  session.start();
+  await vi.advanceTimersByTimeAsync(1000);
+  expect(capturePhone).toHaveBeenCalledTimes(2);
+  expect(vi.mocked(draw).mock.calls.length).toBeGreaterThan(10);
+  const final = document.createElement('canvas');
+  vi.mocked(capturePhone).mockResolvedValueOnce(final);
+  const finish = session.finish();
+  await vi.advanceTimersByTimeAsync(100);
+  expect(draw).toHaveBeenLastCalledWith(final, 0, 0, 720, 1440);
+  expect(stop).not.toHaveBeenCalled();
+  await vi.advanceTimersByTimeAsync(400);
+  const clip = await finish;
+  expect(clip.durationMs).toBeCloseTo(1400);
+  expect(stop).toHaveBeenCalledOnce();
+});
+
 it('uses the theme backdrop selected when preparing every frame of a recording', async () => {
   const node = phone();
   node.style.setProperty('--recording-backdrop', '#213c35');

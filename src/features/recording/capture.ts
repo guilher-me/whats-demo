@@ -14,6 +14,25 @@ export function restoreTextAreas(clone: Node): void {
     field.removeAttribute('data-captured-text');
   });
 }
+// Preserve the chat's scroll offsets while leaving offscreen bubbles out of the rasterizer.
+function visibleChat(node: HTMLElement) {
+  const messages = node.querySelector<HTMLElement>('.chat-body > .messages');
+  if (!messages?.parentElement || !messages.childElementCount) return;
+  const viewport = messages.parentElement.getBoundingClientRect();
+  const children = Array.from(messages.children) as HTMLElement[];
+  const visible = children.filter((child) => {
+    const bounds = child.getBoundingClientRect();
+    return bounds.bottom >= viewport.top - 24 && bounds.top <= viewport.bottom + 24;
+  });
+  if (!visible.length || visible.length === children.length) return;
+  const first = visible[0];
+  const last = visible[visible.length - 1];
+  const before = first.offsetTop - children[0].offsetTop;
+  const tail = children[children.length - 1];
+  const after = tail.offsetTop + tail.offsetHeight - last.offsetTop - last.offsetHeight;
+  return { children: new Set<Node>(children), visible: new Set<Node>(visible), before, after };
+}
+
 // The renderer uses per-render shared caches; serialize snapshots even after cancellation.
 let pending: Promise<unknown> = Promise.resolve();
 
@@ -24,8 +43,9 @@ export function capturePhone(
   height: number,
   backdrop: string,
 ): Promise<HTMLCanvasElement> {
-  const frame = pending.then(() =>
-    domToImage.toCanvas(node, {
+  const frame = pending.then(() => {
+    const chat = visibleChat(node);
+    return domToImage.toCanvas(node, {
       width,
       height,
       pixelRatio: 2,
@@ -35,11 +55,22 @@ export function capturePhone(
       styleCaching: 'strict',
       style: { margin: '0', filter: 'none' },
       filter: (child) =>
-        !(child instanceof Element && child.hasAttribute('data-recording-exclude')),
+        !(child instanceof Element && child.hasAttribute('data-recording-exclude')) &&
+        !(chat?.children.has(child) && !chat.visible.has(child)),
       adjustClonedNode: copyLiveField,
-      onclone: restoreTextAreas,
-    }),
-  );
+      onclone: (clone) => {
+        restoreTextAreas(clone);
+        const messages =
+          chat && clone instanceof Element
+            ? clone.querySelector<HTMLElement>('.chat-body > .messages')
+            : null;
+        if (messages && chat) {
+          messages.style.paddingBlockStart = chat.before + 'px';
+          messages.style.paddingBlockEnd = chat.after + 'px';
+        }
+      },
+    });
+  });
   pending = frame.catch(() => {});
   return frame;
 }

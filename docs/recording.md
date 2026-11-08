@@ -19,7 +19,7 @@ Durante a preparação e a contagem, o botão permite cancelar sem gerar um arqu
 
 O aplicativo testa os codificadores nativos e tenta MP4 primeiro; caso não esteja disponível, usa WebM. A extensão do download corresponde ao formato efetivamente produzido. Para WebM, `fix-webm-duration` adiciona a duração ausente quando necessário.
 
-O celular é mantido em 360 × 720 pixels durante a gravação, e os quadros são gerados em 720 × 1440. O canvas oferece até 24 fps para o codificador; a rasterização busca até 12 atualizações por segundo, em série, e pode ser mais lenta conforme o computador e a complexidade da tela. Não há garantia de taxa fixa de quadros.
+O celular é mantido em 360 × 720 pixels durante a gravação, e os quadros são gerados em 720 × 1440. A captura busca 15 quadros por segundo e repete a imagem mais recente enquanto aguarda uma mudança na tela. A rasterização ignora as mensagens fora da área visível e mantém a posição de rolagem. O quadro final permanece na captura até o codificador ter tempo de recebê-lo. A taxa efetiva depende do navegador e do dispositivo.
 
 Mantenha a aba visível durante a gravação. Navegadores podem reduzir a frequência de atualização em segundo plano. A implementação foi verificada em Chromium; navegadores sem as APIs necessárias ou que bloqueiem a rasterização recebem uma mensagem de erro. Chrome e Edge atualizados são os alvos recomendados para a primeira versão.
 
