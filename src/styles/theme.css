@@ -30,7 +30,8 @@
 .theme-switch-track::after {
   content: '';
   position: absolute;
-  top: 1px;
+  box-sizing: border-box;
+  top: 50%;
   left: 1px;
   width: 26px;
   height: 26px;
@@ -40,7 +41,7 @@
   box-shadow:
     1px 2px 4px #142c2566,
     inset 0 1px 1px #fff;
-  transform: translateX(32px);
+  transform: translate(32px, -50%);
   transition: transform 160ms ease;
 }
 .theme-switch-track svg {
@@ -49,15 +50,20 @@
 }
 .theme-switch[aria-checked='true'] .theme-switch-track {
   justify-content: flex-end;
-  border-color: #627872;
-  background: #263b36;
+  border-color: #4d5d57;
+  background: #111d19;
   color: #ffd17c;
   box-shadow:
     inset 1px 2px 5px #000a,
-    0 1px 0 #65807780;
+    0 1px 0 #54666080;
 }
 .theme-switch[aria-checked='true'] .theme-switch-track::after {
-  transform: translateX(0);
+  border-color: #667571;
+  background: linear-gradient(150deg, #46534e, #252f2b);
+  box-shadow:
+    1px 2px 4px #0009,
+    inset 0 1px 1px #ffffff24;
+  transform: translate(0, -50%);
 }
 @media (prefers-reduced-motion: reduce) {
   .theme-switch-track::after {
@@ -65,11 +71,13 @@
   }
 }
 @media (forced-colors: active) {
-  .theme-switch-track {
+  .theme-switch-track,
+  .theme-switch[aria-checked='true'] .theme-switch-track {
     border-color: ButtonText;
     color: ButtonText;
   }
-  .theme-switch-track::after {
+  .theme-switch-track::after,
+  .theme-switch[aria-checked='true'] .theme-switch-track::after {
     border-color: ButtonText;
     background: ButtonText;
     forced-color-adjust: none;

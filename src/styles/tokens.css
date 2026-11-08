@@ -137,8 +137,9 @@
   --json-literal: #a3c5ff;
   --json-selection: #69d7b647;
 
-  --phone-wallpaper: #10191f;
-  --phone-wallpaper-blend: multiply;
+  /* Difference maps the PNG's beige paper to near-black and its darker strokes to gray. */
+  --phone-wallpaper: #f0f1ef;
+  --phone-wallpaper-blend: difference;
   --phone-header-surface: #161f24;
   --phone-header-line: #26333a;
   --phone-status-ink: #e9edef;
