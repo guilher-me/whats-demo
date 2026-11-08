@@ -47,7 +47,13 @@ export function PhonePreview({
     return () => animations.forEach((animation) => animation.play());
   }, [p.paused, phoneRef]);
   return (
-    <PhoneFrame contact={contact} typing={p.typing} paused={p.paused} phoneRef={phoneRef}>
+    <PhoneFrame
+      contact={contact}
+      typing={p.typing}
+      paused={p.paused}
+      phoneRef={phoneRef}
+      pixCopied={p.commerce.pixCopied}
+    >
       <div className="chat-body" ref={body}>
         <div className="day">{t('phone.today')}</div>
         <div
@@ -80,8 +86,8 @@ export function PhonePreview({
                 onCommerce={
                   canOpen && content?.kind === 'offer'
                     ? () => p.commerce.openOffer(message.id, content, !p.running)
-                    : canOpen && active && content?.kind === 'pix'
-                      ? () => p.commerce.copy(message.id)
+                    : canOpen && content?.kind === 'pix'
+                      ? () => p.commerce.copyPix(message.id)
                       : undefined
                 }
                 attachmentDisabled={

@@ -552,7 +552,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
             messageId = message.id;
             if (offer) offers.set(step.id, message);
             if (payment && commerceContent?.kind === 'pix')
-              commerce.startPix(messageId, commerceContent, payment.finish);
+              commerce.startPix(messageId, payment.finish);
           });
           if (automatic) {
             const choices =
@@ -572,8 +572,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
                 messageId,
               )?.querySelector<HTMLElement>('[data-commerce-action]') ?? null;
             if (automatic) {
-              await tap(open, () => commerce.copy(messageId));
-              await tap(target('[data-commerce-continue]'), commerce.continueDemo);
+              await tap(open, () => commerce.copyPix(messageId));
             } else {
               open?.focus();
             }

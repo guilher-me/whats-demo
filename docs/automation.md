@@ -259,7 +259,7 @@ Add a top-level `catalog` array with up to 200 products. Each product has a uniq
 
 - A business step uses `{ "kind": "product", "sku": "TV-01" }` for a single product or `{ "kind": "showcase", "sections": [{ "title": "Electronics", "skus": ["TV-01"] }] }` for a grouped offer. A showcase supports up to 10 sections and 30 distinct products.
 - A user step uses `{ "kind": "cart", "offerId": "offer" }` to wait for the customer to send a cart from a preceding offer. Set `autoItems` to an array of `{ "sku": "TV-01", "quantity": 2 }` records to configure the automatic cart. Omit the array to select one unit of the first product. Quantities range from 1 to 99.
-- A business step uses `{ "kind": "pix", "amount": { "cartId": "cart" } }` for a simulated Pix charge based on a preceding cart. Use `{ "cents": 249900 }` as the amount for a standalone fixed charge. The phone generates an invalid `PIX-DEMO` code and simulates copying it. Select **Continue demo** to advance while the payment stays pending.
+- A business step uses `{ "kind": "pix", "amount": { "cartId": "cart" } }` for a simulated Pix charge based on a preceding cart. Use `{ "cents": 249900 }` as the amount for a standalone fixed charge. The phone simulates copying the key and briefly shows **Pix key copied**. The journey advances on that tap while the payment stays pending.
 - In `getState().messages`, inspect `commerce.kind === "order"` for the actual order lines and `commerce.kind === "pix"` for the resulting charge in cents. Shared links carry the authored catalog and automatic choices. Each playback starts with an empty cart.
 
 ```json

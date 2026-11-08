@@ -116,4 +116,4 @@ Open **Product catalog** in the editor and add fictional products with a SKU, na
 
 In the Preview, open the offer, add products and review quantities in **View cart**. Sending the cart creates a customer message with its subtotal. Closing the offer or cart keeps the selection until you send it, stop or restart the demo.
 
-In a business **Pix Copy and Paste** step, select a fixed amount or use the subtotal from an earlier cart. The linked total follows the selection made during playback. **Copy Pix code** shows a fictional code and a **Simulated copy** confirmation. **Continue demo** advances the conversation while the charge stays pending.
+In a business **Pix Copy and Paste** step, select a fixed amount or use the subtotal from an earlier cart. The linked total follows the selection made during playback. **Copy Pix code** briefly shows **Pix key copied** and advances the conversation. The demo simulates copying and the charge stays pending.

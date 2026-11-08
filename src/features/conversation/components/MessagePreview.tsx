@@ -42,10 +42,7 @@ export function MessagePreview({
   const commercePlayback = useCommercePlayback();
   const openCommerce = () => {
     if (commerce?.kind === 'offer') commercePlayback.openOffer(step.id, commerce, true);
-    if (commerce?.kind === 'pix') {
-      commercePlayback.startPix(step.id, commerce, () => {});
-      commercePlayback.copy(step.id);
-    }
+    if (commerce?.kind === 'pix') commercePlayback.copyPix(step.id);
   };
   const interactive = step.type === 'business' ? step.interactive : undefined;
   const selection =
@@ -90,7 +87,7 @@ export function MessagePreview({
     selection,
   };
   return (
-    <PhoneFrame contact={contact} phoneRef={phoneRef}>
+    <PhoneFrame contact={contact} phoneRef={phoneRef} pixCopied={commercePlayback.pixCopied}>
       <div className="chat-body draft-chat" aria-label={t('app.draft')}>
         <div className="day">{t('phone.today')}</div>
         <div className="messages">

@@ -1,9 +1,8 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { MAX_CART_QUANTITY, orderLines } from '../../core/commerce';
 import type { CartItem, CommerceMessage, OrderLine } from '../../core/types';
 
 type Offer = Extract<CommerceMessage, { kind: 'offer' }>;
-type Pix = Extract<CommerceMessage, { kind: 'pix' }>;
 type Shopping = {
   kind: 'shopping';
   messageId: string;
@@ -16,23 +15,30 @@ type Shopping = {
 type Payment = {
   kind: 'payment';
   messageId: string;
-  pix: Pix;
-  view: 'closed' | 'copied';
   finish: () => void;
 };
 
 export function useCommercePlayback() {
   const [session, update] = useState<Shopping | Payment | null>(null);
   const current = useRef(session);
+  const [copyNotice, setCopyNotice] = useState(0);
+  useEffect(() => {
+    if (!copyNotice) return;
+    const timeout = setTimeout(() => setCopyNotice(0), 2000);
+    return () => clearTimeout(timeout);
+  }, [copyNotice]);
   const set = useCallback((value: typeof session) => {
     current.current = value;
     update(value);
   }, []);
-  const reset = useCallback(() => set(null), [set]);
+  const reset = useCallback(() => {
+    set(null);
+    setCopyNotice(0);
+  }, [set]);
   const startCart = (messageId: string, offer: Offer, submit?: Shopping['submit']) =>
     set({ kind: 'shopping', messageId, offer, view: 'closed', items: [], submit });
-  const startPix = (messageId: string, pix: Pix, finish: () => void) =>
-    set({ kind: 'payment', messageId, pix, view: 'closed', finish });
+  const startPix = (messageId: string, finish: () => void) =>
+    set({ kind: 'payment', messageId, finish });
   const openOffer = (id: string, offer: Offer, browse: boolean) => {
     const active = current.current;
     const first = offer.single ? offer.sections[0]?.products[0] : undefined;
@@ -88,8 +94,8 @@ export function useCommercePlayback() {
   };
   const close = () => {
     const active = current.current;
-    if (!active) return;
-    if (active.kind === 'shopping' && !active.submit) reset();
+    if (active?.kind !== 'shopping') return;
+    if (!active.submit) set(null);
     else set({ ...active, view: 'closed' });
   };
   const submit = () => {
@@ -100,18 +106,16 @@ export function useCommercePlayback() {
       active.offer.sections.flatMap((group) => group.products),
     );
     if (!lines.length || !active.submit) return;
-    reset();
+    set(null);
     active.submit(lines);
   };
-  const copy = (id: string) => {
+  const copyPix = (id: string) => {
+    setCopyNotice((notice) => notice + 1);
     const active = current.current;
-    if (active?.kind === 'payment' && active.messageId === id) set({ ...active, view: 'copied' });
-  };
-  const continueDemo = () => {
-    const active = current.current;
-    if (active?.kind !== 'payment' || active.view !== 'copied') return;
-    reset();
-    active.finish();
+    if (active?.kind === 'payment' && active.messageId === id) {
+      set(null);
+      active.finish();
+    }
   };
   return {
     session,
@@ -127,8 +131,8 @@ export function useCommercePlayback() {
     back,
     close,
     submit,
-    copy,
-    continueDemo,
+    pixCopied: copyNotice > 0,
+    copyPix,
   };
 }
 

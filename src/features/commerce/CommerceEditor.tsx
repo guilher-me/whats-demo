@@ -363,7 +363,6 @@ export function CommerceFields({
               onValueChange={(cartId) => onChange({ kind: 'pix', amount: { cartId } })}
             />
           )}
-          <p>{t('commerce.pixHelp')}</p>
         </>
       );
       break;

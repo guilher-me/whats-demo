@@ -18,7 +18,7 @@ export function CommerceSheet({
   returnFocus?: (messageId: string) => void;
 }) {
   const t = useT();
-  const active = controls.session;
+  const active = controls.session?.kind === 'shopping' ? controls.session : null;
   const body = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!locked && active?.view !== 'closed') body.current?.focus();
@@ -28,37 +28,6 @@ export function CommerceSheet({
     if (!locked) controls.close();
   };
   const focus = () => returnFocus?.(active.messageId);
-  if (active.kind === 'payment') {
-    return (
-      <PhoneSheet
-        container={container}
-        title={t('commerce.pix')}
-        description={t('commerce.pixHelp')}
-        onClose={close}
-        onReturnFocus={focus}
-        backdrop="dimmed"
-        closeLabel={t('common.closeDialog')}
-        className="commerce-sheet"
-      >
-        <div className="commerce-sheet-body" ref={body} tabIndex={-1}>
-          <strong role="status">{t('commerce.copySimulated')}</strong>
-          <code>{'PIX-DEMO-' + active.pix.reference}</code>
-          <p>{t('commerce.pixHelp')}</p>
-        </div>
-        <footer>
-          <Button
-            variant="primary"
-            data-commerce-continue
-            disabled={locked}
-            onClick={controls.continueDemo}
-          >
-            {t('buttons.continue')}
-          </Button>
-        </footer>
-      </PhoneSheet>
-    );
-  }
-
   const products = active.offer.sections.flatMap((section) => section.products);
   const product = products.find(({ sku }) => sku === active.sku);
   const lines = orderLines(active.items, products);
