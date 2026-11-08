@@ -3,6 +3,7 @@ import { currentLocale, useT, type Locale } from '../i18n';
 import type { Project } from '../core/types';
 import { createShareURL, shareHash } from '../core/codec';
 import { Button } from '../components/ui/Button';
+import { ReleaseNotes } from '../features/releases/ReleaseNotes';
 import { JourneyPhone } from '../features/conversation/components/JourneyPhone';
 import { PlaybackControls } from '../features/playback/components/PlaybackControls';
 import { PlaybackSpeedControl } from '../features/playback/components/PlaybackSpeedControl';
@@ -35,7 +36,10 @@ export function DemoApp({
   return (
     <main className="shared-demo" aria-label={t('sharing.preview')}>
       <header className="shared-demo-header">
-        <h1>WhatsDemo</h1>
+        <div className="brand-title">
+          <h1>WhatsDemo</h1>
+          <ReleaseNotes />
+        </div>
         {token ? (
           <a className="button" href={shareHash('editor', token, locale)}>
             {t('sharing.editCopy')}

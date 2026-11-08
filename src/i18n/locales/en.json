@@ -593,5 +593,16 @@
   "commerce.invalidStep": "This commerce format is invalid for the step.",
   "commerce.invalidOffer": "Select catalog products. Each showcase section needs a title and at least one product. Use each product once per offer.",
   "commerce.invalidCart": "Select an earlier offer and configure at least one valid item for the automatic cart.",
-  "commerce.invalidAmount": "Enter a positive amount in cents or select an earlier cart."
+  "commerce.invalidAmount": "Enter a positive amount in cents or select an earlier cart.",
+  "changelog.title": "What’s new",
+  "changelog.open": "v{{v0}} · What’s new",
+  "changelog.description": "WhatsDemo release history. Current version v{{v0}}.",
+  "changelog.unreleased": "Unreleased",
+  "changelog.added": "Added",
+  "changelog.changed": "Changed",
+  "changelog.deprecated": "Deprecated",
+  "changelog.removed": "Removed",
+  "changelog.fixed": "Fixed",
+  "changelog.security": "Security",
+  "changelog.github": "Changelog on GitHub"
 }

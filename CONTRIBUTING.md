@@ -34,7 +34,7 @@ To add a Flow field, update validation in `core/engine.ts`, rendering in `featur
 
 Do not change the meaning of the `v1z` and `v1j` link prefixes or reuse existing fields for incompatible behavior. Keep the legacy fixtures and compatibility tests. An incompatible schema change needs an explicit new version and migration.
 
-The public browser API uses `window.whatsappFakeFlows` with `apiVersion: 1`. Preserve that contract, including synchronous methods. Update [automation documentation](docs/automation.md) and the `llms.txt` index when tool-facing behavior changes.
+The public browser API uses `window.whatsappFakeFlows` with `apiVersion: 3`. Preserve that contract, including synchronous methods. Update [automation documentation](docs/automation.md) and the `llms.txt` index when tool-facing behavior changes.
 
 Render simulated attachments from metadata with the shared preview component. Use bundled images for the fixed business icon and wallpaper. Keep journey data as text and validate shared links before loading them.
 
@@ -52,6 +52,10 @@ npm run build
 ```
 
 Run checks appropriate to the change. Exercise manual playback, automatic playback and the generated portable HTML when their behavior is affected. Include small fictional journeys for engine or playback regressions. For documentation-only changes, check formatting, links and referenced media; add no tests that merely duplicate prose.
+
+## Record release notes
+
+Add user-visible changes under **Unreleased** in [CHANGELOG.md](CHANGELOG.md). Use the applicable English section heading from Added, Changed, Deprecated, Removed, Fixed or Security and write one plain Markdown bullet per change. The build includes these notes in the app and the portable HTML. See [the release checklist](docs/deployment.md#prepare-a-release) for versioning and publishing.
 
 ## Open a pull request
 

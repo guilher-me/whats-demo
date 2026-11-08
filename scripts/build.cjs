@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const esbuild = require('esbuild');
 const { agentDocs } = require('./agent-docs.cjs');
+const { releaseAssets } = require('./release-notes.cjs');
 const { brandHtml } = require('./branding.cjs');
 const ROOT = path.resolve(__dirname, '..');
 function dependencyNotices(root, inputs) {
@@ -77,6 +78,7 @@ async function build({ root = ROOT, output = path.join(root, 'dist', 'whats-demo
     path.dirname(output),
     brandHtml(root, fs.readFileSync(path.join(root, 'index.html'), 'utf8')),
   );
+  html = releaseAssets(root, path.dirname(output), html);
   html = html.replace(
     '<!-- APP_STYLES -->',
     () => '<style>\n' + css.replace(/<\/style/gi, '<\\/style') + '\n</style>',

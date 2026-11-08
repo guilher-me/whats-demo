@@ -2,22 +2,21 @@ const fs = require('node:fs'),
   path = require('node:path'),
   esbuild = require('esbuild');
 const { agentDocs } = require('./agent-docs.cjs');
+const { releaseAssets } = require('./release-notes.cjs');
 const { brandHtml } = require('./branding.cjs');
 const { shareBuildOptions } = require('./build.cjs');
 async function start() {
   const root = path.resolve(__dirname, '..'),
     directory = path.join(root, '.dev');
   fs.mkdirSync(directory, { recursive: true });
-  fs.writeFileSync(
-    path.join(directory, 'index.html'),
-    agentDocs(
-      root,
-      directory,
-      brandHtml(root, fs.readFileSync(path.join(root, 'index.html'), 'utf8'))
-        .replace('<!-- APP_STYLES -->', '<link rel="stylesheet" href="app.css">')
-        .replace('<!-- APP_SCRIPT -->', '<script defer src="app.js"></script>'),
-    ),
+  const html = agentDocs(
+    root,
+    directory,
+    brandHtml(root, fs.readFileSync(path.join(root, 'index.html'), 'utf8'))
+      .replace('<!-- APP_STYLES -->', '<link rel="stylesheet" href="app.css">')
+      .replace('<!-- APP_SCRIPT -->', '<script defer src="app.js"></script>'),
   );
+  fs.writeFileSync(path.join(directory, 'index.html'), releaseAssets(root, directory, html));
   const context = await esbuild.context({
     absWorkingDir: root,
     entryPoints: ['src/main.tsx'],
