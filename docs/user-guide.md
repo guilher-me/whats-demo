@@ -88,7 +88,7 @@ Invalid or truncated links open a recovery screen with a shortcut to the local e
 
 Select **Record phone**, choose manual or automatic playback, and wait for the three-second countdown. In manual mode, stop the recording yourself. In automatic mode, recording finishes two seconds after the last message.
 
-The download is MP4 where supported, otherwise WebM. Recording captures only the phone, without audio, at 720 × 1280; the editor and controls stay out of the video. Keep the tab visible while recording. Rendering happens locally. See the [recording reference](recording.md) for implementation details and limitations (currently in Brazilian Portuguese).
+The download is MP4 where supported, otherwise WebM. Recording captures only the phone, without audio, at 720 × 1440; the editor and controls stay out of the video. Keep the tab visible while recording. Rendering happens locally. See the [recording reference](recording.md) for implementation details and limitations (currently in Brazilian Portuguese).
 
 The recording in the project README is an MP4 demonstration supplied by the maintainer. The app's recording feature exports video, not GIF.
 
