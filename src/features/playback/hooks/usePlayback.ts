@@ -541,27 +541,34 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
             );
           }
           const payment = commerceContent?.kind === 'pix' ? deferred(signal) : undefined;
+          const interactive = step.type === 'business' ? step.interactive : undefined;
           let messageId = '';
+          let answered: Promise<void> | undefined;
           flushSync(() => {
             const message = append(text, 'business', {
               flowStep: step.type === 'flow' ? step : undefined,
-              interactive: step.type === 'business' ? step.interactive : undefined,
+              interactive,
               attachment: stepAttachment(step),
               commerce: commerceContent,
             });
             messageId = message.id;
+            if (interactive) {
+              answered = interaction.wait(messageId, interactive, signal);
+              setStatus('playback.chooseOption');
+            }
             if (offer) offers.set(step.id, message);
             if (payment && commerceContent?.kind === 'pix')
               commerce.startPix(messageId, payment.finish);
           });
           if (automatic) {
             const choices =
-              step.type === 'business' && step.interactive?.kind === 'buttons'
-                ? messageOptions(step.interactive)
+              interactive?.kind === 'buttons'
+                ? messageOptions(interactive)
                     .map((option) => option.title)
                     .join(' ')
                 : '';
-            await cursor.read(`${text} ${choices}`, signal);
+            const reading = cursor.read(`${text} ${choices}`, signal);
+            await (answered ? Promise.race([reading, answered]) : reading);
           }
           if (payment) {
             setStatus('commerce.waitPix');
@@ -579,13 +586,11 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
             await payment.promise;
             await clock.current?.checkpoint();
           }
-          if (step.type === 'business' && step.interactive) {
-            const answered = interaction.wait(messageId, step.interactive, signal);
-            setStatus('playback.chooseOption');
-            if (automatic)
+          if (interactive && answered) {
+            if (automatic && interaction.isPending(messageId))
               await animateMessage({
                 id: messageId,
-                message: step.interactive,
+                message: interactive,
                 phone,
                 signal,
                 touch: cursor.touch,
@@ -594,6 +599,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
                 reply: interaction.reply,
                 select: interaction.select,
                 confirm: interaction.confirm,
+                isPending: interaction.isPending,
               });
             await answered;
             await clock.current?.checkpoint();
