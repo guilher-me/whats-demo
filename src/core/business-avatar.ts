@@ -42,7 +42,7 @@ export function isBusinessIcon(value: unknown): value is BusinessIcon {
   return BUSINESS_ICONS.some((icon) => icon === value);
 }
 
-export function isIconBackground(value: unknown): value is string {
+export function isAvatarColor(value: unknown): value is string {
   return typeof value === 'string' && value.length === 7 && /^#[0-9A-Fa-f]{6}$/.test(value);
 }
 

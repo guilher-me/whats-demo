@@ -63,12 +63,16 @@ const storePath =
 export function BusinessAvatar({
   icon = DEFAULT_BUSINESS_ICON,
   iconBackground = DEFAULT_ICON_BACKGROUND,
+  iconForeground: foregroundOverride,
 }: {
   icon?: BusinessIcon;
   iconBackground?: string;
+  iconForeground?: string;
 }) {
   const background = iconBackground.toUpperCase();
-  const foreground = background === DEFAULT_ICON_BACKGROUND ? '#fff' : iconForeground(background);
+  const foreground =
+    foregroundOverride ??
+    (background === DEFAULT_ICON_BACKGROUND ? '#fff' : iconForeground(background));
   return (
     <svg
       className="avatar"

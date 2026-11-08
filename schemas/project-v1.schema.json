@@ -58,10 +58,10 @@
           ]
         },
         "iconBackground": {
-          "type": "string",
-          "pattern": "^#[0-9A-Fa-f]{6}$",
-          "minLength": 7,
-          "maxLength": 7
+          "$ref": "#/$defs/avatarColor"
+        },
+        "iconForeground": {
+          "$ref": "#/$defs/avatarColor"
         }
       }
     },
@@ -79,6 +79,12 @@
     }
   },
   "$defs": {
+    "avatarColor": {
+      "type": "string",
+      "pattern": "^#[0-9A-Fa-f]{6}$",
+      "minLength": 7,
+      "maxLength": 7
+    },
     "id": { "type": "string", "minLength": 1 },
     "media": {
       "oneOf": [{ "$ref": "#/$defs/fileMedia" }, { "$ref": "#/$defs/locationMedia" }]

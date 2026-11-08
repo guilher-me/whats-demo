@@ -22,7 +22,11 @@ it('commits the selected icon and HEX only when Apply is pressed', async () => {
 
   let picker = await open();
   await user.click(picker.getByRole('radio', { name: 'Carro' }));
-  await user.click(picker.getByRole('radio', { name: 'Azul' }));
+  await user.click(
+    within(picker.getByRole('group', { name: 'Cor de fundo' })).getByRole('radio', {
+      name: 'Azul',
+    }),
+  );
   expect(picker.getByText('car', { selector: 'code' })).toBeVisible();
   expect(current()).not.toHaveProperty('icon');
   await user.click(picker.getByRole('button', { name: 'Cancelar' }));
@@ -49,4 +53,42 @@ it('commits the selected icon and HEX only when Apply is pressed', async () => {
   await user.click(picker.getByRole('button', { name: 'Restaurar padrão' }));
   await user.keyboard('{Escape}');
   expect(current().icon).toBe('tooth');
+});
+
+it('customizes the glyph independently and restores automatic contrast', async () => {
+  const user = userEvent.setup();
+  render(<App />);
+  const open = async () => {
+    await user.click(screen.getByRole('button', { name: 'Editar ícone da empresa' }));
+    return within(screen.getByRole('dialog', { name: 'Ícone da empresa' }));
+  };
+  const contact = () => window.whatsappFakeFlows!.getProject().contact;
+  const preview = () => document.querySelector('.contact-avatar-preview .avatar path');
+
+  let picker = await open();
+  const colors = within(picker.getByRole('group', { name: 'Cor do ícone' }));
+  expect(colors.getByRole('button', { name: 'Contraste automático' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await user.click(colors.getByRole('radio', { name: 'Preto' }));
+  expect(preview()).toHaveAttribute('fill', '#000000');
+  expect(contact()).not.toHaveProperty('iconForeground');
+
+  const hex = colors.getByRole('textbox', { name: 'HEX do ícone' });
+  fireEvent.change(hex, { target: { value: 'bad' } });
+  expect(picker.getByRole('button', { name: 'Aplicar' })).toBeDisabled();
+  expect(preview()).toHaveAttribute('fill', '#000000');
+  fireEvent.change(hex, { target: { value: '9a305b' } });
+  expect(preview()).toHaveAttribute('fill', '#9A305B');
+  await user.click(picker.getByRole('button', { name: 'Aplicar' }));
+  expect(contact()).toMatchObject({ iconForeground: '#9A305B' });
+  expect(contact()).not.toHaveProperty('iconBackground');
+  expect(document.querySelector('.chat-header .avatar path')).toHaveAttribute('fill', '#9A305B');
+
+  picker = await open();
+  await user.click(picker.getByRole('button', { name: 'Contraste automático' }));
+  expect(preview()).toHaveAttribute('fill', '#fff');
+  await user.click(picker.getByRole('button', { name: 'Aplicar' }));
+  expect(contact()).not.toHaveProperty('iconForeground');
 });

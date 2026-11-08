@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { DEFAULT_BUSINESS_ICON, DEFAULT_ICON_BACKGROUND } from '../../../core/business-avatar';
 import { useT } from '../../../i18n';
 import type { Contact } from '../../../core/types';
 import { BusinessAvatar } from '../../../components/ui/BusinessAvatar';
@@ -21,7 +20,11 @@ export function ContactEditor({
   return (
     <section className="contact-panel" aria-label={t('contact.region')}>
       <div className="contact-image">
-        <BusinessAvatar icon={contact.icon} iconBackground={contact.iconBackground} />
+        <BusinessAvatar
+          icon={contact.icon}
+          iconBackground={contact.iconBackground}
+          iconForeground={contact.iconForeground}
+        />
         <Dialog
           open={open}
           onOpenChange={setOpen}
@@ -43,16 +46,13 @@ export function ContactEditor({
             <BusinessIconPicker
               contact={contact}
               onCancel={() => setOpen(false)}
-              onApply={(icon, background) => {
-                const iconChanged = icon !== (contact.icon ?? DEFAULT_BUSINESS_ICON);
-                const colorChanged =
-                  background !== (contact.iconBackground ?? DEFAULT_ICON_BACKGROUND);
-                if (iconChanged || colorChanged) {
-                  onChange({
-                    ...contact,
-                    icon: icon === DEFAULT_BUSINESS_ICON ? undefined : icon,
-                    iconBackground: background === DEFAULT_ICON_BACKGROUND ? undefined : background,
-                  });
+              onApply={(avatar) => {
+                if (
+                  avatar.icon !== contact.icon ||
+                  avatar.iconBackground !== contact.iconBackground ||
+                  avatar.iconForeground !== contact.iconForeground
+                ) {
+                  onChange({ ...contact, ...avatar });
                 }
                 setOpen(false);
               }}

@@ -147,15 +147,28 @@
   color: var(--muted);
   font-size: 11px;
 }
+.contact-color-picker + .contact-color-picker {
+  margin-top: 12px;
+}
+.contact-color-auto {
+  padding: 4px 7px;
+  margin-bottom: 4px;
+  border: 1px solid var(--line);
+  font-size: 11px;
+}
+.contact-color-auto[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
 .contact-color-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 2px;
   margin-bottom: 8px;
 }
 .contact-color-option {
   display: grid;
-  width: 40px;
   height: 36px;
   place-items: center;
   border: 1px solid transparent;

@@ -1,4 +1,4 @@
-import { isBusinessIcon, isIconBackground } from './business-avatar';
+import { isBusinessIcon, isAvatarColor } from './business-avatar';
 import { validateCommerce } from './commerce';
 import { t } from '../i18n';
 import { interactiveError } from './interactive';
@@ -200,8 +200,10 @@ export function validateProject(input: unknown, { allowDrafts = false } = {}): P
     throw new Error(t('errors.project'));
   if (input.contact.icon !== undefined && !isBusinessIcon(input.contact.icon))
     throw new Error('contact.icon · ' + t('contact.invalidIcon'));
-  if (input.contact.iconBackground !== undefined && !isIconBackground(input.contact.iconBackground))
+  if (input.contact.iconBackground !== undefined && !isAvatarColor(input.contact.iconBackground))
     throw new Error('contact.iconBackground · ' + t('contact.invalidHex'));
+  if (input.contact.iconForeground !== undefined && !isAvatarColor(input.contact.iconForeground))
+    throw new Error('contact.iconForeground · ' + t('contact.invalidHex'));
   if (input.steps.length > 200) throw new Error(t('errors.stepLimit'));
   for (const [index, step] of input.steps.entries()) {
     if (
