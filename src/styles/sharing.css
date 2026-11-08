@@ -81,7 +81,7 @@ a.button--primary:hover {
   align-items: center;
   gap: 8px;
   padding: 12px;
-  background: var(--background-editor);
+  background: var(--background-preview);
 }
 .shared-demo-header {
   width: min(100%, 428px);
@@ -102,7 +102,11 @@ a.button--primary:hover {
   justify-content: center;
 }
 .shared-demo .phone-stage .phone-device {
-  width: min(360px, calc(100% - 68px), max(240px, calc((100dvh - 150px) * 0.5)));
+  width: min(
+    360px,
+    calc(100% - 68px),
+    max(240px, calc((100dvh - 150px) * var(--phone-preview-scale) / 2))
+  );
 }
 .shared-demo .play-status {
   margin: 0;
@@ -116,7 +120,7 @@ a.button--primary:hover {
     align-items: center;
   }
   .shared-demo .phone-stage .phone-device {
-    width: min(360px, 100%, max(260px, calc((100dvh - 170px) * 0.5)));
+    width: min(360px, 100%, max(260px, calc((100dvh - 170px) * var(--phone-preview-scale) / 2)));
   }
   .shared-demo .phone-tools,
   .shared-demo .playback {

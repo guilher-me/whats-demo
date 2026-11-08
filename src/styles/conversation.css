@@ -1,22 +1,20 @@
 .phone-device {
-  --phone-rail: 3px;
+  --phone-rail: 2px;
+  --phone-bezel: #08090a;
   --phone-radius: 40px;
   position: relative;
   width: 360px;
   flex-shrink: 0;
   aspect-ratio: 1 / 2;
   border-radius: var(--phone-radius);
-  box-shadow:
-    2px 3px 3px -1px #12181d70,
-    6px 9px 11px -3px #12181d46,
-    12px 18px 26px -5px #12181d24;
+  filter: drop-shadow(1px 3px 1px #08090a94) drop-shadow(7px 12px 12px #08090a3b);
 }
 .phone-device::before {
   content: '';
   position: absolute;
   inset: 0 var(--phone-rail);
   border-radius: inherit;
-  background: linear-gradient(155deg, #acb3b8 0%, #69737a 34%, #9ca3a8 54%, #525a60 100%);
+  background: var(--phone-bezel);
 }
 .phone-side-keys {
   position: absolute;
@@ -28,7 +26,7 @@
   left: 0;
   width: calc(var(--phone-rail) + 2px);
   border-radius: 2px;
-  background: linear-gradient(180deg, #91999f, #495158 16% 82%, #727a81);
+  background: linear-gradient(180deg, #2b2d30, #08090a 18% 82%, #25272a);
 }
 .phone-side-keys span:nth-child(1) {
   top: 16%;
@@ -54,7 +52,7 @@
   --phone-header-surface: #f0f2f5;
   position: absolute;
   inset: 1px calc(var(--phone-rail) + 1px);
-  border: 5px solid #121619;
+  border: 5px solid var(--phone-bezel);
   border-radius: calc(var(--phone-radius) - 1px);
   overflow: hidden;
   background: #efeae2;
