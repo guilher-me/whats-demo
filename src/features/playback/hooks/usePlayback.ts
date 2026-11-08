@@ -1,3 +1,4 @@
+import { formatPhoneTime } from '../../conversation/phone-time';
 import { t, useT, type MessageKey } from '../../../i18n';
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { flushSync } from 'react-dom';
@@ -91,9 +92,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
       id: uid(),
       direction,
       text,
-      time: new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(
-        new Date(),
-      ),
+      time: formatPhoneTime(),
       ...content,
       receipt: direction === 'user' ? 'delivered' : undefined,
     };

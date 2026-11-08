@@ -57,7 +57,7 @@ afterEach(() => {
 });
 function phone() {
   const node = document.createElement('div');
-  Object.defineProperties(node, { offsetWidth: { value: 360 }, offsetHeight: { value: 640 } });
+  Object.defineProperties(node, { offsetWidth: { value: 360 }, offsetHeight: { value: 720 } });
   return node;
 }
 it('gera MP4 nativo e libera todas as tracks ao finalizar', async () => {
@@ -68,7 +68,7 @@ it('gera MP4 nativo e libera todas as tracks ao finalizar', async () => {
   const clip = await first;
   expect(clip.extension).toBe('mp4');
   expect(clip.blob.size).toBeGreaterThan(0);
-  expect([clip.width, clip.height]).toEqual([720, 1280]);
+  expect([clip.width, clip.height]).toEqual([720, 1440]);
   expect(stopTrack).toHaveBeenCalled();
   expect(fixWebmDuration).not.toHaveBeenCalled();
 });

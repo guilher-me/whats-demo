@@ -4,6 +4,7 @@ import { useT } from '../../../i18n';
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import type { Attachment, ChatMessage, CommerceMessage, Contact, Step } from '../../../core/types';
 import { messageOptions } from '../../../core/interactive';
+import { usePhoneTime } from '../phone-time';
 import { PhoneFrame } from './PhoneFrame';
 import { MessageBubble } from './MessageBubble';
 import { ListPicker } from './ListPicker';
@@ -33,6 +34,7 @@ export function MessagePreview({
   flowPreview?: FlowPreviewRequest;
 }) {
   const t = useT();
+  const time = usePhoneTime();
 
   const [listOpen, setListOpen] = useState(false),
     [selected, setSelected] = useState(''),
@@ -78,7 +80,7 @@ export function MessagePreview({
           : step.text,
     attachment,
     commerce,
-    time: '12:00',
+    time,
     ...(step.type === 'user' && step.voiceDurationSeconds !== undefined
       ? { voiceDurationMs: step.voiceDurationSeconds * 1000 }
       : {}),
@@ -87,7 +89,12 @@ export function MessagePreview({
     selection,
   };
   return (
-    <PhoneFrame contact={contact} phoneRef={phoneRef} pixCopied={commercePlayback.pixCopied}>
+    <PhoneFrame
+      time={time}
+      contact={contact}
+      phoneRef={phoneRef}
+      pixCopied={commercePlayback.pixCopied}
+    >
       <div className="chat-body draft-chat" aria-label={t('app.draft')}>
         <div className="day">{t('phone.today')}</div>
         <div className="messages">
@@ -140,6 +147,7 @@ export function MessagePreview({
       )}
       {flow.session && (
         <FlowSheet
+          contact={contact}
           session={flow.session}
           error={flowError}
           onChange={(name, value) => {
