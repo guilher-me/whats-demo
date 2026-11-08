@@ -6,6 +6,11 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 
 ## [Unreleased]
 
+### Added
+
+- Point first-time shared preview visitors to automatic playback with an animated hint.
+- Add a subtle repeating doodle to the preview background.
+
 ## [0.4.0] - 2026-11-08
 
 ### Added

@@ -4,14 +4,15 @@ import type { ButtonProps } from './Button';
 export function TooltipIconButton({
   label,
   description,
+  firstVisitHint,
   ...props
-}: ButtonProps & { label: string; description: string }) {
+}: ButtonProps & { label: string; description: string; firstVisitHint?: string }) {
   const id = useId();
   const pointerFocus = useRef(false);
   const [hovered, setHovered] = useState(false),
     [focused, setFocused] = useState(false),
     [dismissed, setDismissed] = useState(false);
-  const open = (hovered || focused) && !dismissed;
+  const open = !!firstVisitHint || ((hovered || focused) && !dismissed);
   return (
     <span
       className="tooltip-anchor"
@@ -47,9 +48,14 @@ export function TooltipIconButton({
         aria-describedby={open ? id : undefined}
       />
       {open && (
-        <span id={id} className="control-tooltip" role="tooltip">
+        <span
+          id={id}
+          className="control-tooltip"
+          role="tooltip"
+          data-preview-hint={firstVisitHint ? '' : undefined}
+        >
           <span className="tooltip-title">{label}</span>
-          {description}
+          {firstVisitHint ?? description}
         </span>
       )}
     </span>

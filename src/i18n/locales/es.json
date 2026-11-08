@@ -193,6 +193,7 @@
   "playback.stop": "Detener reproducción",
   "playback.reset": "Reiniciar vista previa",
   "playback.manualHint": "Completa los campos y elige las opciones en el teléfono.",
+  "playback.firstVisitHint": "Selecciona el botón de reproducción para ver este recorrido desde el principio.",
   "playback.autoHint": "Reproduce el recorrido con cursor y respuestas animados.",
   "playback.stopHint": "Detiene la conversación y conserva los mensajes mostrados.",
   "playback.resetHint": "Detiene la reproducción y borra el historial de la vista previa.",

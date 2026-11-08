@@ -193,6 +193,7 @@
   "playback.stop": "Stop playback",
   "playback.reset": "Reset preview",
   "playback.manualHint": "Fill in the fields and choose options on the phone.",
+  "playback.firstVisitHint": "Select the play button to watch this journey from the beginning.",
   "playback.autoHint": "Runs the journey with an animated cursor and replies.",
   "playback.stopHint": "Stops the conversation and keeps the displayed messages.",
   "playback.resetHint": "Stops playback and clears the preview history.",
