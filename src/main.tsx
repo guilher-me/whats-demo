@@ -2,16 +2,20 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './app/App';
 import { ThemeProvider } from './features/theme/Theme';
+import { SeasonalEffects } from './features/seasonal/SeasonalEffects';
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/theme.css';
+import './styles/seasonal.css';
 import './styles/editor.css';
 import './styles/conversation.css';
 import './styles/flows.css';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
-      <App />
+      <SeasonalEffects>
+        <App />
+      </SeasonalEffects>
     </ThemeProvider>
   </StrictMode>,
 );

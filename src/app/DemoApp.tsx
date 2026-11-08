@@ -5,6 +5,7 @@ import { createShareURL, shareHash } from '../core/codec';
 import { Button } from '../components/ui/Button';
 import { ReleaseNotes } from '../features/releases/ReleaseNotes';
 import { ThemeSwitch } from '../features/theme/Theme';
+import { SeasonalEffectButton } from '../features/seasonal/SeasonalEffects';
 import { JourneyPhone } from '../features/conversation/components/JourneyPhone';
 import { PlaybackControls } from '../features/playback/components/PlaybackControls';
 import { PlaybackSpeedControl } from '../features/playback/components/PlaybackSpeedControl';
@@ -42,6 +43,7 @@ export function DemoApp({
           <ReleaseNotes />
         </div>
         <div className="header-actions">
+          <SeasonalEffectButton effect="christmas" />
           <div className="header-theme">
             <ThemeSwitch />
           </div>
