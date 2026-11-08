@@ -39,7 +39,7 @@
 }
 .editor .field input:hover,
 .editor .field textarea:hover {
-  border-color: #b9c9c2;
+  border-color: var(--field-hover-line);
 }
 .editor .field input:focus,
 .editor .field textarea:focus {
@@ -620,7 +620,7 @@
     justify-self: stretch;
     width: 100%;
     margin-left: 0;
-    justify-content: space-between;
+    justify-content: flex-start;
   }
   .header-links {
     grid-row: 3;
@@ -745,7 +745,7 @@
 }
 
 .preview-heading .workspace-flow-issue[data-severity='warning'] {
-  color: #865100;
+  color: var(--warning);
 }
 
 .automatic-answers,

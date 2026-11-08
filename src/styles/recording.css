@@ -33,7 +33,7 @@
   background: var(--danger-soft);
 }
 .record-control .icon-button:hover {
-  background: #fee4e2;
+  background: var(--danger-hover);
 }
 .record-label {
   display: inline-flex;
@@ -51,7 +51,7 @@
   background: currentColor;
 }
 .record-control.recording-active .icon-button {
-  color: var(--surface);
+  color: var(--on-danger);
   background: var(--danger);
 }
 .record-control svg {
@@ -109,7 +109,7 @@
   padding: 9px 13px;
   border-radius: 9px;
   background: var(--accent);
-  color: var(--surface);
+  color: var(--on-accent);
   text-decoration: none;
   font-weight: 500;
 }

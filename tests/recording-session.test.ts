@@ -72,6 +72,19 @@ it('gera MP4 nativo e libera todas as tracks ao finalizar', async () => {
   expect(stopTrack).toHaveBeenCalled();
   expect(fixWebmDuration).not.toHaveBeenCalled();
 });
+it('uses the theme backdrop selected when preparing every frame of a recording', async () => {
+  const node = phone();
+  node.style.setProperty('--recording-backdrop', '#213c35');
+  const context = document.createElement('canvas').getContext('2d')!;
+  const session = await preparePhoneRecording(node, vi.fn());
+  expect(context.fillStyle).toBe('#213c35');
+  node.style.setProperty('--recording-backdrop', '#fff');
+  session.start();
+  await session.finish();
+  const calls = vi.mocked(capturePhone).mock.calls;
+  expect(calls.length).toBeGreaterThan(1);
+  for (const call of calls) expect(call).toEqual([node, 360, 720, '#213c35']);
+});
 it('usa WebM quando MP4 não está disponível e corrige a duração', async () => {
   FakeMediaRecorder.supported = new Set(['video/webm']);
   const session = await preparePhoneRecording(phone(), vi.fn());

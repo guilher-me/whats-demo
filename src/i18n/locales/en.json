@@ -1,4 +1,5 @@
 {
+  "app.darkMode": "Dark mode",
   "app.playgroundLink": "WhatsApp Flows Playground (opens in a new tab)",
   "app.tagline": "Build conversations. Show experiences.",
   "app.corrections": "Some fields need attention",
@@ -311,7 +312,7 @@
   "privacy.title": "Privacy in WhatsDemo",
   "privacy.description": "How your journey is stored and shared.",
   "privacy.storageTitle": "Data saved in this browser",
-  "privacy.storageBody": "Contact name, verification badge, messages, simulated attachments, Flows and automatic answers are stored in this browser using localStorage. Interface language and playback speed are also stored locally.",
+  "privacy.storageBody": "Contact name, verification badge, messages, simulated attachments, Flows and automatic answers are stored in this browser using localStorage. Interface language, theme and playback speed are also stored locally.",
   "privacy.sharingTitle": "Links contain the journey",
   "privacy.sharingBody": "Copy a link to share the conversation. Anyone with it can read the conversation. Use sample data.",
   "privacy.deleteTitle": "How to delete saved data",

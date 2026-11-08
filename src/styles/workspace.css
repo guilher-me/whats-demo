@@ -137,6 +137,18 @@
   padding: 18px var(--panel-inset) 16px;
   background: var(--surface-subtle);
 }
+:root[data-theme='dark'] .code-panel {
+  --surface: #111216;
+  --surface-subtle: #1a1b20;
+  --surface-hover: #24262c;
+  --line: #373941;
+  --soft: #25272e;
+  --muted: #aeb1bc;
+  --text-disabled: #979ba7;
+  --accent-soft: #21232a;
+  --json-selection: #7f92cc55;
+  background: #18191d;
+}
 .code-heading p {
   margin: 4px 0 0;
   color: var(--muted);

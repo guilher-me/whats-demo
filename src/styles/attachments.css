@@ -154,7 +154,7 @@
   inset: auto 7px 57px;
   border-radius: 16px;
   padding: 15px 7px 12px;
-  background: #f7f8fa;
+  background: var(--phone-panel-subtle);
 }
 .attachment-menu {
   display: grid;
@@ -170,7 +170,7 @@
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: #33434a;
+  color: var(--phone-muted);
   font:
     11px/1.2 Arial,
     sans-serif;
@@ -184,12 +184,12 @@
   height: 49px;
   display: grid;
   place-items: center;
-  border: 1px solid #e7eaed;
+  border: 1px solid var(--phone-line);
   border-radius: 16px;
-  background: #fff;
+  background: var(--phone-panel);
 }
 .attachment-menu button:not(:disabled):hover .attachment-menu-icon {
-  background: #ebeff1;
+  background: var(--phone-action-surface-hover);
 }
 .attachment-menu-icon.blue {
   color: #0878c4;
@@ -225,7 +225,7 @@
   width: 28px;
   height: 3px;
   border-radius: 2px;
-  background: #89949a;
+  background: var(--phone-meta);
 }
 .android-photo-gallery > header {
   position: relative;
@@ -247,7 +247,7 @@
 }
 .android-photo-gallery > header button {
   top: 18px;
-  color: #111b21;
+  color: var(--phone-ink);
 }
 .photo-gallery-scroll {
   flex: 1;
@@ -270,7 +270,7 @@
   border: 0;
   border-radius: 0;
   padding: 0;
-  background: #e9edef;
+  background: var(--phone-line);
   overflow: hidden;
 }
 .photo-gallery-grid button:focus-visible {
@@ -303,15 +303,15 @@
   align-items: center;
   gap: 7px;
   padding: 8px;
-  background: #fff;
+  background: var(--phone-panel);
 }
 .photo-send-bar input {
   flex: 1;
   min-width: 0;
   border: 0;
   border-radius: 24px;
-  background: #f0f2f5;
-  color: #111b21;
+  background: var(--phone-header-surface);
+  color: var(--phone-ink);
   height: 42px;
   padding: 0 12px;
   font-size: 14px;
@@ -419,7 +419,7 @@
   align-items: center;
   gap: 10px;
   padding: 8px;
-  background: #0000000a;
+  background: var(--media-overlay);
 }
 .message-document-name {
   min-width: 0;
@@ -427,7 +427,7 @@
   gap: 3px;
 }
 .message-document-name small {
-  color: #54656f;
+  color: var(--phone-muted);
 }
 .message-attachment p {
   margin-top: 5px;
@@ -443,8 +443,8 @@
   gap: 6px;
   padding: 5px;
   overflow: hidden;
-  background: #e8f2ee;
-  color: #285e4e;
+  background: var(--media-tint);
+  color: var(--media-ink);
   text-align: center;
   font-size: 12px;
   font-weight: 650;
@@ -461,7 +461,7 @@
   letter-spacing: 0.04em;
 }
 .photo-gallery-grid button[aria-pressed='true'] .attachment-image-placeholder {
-  background: #cfe6da;
+  background: var(--media-selected);
 }
 .photo-review .attachment-image-placeholder {
   opacity: 0.65;
@@ -494,7 +494,7 @@
 .message-attachment-preview.location {
   display: block;
   width: 248px;
-  background: #00000008;
+  background: var(--media-overlay);
 }
 
 .message-location-name,
@@ -511,7 +511,7 @@
 .message-location-name small,
 .location-details-text small,
 .location-choice small {
-  color: #54656f;
+  color: var(--phone-muted);
 }
 
 .location-picker-content {
@@ -522,7 +522,7 @@
 .location-picker-content h3 {
   margin: 0;
   padding: 10px 14px 4px;
-  color: #54656f;
+  color: var(--phone-muted);
   font-size: 12px;
 }
 
@@ -534,14 +534,14 @@
   padding: 9px 14px;
   border: 0;
   border-radius: 0;
-  border-bottom: 1px solid #e9edef;
+  border-bottom: 1px solid var(--phone-line);
   background: transparent;
   text-align: start;
 }
 
 .location-choice > svg {
   flex-shrink: 0;
-  color: #008069;
+  color: var(--phone-action);
 }
 
 .location-choice > span {

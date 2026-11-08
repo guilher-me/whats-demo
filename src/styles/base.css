@@ -117,11 +117,9 @@ label select {
   position: relative;
   display: inline-block;
   padding: 4px 9px;
-  border: 2px solid #fff;
+  border: 2px solid var(--surface);
   border-radius: 5px 6px 7px 4px;
-  background:
-    linear-gradient(170deg, #ffffff24, transparent 55%),
-    linear-gradient(115deg, var(--brand-whats), var(--brand-demo));
+  background: linear-gradient(170deg, #ffffff24, transparent 55%), var(--brand-badge);
   color: #fff;
   font-size: 10px;
   font-weight: 650;
@@ -142,7 +140,7 @@ label select {
   width: 7px;
   height: 7px;
   border-radius: 3px 0 5px 0;
-  background: linear-gradient(135deg, #0b5849 42%, #b8e4d6 50%, #fff 100%);
+  background: linear-gradient(135deg, #0b5849 42%, #b8e4d6 50%, var(--surface) 100%);
   box-shadow: -1px -1px 2px #123f3b24;
 }
 .brand-meta {
@@ -177,7 +175,7 @@ label select {
   padding: 10px 12px;
   border-radius: 9px;
   background: var(--tooltip-bg);
-  color: var(--surface);
+  color: var(--tooltip-ink);
   line-height: 1.5;
   font-weight: 400;
   box-shadow: 0 4px 16px #0002;
@@ -243,15 +241,17 @@ label select {
 .share-button svg {
   flex-shrink: 0;
 }
+.header-theme,
 .language-switcher {
   position: relative;
   display: flex;
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
-  padding-inline-end: 18px;
-  margin-inline-end: 10px;
+  padding-inline-end: 12px;
+  margin-inline-end: 4px;
 }
+.header-theme::after,
 .language-switcher::after {
   content: '';
   position: absolute;
@@ -361,7 +361,7 @@ h3 {
 }
 .button--primary {
   background: var(--accent);
-  color: var(--surface);
+  color: var(--on-accent);
   border-color: var(--accent);
 }
 .button--primary:hover {
