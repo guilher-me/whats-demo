@@ -1,3 +1,5 @@
+import type { BusinessIcon } from './business-avatar';
+
 export type Value =
   string | number | boolean | null | Value[] | { [key: string]: Value | undefined } | undefined;
 export type Values = Record<string, Value>;
@@ -50,6 +52,8 @@ export interface FlowDefinition {
 export interface Contact {
   name: string;
   verified: boolean;
+  icon?: BusinessIcon;
+  iconBackground?: string;
 }
 export type ImageExtension = 'png' | 'jpg';
 export type DocumentExtension = 'pdf' | 'txt' | 'doc' | 'docx' | 'xls' | 'xlsx' | 'ppt' | 'pptx';
