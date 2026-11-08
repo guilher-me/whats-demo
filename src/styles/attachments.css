@@ -484,3 +484,78 @@
   aspect-ratio: 4 / 3;
   border-radius: 6px;
 }
+
+.mock-location-map {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.message-attachment-preview.location {
+  display: block;
+  width: 248px;
+  background: #00000008;
+}
+
+.message-location-name,
+.location-details-text {
+  display: grid;
+  gap: 2px;
+  overflow-wrap: anywhere;
+}
+
+.message-location-name {
+  padding: 7px 9px;
+}
+
+.message-location-name small,
+.location-details-text small,
+.location-choice small {
+  color: #54656f;
+}
+
+.location-picker-content {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.location-picker-content h3 {
+  margin: 0;
+  padding: 10px 14px 4px;
+  color: #54656f;
+  font-size: 12px;
+}
+
+.location-choice {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid #e9edef;
+  background: transparent;
+  text-align: start;
+}
+
+.location-choice > svg {
+  flex-shrink: 0;
+  color: #008069;
+}
+
+.location-choice > span {
+  display: grid;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.location-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.attachment-details .mock-location-map {
+  border-radius: 6px;
+}

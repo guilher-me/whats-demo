@@ -144,9 +144,10 @@ it.each(locales)(
     await start();
     fireEvent.click(screen.getByRole('button', { name: t('editor.expandStep', { v0: 2 }) }));
     const group = screen.getByRole('group', { name: t('editor.format') });
-    expect(within(group).getAllByRole('radio')).toHaveLength(8);
+    expect(within(group).getAllByRole('radio')).toHaveLength(9);
     expect(within(group).getByRole('radio', { name: t('attachments.image') })).toBeVisible();
     expect(within(group).getByRole('radio', { name: t('attachments.document') })).toBeVisible();
+    expect(within(group).getByRole('radio', { name: t('attachments.location') })).toBeVisible();
     expect(within(group).getByRole('radio', { name: t('commerce.product') })).toBeVisible();
     expect(within(group).getByRole('radio', { name: t('commerce.showcase') })).toBeVisible();
     expect(within(group).getByRole('radio', { name: t('commerce.pix') })).toBeVisible();

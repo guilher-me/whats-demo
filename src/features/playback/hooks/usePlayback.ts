@@ -211,19 +211,29 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
     });
     done();
   };
-  const sendAttachment = () => {
+  const deliverAttachment = (attachment: NonNullable<ChatMessage['attachment']>, caption = '') => {
     const done = waitingAttachment.current;
-    const session = media.current.current;
-    const selected = session?.selected;
-    if (!done || !selected || clock.current?.paused) return;
-    if (session.view !== 'preview' && !(session.view === 'items' && selected.kind === 'image'))
-      return;
+    if (!done || clock.current?.paused) return;
     waitingAttachment.current = null;
     flushSync(() => {
-      append(session.caption, 'user', { attachment: selected });
+      append(caption, 'user', { attachment });
       media.set(null);
     });
     done();
+  };
+  const sendAttachment = () => {
+    const session = media.current.current;
+    const selected = session?.selected;
+    if (!selected) return;
+    if (session.view !== 'preview' && !(session.view === 'items' && selected.kind === 'image'))
+      return;
+    deliverAttachment(selected, session.caption);
+  };
+  const sendLocation = (id: string) => {
+    const session = media.current.current;
+    if (session?.kind !== 'location' || session.view !== 'items') return;
+    const location = session.items.find((item) => item.id === id && item.kind === 'location');
+    if (location) deliverAttachment(location);
   };
   const openFlow = (step: FlowStep) => {
     setFlowError('');
@@ -444,6 +454,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
             flushSync(() =>
               media.set({
                 kind: item.kind,
+                configuredId: item.id,
                 items: attachments.filter((attachment) => attachment.kind === item.kind),
                 view: 'closed',
                 caption: '',
@@ -460,17 +471,21 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
               const tile = Array.from(
                 phone.current?.querySelectorAll<HTMLElement>('[data-attachment-item]') ?? [],
               ).find((tile) => tile.dataset.attachmentItem === item.id);
-              await cursor.touch(tile ?? null, signal, () =>
-                flushSync(() => media.select(item.id)),
-              );
-              if (step.media.caption)
-                await cursor.type(
-                  target('[data-attachment-caption]'),
-                  step.media.caption,
-                  signal,
-                  media.caption,
+              if (item.kind === 'location') {
+                await cursor.touch(tile ?? null, signal, () => sendLocation(item.id));
+              } else {
+                await cursor.touch(tile ?? null, signal, () =>
+                  flushSync(() => media.select(item.id)),
                 );
-              await cursor.touch(target('[data-send-attachment]'), signal, sendAttachment);
+                if (step.media.caption)
+                  await cursor.type(
+                    target('[data-attachment-caption]'),
+                    step.media.caption,
+                    signal,
+                    media.caption,
+                  );
+                await cursor.touch(target('[data-send-attachment]'), signal, sendAttachment);
+              }
             } else {
               setStatus('attachments.wait');
               phone.current?.querySelector<HTMLButtonElement>('[data-attach]')?.focus();
@@ -662,6 +677,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
     media,
     commerce,
     sendAttachment,
+    sendLocation,
     running,
     paused,
     pause,

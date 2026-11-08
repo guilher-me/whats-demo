@@ -2,7 +2,7 @@ import { t } from '../../i18n';
 import { clone, normalizeProject } from '../../core/project';
 import { createShareURL, type ShareMode } from '../../core/codec';
 import { reviewJourney, type JourneyDiagnostic } from '../flows/diagnostics';
-import type { ChatMessage, Project } from '../../core/types';
+import type { ChatMessage, LocationPlace, Project } from '../../core/types';
 
 export interface AutomationState {
   ready: boolean;
@@ -11,7 +11,10 @@ export interface AutomationState {
   activeStep: string | null;
   flowScreen: string | null;
   pendingMessageId: string | null;
-  messages: (Omit<ChatMessage, 'attachment'> & { attachmentId?: string })[];
+  messages: (Omit<ChatMessage, 'attachment'> & {
+    attachmentId?: string;
+    location?: LocationPlace;
+  })[];
 }
 export interface AutomationBindings {
   project: () => Project;
