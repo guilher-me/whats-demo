@@ -4,7 +4,11 @@
 
 ## Start a journey
 
-Open the editor to start with an empty conversation or recover a draft saved in this browser. Open a shared link to work with a specific journey. In an editable copy, **Restore from link** replaces local edits in that copy with the journey encoded in its link.
+Select **＋ New journey** in the workspace toolbar to start with an empty contact, catalog and conversation. The editor focuses the contact name. Name the journey using **Journey title**, which is separate from the contact name shown in the phone.
+
+Open **My journeys** to switch between titles saved in this browser. The list shows the most recently edited journeys first and marks the current one. Each item has controls to copy its preview link, rename it, or delete it from this browser. Deleting the current journey opens the most recently edited remaining journey or a blank editor. Changes save automatically, including incomplete journeys and pending JSON drafts, without an account. If saving fails, the edits remain available in the open tab.
+
+Open a shared link to try a specific journey. Editing it saves a separate local copy. **Restore from link** resets that copy to the original shared snapshot.
 
 ## Build the conversation
 
@@ -12,13 +16,13 @@ The workspace opens with **Code**, **Editor** and **Preview**. Drag a divider to
 
 **Code** shows the entire journey as JSON. Paste or edit a draft there, use **Validate** to check it, and select **Apply** to update the editor and phone. **Copy JSON** copies the text on screen. If the visual editor changes while a code draft is pending, reload the current project before applying. The diagnostics distinguish Flow JSON rules, simulator support and missing automatic answers. Missing automatic answers leave manual playback available.
 
-1. Set the **contact name** and choose whether to display the **verified account badge**.
+1. Set the **contact name** and choose whether to display the **verified account badge**. Open the pencil on the avatar to choose a **Business icon** and preset colors or the visual color picker for the background and icon. **Automatic contrast** chooses the icon color based on the background. Select **Apply** to update the contact avatar.
 2. Add a **Customer**, **Business** or **Flow** step from the fixed bar at the bottom of the editor. New steps go at the end and receive focus.
 3. Expand a step to edit it. Select a step or focus one of its fields to see the message update in the phone.
 4. Open **Behavior** to set the delay and, for business replies, the typing indicator.
 5. Reorder steps with the drag handle or keyboard. Use the step action menu to duplicate, move or remove a step.
 
-The header status describes saving for the **entire project**, including contact details and the conversation. Hover or focus it for details. Changes are stored in the current browser, not in an online account. Clearing browser storage removes that local draft.
+The header status describes saving for the **entire project**, including contact details and the conversation. Hover or focus it for details. Clearing the site’s browser storage removes the local library.
 
 ## Messages, buttons and lists
 
@@ -41,6 +45,10 @@ Message bodies support `*bold*`, `_italic_` and `~strikethrough~`, including com
 Set a Customer or Business message to **Image** or **Document**. Choose a file extension directly in the step. Images offer .png and .jpg, with optional short text on the preview and a separate message caption. For a document, enter the name, a positive size and its unit. The editor adds the selected extension to the name and enforces the WhatsApp Business document limit of 100 MB (100,000 KB). [WhatsApp Business media limits](https://docs.aws.amazon.com/social-messaging/latest/userguide/supported-media-types.html)
 
 The gallery and document picker show matching simulated files from the conversation. In manual playback, use the paperclip to choose an item and send it. Automatic playback selects the item configured on the step.
+
+## Set up a product showcase
+
+In a **Product showcase** message, open **Automatic cart** to choose product quantities for automatic playback. If the showcase has no linked cart, select **Add Send cart step** to create one immediately after the showcase. The quantities are saved on the linked **Send cart** step. In manual playback, the customer chooses the products and quantities on the phone.
 
 ## Add a WhatsApp Flow
 
@@ -76,7 +84,9 @@ The composer is disabled during automatic playback. Use the pause button to susp
 
 ## Share a demo
 
-Select **Copy link** to copy the link in the current interface language. The link opens a browser-local copy with only **Preview** expanded. Recipients can play the journey immediately or expand **Code** and **Editor** to edit their copy.
+The address of the editing tab updates shortly after a valid change. Pending invalid edits leave the last shareable snapshot in the address. Reload the same tab to resume the newer local draft, including pending JSON.
+
+Select **Copy link** to copy the current applied journey in the interface language. Recipients open it with only **Preview** expanded and can expand **Code** and **Editor** to edit. Each copied link keeps the snapshot it carried at the time of copying. Journey titles stay in the local library.
 
 An AI tool with browser access can build the journey in the editor and copy the result. See [the AI guide](ai-guide.md).
 
@@ -88,7 +98,7 @@ Invalid or truncated links open a recovery screen with a shortcut to the local e
 
 Select **Record phone**, choose manual or automatic playback, and wait for the three-second countdown. In manual mode, stop the recording yourself. In automatic mode, recording finishes two seconds after the last message.
 
-The download is MP4 where supported, otherwise WebM. Recording captures only the phone, without audio, at 720 × 1440; the editor and controls stay out of the video. Keep the tab visible while recording. Rendering happens locally. See the [recording reference](recording.md) for implementation details and limitations (currently in Brazilian Portuguese).
+The standard download is MP4 where supported, otherwise WebM. To show the slide behind the phone’s rounded corners, choose **Transparent corners (WebM)** before recording. The presentation app must preserve WebM transparency. Recording captures only the phone, without audio, at 720 × 1440; the editor and controls stay out of the video. Keep the tab visible while recording. Rendering happens locally. See the [recording reference](recording.md) for implementation details and limitations (currently in Brazilian Portuguese).
 
 The recording in the project README is an MP4 demonstration supplied by the maintainer. The app's recording feature exports video, not GIF.
 

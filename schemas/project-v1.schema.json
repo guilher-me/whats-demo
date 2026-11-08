@@ -22,14 +22,46 @@
             "industry",
             "mobility",
             "travel",
-            "services"
+            "services",
+            "shirt",
+            "utensils",
+            "coffee",
+            "shopping-cart",
+            "gift",
+            "basket",
+            "lightbulb",
+            "sofa",
+            "plant",
+            "house",
+            "key",
+            "hammer",
+            "tooth",
+            "stethoscope",
+            "pill",
+            "heart",
+            "dog",
+            "paw",
+            "car",
+            "bicycle",
+            "boat",
+            "bus",
+            "hotel",
+            "music",
+            "camera",
+            "headphones",
+            "book",
+            "gamepad",
+            "laptop",
+            "smartphone",
+            "scissors",
+            "paintbrush"
           ]
         },
         "iconBackground": {
-          "type": "string",
-          "pattern": "^#[0-9A-Fa-f]{6}$",
-          "minLength": 7,
-          "maxLength": 7
+          "$ref": "#/$defs/avatarColor"
+        },
+        "iconForeground": {
+          "$ref": "#/$defs/avatarColor"
         }
       }
     },
@@ -47,6 +79,12 @@
     }
   },
   "$defs": {
+    "avatarColor": {
+      "type": "string",
+      "pattern": "^#[0-9A-Fa-f]{6}$",
+      "minLength": 7,
+      "maxLength": 7
+    },
     "id": { "type": "string", "minLength": 1 },
     "media": {
       "oneOf": [{ "$ref": "#/$defs/fileMedia" }, { "$ref": "#/$defs/locationMedia" }]
