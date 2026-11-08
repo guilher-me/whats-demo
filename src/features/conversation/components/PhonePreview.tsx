@@ -115,6 +115,7 @@ export function PhonePreview({
       ) : (
         <MessageComposer
           value={attach ? '' : p.draft}
+          followText={p.automatic}
           onChange={p.setDraft}
           onSend={onSend ?? p.send}
           disabled={!!attach || !!commerce || composerDisabled || p.automatic || p.paused}
