@@ -36,7 +36,11 @@ export function FlowFooter({
         {label}
       </Button>
       <small>
-        <BusinessAvatar icon={contact.icon} iconBackground={contact.iconBackground} />
+        <BusinessAvatar
+          icon={contact.icon}
+          iconBackground={contact.iconBackground}
+          iconForeground={contact.iconForeground}
+        />
         <span>
           {t('flow.managed', { v0: contact.name.trim() || t('common.contact') })}{' '}
           <span className="flow-learn-more">{t('flow.learnMore')}</span>

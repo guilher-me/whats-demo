@@ -147,15 +147,28 @@
   color: var(--muted);
   font-size: 11px;
 }
+.contact-color-picker + .contact-color-picker {
+  margin-top: 12px;
+}
+.contact-color-auto {
+  padding: 4px 7px;
+  margin-bottom: 4px;
+  border: 1px solid var(--line);
+  font-size: 11px;
+}
+.contact-color-auto[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
 .contact-color-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 2px;
   margin-bottom: 8px;
 }
 .contact-color-option {
   display: grid;
-  width: 40px;
   height: 36px;
   place-items: center;
   border: 1px solid transparent;
@@ -164,18 +177,47 @@
 .contact-color-option > span {
   width: 22px;
   height: 22px;
-  border: 1px solid #0002;
+  border: 1px solid var(--line);
   border-radius: 50%;
 }
 .contact-color-option:has(input:checked) {
   border-color: var(--accent);
 }
-.contact-avatar-settings .field {
-  margin: 0;
+.contact-custom-color {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  cursor: pointer;
 }
-.contact-avatar-settings .field-error {
-  margin-bottom: 0;
-  color: var(--danger);
+.contact-custom-color:hover {
+  border-color: var(--accent);
+}
+.contact-custom-color:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.contact-custom-color-swatch {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+.contact-custom-color input[type='color'] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
 }
 .contact-avatar-reset {
   margin-top: 7px;

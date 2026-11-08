@@ -21,9 +21,17 @@ describe('business avatar configuration', () => {
     expect(normalized.contact.icon ?? 'commerce').toBe(icon);
   });
 
-  it('round-trips the chosen icon and canonical HEX through an editable preview link', async () => {
+  it('round-trips the chosen icon and both canonical HEX colors through an editable preview link', async () => {
     const url = await createShareURL(
-      { ...project, contact: { ...project.contact, icon: 'tooth', iconBackground: '#f0f5aa' } },
+      {
+        ...project,
+        contact: {
+          ...project.contact,
+          icon: 'tooth',
+          iconBackground: '#f0f5aa',
+          iconForeground: '#123abc',
+        },
+      },
       'editor',
       'https://example.test/',
       'pt-BR',
@@ -35,6 +43,7 @@ describe('business avatar configuration', () => {
       ...project.contact,
       icon: 'tooth',
       iconBackground: '#F0F5AA',
+      iconForeground: '#123ABC',
     });
   });
 
@@ -50,10 +59,12 @@ describe('business avatar configuration', () => {
     expect(() =>
       normalizeProject({ ...project, contact: { ...project.contact, icon: 'constructor' } }),
     ).toThrow('contact.icon');
-    for (const iconBackground of ['red', '#FFF', '#12345678', '123456', '#123456\n']) {
-      expect(() =>
-        normalizeProject({ ...project, contact: { ...project.contact, iconBackground } }),
-      ).toThrow('contact.iconBackground');
+    for (const color of ['red', '#FFF', '#12345678', '123456', '#123456\n']) {
+      for (const field of ['iconBackground', 'iconForeground']) {
+        expect(() =>
+          normalizeProject({ ...project, contact: { ...project.contact, [field]: color } }),
+        ).toThrow('contact.' + field);
+      }
     }
   });
 

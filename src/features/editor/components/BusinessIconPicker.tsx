@@ -1,31 +1,85 @@
 import { useId, useState } from 'react';
 import { Button } from '../../../components/ui/Button';
 import { BusinessAvatar } from '../../../components/ui/BusinessAvatar';
-import { FieldError, TextField } from '../../../components/ui/Field';
 import {
   BUSINESS_ICON_GROUPS,
   DEFAULT_BUSINESS_ICON,
   DEFAULT_ICON_BACKGROUND,
-  isIconBackground,
-  type BusinessIcon,
+  iconForeground,
 } from '../../../core/business-avatar';
 import type { Contact } from '../../../core/types';
 import { useT } from '../../../i18n';
 
 const palette = [
   ['green', DEFAULT_ICON_BACKGROUND],
-  ['blue', '#1D4ED8'],
-  ['teal', '#0F766E'],
-  ['purple', '#6D28D9'],
-  ['red', '#B91C1C'],
-  ['amber', '#B45309'],
-  ['slate', '#334155'],
-  ['light', '#F1F5F9'],
+  ['blue', '#2196F3'],
+  ['pink', '#EC4899'],
+  ['yellow', '#FACC15'],
+  ['white', '#FFFFFF'],
+  ['darkGreen', '#14532D'],
+  ['darkBlue', '#1E3A8A'],
+  ['red', '#DC2626'],
+  ['orange', '#F97316'],
+  ['black', '#000000'],
 ] as const;
 
-function readHex(input: string): string | undefined {
-  const hex = '#' + input.trim().replace(/^#/, '');
-  return isIconBackground(hex) ? hex.toUpperCase() : undefined;
+function AvatarColorPicker({
+  label,
+  value,
+  onChange,
+  automatic,
+}: {
+  label: string;
+  value?: string;
+  onChange: (value: string) => void;
+  automatic?: { color: string; onSelect: () => void };
+}) {
+  const t = useT();
+  const id = useId();
+  const currentColor = value ?? automatic?.color ?? DEFAULT_ICON_BACKGROUND;
+  return (
+    <fieldset className="contact-avatar-picker contact-color-picker">
+      <legend>{label}</legend>
+      {automatic && (
+        <Button
+          variant="ghost"
+          className="contact-color-auto"
+          aria-pressed={!value}
+          onClick={automatic.onSelect}
+        >
+          {t('contact.autoColor')}
+        </Button>
+      )}
+      <div className="contact-color-grid">
+        {palette.map(([name, color]) => (
+          <label className="contact-color-option" key={name} title={t(`contact.color.${name}`)}>
+            <input
+              type="radio"
+              className="visually-hidden"
+              name={id}
+              aria-label={t(`contact.color.${name}`)}
+              checked={value === color}
+              onChange={() => onChange(color)}
+            />
+            <span aria-hidden="true" style={{ backgroundColor: color }} />
+          </label>
+        ))}
+      </div>
+      <label className="contact-custom-color">
+        <span
+          aria-hidden="true"
+          className="contact-custom-color-swatch"
+          style={{ backgroundColor: currentColor }}
+        />
+        {t('contact.customColor')}
+        <input
+          type="color"
+          value={currentColor.toLowerCase()}
+          onChange={(event) => onChange(event.currentTarget.value.toUpperCase())}
+        />
+      </label>
+    </fieldset>
+  );
 }
 
 export function BusinessIconPicker({
@@ -34,26 +88,27 @@ export function BusinessIconPicker({
   onCancel,
 }: {
   contact: Contact;
-  onApply: (icon: BusinessIcon, background: string) => void;
+  onApply: (avatar: Pick<Contact, 'icon' | 'iconBackground' | 'iconForeground'>) => void;
   onCancel: () => void;
 }) {
   const t = useT();
   const id = useId();
   const [icon, setIcon] = useState(contact.icon ?? DEFAULT_BUSINESS_ICON);
   const [background, setBackground] = useState(contact.iconBackground ?? DEFAULT_ICON_BACKGROUND);
-  const [hexText, setHexText] = useState(background);
-  const invalid = !readHex(hexText);
-  const selectColor = (color: string) => {
-    setBackground(color);
-    setHexText(color);
-  };
+  const [foreground, setForeground] = useState(contact.iconForeground);
+  const automaticColor = iconForeground(background) === '#fff' ? '#FFFFFF' : '#000000';
+  const colors = { iconBackground: background, iconForeground: foreground };
 
   return (
     <form
       className="business-avatar-form"
       onSubmit={(event) => {
         event.preventDefault();
-        if (!invalid) onApply(icon, background);
+        onApply({
+          icon: icon === DEFAULT_BUSINESS_ICON ? undefined : icon,
+          iconBackground: background === DEFAULT_ICON_BACKGROUND ? undefined : background,
+          iconForeground: foreground,
+        });
       }}
     >
       <div className="business-avatar-body">
@@ -72,7 +127,7 @@ export function BusinessIconPicker({
                       checked={icon === choice}
                       onChange={() => setIcon(choice)}
                     />
-                    <BusinessAvatar icon={choice} iconBackground={background} />
+                    <BusinessAvatar icon={choice} {...colors} />
                     <span>{t(`contact.icon.${choice}`)}</span>
                   </label>
                 ))}
@@ -82,7 +137,7 @@ export function BusinessIconPicker({
         </fieldset>
         <div className="contact-avatar-settings">
           <div className="contact-avatar-preview">
-            <BusinessAvatar icon={icon} iconBackground={background} />
+            <BusinessAvatar icon={icon} {...colors} />
             <div>
               <strong>{t(`contact.icon.${icon}`)}</strong>
               <span>
@@ -90,52 +145,24 @@ export function BusinessIconPicker({
               </span>
             </div>
           </div>
-          <fieldset className="contact-avatar-picker">
-            <legend>{t('contact.background')}</legend>
-            <div className="contact-color-grid">
-              {palette.map(([name, color]) => (
-                <label
-                  className="contact-color-option"
-                  key={name}
-                  title={t(`contact.color.${name}`)}
-                >
-                  <input
-                    type="radio"
-                    className="visually-hidden"
-                    name={id + '-color'}
-                    aria-label={t(`contact.color.${name}`)}
-                    checked={!invalid && background === color}
-                    onChange={() => selectColor(color)}
-                  />
-                  <span aria-hidden="true" style={{ backgroundColor: color }} />
-                </label>
-              ))}
-            </div>
-          </fieldset>
-          <TextField
-            label={t('contact.hex')}
-            value={hexText}
-            spellCheck={false}
-            autoComplete="off"
-            aria-invalid={invalid || undefined}
-            aria-describedby={invalid ? id + '-error' : undefined}
-            onChange={(event) => {
-              const value = event.currentTarget.value;
-              setHexText(value);
-              const parsed = readHex(value);
-              if (parsed) setBackground(parsed);
-            }}
-            onBlur={() => {
-              if (!invalid) setHexText(background);
-            }}
+          <AvatarColorPicker
+            label={t('contact.background')}
+            value={background}
+            onChange={setBackground}
           />
-          <FieldError id={id + '-error'}>{invalid && t('contact.invalidHex')}</FieldError>
+          <AvatarColorPicker
+            label={t('contact.foreground')}
+            value={foreground}
+            onChange={setForeground}
+            automatic={{ color: automaticColor, onSelect: () => setForeground(undefined) }}
+          />
           <Button
             variant="ghost"
             className="contact-avatar-reset"
             onClick={() => {
               setIcon(DEFAULT_BUSINESS_ICON);
-              selectColor(DEFAULT_ICON_BACKGROUND);
+              setBackground(DEFAULT_ICON_BACKGROUND);
+              setForeground(undefined);
             }}
           >
             {t('contact.resetAvatar')}
@@ -144,7 +171,7 @@ export function BusinessIconPicker({
       </div>
       <div className="dialog-actions">
         <Button onClick={onCancel}>{t('common.cancel')}</Button>
-        <Button type="submit" variant="primary" disabled={invalid}>
+        <Button type="submit" variant="primary">
           {t('code.apply')}
         </Button>
       </div>

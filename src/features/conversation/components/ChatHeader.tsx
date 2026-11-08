@@ -7,7 +7,11 @@ export function ChatHeader({ contact }: { contact: Contact }) {
 
   return (
     <header className="chat-header">
-      <BusinessAvatar icon={contact.icon} iconBackground={contact.iconBackground} />
+      <BusinessAvatar
+        icon={contact.icon}
+        iconBackground={contact.iconBackground}
+        iconForeground={contact.iconForeground}
+      />
       <div>
         <strong title={contact.name}>{contact.name.trim() || t('common.contact')}</strong>
         {contact.verified && (
