@@ -14,6 +14,8 @@ import {
 } from '../../journeys/storage';
 import { setJourneyAddress } from '../../journeys/live-link';
 
+const SAVE_INDICATOR_PAUSE_MS = 700;
+
 export type SaveState = 'empty' | 'recovered' | 'saving' | 'saved' | 'failed' | 'shared';
 export interface SharedCopy {
   project: Project;
@@ -73,6 +75,7 @@ export function useProject(copy?: SharedCopy, localId?: string) {
   const [error, setError] = useState('');
   const pending = useRef(new Map<string, symbol>());
   const outcomes = useRef(new Map<string, SaveState>());
+  const savedTimer = useRef<number | undefined>(undefined);
 
   function initialize(library: Library) {
     const base = projectStorageKey(location);
@@ -117,12 +120,25 @@ export function useProject(copy?: SharedCopy, localId?: string) {
     (next: Journey, mode: WriteMode = 'save') => {
       const operation = Symbol();
       pending.current.set(next.id, operation);
-      if (current.current.id === next.id) setSaveState('saving');
+      const showSavedAt =
+        Date.now() + (mode === 'save' || mode === 'rename' ? SAVE_INDICATOR_PAUSE_MS : 0);
+      if (current.current.id === next.id) {
+        window.clearTimeout(savedTimer.current);
+        setSaveState('saving');
+      }
       const finish = (status: SaveState) => {
         if (pending.current.get(next.id) !== operation) return;
         pending.current.delete(next.id);
         outcomes.current.set(next.id, status);
-        if (current.current.id === next.id) setSaveState(status);
+        if (current.current.id !== next.id) return;
+
+        const remaining = showSavedAt - Date.now();
+        if (status === 'saved' && remaining > 0) {
+          // Writes are immediate. Hold the visual confirmation across a burst of edits.
+          savedTimer.current = window.setTimeout(() => setSaveState(status), remaining);
+        } else {
+          setSaveState(status);
+        }
       };
       try {
         const write = storage.write(next, mode);
@@ -181,6 +197,8 @@ export function useProject(copy?: SharedCopy, localId?: string) {
     }
     return () => {
       active = false;
+      pending.current.clear();
+      window.clearTimeout(savedTimer.current);
     };
   }, [storage]);
 
@@ -248,6 +266,7 @@ export function useProject(copy?: SharedCopy, localId?: string) {
   };
 
   const activate = (next: Journey, local: boolean) => {
+    window.clearTimeout(savedTimer.current);
     setLive(local);
     current.current = next;
     setJourney(next);

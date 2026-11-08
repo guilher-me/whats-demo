@@ -16,6 +16,7 @@ afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+  vi.useRealTimers();
 });
 async function start() {
   render(<App />);
@@ -52,15 +53,20 @@ it('does not claim the untouched empty editor is saved and separates sharing fro
   expect(document.querySelector('.editor .save-indicator')).toBeNull();
   expect(screen.getByRole('button', { name: 'Copiar link' })).toBeInTheDocument();
 });
-it('shows success only after writing and restores the saved draft on reopening', async () => {
-  const project = createLumaProject();
-
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
+it('writes immediately, then shows success after the last edit settles', async () => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(createLumaProject()));
   await start();
-  fireEvent.change(screen.getByLabelText('Nome do contato'), {
-    target: { value: 'Contato de teste' },
-  });
+  vi.useFakeTimers();
+  const input = screen.getByLabelText('Nome do contato');
+  fireEvent.change(input, { target: { value: 'Contato' } });
+  expect(savedJourney()?.project.contact.name).toBe('Contato');
+  expect(indicator()).toHaveAttribute('data-state', 'saving');
+  await act(() => vi.advanceTimersByTimeAsync(450));
+  fireEvent.change(input, { target: { value: 'Contato de teste' } });
   expect(savedJourney()?.project.contact.name).toBe('Contato de teste');
+  await act(() => vi.advanceTimersByTimeAsync(699));
+  expect(indicator()).toHaveAttribute('data-state', 'saving');
+  await act(() => vi.advanceTimersByTimeAsync(1));
   expect(indicator()).toHaveAttribute('data-state', 'saved');
   expect(indicator()).toHaveTextContent('Todas as alterações salvas');
   cleanup();
@@ -76,6 +82,7 @@ it('shows success only after writing and restores the saved draft on reopening',
 });
 it('reports a failed write visibly, keeps the edits, and clears the warning after a successful save', async () => {
   await start();
+  vi.useFakeTimers();
   const save = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
     throw new Error('quota');
   });
@@ -87,6 +94,8 @@ it('reports a failed write visibly, keeps the edits, and clears the warning afte
   expect(screen.getByLabelText('Nome do contato')).toHaveValue('Alteração preservada');
   save.mockRestore();
   fireEvent.change(screen.getByLabelText('Nome do contato'), { target: { value: 'Agora salvo' } });
+  expect(indicator()).toHaveAttribute('data-state', 'saving');
+  await act(() => vi.advanceTimersByTimeAsync(700));
   expect(indicator()).toHaveAttribute('data-state', 'saved');
   expect(screen.queryByRole('alert')).toBeNull();
 });
@@ -108,8 +117,11 @@ it('opens a shared copy separately, saves its edits and keeps the original snaps
   const name = await screen.findByLabelText('Nome do contato');
   expect(name).toHaveValue('Jornada compartilhada');
   expect(indicator()).toHaveAttribute('data-state', 'shared');
+  vi.useFakeTimers();
   fireEvent.change(name, { target: { value: 'Cópia editada' } });
+  await act(() => vi.advanceTimersByTimeAsync(700));
   expect(indicator()).toHaveAttribute('data-state', 'saved');
+  vi.useRealTimers();
   expect(localStorage.getItem(STORAGE_KEY)).toBe(JSON.stringify(draft));
 
   cleanup();

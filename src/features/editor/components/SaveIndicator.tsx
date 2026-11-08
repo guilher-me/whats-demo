@@ -18,6 +18,14 @@ const help: Record<SaveState, MessageKey> = {
   failed: 'storage.failureHelp',
   shared: 'storage.sharedHelp',
 };
+const marks: Record<SaveState, string> = {
+  empty: '○',
+  recovered: '✓',
+  saving: '',
+  saved: '✓',
+  failed: '!',
+  shared: '○',
+};
 /** Project-wide persistence status beneath the app name; sharing remains a separate action. */
 export function SaveIndicator({ state }: { state: SaveState }) {
   const t = useT();
@@ -49,9 +57,9 @@ export function SaveIndicator({ state }: { state: SaveState }) {
         }
       }}
     >
-      <span role="status" aria-live="polite">
-        <span aria-hidden="true">
-          {state === 'saved' || state === 'recovered' ? '✓' : state === 'failed' ? '!' : '○'}{' '}
+      <span className="save-indicator-status" role="status" aria-live="polite">
+        <span className="save-indicator-mark" aria-hidden="true">
+          {marks[state]}
         </span>
         {t(labels[state])}
       </span>
