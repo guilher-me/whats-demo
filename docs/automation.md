@@ -252,3 +252,54 @@ O campo `text` das etapas aceita `*negrito*`, `_itálico_` e `~tachado~`, inclus
 ## Typed message buttons
 
 For `interactive.kind: "buttons"`, set optional `context` to `"interactive"` (default) or `"template"`. Each button has `id`, `title` and optional `type`: `"quick_reply"` (default), `"url"` with `url`, `"phone_number"` with `phoneNumber`, `"copy_code"` with `code`, or `"voice_call"` with optional integer `ttlMinutes`. See [message rules](messages.md#button-types-and-contexts) before combining types. In mixed templates, `autoReplyId` must target a quick reply; action-only messages may target an action. Action buttons open a phone-contained simulation, not an external site/call/clipboard operation. UI selects are labeled `Message context` and `Button type`; URL, phone, code and TTL fields appear for the chosen type. More than three template buttons use `See all options`.
+
+## Simulated commerce
+
+Add a top-level `catalog` array with up to 200 products. Each product has a unique `sku`, a `name`, a `description` and a positive integer `priceCents` in BRL. Product images are generated from the name. Each commerce step uses `commerce` in place of `interactive`, `media` and `voiceDurationSeconds`.
+
+- A business step uses `{ "kind": "product", "sku": "TV-01" }` for a single product or `{ "kind": "showcase", "sections": [{ "title": "Electronics", "skus": ["TV-01"] }] }` for a grouped offer. A showcase supports up to 10 sections and 30 distinct products.
+- A user step uses `{ "kind": "cart", "offerId": "offer" }` to wait for the customer to send a cart from a preceding offer. Set `autoItems` to an array of `{ "sku": "TV-01", "quantity": 2 }` records to configure the automatic cart. Omit the array to select one unit of the first product. Quantities range from 1 to 99.
+- A business step uses `{ "kind": "pix", "amount": { "cartId": "cart" } }` for a simulated Pix charge based on a preceding cart. Use `{ "cents": 249900 }` as the amount for a standalone fixed charge. The phone simulates copying the key and briefly shows **Pix key copied**. The journey advances on that tap while the payment stays pending.
+- In `getState().messages`, inspect `commerce.kind === "order"` for the actual order lines and `commerce.kind === "pix"` for the resulting charge in cents. Shared links carry the authored catalog and automatic choices. Each playback starts with an empty cart.
+
+```json
+{
+  "version": 1,
+  "contact": { "name": "Demo store", "verified": false },
+  "catalog": [
+    { "sku": "TV-01", "name": "Smart TV", "description": "55-inch display", "priceCents": 249900 },
+    { "sku": "SND-01", "name": "Soundbar", "description": "Compact soundbar", "priceCents": 54900 },
+    { "sku": "CBL-01", "name": "HDMI cable", "description": "Two meters", "priceCents": 3990 }
+  ],
+  "steps": [
+    {
+      "id": "offer",
+      "type": "business",
+      "text": "What would you like to order?",
+      "delay": 1,
+      "commerce": {
+        "kind": "showcase",
+        "sections": [{ "title": "Electronics", "skus": ["TV-01", "SND-01", "CBL-01"] }]
+      }
+    },
+    {
+      "id": "cart",
+      "type": "user",
+      "text": "",
+      "delay": 0.4,
+      "commerce": {
+        "kind": "cart",
+        "offerId": "offer",
+        "autoItems": [{ "sku": "CBL-01", "quantity": 2 }]
+      }
+    },
+    {
+      "id": "payment",
+      "type": "business",
+      "text": "Here is your simulated Pix charge.",
+      "delay": 1,
+      "commerce": { "kind": "pix", "amount": { "cartId": "cart" } }
+    }
+  ]
+}
+```

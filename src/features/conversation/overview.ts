@@ -1,3 +1,4 @@
+import { commercePreview } from '../../core/commerce';
 import { resolve, resolveOptions } from '../../core/engine';
 import { automaticOption, isReplyButton } from '../../core/message-buttons';
 import type {
@@ -72,8 +73,14 @@ export function conversationOverviewMessages(project: Project): ChatMessage[] {
     const message: ChatMessage = {
       id: `overview:${index}:message`,
       direction: step.type === 'user' ? 'user' : 'business',
-      text: step.type !== 'flow' && step.media ? (step.media.caption ?? '') : step.text,
+      text:
+        step.type === 'user' && step.commerce
+          ? ''
+          : step.type !== 'flow' && step.media
+            ? (step.media.caption ?? '')
+            : step.text,
       attachment: stepAttachment(step),
+      commerce: commercePreview(project, index),
       time: '12:00',
       ...(step.type === 'user' && step.voiceDurationSeconds !== undefined
         ? { voiceDurationMs: step.voiceDurationSeconds * 1000 }

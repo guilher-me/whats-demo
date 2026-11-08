@@ -9,6 +9,9 @@ import { Button } from '../../../components/ui/Button';
 import { FieldError } from '../../../components/ui/Field';
 import type { StepAction } from './StepActions';
 import type { SaveState } from '../hooks/useProject';
+import { CatalogEditor } from '../../commerce/CommerceEditor';
+import { catalogError, commerceStepError } from '../../../core/commerce';
+import type { Product } from '../../../core/types';
 import { SortableSteps } from './SortableSteps';
 interface Props {
   saveState: SaveState;
@@ -19,6 +22,7 @@ interface Props {
   disabled?: boolean;
   onSelect: (id: string | null) => void;
   error: string;
+  onCatalog: (catalog: Product[]) => void;
   onContact: (contact: Contact) => void;
   onChange: (id: string, change: Partial<Step>) => void;
   onReorder: (steps: Step[]) => void;
@@ -60,6 +64,12 @@ export function EditorPanel(props: Props) {
           contact={props.project.contact}
           onChange={props.onContact}
         />
+        <CatalogEditor
+          key={`catalog:${props.revision}`}
+          project={props.project}
+          onChange={props.onCatalog}
+          error={catalogError(props.project.catalog, false)}
+        />
         <div className="timeline-heading">
           <div className="sequence-title">
             <h3>{t('editor.sequence')}</h3>
@@ -71,6 +81,8 @@ export function EditorPanel(props: Props) {
             <StepCard
               key={`${props.revision}:${step.id}`}
               step={step}
+              project={props.project}
+              commerceError={commerceStepError(props.project, index)}
               index={index}
               total={props.project.steps.length}
               active={props.activeStep === step.id}

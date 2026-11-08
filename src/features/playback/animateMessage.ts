@@ -16,6 +16,7 @@ export async function animateMessage({
   reply,
   select,
   confirm,
+  isPending,
 }: {
   id: string;
   message: BusinessInteractive;
@@ -27,6 +28,7 @@ export async function animateMessage({
   reply: (messageId: string, optionId: string) => void;
   select: (id: string) => void;
   confirm: () => void;
+  isPending: (id: string) => boolean;
 }) {
   const option = automaticOption(message);
   if (!option) throw new Error(t('errors.missingOption'));
@@ -44,6 +46,7 @@ export async function animateMessage({
     if (!findTarget()) {
       const expand = bubble?.querySelector<HTMLElement>('[data-open-buttons]') ?? null;
       await touch(expand, signal, () => expand?.click());
+      if (!isPending(id)) return;
     }
     const target = findTarget();
     if (isReplyButton(option))
@@ -54,29 +57,31 @@ export async function animateMessage({
       });
     else {
       await touch(target, signal, () => target?.click());
+      if (!isPending(id)) return;
       const confirmAction =
         phone.current?.querySelector<HTMLElement>('[data-confirm-button-action]') ?? null;
       await touch(confirmAction, signal, () => confirmAction?.click());
     }
   } else {
-    await touch(bubble?.querySelector<HTMLElement>('[data-open-list]') ?? null, signal, () =>
-      open(id),
-    );
+    const confirmButton = () =>
+      phone.current?.querySelector<HTMLElement>('[data-confirm-list]') ?? null;
+    if (!confirmButton())
+      await touch(bubble?.querySelector<HTMLElement>('[data-open-list]') ?? null, signal, () => {
+        if (!confirmButton()) open(id);
+      });
+    if (!isPending(id)) return;
     await read(
       messageOptions(message)
         .map((option) => `${option.title} ${option.description ?? ''}`)
         .join(' '),
       signal,
     );
+    if (!isPending(id)) return;
     const target =
       [...(phone.current?.querySelectorAll<HTMLElement>('[data-list-option]') ?? [])].find(
         (n) => n.dataset.listOption === option.id,
       ) ?? null;
     await touch(target, signal, () => select(option.id));
-    await touch(
-      phone.current?.querySelector<HTMLElement>('[data-confirm-list]') ?? null,
-      signal,
-      confirm,
-    );
+    if (isPending(id)) await touch(confirmButton(), signal, confirm);
   }
 }

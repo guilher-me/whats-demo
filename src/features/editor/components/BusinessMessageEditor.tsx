@@ -1,7 +1,8 @@
+import { CommerceFields } from '../../commerce/CommerceEditor';
 import { createMedia } from '../../../core/attachments';
 import { buttonLabel, isReplyButton } from '../../../core/message-buttons';
 import { useT } from '../../../i18n';
-import type { BusinessInteractive, MessageStep } from '../../../core/types';
+import type { BusinessInteractive, MessageStep, Project } from '../../../core/types';
 import { createInteractive, businessMessageError, messageOptions } from '../../../core/interactive';
 import { TextField, FieldError } from '../../../components/ui/Field';
 import { MessageTextEditor } from './MessageTextEditor';
@@ -13,9 +14,15 @@ import { FormSection } from '../../../components/ui/FormSection';
 import { MessageAttachmentEditor } from './MessageAttachmentEditor';
 export function BusinessMessageEditor({
   step,
+  project,
+  index,
+  commerceError,
   onChange,
 }: {
   step: MessageStep;
+  project: Project;
+  index: number;
+  commerceError: string;
   onChange: (change: Partial<MessageStep>) => void;
 }) {
   const t = useT();
@@ -37,9 +44,25 @@ export function BusinessMessageEditor({
   return (
     <>
       <MessageFormatPicker
-        value={step.media?.kind ?? value?.kind ?? 'text'}
+        value={step.commerce?.kind ?? step.media?.kind ?? value?.kind ?? 'text'}
         onChange={(format) =>
           onChange({
+            commerce:
+              format === 'product'
+                ? { kind: 'product', sku: project.catalog?.[0]?.sku ?? '' }
+                : format === 'showcase'
+                  ? {
+                      kind: 'showcase',
+                      sections: [
+                        {
+                          title: t('commerce.sectionNumber', { v0: 1 }),
+                          skus: [],
+                        },
+                      ],
+                    }
+                  : format === 'pix'
+                    ? { kind: 'pix', amount: { cents: 0 } }
+                    : undefined,
             interactive:
               format === 'buttons' || format === 'list' ? createInteractive(format) : undefined,
             media: format === 'image' || format === 'document' ? createMedia(format) : undefined,
@@ -54,6 +77,15 @@ export function BusinessMessageEditor({
           value={step.text}
           maxLength={value ? 1024 : undefined}
           onChange={(text) => onChange({ text })}
+        />
+      )}
+      {step.commerce && (
+        <CommerceFields
+          value={step.commerce}
+          project={project}
+          index={index}
+          error={commerceError}
+          onChange={(commerce) => onChange({ commerce })}
         />
       )}
       {value && (

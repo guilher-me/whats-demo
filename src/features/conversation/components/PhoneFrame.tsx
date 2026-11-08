@@ -6,12 +6,14 @@ export function PhoneFrame({
   contact,
   typing = false,
   paused = false,
+  pixCopied = false,
   phoneRef,
   children,
 }: {
   contact: Contact;
   typing?: boolean;
   paused?: boolean;
+  pixCopied?: boolean;
   phoneRef: RefObject<HTMLDivElement | null>;
   children: ReactNode;
 }) {
@@ -29,6 +31,9 @@ export function PhoneFrame({
     >
       <ChatHeader contact={contact} typing={typing} />
       {children}
+      <div className="phone-pix-notice" role="status">
+        {pixCopied && <span>{t('commerce.pixCopied')}</span>}
+      </div>
     </div>
   );
 }

@@ -109,3 +109,11 @@ Changing the interface language does not translate your message text or Flow JSO
 - Browser support affects video recording and link compression. The app reports unsupported operations instead of requiring a backend.
 
 For problems, [open an issue](https://github.com/guilher-me/whats-demo/issues) with a small fictional journey and steps to reproduce it.
+
+## Catalog, cart and Pix
+
+Open **Product catalog** in the editor and add fictional products with a SKU, name, description and price in BRL cents. The app generates a simulated thumbnail. In a business message, choose **Product** or **Product showcase**. Add a customer **Send cart** step and link it to the offer. Set quantities in **Automatic cart**. By default, automatic playback picks one unit of the first product.
+
+In the Preview, open the offer, add products and review quantities in **View cart**. Sending the cart creates a customer message with its subtotal. Closing the offer or cart keeps the selection until you send it, stop or restart the demo.
+
+In a business **Pix Copy and Paste** step, select a fixed amount or use the subtotal from an earlier cart. The linked total follows the selection made during playback. **Copy Pix code** briefly shows **Pix key copied** and advances the conversation. The demo simulates copying and the charge stays pending.

@@ -1,3 +1,4 @@
+import { catalogError, commercePreview, commerceStepError } from '../core/commerce';
 import { currentLocale, useT } from '../i18n';
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { AppHeader } from './AppHeader';
@@ -64,13 +65,17 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
       setInvalid((current) => (current[id] === !valid ? current : { ...current, [id]: !valid })),
     [],
   );
-  const hasErrors = editor.project.steps.some((step) =>
-    step.type !== 'flow' && step.media
-      ? !stepAttachment(step)
-      : step.type === 'business'
-        ? !!businessMessageError(step)
-        : step.type === 'flow' && invalid[step.id],
-  );
+  const hasErrors =
+    !!catalogError(editor.project.catalog, false) ||
+    editor.project.steps.some(
+      (step, index) =>
+        !!commerceStepError(editor.project, index) ||
+        (step.type !== 'flow' && step.media
+          ? !stepAttachment(step)
+          : step.type === 'business'
+            ? !!businessMessageError(step)
+            : step.type === 'flow' && invalid[step.id]),
+    );
   const selectedStep = !playback.running
     ? editor.project.steps.find((step) => step.id === selectedId)
     : undefined;
@@ -111,7 +116,9 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
       status: playback.status,
       activeStep: playback.activeStep,
       flowScreen: playback.flow?.step.flow.screens[playback.flow.index]?.id ?? null,
-      pendingMessageId: playback.interaction.pendingId,
+      pendingMessageId:
+        playback.interaction.pendingId ??
+        (playback.running ? (playback.commerce.session?.messageId ?? null) : null),
       messages: playback.messages.map(({ attachment, ...message }) =>
         attachment ? { ...message, attachmentId: attachment.id } : message,
       ),
@@ -163,6 +170,7 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
         selectStep(id);
       }}
       error={editor.error}
+      onCatalog={(catalog) => edit(() => editor.update((project) => ({ ...project, catalog })))}
       onContact={(contact) => edit(() => editor.update((p) => ({ ...p, contact })))}
       onChange={(id, change) =>
         edit(() => {
@@ -238,12 +246,13 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
         ) : selectedStep ? (
           <>
             <MessagePreview
-              key={`${selectedStep.id}:${selectedStep.type === 'flow' ? 'flow' : (selectedStep.media?.kind ?? selectedStep.interactive?.kind ?? selectedStep.type)}`}
+              key={`${selectedStep.id}:${selectedStep.type === 'flow' ? 'flow' : (selectedStep.commerce?.kind ?? selectedStep.media?.kind ?? selectedStep.interactive?.kind ?? selectedStep.type)}`}
               contact={editor.project.contact}
               step={selectedStep}
               phoneRef={phoneRef}
               flowPreview={flowPreview?.stepId === selectedStep.id ? flowPreview : undefined}
               attachment={stepAttachment(selectedStep)}
+              commerce={commercePreview(editor.project, editor.project.steps.indexOf(selectedStep))}
             />
           </>
         ) : (

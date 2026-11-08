@@ -30,7 +30,7 @@ export function useMessageInteraction(
   const wait = (id: string, message: BusinessInteractive, signal: AbortSignal) => {
     const response = deferred(signal);
     pending.current = { id, message, finish: response.finish, signal };
-    flushSync(() => setPendingId(id));
+    setPendingId(id);
     return response.promise;
   };
   const reply = (id: string, optionId: string) => {
@@ -75,6 +75,7 @@ export function useMessageInteraction(
     list,
     selection,
     wait,
+    isPending: (id: string) => pending.current?.id === id,
     reply,
     open,
     select,
