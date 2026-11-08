@@ -518,6 +518,7 @@
   "commerce.catalogHelp": "Use fictional products and simulated images.",
   "commerce.browseHelp": "Browse the products in this offer.",
   "commerce.productCount": "Products: {{v0}}",
+  "commerce.emptyCatalog": "Your catalog is empty",
   "commerce.addProduct": "Add product",
   "commerce.removeProduct": "Remove product",
   "commerce.productInUse": "Used in steps {{v0}}. Remove those references before deleting this product.",

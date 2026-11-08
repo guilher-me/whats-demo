@@ -518,6 +518,7 @@
   "commerce.catalogHelp": "Use produtos fictícios e imagens simuladas.",
   "commerce.browseHelp": "Veja os produtos desta oferta.",
   "commerce.productCount": "Produtos: {{v0}}",
+  "commerce.emptyCatalog": "O catálogo ainda está vazio",
   "commerce.addProduct": "Adicionar produto",
   "commerce.removeProduct": "Remover produto",
   "commerce.productInUse": "Usado nas etapas {{v0}}. Remova essas referências antes de excluir o produto.",

@@ -178,3 +178,199 @@
   font-size: 13px;
   text-align: center;
 }
+
+.catalog-panel {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.catalog-panel > summary,
+.catalog-product > summary {
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 12px;
+  color: var(--ink);
+  border-radius: inherit;
+}
+
+.catalog-panel > summary:focus-visible,
+.catalog-product > summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -3px;
+}
+
+.catalog-panel[open] > summary,
+.catalog-product[open] > summary {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.catalog-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.catalog-panel > summary .form-section-title,
+.catalog-product > summary .form-section-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.catalog-panel > summary strong,
+.catalog-product > summary strong {
+  display: block;
+  color: inherit;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.catalog-product > summary strong,
+.catalog-product > summary small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.catalog-panel > summary .form-section-badge,
+.catalog-product > summary .form-section-badge {
+  flex: 0 0 auto;
+  border-radius: 6px;
+  padding: 3px 7px;
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.catalog-panel > summary .form-section-badge {
+  background: var(--soft);
+  color: var(--text-secondary);
+}
+
+.catalog-product > summary .form-section-badge {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+.catalog-panel > .form-section-body {
+  gap: 10px;
+  padding: 12px;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 11px 11px;
+  background: var(--surface-editor);
+}
+
+.catalog-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+
+.catalog-toolbar p,
+.catalog-product-footer p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.catalog-toolbar .button {
+  padding: 6px 10px;
+  color: var(--accent-hover);
+  font-size: 12px;
+}
+
+.catalog-toolbar .button span {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.catalog-empty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px dashed var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 550;
+}
+
+.catalog-products {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.catalog-products > li {
+  min-width: 0;
+}
+
+.catalog-product {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+}
+
+.catalog-product[open] {
+  border-color: #b7dacf;
+}
+
+.catalog-product > summary {
+  padding: 8px;
+}
+
+.catalog-thumbnail {
+  display: block;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+}
+
+.catalog-product > .form-section-body {
+  gap: 10px;
+  padding: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.catalog-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr));
+  gap: 10px;
+}
+
+.catalog-fields .field {
+  min-width: 0;
+  margin: 0;
+}
+
+.catalog-product-footer {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.catalog-product-footer p {
+  flex: 1 1 150px;
+}
+
+.catalog-product-footer .button {
+  margin-inline-start: auto;
+  padding: 6px 9px;
+  font-size: 12px;
+}

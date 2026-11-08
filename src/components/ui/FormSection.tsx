@@ -5,6 +5,9 @@ import { ControlIcon } from '../icons/ControlIcon';
 export function FormSection({
   title,
   summary,
+  leading,
+  badge,
+  name,
   children,
   defaultOpen = false,
   className = '',
@@ -12,6 +15,9 @@ export function FormSection({
 }: {
   title: string;
   summary?: string;
+  leading?: ReactNode;
+  badge?: string;
+  name?: string;
   children: ReactNode;
   defaultOpen?: boolean;
   className?: string;
@@ -22,6 +28,7 @@ export function FormSection({
   return (
     <details
       className={`form-section ${className}`}
+      name={name}
       open={defaultOpen || undefined}
       onToggle={
         mountOnOpen && !opened
@@ -32,10 +39,12 @@ export function FormSection({
       }
     >
       <summary aria-controls={id}>
-        <span>
+        {leading}
+        <span className="form-section-title">
           <strong>{title}</strong>
           {summary && <small>{summary}</small>}
         </span>
+        {badge && <span className="form-section-badge">{badge}</span>}
         <ControlIcon name="chevron" />
       </summary>
       <div id={id} className="form-section-body">

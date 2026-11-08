@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
+import { ControlIcon } from '../../components/icons/ControlIcon';
 import { ProductImage } from './CommerceCards';
 import { useT } from '../../i18n';
 import { Button } from '../../components/ui/Button';
@@ -27,97 +28,144 @@ export function CatalogEditor({
   error: string;
 }) {
   const t = useT();
-  const [skuError, setSkuError] = useState('');
+  const group = useId();
+  const [skuError, setSkuError] = useState<string>();
+  const [openedProduct, setOpenedProduct] = useState<{ sku: string; focusName?: boolean }>();
   const catalog = project.catalog ?? [];
   const update = (index: number, change: Partial<Product>) =>
     onChange(catalog.map((product, at) => (at === index ? { ...product, ...change } : product)));
+  const addProduct = () => {
+    let number = catalog.length + 1;
+    while (catalog.some(({ sku }) => sku === 'SKU-' + number)) number++;
+    const sku = 'SKU-' + number;
+    setOpenedProduct({ sku, focusName: true });
+    onChange([
+      ...catalog,
+      { sku, name: t('commerce.newProduct', { v0: number }), description: '', priceCents: 100 },
+    ]);
+  };
+
   return (
     <FormSection
       title={t('commerce.catalog')}
-      summary={t('commerce.productCount', { v0: catalog.length })}
+      badge={t('commerce.productCount', { v0: catalog.length })}
+      className="catalog-panel"
+      leading={
+        <span className="catalog-icon">
+          <ControlIcon name="package" />
+        </span>
+      }
     >
-      <p>{t('commerce.catalogHelp')}</p>
-      {catalog.map((product, index) => {
-        const used = project.steps.flatMap((step, at) => {
-          const offer = offerOf(step);
-          return offer && offerSkus(offer).includes(product.sku) ? [at + 1] : [];
-        });
-        return (
-          <FormSection
-            key={product.sku}
-            title={product.name || product.sku}
-            summary={product.priceCents ? money(product.priceCents) : undefined}
-          >
-            <div className="commerce-card-image">
-              <ProductImage product={product} />
-            </div>
-            <TextField
-              label="SKU"
-              defaultValue={product.sku}
-              maxLength={48}
-              readOnly={!!used.length}
-              onBlur={(event) => {
-                const next = event.currentTarget.value.trim();
-                if (next === product.sku || used.length) return;
-                if (
-                  !/^[A-Za-z0-9][A-Za-z0-9._-]{0,47}$/.test(next) ||
-                  catalog.some(({ sku }) => sku === next)
-                ) {
-                  event.currentTarget.value = product.sku;
-                  setSkuError(t('commerce.skuHelp'));
-                  return;
-                }
-                setSkuError('');
-                update(index, { sku: next });
-              }}
-            />
-            <TextField
-              label={t('commerce.productName')}
-              value={product.name}
-              maxLength={100}
-              onChange={(event) => update(index, { name: event.currentTarget.value })}
-            />
-            <TextArea
-              label={t('commerce.description')}
-              value={product.description}
-              maxLength={500}
-              onChange={(event) => update(index, { description: event.currentTarget.value })}
-            />
-            <CentsField
-              value={product.priceCents}
-              max={MAX_PRODUCT_CENTS}
-              onChange={(priceCents) => update(index, { priceCents })}
-            />
-            {used.length > 0 && <p>{t('commerce.productInUse', { v0: used.join(', ') })}</p>}
-            <Button
-              variant="ghost"
-              disabled={!!used.length}
-              onClick={() => onChange(catalog.filter((_, at) => at !== index))}
-            >
-              {t('commerce.removeProduct')}
-            </Button>
-          </FormSection>
-        );
-      })}
-      <FieldError>{skuError || error}</FieldError>
-      <Button
-        disabled={catalog.length >= MAX_CATALOG_PRODUCTS}
-        onClick={() => {
-          let number = catalog.length + 1;
-          while (catalog.some(({ sku }) => sku === 'SKU-' + number)) number++;
-          onChange([
-            ...catalog,
-            {
-              sku: 'SKU-' + number,
-              name: t('commerce.newProduct', { v0: number }),
-              description: '',
-              priceCents: 100,
-            },
-          ]);
-        }}
-      >
-        {t('commerce.addProduct')}
-      </Button>
+      <div className="catalog-toolbar">
+        <p>{t('commerce.catalogHelp')}</p>
+        <Button
+          className="button-with-icon"
+          disabled={catalog.length >= MAX_CATALOG_PRODUCTS}
+          onClick={addProduct}
+        >
+          <span aria-hidden="true">+</span>
+          {t('commerce.addProduct')}
+        </Button>
+      </div>
+      <FieldError>{error}</FieldError>
+      {catalog.length === 0 ? (
+        <div className="catalog-empty">
+          <span className="catalog-icon">
+            <ControlIcon name="package" />
+          </span>
+          <span>{t('commerce.emptyCatalog')}</span>
+        </div>
+      ) : (
+        <ul className="catalog-products" role="list">
+          {catalog.map((product, index) => {
+            const used = project.steps.flatMap((step, at) => {
+              const offer = offerOf(step);
+              return offer && offerSkus(offer).includes(product.sku) ? [at + 1] : [];
+            });
+            const invalidSku = skuError === product.sku;
+            const skuErrorId = `${group}-sku-${index}`;
+            return (
+              <li key={product.sku}>
+                <FormSection
+                  title={product.name || product.sku}
+                  summary={product.sku}
+                  badge={product.priceCents ? money(product.priceCents) : undefined}
+                  className="catalog-product"
+                  name={group}
+                  defaultOpen={openedProduct?.sku === product.sku}
+                  leading={
+                    <span className="commerce-thumb catalog-thumbnail">
+                      <ProductImage product={product} />
+                    </span>
+                  }
+                >
+                  <TextField
+                    label={t('commerce.productName')}
+                    value={product.name}
+                    maxLength={100}
+                    autoFocus={openedProduct?.sku === product.sku && openedProduct.focusName}
+                    onChange={(event) => update(index, { name: event.currentTarget.value })}
+                  />
+                  <div className="catalog-fields">
+                    <TextField
+                      label="SKU"
+                      defaultValue={product.sku}
+                      maxLength={48}
+                      readOnly={!!used.length}
+                      aria-invalid={invalidSku || undefined}
+                      aria-describedby={invalidSku ? skuErrorId : undefined}
+                      onBlur={(event) => {
+                        const next = event.currentTarget.value.trim();
+                        event.currentTarget.value = product.sku;
+                        if (
+                          next !== product.sku &&
+                          (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,47}$/.test(next) ||
+                            catalog.some(({ sku }) => sku === next))
+                        ) {
+                          setSkuError(product.sku);
+                          return;
+                        }
+                        setSkuError(undefined);
+                        if (next !== product.sku && !used.length) {
+                          setOpenedProduct({ sku: next });
+                          update(index, { sku: next });
+                        }
+                      }}
+                    />
+                    <CentsField
+                      value={product.priceCents}
+                      max={MAX_PRODUCT_CENTS}
+                      onChange={(priceCents) => update(index, { priceCents })}
+                    />
+                  </div>
+                  <FieldError id={skuErrorId}>{invalidSku && t('commerce.skuHelp')}</FieldError>
+                  <TextArea
+                    label={t('commerce.description')}
+                    value={product.description}
+                    maxLength={500}
+                    rows={2}
+                    onChange={(event) => update(index, { description: event.currentTarget.value })}
+                  />
+                  <div className="catalog-product-footer">
+                    {used.length > 0 && (
+                      <p>{t('commerce.productInUse', { v0: used.join(', ') })}</p>
+                    )}
+                    <Button
+                      variant="danger"
+                      className="button-with-icon"
+                      disabled={!!used.length}
+                      onClick={() => onChange(catalog.filter((_, at) => at !== index))}
+                    >
+                      <ControlIcon name="trash" />
+                      {t('commerce.removeProduct')}
+                    </Button>
+                  </div>
+                </FormSection>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </FormSection>
   );
 }
