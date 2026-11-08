@@ -28,8 +28,7 @@ interface Props {
   onReorder: (steps: Step[]) => void;
   onAction: (id: string, action: StepAction) => void;
   onAdd: (type: Step['type']) => string | undefined;
-  onRestore: () => void;
-  restoreLabel: string;
+  onRestore?: () => void;
   onValidity: (id: string, valid: boolean) => void;
   onFlowPreview: (id: string, screenId?: string) => void;
 }
@@ -55,9 +54,11 @@ export function EditorPanel(props: Props) {
             <h2>{t('editor.title')}</h2>
             <p>{t('editor.orderHint')}</p>
           </div>
-          <Button variant="ghost" onClick={props.onRestore}>
-            {props.restoreLabel}
-          </Button>
+          {props.onRestore && (
+            <Button variant="ghost" onClick={props.onRestore}>
+              {t('sharing.restoreSource')}
+            </Button>
+          )}
         </div>
         <ContactEditor
           key={props.revision}

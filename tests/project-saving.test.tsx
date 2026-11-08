@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 import '@testing-library/jest-dom/vitest';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
-import { createDefaultProject } from '../src/core/defaults';
+import { createLumaProject } from './fixtures/luma-project';
 import { projectStorageKey, STORAGE_KEY } from '../src/core/project';
 import { createShareURL } from '../src/core/codec';
 import { Blob as NativeBlob } from 'node:buffer';
@@ -22,7 +22,7 @@ async function start() {
 }
 const indicator = () => document.querySelector('.save-indicator') as HTMLElement;
 it('keeps development edits separate from the existing production draft', async () => {
-  const production = createDefaultProject();
+  const production = createLumaProject();
   production.contact.name = 'Production contact';
   localStorage.setItem(STORAGE_KEY, JSON.stringify(production));
   history.replaceState(null, '', '/whats-demo/development/');
@@ -40,17 +40,21 @@ it('keeps development edits separate from the existing production draft', async 
   await start();
   expect(screen.getByLabelText('Nome do contato')).toHaveValue('Production contact');
 });
-it('does not claim the untouched example is saved and separates sharing from storage', async () => {
+it('does not claim the untouched empty editor is saved and separates sharing from storage', async () => {
   await start();
-  expect(indicator()).toHaveAttribute('data-state', 'example');
-  expect(indicator()).toHaveTextContent('Exemplo · não salvo');
+  expect(indicator()).toHaveAttribute('data-state', 'empty');
+  expect(indicator()).toHaveTextContent('Nova jornada · não salva');
   expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+  expect(window.whatsappFakeFlows!.getProject().steps).toEqual([]);
+  expect(screen.getByLabelText('Nome do contato')).toHaveValue('');
+  expect(screen.queryByRole('button', { name: 'Restaurar do link' })).toBeNull();
+  expect(screen.queryByRole('button', { name: 'Restaurar exemplo' })).toBeNull();
   expect(document.querySelector('.app-header .brand-meta .save-indicator')).toBe(indicator());
   expect(document.querySelector('.editor .save-indicator')).toBeNull();
   expect(screen.getByRole('button', { name: 'Copiar link' })).toBeInTheDocument();
 });
 it('shows success only after writing and restores the saved draft on reopening', async () => {
-  const project = createDefaultProject();
+  const project = createLumaProject();
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
   await start();
@@ -87,13 +91,18 @@ it('reports a failed write visibly, keeps the edits, and clears the warning afte
   expect(indicator()).toHaveAttribute('data-state', 'saved');
   expect(screen.queryByRole('alert')).toBeNull();
 });
+function oneMessageProject(name: string) {
+  return {
+    version: 1,
+    contact: { name, verified: false },
+    steps: [{ id: 'hello', type: 'business', text: 'Olá!', delay: 0 }],
+  };
+}
 it('opens a shared copy separately, saves its edits and keeps the original snapshot', async () => {
   vi.stubGlobal('Blob', NativeBlob);
-  const draft = createDefaultProject();
-  draft.contact.name = 'Rascunho original';
+  const draft = oneMessageProject('Rascunho original');
   localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
-  const project = createDefaultProject();
-  project.contact.name = 'Jornada compartilhada';
+  const project = oneMessageProject('Jornada compartilhada');
   const editor = new URL(await createShareURL(project, 'editor', location.href));
   history.replaceState(null, '', editor.hash);
   await start();
@@ -121,8 +130,26 @@ it('opens a shared copy separately, saves its edits and keeps the original snaps
   expect(await screen.findByLabelText('Nome do contato')).toHaveValue('Cópia editada');
 });
 
+it('restores the journey from the link while keeping the main draft', async () => {
+  vi.stubGlobal('Blob', NativeBlob);
+  const draft = oneMessageProject('Rascunho original');
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+  const project = oneMessageProject('Jornada compartilhada');
+  const link = new URL(await createShareURL(project, 'editor', location.href));
+  history.replaceState(null, '', link.hash);
+  await start();
+  const name = await screen.findByLabelText('Nome do contato');
+  fireEvent.change(name, { target: { value: 'Cópia editada' } });
+
+  fireEvent.click(screen.getByRole('button', { name: 'Restaurar do link' }));
+  const dialog = screen.getByRole('dialog');
+  fireEvent.click(within(dialog).getByRole('button', { name: 'Restaurar do link' }));
+  expect(screen.getByLabelText('Nome do contato')).toHaveValue('Jornada compartilhada');
+  expect(localStorage.getItem(STORAGE_KEY)).toBe(JSON.stringify(draft));
+});
+
 it('reports a truncated share link and preserves the local draft', async () => {
-  const draft = createDefaultProject();
+  const draft = createLumaProject();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
   // Base62 for the first byte of a zlib stream, with the rest missing.
   history.replaceState(null, '', '#demo=v3z.1w');

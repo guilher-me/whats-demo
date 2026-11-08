@@ -4,7 +4,7 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
 import { readJsonEditor, writeJsonEditor } from './fixtures/json-editor';
-import { createDefaultProject } from '../src/core/defaults';
+import { createLumaProject } from './fixtures/luma-project';
 import type { FlowStep } from '../src/core/types';
 import { STORAGE_KEY } from '../src/core/project';
 
@@ -98,7 +98,11 @@ it('applies valid journey JSON atomically and preserves the editor on failure', 
 
 it('keeps newer visual edits separate from a pending code draft', () => {
   render(<App />);
-  const draft = readJsonEditor(code()).replace('Luma Home', 'Proposta do código');
+  const project = api().getProject();
+  const draft = JSON.stringify({
+    ...project,
+    contact: { ...project.contact, name: 'Proposta do código' },
+  });
   writeJsonEditor(code(), draft);
   fireEvent.change(screen.getByLabelText('Nome do contato'), {
     target: { value: 'Edição visual' },
@@ -111,7 +115,7 @@ it('keeps newer visual edits separate from a pending code draft', () => {
 
 it('reports precise Flow errors and keeps the manual mode for missing automatic answers', async () => {
   render(<App />);
-  const candidate = createDefaultProject();
+  const candidate = createLumaProject();
   const stepIndex = candidate.steps.findIndex((step) => step.type === 'flow');
   const step = candidate.steps[stepIndex] as FlowStep;
   step.answers = {};

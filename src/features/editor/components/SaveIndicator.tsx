@@ -3,7 +3,7 @@ import { useT, type MessageKey } from '../../../i18n';
 import type { SaveState } from '../hooks/useProject';
 
 const labels: Record<SaveState, MessageKey> = {
-  example: 'storage.example',
+  empty: 'storage.empty',
   recovered: 'storage.recovered',
   saving: 'storage.saving',
   saved: 'storage.saved',
@@ -11,7 +11,7 @@ const labels: Record<SaveState, MessageKey> = {
   shared: 'storage.shared',
 };
 const help: Record<SaveState, MessageKey> = {
-  example: 'storage.exampleHelp',
+  empty: 'storage.emptyHelp',
   recovered: 'storage.localOnly',
   saving: 'storage.savingHelp',
   saved: 'storage.localOnly',

@@ -20,9 +20,9 @@ The editor contains `<link rel="describedby">` links and a `whatsapp-fake-flows-
 
 | Member                          | Contract                                                                                                                                                            |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `apiVersion`, `projectVersion`  | Current values are 2 and 1.                                                                                                                                         |
+| `apiVersion`, `projectVersion`  | Current values are 3 and 1.                                                                                                                                         |
 | `getInstructions()`             | Embedded agent instructions.                                                                                                                                        |
-| `getProject()`, `getExample()`  | Independent copies of the current project and showcase.                                                                                                             |
+| `getProject()`                  | Independent copy of the current project.                                                                                                                            |
 | `getState()`                    | Snapshot with readiness, playback status and rendered messages.                                                                                                     |
 | `validateProject(input)`        | Returns `{ valid: true, project }` or `{ valid: false, errors }` without changing the draft. Also returns Flow diagnostics when the project structure can be read.  |
 | `createShareURL(input?, mode?)` | Returns a promise for a validated link. Defaults to the current project and editor mode.                                                                            |
@@ -33,6 +33,8 @@ The editor contains `<link rel="describedby">` links and a `whatsapp-fake-flows-
 `getState()` returns `ready`, `running`, `status`, `activeStep`, `flowScreen`, `pendingMessageId` and `messages`. Use booleans and nullable fields for coordination. Rendered messages include `direction`, `text` and `time`. Attachment messages include the actual `attachmentId` sent in playback, and the caption appears in `text`. Voice notes include `voiceDurationMs`.
 
 In browser controls, scope editing to **Conversation editor** and expand a step through **Edit step N**. Choose the extension and enter the image text or document metadata directly on the step. In **Conversation preview**, use **Start manually** or **Play automatically**. Follow the accessible labels in the selected interface language.
+
+The browser editor starts with an empty journey on a fresh browser. Supply a project using the examples in this guide. API v3 removes `getExample()`.
 
 ## Project contract
 

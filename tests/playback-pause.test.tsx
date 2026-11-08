@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
-import { createDefaultProject } from '../src/core/defaults';
+import { createLumaProject } from './fixtures/luma-project';
 import { STORAGE_KEY } from '../src/core/project';
 import type { Project } from '../src/core/types';
 beforeEach(() => {
@@ -21,7 +21,7 @@ async function tick(ms: number) {
   });
 }
 async function start(steps: Project['steps']) {
-  const project = createDefaultProject();
+  const project = createLumaProject();
 
   project.steps = steps;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
