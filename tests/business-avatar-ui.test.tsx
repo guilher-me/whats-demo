@@ -11,7 +11,7 @@ afterEach(() => {
   history.replaceState(null, '', '/');
 });
 
-it('commits the selected icon and HEX only when Apply is pressed', async () => {
+it('commits the selected icon and custom color only when Apply is pressed', async () => {
   const user = userEvent.setup();
   render(<App />);
   const open = async () => {
@@ -39,11 +39,27 @@ it('commits the selected icon and HEX only when Apply is pressed', async () => {
 
   picker = await open();
   await user.click(picker.getByRole('radio', { name: 'Dente' }));
-  const hex = picker.getByRole('textbox', { name: 'HEX personalizado' });
-  fireEvent.change(hex, { target: { value: 'invalid' } });
-  expect(picker.getByRole('button', { name: 'Aplicar' })).toBeDisabled();
-  expect(picker.getByRole('alert')).toBeVisible();
-  fireEvent.change(hex, { target: { value: 'f1f5f9' } });
+  const colors = within(picker.getByRole('group', { name: 'Cor de fundo' }));
+  expect(colors.getAllByRole('radio').map((color) => color.getAttribute('aria-label'))).toEqual([
+    'Verde',
+    'Azul',
+    'Rosa',
+    'Amarelo',
+    'Branco',
+    'Verde-escuro',
+    'Azul-escuro',
+    'Vermelho',
+    'Laranja',
+    'Preto',
+  ]);
+  const custom = colors.getByLabelText('Escolher outra cor');
+  expect(custom).toHaveAttribute('type', 'color');
+  fireEvent.change(custom, { target: { value: '#f1f5f9' } });
+  expect(document.querySelector('.contact-avatar-preview .avatar circle')).toHaveAttribute(
+    'fill',
+    '#F1F5F9',
+  );
+  expect(current()).not.toHaveProperty('iconBackground');
   await user.click(picker.getByRole('button', { name: 'Aplicar' }));
   expect(current()).toMatchObject({ icon: 'tooth', iconBackground: '#F1F5F9' });
   expect(document.querySelector('.chat-header .avatar circle')).toHaveAttribute('fill', '#F1F5F9');
@@ -75,11 +91,8 @@ it('customizes the glyph independently and restores automatic contrast', async (
   expect(preview()).toHaveAttribute('fill', '#000000');
   expect(contact()).not.toHaveProperty('iconForeground');
 
-  const hex = colors.getByRole('textbox', { name: 'HEX do ícone' });
-  fireEvent.change(hex, { target: { value: 'bad' } });
-  expect(picker.getByRole('button', { name: 'Aplicar' })).toBeDisabled();
-  expect(preview()).toHaveAttribute('fill', '#000000');
-  fireEvent.change(hex, { target: { value: '9a305b' } });
+  const custom = colors.getByLabelText('Escolher outra cor');
+  fireEvent.change(custom, { target: { value: '#9a305b' } });
   expect(preview()).toHaveAttribute('fill', '#9A305B');
   await user.click(picker.getByRole('button', { name: 'Aplicar' }));
   expect(contact()).toMatchObject({ iconForeground: '#9A305B' });

@@ -16,7 +16,7 @@ The workspace opens with **Code**, **Editor** and **Preview**. Drag a divider to
 
 **Code** shows the entire journey as JSON. Paste or edit a draft there, use **Validate** to check it, and select **Apply** to update the editor and phone. **Copy JSON** copies the text on screen. If the visual editor changes while a code draft is pending, reload the current project before applying. The diagnostics distinguish Flow JSON rules, simulator support and missing automatic answers. Missing automatic answers leave manual playback available.
 
-1. Set the **contact name** and choose whether to display the **verified account badge**. Open the pencil on the avatar to choose a **Business icon** and preset or custom HEX colors for the background and icon. **Automatic contrast** chooses the icon color based on the background. Select **Apply** to update the contact avatar.
+1. Set the **contact name** and choose whether to display the **verified account badge**. Open the pencil on the avatar to choose a **Business icon** and preset colors or the visual color picker for the background and icon. **Automatic contrast** chooses the icon color based on the background. Select **Apply** to update the contact avatar.
 2. Add a **Customer**, **Business** or **Flow** step from the fixed bar at the bottom of the editor. New steps go at the end and receive focus.
 3. Expand a step to edit it. Select a step or focus one of its fields to see the message update in the phone.
 4. Open **Behavior** to set the delay and, for business replies, the typing indicator.

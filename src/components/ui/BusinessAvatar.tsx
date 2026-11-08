@@ -70,9 +70,7 @@ export function BusinessAvatar({
   iconForeground?: string;
 }) {
   const background = iconBackground.toUpperCase();
-  const foreground =
-    foregroundOverride ??
-    (background === DEFAULT_ICON_BACKGROUND ? '#fff' : iconForeground(background));
+  const foreground = foregroundOverride ?? iconForeground(background);
   return (
     <svg
       className="avatar"
