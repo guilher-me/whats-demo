@@ -1,27 +1,31 @@
 import { useEffect, useRef, useState } from 'react';
+import { ControlIcon } from '../../../components/icons/ControlIcon';
 import { MicrophoneIcon } from '../../../components/icons/WhatsAppIcons';
 import { formatVoiceTime } from '../../../core/voice-message';
 import { useT } from '../../../i18n';
-import { VoiceWaveform } from './VoiceWaveform';
 import { ComposerField } from './ComposerField';
 
-function RecordingWaveform({ elapsed, paused }: { elapsed: () => number; paused: boolean }) {
-  const [milliseconds, setMilliseconds] = useState(elapsed);
+function RecordingIndicator({ elapsed, paused }: { elapsed: () => number; paused: boolean }) {
+  const t = useT();
+  const [duration, setDuration] = useState(() => formatVoiceTime(elapsed()));
   useEffect(() => {
-    const update = () => setMilliseconds(elapsed());
+    const update = () => setDuration(formatVoiceTime(elapsed()));
     update();
     if (paused) return;
-    const timer = setInterval(update, 40);
+    const timer = setInterval(update, 100);
     return () => clearInterval(timer);
   }, [elapsed, paused]);
 
   return (
     <div className="composer-field voice-recording">
-      <span className="voice-recording-dot" aria-hidden="true" />
+      <MicrophoneIcon className="voice-recording-marker" />
       <span className="voice-duration" aria-hidden="true">
-        {formatVoiceTime(milliseconds)}
+        {duration}
       </span>
-      <VoiceWaveform milliseconds={milliseconds} recording />
+      <span className="voice-cancel-hint">
+        <ControlIcon name="chevron" />
+        {t('phone.voiceSlideToCancel')}
+      </span>
     </div>
   );
 }
@@ -62,7 +66,7 @@ export function VoiceComposer({
   return (
     <div className="composer">
       {recording ? (
-        <RecordingWaveform elapsed={elapsed} paused={paused} />
+        <RecordingIndicator elapsed={elapsed} paused={paused} />
       ) : (
         <ComposerField empty>
           <span className="composer-placeholder" aria-hidden="true">

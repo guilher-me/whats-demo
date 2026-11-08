@@ -1,9 +1,8 @@
-const SAMPLE_MS = 70;
+const BAR_COUNT = 36;
 const BAR_SPACING = 4;
 const HEIGHT = 24;
 
 function sampleVoice(time: number) {
-  if (time < 0) return 2;
   // A fixed envelope groups irregular peaks into syllables and leaves gaps between phrases.
   const syllable = 0.2 + 0.8 * Math.max(0, Math.sin(time * 0.024 + Math.sin(time * 0.008) * 0.8));
   const phrase = Math.max(0, Math.sin(time * 0.0023 + Math.sin(time * 0.0011)) + 0.35);
@@ -11,34 +10,20 @@ function sampleVoice(time: number) {
   return 2 + 20 * syllable * Math.min(1, phrase) * peak;
 }
 
-export function VoiceWaveform({
-  milliseconds,
-  recording = false,
-}: {
-  milliseconds: number;
-  recording?: boolean;
-}) {
-  const count = recording ? 48 : 36;
-  const samples = milliseconds / SAMPLE_MS;
-  const newest = Math.floor(samples);
-  const offset = recording ? (samples - newest) * BAR_SPACING : 0;
-
+export function VoiceWaveform({ milliseconds }: { milliseconds: number }) {
   return (
     <svg
       className="voice-waveform"
-      viewBox={`0 0 ${count * BAR_SPACING} ${HEIGHT}`}
+      viewBox={`0 0 ${BAR_COUNT * BAR_SPACING} ${HEIGHT}`}
       preserveAspectRatio="none"
       aria-hidden="true"
     >
-      {Array.from({ length: count + Number(recording) }, (_, index) => {
-        const time = recording
-          ? (newest - count + index) * SAMPLE_MS
-          : (index / (count - 1)) * milliseconds;
-        const height = sampleVoice(time);
+      {Array.from({ length: BAR_COUNT }, (_, index) => {
+        const height = sampleVoice((index / (BAR_COUNT - 1)) * milliseconds);
         return (
           <rect
             key={index}
-            x={index * BAR_SPACING + 1 - offset}
+            x={index * BAR_SPACING + 1}
             y={(HEIGHT - height) / 2}
             width="2"
             height={height}
