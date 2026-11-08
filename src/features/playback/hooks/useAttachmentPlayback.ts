@@ -3,6 +3,7 @@ import type { Attachment, AttachmentKind } from '../../../core/types';
 
 interface Session {
   kind: AttachmentKind;
+  configuredId: string;
   items: Attachment[];
   view: 'closed' | 'menu' | 'items' | 'preview';
   selected?: Attachment;
@@ -28,7 +29,7 @@ export function useAttachmentPlayback() {
     showItems: () => update({ view: 'items' }),
     select: (id: string) => {
       const selected = current.current?.items.find((item) => item.id === id);
-      if (!selected || current.current?.view !== 'items') return;
+      if (!selected || selected.kind === 'location' || current.current?.view !== 'items') return;
       if (selected.kind === 'image')
         update({ selected: current.current.selected?.id === id ? undefined : selected });
       else update({ selected, view: 'preview' });

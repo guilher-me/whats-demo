@@ -145,6 +145,7 @@ export function PhonePreview({
         container={phoneRef.current}
         disabled={p.automatic || p.paused}
         onSend={p.sendAttachment}
+        onSendLocation={p.sendLocation}
       />
       {p.flow && (
         <FlowSheet

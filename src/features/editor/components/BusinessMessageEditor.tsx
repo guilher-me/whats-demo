@@ -1,5 +1,5 @@
 import { CommerceFields } from '../../commerce/CommerceEditor';
-import { createMedia } from '../../../core/attachments';
+import { createMedia, isAttachmentKind } from '../../../core/attachments';
 import { buttonLabel, isReplyButton } from '../../../core/message-buttons';
 import { useT } from '../../../i18n';
 import type { BusinessInteractive, MessageStep, Project } from '../../../core/types';
@@ -65,7 +65,7 @@ export function BusinessMessageEditor({
                     : undefined,
             interactive:
               format === 'buttons' || format === 'list' ? createInteractive(format) : undefined,
-            media: format === 'image' || format === 'document' ? createMedia(format) : undefined,
+            media: isAttachmentKind(format) ? createMedia(format) : undefined,
           })
         }
       />

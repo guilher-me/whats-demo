@@ -78,6 +78,12 @@ export function MessageBubble({
             onClick={() => setOpen(true)}
           >
             <AttachmentVisual item={attachment} />
+            {attachment.kind === 'location' && (
+              <span className="message-location-name">
+                <strong>{attachment.name}</strong>
+                {attachment.address && <small>{attachment.address}</small>}
+              </span>
+            )}
             {attachment.kind === 'document' && (
               <span className="message-document-name">
                 <strong>{attachment.name}</strong>

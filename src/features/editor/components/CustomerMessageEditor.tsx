@@ -1,6 +1,6 @@
 import { offerOf } from '../../../core/commerce';
 import { CommerceFields } from '../../commerce/CommerceEditor';
-import { createMedia } from '../../../core/attachments';
+import { createMedia, isAttachmentKind } from '../../../core/attachments';
 import { useT } from '../../../i18n';
 import type { MessageStep, Project } from '../../../core/types';
 import { DEFAULT_VOICE_SECONDS, MAX_VOICE_SECONDS } from '../../../core/voice-message';
@@ -38,6 +38,7 @@ export function CustomerMessageEditor({
           { value: 'voice', label: t('editor.voiceMock') },
           { value: 'image', label: t('attachments.image') },
           { value: 'document', label: t('attachments.document') },
+          { value: 'location', label: t('attachments.location') },
         ]}
         onValueChange={(format) =>
           onChange({
@@ -53,7 +54,7 @@ export function CustomerMessageEditor({
                   }
                 : undefined,
             voiceDurationSeconds: format === 'voice' ? DEFAULT_VOICE_SECONDS : undefined,
-            media: format === 'image' || format === 'document' ? createMedia(format) : undefined,
+            media: isAttachmentKind(format) ? createMedia(format) : undefined,
           })
         }
       />

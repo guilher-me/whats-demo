@@ -108,6 +108,12 @@ Changing the interface language does not translate your message text or Flow JSO
 
 For problems, [open an issue](https://github.com/guilher-me/whats-demo/issues) with a small fictional journey and steps to reproduce it.
 
+## Simulated locations
+
+Choose **Location** as the format of a customer or business message. Set a fictional place name and, optionally, an address. The phone shows an illustrated map and opens its details inside the demo.
+
+In manual playback, use **Attach → Location**. **Send my current location** uses the point from the active step. You can also choose another place from the demo. Automatic playback sends the point configured for the step.
+
 ## Catalog, cart and Pix
 
 Open **Product catalog** in the editor and add fictional products with a SKU, name, description and price in BRL cents. The app generates a simulated thumbnail. In a business message, choose **Product** or **Product showcase**. Add a customer **Send cart** step and link it to the offer. Set quantities in **Automatic cart**. By default, automatic playback picks one unit of the first product.
