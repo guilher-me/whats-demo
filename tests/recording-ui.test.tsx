@@ -45,7 +45,7 @@ async function start() {
       blob: new Blob(['video'], { type: 'video/webm' }),
       extension: 'webm' as const,
       width: 720,
-      height: 1280,
+      height: 1440,
       durationMs: 4000,
     })),
   };
@@ -61,10 +61,16 @@ async function tick(ms: number) {
 }
 it('grava manualmente, bloqueia alterações e oferece download acessível com extensão correta', async () => {
   const { project, session } = await start();
-  fireEvent.click(screen.getByRole('button', { name: 'Gravar celular' }));
+  const record = screen.getByRole('button', { name: 'REC · Gravar celular' });
+  expect(record).toHaveTextContent('REC');
+  fireEvent.click(record);
   fireEvent.click(screen.getByRole('button', { name: /^Gravar manualmente/ }));
   await tick(3001);
   expect(session.start).toHaveBeenCalledOnce();
+  expect(preparePhoneRecording).toHaveBeenCalledWith(
+    document.querySelector('.phone-device'),
+    expect.any(Function),
+  );
   expect(document.querySelector('.editor')).toHaveAttribute('inert');
   expect(() => window.whatsappFakeFlows!.loadProject(project)).toThrow('gravação');
   expect(screen.getByRole('button', { name: 'Pausar reprodução' })).toBeDisabled();
@@ -90,19 +96,19 @@ it('grava manualmente, bloqueia alterações e oferece download acessível com e
 });
 it('cancela a contagem pela interface e volta a liberar a edição', async () => {
   const { session } = await start();
-  fireEvent.click(screen.getByRole('button', { name: 'Gravar celular' }));
+  fireEvent.click(screen.getByRole('button', { name: 'REC · Gravar celular' }));
   fireEvent.click(screen.getByRole('button', { name: /^Gravar automaticamente/ }));
   await tick(1000);
   fireEvent.click(screen.getByRole('button', { name: 'Cancelar gravação' }));
   await tick(4000);
   expect(session.cancel).toHaveBeenCalled();
   expect(session.start).not.toHaveBeenCalled();
-  expect(screen.getByRole('button', { name: 'Gravar celular' })).toBeEnabled();
+  expect(screen.getByRole('button', { name: 'REC · Gravar celular' })).toBeEnabled();
 });
 it('apresenta erros de preparação em um diálogo sem deixar a interface bloqueada', async () => {
   await start();
   vi.mocked(preparePhoneRecording).mockRejectedValueOnce(new Error('Captura indisponível'));
-  fireEvent.click(screen.getByRole('button', { name: 'Gravar celular' }));
+  fireEvent.click(screen.getByRole('button', { name: 'REC · Gravar celular' }));
   fireEvent.click(screen.getByRole('button', { name: /^Gravar manualmente/ }));
   await tick(1);
   expect(screen.getByRole('dialog', { name: 'Não foi possível gravar' })).toHaveTextContent(
@@ -112,7 +118,7 @@ it('apresenta erros de preparação em um diálogo sem deixar a interface bloque
 });
 it('mantém a semântica acessível no diálogo de configuração', async () => {
   await start();
-  fireEvent.click(screen.getByRole('button', { name: 'Gravar celular' }));
+  fireEvent.click(screen.getByRole('button', { name: 'REC · Gravar celular' }));
   vi.useRealTimers();
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null);
   const result = await axe.run(document.body, { rules: { 'color-contrast': { enabled: false } } });

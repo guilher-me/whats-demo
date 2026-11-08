@@ -3,6 +3,7 @@ import { useT } from '../../../i18n';
 import { useEffect, useRef, type RefObject } from 'react';
 import type { Contact } from '../../../core/types';
 import type { Playback } from '../../playback/hooks/usePlayback';
+import { usePhoneTime } from '../phone-time';
 import { PhoneFrame } from './PhoneFrame';
 import { MessageBubble } from './MessageBubble';
 import { TypingIndicator } from './TypingIndicator';
@@ -29,6 +30,7 @@ export function PhonePreview({
   composerDisabled?: boolean;
 }) {
   const t = useT();
+  const time = usePhoneTime();
 
   const body = useRef<HTMLDivElement>(null);
   const commerce = p.commerce.session;
@@ -48,8 +50,8 @@ export function PhonePreview({
   }, [p.paused, phoneRef]);
   return (
     <PhoneFrame
+      time={time}
       contact={contact}
-      typing={p.typing}
       paused={p.paused}
       phoneRef={phoneRef}
       pixCopied={p.commerce.pixCopied}
@@ -150,6 +152,7 @@ export function PhonePreview({
       />
       {p.flow && (
         <FlowSheet
+          contact={contact}
           session={p.flow}
           error={p.flowError}
           onChange={p.changeFlow}

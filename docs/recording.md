@@ -1,6 +1,6 @@
 # Gravação do celular
 
-O botão **Gravar celular**, à direita da prévia, gera um vídeo local sem áudio. O arquivo contém apenas o celular: campos, mensagens, Flows, listas e o cursor animado do modo automático. O editor, o cronômetro e os controles ficam fora do vídeo. O cursor do sistema não é capturado.
+O botão **Gravar celular**, à direita da prévia, gera um vídeo local sem áudio. O arquivo mostra a carcaça com câmera e botões laterais, a barra de status e o conteúdo da tela, incluindo o cursor animado do modo automático. O editor, o cronômetro e os controles ficam fora do vídeo. O cursor do sistema não é capturado.
 
 ## Uso
 
@@ -19,7 +19,7 @@ Durante a preparação e a contagem, o botão permite cancelar sem gerar um arqu
 
 O aplicativo testa os codificadores nativos e tenta MP4 primeiro; caso não esteja disponível, usa WebM. A extensão do download corresponde ao formato efetivamente produzido. Para WebM, `fix-webm-duration` adiciona a duração ausente quando necessário.
 
-O celular é mantido em 360 × 640 pixels durante a gravação, e os quadros são gerados em 720 × 1280. O canvas oferece até 24 fps para o codificador; a rasterização busca até 12 atualizações por segundo, em série, e pode ser mais lenta conforme o computador e a complexidade da tela. Não há garantia de taxa fixa de quadros.
+O celular é mantido em 360 × 720 pixels durante a gravação, e os quadros são gerados em 720 × 1440. O canvas oferece até 24 fps para o codificador; a rasterização busca até 12 atualizações por segundo, em série, e pode ser mais lenta conforme o computador e a complexidade da tela. Não há garantia de taxa fixa de quadros.
 
 Mantenha a aba visível durante a gravação. Navegadores podem reduzir a frequência de atualização em segundo plano. A implementação foi verificada em Chromium; navegadores sem as APIs necessárias ou que bloqueiem a rasterização recebem uma mensagem de erro. Chrome e Edge atualizados são os alvos recomendados para a primeira versão.
 

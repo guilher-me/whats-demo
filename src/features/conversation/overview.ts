@@ -1,3 +1,4 @@
+import { formatPhoneTime } from './phone-time';
 import { commercePreview } from '../../core/commerce';
 import { resolve, resolveOptions } from '../../core/engine';
 import { automaticOption, isReplyButton } from '../../core/message-buttons';
@@ -68,7 +69,10 @@ export function flowOverviewReply(step: FlowStep): string {
   return [step.completion, ...lines].filter(Boolean).join('\n');
 }
 
-export function conversationOverviewMessages(project: Project): ChatMessage[] {
+export function conversationOverviewMessages(
+  project: Project,
+  time = formatPhoneTime(),
+): ChatMessage[] {
   return project.steps.flatMap((step, index) => {
     const message: ChatMessage = {
       id: `overview:${index}:message`,
@@ -81,7 +85,7 @@ export function conversationOverviewMessages(project: Project): ChatMessage[] {
             : step.text,
       attachment: stepAttachment(step),
       commerce: commercePreview(project, index),
-      time: '12:00',
+      time,
       ...(step.type === 'user' && step.voiceDurationSeconds !== undefined
         ? { voiceDurationMs: step.voiceDurationSeconds * 1000 }
         : {}),
@@ -99,10 +103,7 @@ export function conversationOverviewMessages(project: Project): ChatMessage[] {
       message.selection = selected?.id;
     }
     return reply
-      ? [
-          message,
-          { id: `overview:${index}:reply`, direction: 'user' as const, text: reply, time: '12:00' },
-        ]
+      ? [message, { id: `overview:${index}:reply`, direction: 'user' as const, text: reply, time }]
       : [message];
   });
 }

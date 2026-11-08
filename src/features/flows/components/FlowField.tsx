@@ -1,6 +1,6 @@
 import { useT } from '../../../i18n';
 import { useId } from 'react';
-import type { ExpressionContext, FlowComponent, Option, Value } from '../../../core/types';
+import type { ExpressionContext, FlowComponent, Value } from '../../../core/types';
 import { resolve, resolveOptions } from '../../../core/engine';
 import { OptionGroup } from './OptionGroup';
 interface Props {
@@ -33,15 +33,19 @@ export function FlowField({ component: c, context, onChange }: Props) {
     if (c.type === 'Dropdown')
       return (
         <label className="flow-field" htmlFor={id}>
-          {label}
+          <span id={`${id}-label`} className={value ? 'flow-field-label' : 'visually-hidden'}>
+            {label}
+          </span>
           <select
             id={id}
+            className={value ? undefined : 'flow-select-empty'}
+            aria-labelledby={`${id}-label`}
             data-field={name}
             aria-required={c.required || undefined}
             value={String(value ?? '')}
             onChange={(e) => change(e.target.value)}
           >
-            <option value="">{t('flow.select')}</option>
+            <option value="">{label}</option>
             {options.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.title}
@@ -65,7 +69,6 @@ export function FlowField({ component: c, context, onChange }: Props) {
   if (c.type === 'OptIn')
     return (
       <label className="flow-option flow-optin">
-        <span>{label}</span>
         <input
           data-field={name}
           aria-required={c.required || undefined}
@@ -73,23 +76,29 @@ export function FlowField({ component: c, context, onChange }: Props) {
           checked={Boolean(value)}
           onChange={(e) => change(e.target.checked)}
         />
+        <span>{label}</span>
       </label>
     );
   if (['TextInput', 'TextArea', 'DatePicker'].includes(c.type)) {
     const hint = c['helper-text'] ? String(resolve(c['helper-text'], context)) : '';
+    const multiline = c.type === 'TextArea';
+    const maxLength = multiline ? (c['max-length'] ?? c['max-chars']) : c['max-chars'];
     const common = {
       id,
       'data-field': name,
       'aria-required': c.required || undefined,
       value: String(value ?? ''),
-      maxLength: c.type === 'TextArea' ? (c['max-length'] ?? c['max-chars']) : c['max-chars'],
+      maxLength,
+      'aria-labelledby': `${id}-label`,
       autoComplete: 'off',
       'aria-describedby': hint ? `${id}-hint` : undefined,
     };
     return (
-      <label className="flow-field" htmlFor={id}>
-        {label}
-        {c.type === 'TextArea' ? (
+      <label className={multiline ? 'flow-field flow-field--textarea' : 'flow-field'} htmlFor={id}>
+        <span id={`${id}-label`} className="flow-field-label">
+          {label}
+        </span>
+        {multiline ? (
           <textarea {...common} onChange={(e) => change(e.target.value)} />
         ) : (
           <input
@@ -100,6 +109,11 @@ export function FlowField({ component: c, context, onChange }: Props) {
           />
         )}
         {hint && <small id={`${id}-hint`}>{hint}</small>}
+        {multiline && maxLength !== undefined && (
+          <small className="flow-count" aria-hidden="true">
+            {common.value.length} / {maxLength}
+          </small>
+        )}
       </label>
     );
   }

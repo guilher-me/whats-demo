@@ -42,6 +42,27 @@ it('seleciona pelo teclado e atualiza o texto sem enviar mensagens', async () =>
     screen.queryByLabelText('Prévia da mensagem em edição', { selector: '.draft-chat' }),
   ).toBeNull();
 });
+it('mantém a hora do celular e das novas mensagens sincronizada na virada do minuto', async () => {
+  vi.setSystemTime(new Date(2026, 10, 8, 11, 59, 58));
+  await start([
+    { id: 'customer', type: 'user', text: 'Oi', delay: 0 },
+    { id: 'business', type: 'business', text: 'Olá', delay: 3, typing: false },
+  ]);
+  const phoneTime = document.querySelector('.phone-time');
+  expect(phoneTime).toHaveTextContent('11:59');
+  fireEvent.change(screen.getByRole('textbox', { name: 'Mensagem' }), {
+    target: { value: 'Oi' },
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'Enviar mensagem' }));
+  await act(() => vi.advanceTimersByTimeAsync(2000));
+  expect(phoneTime).toHaveTextContent('12:00');
+  await act(() => vi.advanceTimersByTimeAsync(1000));
+  expect(window.whatsappFakeFlows!.getState().messages.map(({ time }) => time)).toEqual([
+    '11:59',
+    '12:00',
+  ]);
+});
+
 it('mostra uma nova etapa e reflete textos e botões em tempo real', async () => {
   await start([{ id: 'initial', type: 'user', text: 'Hi', delay: 0 }]);
   fireEvent.click(screen.getByRole('button', { name: '＋ Empresa' }));

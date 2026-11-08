@@ -97,7 +97,8 @@ export function useRecording(options: Options) {
     try {
       latest.current.prepare();
       await delay(0, active.signal);
-      const node = latest.current.phone.current;
+      const screen = latest.current.phone.current;
+      const node = screen?.closest<HTMLElement>('.phone-device') ?? screen;
       if (!node) throw new Error(t('errors.phoneUnavailable'));
       const recorder = await preparePhoneRecording(node, (reason) => fail(active, reason));
       if (active.signal.aborted || operation.current !== active) {

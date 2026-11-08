@@ -94,6 +94,8 @@ it('builds two screens, connects a route and tests it in an isolated phone sessi
   expect(
     phone().getByText(initial.flow.screens[0].title, { selector: '.flow-header strong' }),
   ).toBeVisible();
+  expect(phone().getByRole('button', { name: 'Fechar Flow' })).toBeVisible();
+  expect(phone().queryByRole('button', { name: 'Voltar' })).toBeNull();
   const fill = () =>
     fireEvent.change(phone().getByLabelText(initial.flow.screens[0].layout.children[0].label!), {
       target: { value: 'Cliente de teste' },
@@ -106,7 +108,9 @@ it('builds two screens, connects a route and tests it in an isolated phone sessi
   fireEvent.click(screen.getByRole('menuitem', { name: 'Parágrafo' }));
   expect(phone().getByText('Tela 2', { selector: '.flow-header strong' })).toBeVisible();
   expect(phone().getByText('Parágrafo')).toBeVisible();
+  expect(phone().queryByRole('button', { name: 'Fechar Flow' })).toBeNull();
   fireEvent.click(phone().getByRole('button', { name: 'Voltar' }));
+  expect(phone().getByRole('button', { name: 'Fechar Flow' })).toBeVisible();
   expect(phone().getByDisplayValue('Cliente de teste')).toBeVisible();
   advance();
   advance();

@@ -1,12 +1,14 @@
 import { useT } from '../../../i18n';
 import { useEffect, useRef } from 'react';
-import type { FlowSession, Value, FlowComponent } from '../../../core/types';
+import type { Contact, FlowSession, Value, FlowComponent } from '../../../core/types';
 import { getComponents, validation } from '../model';
 import { resolve, screenError } from '../../../core/engine';
 import { FlowField } from './FlowField';
 import { FlowFooter } from './FlowFooter';
+import { ControlIcon } from '../../../components/icons/ControlIcon';
 import { IconButton } from '../../../components/ui/IconButton';
 export function FlowSheet({
+  contact,
   session,
   error,
   onChange,
@@ -14,6 +16,7 @@ export function FlowSheet({
   onClose,
   onNext,
 }: {
+  contact: Contact;
   session: FlowSession;
   error: string;
   onChange: (name: string, value: Value) => void;
@@ -34,6 +37,7 @@ export function FlowSheet({
     components = [];
     invalid = [(e as Error).message];
   }
+  const canGoBack = session.history.length > 0;
   const footer = components.find((c) => c.type === 'Footer');
   const displayError = error || screenError(components) || (!components.length ? invalid[0] : '');
   useEffect(() => {
@@ -45,16 +49,14 @@ export function FlowSheet({
       <div className="flow-dimmer" />
       <section className="flow-sheet" aria-label="Flow">
         <header className="flow-header">
-          {session.history.length > 0 && (
-            <IconButton label={t('common.back')} onClick={onBack}>
-              ‹
-            </IconButton>
-          )}
-          <IconButton label={t('common.closeFlow')} onClick={onClose}>
-            ×
+          <IconButton
+            label={t(canGoBack ? 'common.back' : 'common.closeFlow')}
+            onClick={canGoBack ? onBack : onClose}
+          >
+            <ControlIcon name={canGoBack ? 'back' : 'close'} />
           </IconButton>
           <strong>{screen.title || screen.id}</strong>
-          <span aria-hidden="true">⋮</span>
+          <ControlIcon className="flow-header-more" name="more" />
         </header>
         <div className="flow-content" ref={content}>
           {components
@@ -69,6 +71,7 @@ export function FlowSheet({
             ))}
         </div>
         <FlowFooter
+          contact={contact}
           label={String(
             resolve(footer?.label, { data: session.data, form: session.form }) ?? t('common.next'),
           )}

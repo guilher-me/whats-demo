@@ -25,7 +25,7 @@ export function RecordingControls({
         ? t('recording.finish')
         : recording.busy
           ? t('recording.cancel')
-          : t('recording.record');
+          : `REC · ${t('recording.record')}`;
   return (
     <>
       <div
@@ -51,7 +51,13 @@ export function RecordingControls({
             else setOpen(true);
           }}
         >
-          <ControlIcon name={readyToStop ? 'stop' : 'record'} />
+          {recording.busy ? (
+            <ControlIcon name={readyToStop ? 'stop' : 'record'} />
+          ) : (
+            <span className="record-label" aria-hidden="true">
+              REC
+            </span>
+          )}
         </TooltipIconButton>
         {recording.busy && (
           <output className="record-clock" aria-label={t('recording.elapsed')} aria-live="off">

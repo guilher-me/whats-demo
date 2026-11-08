@@ -31,7 +31,7 @@ function setup() {
       blob: new Blob(['clip']),
       extension: 'webm' as const,
       width: 720,
-      height: 1280,
+      height: 1440,
       durationMs: 5000,
     })),
   };

@@ -2,7 +2,7 @@ import { useT } from '../../../i18n';
 import type { Contact } from '../../../core/types';
 import { BusinessAvatar } from '../../../components/ui/BusinessAvatar';
 import { VerifiedIcon } from '../../../components/icons/WhatsAppIcons';
-export function ChatHeader({ contact, typing }: { contact: Contact; typing: boolean }) {
+export function ChatHeader({ contact }: { contact: Contact }) {
   const t = useT();
 
   return (
@@ -15,7 +15,7 @@ export function ChatHeader({ contact, typing }: { contact: Contact; typing: bool
             <VerifiedIcon />
           </span>
         )}
-        <small>{typing ? t('phone.typing') : t('phone.business')}</small>
+        <small>{t('phone.business')}</small>
       </div>
       <span className="dots" aria-hidden="true">
         ⋮

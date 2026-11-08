@@ -348,7 +348,7 @@
   font-size: 10px;
 }
 .phone-sheet.android-photo-review {
-  inset: 0;
+  inset: var(--phone-status-height) 0 0;
   max-height: none;
   border-radius: 0;
   background: #111b21;
