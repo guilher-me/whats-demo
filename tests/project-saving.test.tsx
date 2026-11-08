@@ -91,13 +91,18 @@ it('reports a failed write visibly, keeps the edits, and clears the warning afte
   expect(indicator()).toHaveAttribute('data-state', 'saved');
   expect(screen.queryByRole('alert')).toBeNull();
 });
+function oneMessageProject(name: string) {
+  return {
+    version: 1,
+    contact: { name, verified: false },
+    steps: [{ id: 'hello', type: 'business', text: 'Olá!', delay: 0 }],
+  };
+}
 it('opens a shared copy separately, saves its edits and keeps the original snapshot', async () => {
   vi.stubGlobal('Blob', NativeBlob);
-  const draft = createLumaProject();
-  draft.contact.name = 'Rascunho original';
+  const draft = oneMessageProject('Rascunho original');
   localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
-  const project = createLumaProject();
-  project.contact.name = 'Jornada compartilhada';
+  const project = oneMessageProject('Jornada compartilhada');
   const editor = new URL(await createShareURL(project, 'editor', location.href));
   history.replaceState(null, '', editor.hash);
   await start();
@@ -123,6 +128,19 @@ it('opens a shared copy separately, saves its edits and keeps the original snaps
   history.replaceState(null, '', editor.hash);
   await start();
   expect(await screen.findByLabelText('Nome do contato')).toHaveValue('Cópia editada');
+});
+
+it('restores the journey from the link while keeping the main draft', async () => {
+  vi.stubGlobal('Blob', NativeBlob);
+  const draft = oneMessageProject('Rascunho original');
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+  const project = oneMessageProject('Jornada compartilhada');
+  const link = new URL(await createShareURL(project, 'editor', location.href));
+  history.replaceState(null, '', link.hash);
+  await start();
+  const name = await screen.findByLabelText('Nome do contato');
+  fireEvent.change(name, { target: { value: 'Cópia editada' } });
+
   fireEvent.click(screen.getByRole('button', { name: 'Restaurar do link' }));
   const dialog = screen.getByRole('dialog');
   fireEvent.click(within(dialog).getByRole('button', { name: 'Restaurar do link' }));
