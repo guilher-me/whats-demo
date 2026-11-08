@@ -28,6 +28,10 @@ export interface FlowComponent {
   'max-chars'?: number;
   'max-length'?: number;
   'min-selected-items'?: number;
+  'max-selected-items'?: number;
+  'min-date'?: string;
+  'max-date'?: string;
+  'unavailable-dates'?: string[] | string;
   pattern?: string;
   'on-click-action'?: FlowAction;
 }
