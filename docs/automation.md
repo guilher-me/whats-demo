@@ -32,7 +32,7 @@ The editor contains `<link rel="describedby">` links and a `whatsapp-fake-flows-
 
 `getState()` returns `ready`, `running`, `status`, `activeStep`, `flowScreen`, `pendingMessageId` and `messages`. Use booleans and nullable fields for coordination. Rendered messages include `direction`, `text` and `time`. Attachment messages include the actual `attachmentId` sent in playback, and the caption appears in `text`. Voice notes include `voiceDurationMs`.
 
-In browser controls, scope editing to **Conversation editor** and expand a step through **Edit step N**. Use **Choose an attachment** in an image or document step to create a preview or reuse one from another step. A Customer step can **Add a manual choice**. In **Conversation preview**, use **Start manually** or **Play automatically**. Follow the accessible labels in the selected interface language.
+In browser controls, scope editing to **Conversation editor** and expand a step through **Edit step N**. Choose the extension and enter the image text or document metadata directly on the step. In **Conversation preview**, use **Start manually** or **Play automatically**. Follow the accessible labels in the selected interface language.
 
 ## Project contract
 
@@ -40,7 +40,6 @@ In browser controls, scope editing to **Conversation editor** and expand a step 
 {
   version: 1,
   contact: { name: string, verified: boolean },
-  attachments?: Attachment[],
   steps: Step[]
 }
 ```
@@ -58,9 +57,12 @@ The sequence is linear. Reply buttons and lists wait for a choice and append tha
 
 ## Simulated attachments
 
-List each attachment once in `attachments`. An image uses `{ id, kind: 'image', name }`, for example `IMG 01`. A document uses `{ id, kind: 'document', name, sizeLabel }`, such as `Estimate.pdf` and `240 KB`. Use up to 50 attachments with unique IDs of letters, digits, underscores or hyphens. Names, sizes and captions are plain text.
+Configure a simulated file in the step’s `media.file`. Use `text: ''` for media steps.
 
-Set `media: { kind, attachmentId, caption? }` on a Customer or Business step. The referenced item must match the kind. Use `text: ''` for media and keep the image caption on its step. A Customer media step can include `alternativeIds` of the same kind for extra manual choices. The phone's picker contains all items referenced by any step, including later steps and alternatives, once per ID. Automatic playback uses the primary `attachmentId`. Omit media sources, document covers and avatars.
+- An image uses `media: { kind: 'image', file: { extension: 'jpg', name: 'IMG 01' }, caption: 'Optional caption' }`. Supported extensions are `png` and `jpg`. The name appears on the image preview and can contain up to 48 characters. Use an empty string for the default label.
+- A document uses `media: { kind: 'document', file: { extension: 'pdf', name: 'Estimate', size: 240, unit: 'KB' } }`. Supported extensions are `pdf`, `txt`, `doc`, `docx`, `xls`, `xlsx`, `ppt` and `pptx`. Use a positive number and the unit `KB` or `MB`. The maximum is 100 MB or 100,000 KB. Use a name of up to 60 characters. The selected extension is appended to the filename.
+
+Automatic playback sends the configured file. Manual playback lists the matching files from all steps. Inline files use `media:<step-id>` as the recorded `attachmentId`. Omit media sources, document covers and avatars.
 
 ## Reply buttons
 
@@ -196,11 +198,6 @@ const { createShareURL } = await import(moduleURL);
 const project = {
   version: 1,
   contact: { name: 'Harbor Cycles', verified: false },
-  attachments: [
-    { id: 'photo', kind: 'image', name: 'IMG 01' },
-    { id: 'photo-2', kind: 'image', name: 'IMG 02' },
-    { id: 'estimate', kind: 'document', name: 'Estimate.pdf', sizeLabel: '240 KB' },
-  ],
   steps: [
     {
       id: 'photo',
@@ -209,8 +206,7 @@ const project = {
       delay: 0,
       media: {
         kind: 'image',
-        attachmentId: 'photo',
-        alternativeIds: ['photo-2'],
+        file: { extension: 'jpg', name: 'IMG 01' },
         caption: 'Damaged part',
       },
     },
@@ -221,7 +217,7 @@ const project = {
       delay: 1,
       media: {
         kind: 'document',
-        attachmentId: 'estimate',
+        file: { extension: 'pdf', name: 'Estimate', size: 240, unit: 'KB' },
       },
     },
   ],
@@ -231,7 +227,7 @@ console.log(await createShareURL(project, 'demo'));
 
 ## Compatibility and contribution
 
-API v2 uses `createShareURL` and `loadProject` for simulated attachments. New links use a `v3z` alphanumeric payload. Existing `v2z` links still open in both modes. Existing `#project=v1z…` and `#project=v1j…` links open as demos. Legacy drafts and links keep attachment names and valid step references. Old image bytes and custom avatars are discarded on recovery. Invalid links leave the local draft intact.
+API v2 uses `createShareURL` and `loadProject` for simulated attachments. New links use a `v3z` alphanumeric payload. Existing `v2z` links still open in both modes. Existing `#project=v1z…` and `#project=v1j…` links open as demos. Invalid links leave the local draft intact.
 
 The implementation uses the same codec and project validation in the app, public module and browser API. Add tests for contract changes and update the schema and instructions together.
 

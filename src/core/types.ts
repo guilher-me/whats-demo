@@ -47,19 +47,23 @@ export interface Contact {
   name: string;
   verified: boolean;
 }
-interface AttachmentBase {
-  id: string;
-  name: string;
-}
-export type Attachment = AttachmentBase &
-  ({ kind: 'image' } | { kind: 'document'; sizeLabel: string });
+export type ImageExtension = 'png' | 'jpg';
+export type DocumentExtension = 'pdf' | 'txt' | 'doc' | 'docx' | 'xls' | 'xlsx' | 'ppt' | 'pptx';
+export type DocumentUnit = 'KB' | 'MB';
+
+export type Attachment = { id: string; name: string } & (
+  | { kind: 'image'; extension: ImageExtension }
+  | { kind: 'document'; extension: DocumentExtension; sizeLabel: string }
+);
 export type AttachmentKind = Attachment['kind'];
-export interface MediaStep {
-  kind: AttachmentKind;
-  attachmentId?: string;
-  alternativeIds?: string[];
-  caption?: string;
-}
+
+export type MediaStep =
+  | { kind: 'image'; file: { extension: ImageExtension; name: string }; caption?: string }
+  | {
+      kind: 'document';
+      file: { extension: DocumentExtension; name: string; size?: number; unit: DocumentUnit };
+      caption?: never;
+    };
 export interface MessageStep {
   id: string;
   type: 'user' | 'business';
@@ -119,7 +123,6 @@ export type Step = MessageStep | FlowStep;
 export interface Project {
   version: 1;
   contact: Contact;
-  attachments?: Attachment[];
   steps: Step[];
 }
 export interface ExpressionContext {

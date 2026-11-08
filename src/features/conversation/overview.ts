@@ -73,7 +73,7 @@ export function conversationOverviewMessages(project: Project): ChatMessage[] {
       id: `overview:${index}:message`,
       direction: step.type === 'user' ? 'user' : 'business',
       text: step.type !== 'flow' && step.media ? (step.media.caption ?? '') : step.text,
-      attachment: stepAttachment(step, project.attachments ?? []),
+      attachment: stepAttachment(step),
       time: '12:00',
       ...(step.type === 'user' && step.voiceDurationSeconds !== undefined
         ? { voiceDurationMs: step.voiceDurationSeconds * 1000 }

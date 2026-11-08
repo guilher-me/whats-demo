@@ -355,7 +355,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
           // Register the expected input before the composer can submit.
           const received = deferred(signal);
           if (step.media) {
-            const item = stepAttachment(step, attachments);
+            const item = stepAttachment(step);
             if (!item) throw new Error(t('attachments.required'));
             waitingAttachment.current = received.finish;
             flushSync(() =>
@@ -374,7 +374,10 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
               await cursor.touch(target('[data-attachment-kind]'), signal, () =>
                 flushSync(media.showItems),
               );
-              await cursor.touch(target(`[data-attachment-item="${item.id}"]`), signal, () =>
+              const tile = Array.from(
+                phone.current?.querySelectorAll<HTMLElement>('[data-attachment-item]') ?? [],
+              ).find((tile) => tile.dataset.attachmentItem === item.id);
+              await cursor.touch(tile ?? null, signal, () =>
                 flushSync(() => media.select(item.id)),
               );
               if (step.media.caption)
@@ -449,7 +452,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
             const message = append(text, 'business', {
               flowStep: step.type === 'flow' ? step : undefined,
               interactive: step.type === 'business' ? step.interactive : undefined,
-              attachment: stepAttachment(step, attachments),
+              attachment: stepAttachment(step),
             });
             messageId = message.id;
           });

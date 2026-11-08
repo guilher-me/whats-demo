@@ -3,28 +3,20 @@ import '@testing-library/jest-dom/vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
-import storeIcon from '../assets/whatsapp-store.svg';
-import { conversationAttachments } from '../src/core/attachments';
+import { Blob as NativeBlob } from 'node:buffer';
+import { loadSharedProject, sharedRoute } from '../src/core/codec';
+import {
+  conversationAttachments,
+  DOCUMENT_EXTENSIONS,
+  stepAttachment,
+} from '../src/core/attachments';
 import { normalizeProject } from '../src/core/project';
-import { STORAGE_KEY } from '../src/core/project';
-import type { Attachment, Project } from '../src/core/types';
+import type { Project } from '../src/core/types';
 
-const images: Attachment[] = ['A', 'B', 'C'].map((id) => ({
-  id,
-  name: `Foto ${id}`,
-  kind: 'image',
-}));
-const documentItem: Attachment = {
-  id: 'pdf',
-  name: 'Orçamento.pdf',
-  kind: 'document',
-  sizeLabel: '240 KB',
-};
 function project(): Project {
   return {
     version: 1,
     contact: { name: 'Oficina', verified: false },
-    attachments: [...images, documentItem],
     steps: [
       {
         id: 'customer-image',
@@ -33,8 +25,7 @@ function project(): Project {
         delay: 0,
         media: {
           kind: 'image',
-          attachmentId: 'A',
-          alternativeIds: ['B'],
+          file: { extension: 'jpg', name: 'Foto A' },
           caption: 'Legenda automática',
         },
       },
@@ -43,21 +34,32 @@ function project(): Project {
         type: 'business',
         text: '',
         delay: 0,
-        media: { kind: 'document', attachmentId: 'pdf' },
+        media: {
+          kind: 'document',
+          file: { extension: 'pdf', name: 'Orçamento', size: 240, unit: 'KB' },
+        },
       },
       {
         id: 'business-image',
         type: 'business',
         text: '',
         delay: 0,
-        media: { kind: 'image', attachmentId: 'C', caption: 'Foto da empresa' },
+        media: {
+          kind: 'image',
+          file: { extension: 'png', name: 'Foto C' },
+          caption: 'Foto da empresa',
+        },
       },
       {
-        id: 'image-reused',
+        id: 'second-image',
         type: 'business',
         text: '',
         delay: 0,
-        media: { kind: 'image', attachmentId: 'A', caption: 'Outra legenda' },
+        media: {
+          kind: 'image',
+          file: { extension: 'jpg', name: 'Foto B' },
+          caption: 'Outra legenda',
+        },
       },
     ],
   };
@@ -125,12 +127,12 @@ it('lets the manual customer choose any visible photo, keeps the gallery and sho
   fireEvent.click(sheet().getByRole('button', { name: 'Enviar mensagem' }));
   await tick(300);
   expect(api().getState().messages).toMatchObject([
-    { attachmentId: 'C', text: 'Minha foto', direction: 'user' },
-    { attachmentId: 'pdf', direction: 'business' },
-    { attachmentId: 'C', text: 'Foto da empresa' },
-    { attachmentId: 'A', text: 'Outra legenda' },
+    { attachmentId: 'media:business-image', text: 'Minha foto', direction: 'user' },
+    { attachmentId: 'media:business-document', direction: 'business' },
+    { attachmentId: 'media:business-image', text: 'Foto da empresa' },
+    { attachmentId: 'media:second-image', text: 'Outra legenda' },
   ]);
-  expect(api().getProject().attachments).toHaveLength(4);
+  expect(conversationAttachments(api().getProject())).toHaveLength(4);
   fireEvent.click(button('Orçamento.pdf'));
   expect(sheet().getByText('Documento simulado · 240 KB')).toBeVisible();
 });
@@ -148,10 +150,10 @@ it('animates the authored selection and caption, preserves the picker on pause a
   fireEvent.click(button('Continuar reprodução'));
   await tick(8000);
   expect(api().getState().messages).toMatchObject([
-    { attachmentId: 'A', text: 'Legenda automática' },
-    { attachmentId: 'pdf' },
-    { attachmentId: 'C', text: 'Foto da empresa' },
-    { attachmentId: 'A', text: 'Outra legenda' },
+    { attachmentId: 'media:customer-image', text: 'Legenda automática' },
+    { attachmentId: 'media:business-document' },
+    { attachmentId: 'media:business-image', text: 'Foto da empresa' },
+    { attachmentId: 'media:second-image', text: 'Outra legenda' },
   ]);
   fireEvent.click(button('Reproduzir automaticamente'));
   await tick(1350);
@@ -161,77 +163,135 @@ it('animates the authored selection and caption, preserves the picker on pause a
   expect(screen.queryByRole('dialog')).toBeNull();
 });
 
-it('creates a simulated document in a business step without files or an attachment library', () => {
+it('configures a document inline and validates its numeric size in both units', async () => {
+  const candidate: Project = {
+    version: 1,
+    contact: { name: 'Oficina', verified: false },
+    steps: [{ id: 'business', type: 'business', text: 'Olá', delay: 0 }],
+  };
   render(<App />);
-  act(() => {
-    api().loadProject({
-      version: 1,
-      contact: { name: 'Oficina', verified: false },
-      steps: [{ id: 'business', type: 'business', text: 'Olá', delay: 0 }],
-    });
-  });
+  act(() => api().loadProject(candidate));
   fireEvent.click(screen.getByRole('radio', { name: 'Documento' }));
   expect(button('Iniciar manual')).toBeDisabled();
-  fireEvent.click(button('Escolher dos anexos'));
-  expect(screen.getByRole('dialog', { name: 'Criar documento simulado' })).toBeVisible();
-  fireEvent.change(sheet().getByLabelText('Nome do arquivo'), { target: { value: 'Recibo.pdf' } });
-  fireEvent.change(sheet().getByLabelText('Tamanho exibido'), { target: { value: '18 KB' } });
-  fireEvent.click(sheet().getByRole('button', { name: 'Salvar anexo' }));
-  const item = api().getProject().attachments?.[0];
-  expect(item).toMatchObject({ kind: 'document', sizeLabel: '18 KB' });
-  expect(api().getProject().steps[0]).toMatchObject({ media: { attachmentId: item?.id } });
-  expect(screen.queryByRole('button', { name: /Anexos da conversa/ })).toBeNull();
+  for (const extension of DOCUMENT_EXTENSIONS)
+    expect(screen.getByRole('radio', { name: '.' + extension })).toBeVisible();
+
+  fireEvent.click(screen.getByRole('radio', { name: '.xlsx' }));
+  fireEvent.change(screen.getByRole('textbox', { name: /^Nome do arquivo/ }), {
+    target: { value: 'Recibo.pdf' },
+  });
+  const size = screen.getByRole('spinbutton', { name: 'Tamanho exibido' });
+  fireEvent.change(size, { target: { value: '100001' } });
+  expect(button('Iniciar manual')).toBeDisabled();
+  expect(screen.getByText(/maior que zero e de até 100 MB/)).toBeVisible();
+  expect(normalizeProject(api().getProject(), { allowDrafts: true }).steps[0]).toMatchObject({
+    media: { file: { size: 100001, unit: 'KB' } },
+  });
+  expect(() => normalizeProject(api().getProject())).toThrow('100 MB');
+
+  fireEvent.change(size, { target: { value: '100000' } });
+  expect(button('Iniciar manual')).toBeEnabled();
+  const unit = screen.getByRole('combobox', { name: 'Unidade' });
+  fireEvent.keyDown(unit, { key: 'ArrowDown' });
+  fireEvent.click(screen.getByRole('option', { name: 'MB' }));
+  expect(button('Iniciar manual')).toBeDisabled();
+  fireEvent.change(size, { target: { value: '100' } });
+
+  const current = api().getProject();
+  expect(current).not.toHaveProperty('attachments');
+  expect(current.steps[0]).toMatchObject({
+    media: {
+      kind: 'document',
+      file: { extension: 'xlsx', name: 'Recibo.pdf', size: 100, unit: 'MB' },
+    },
+  });
+  expect(stepAttachment(current.steps[0])).toMatchObject({
+    name: 'Recibo.xlsx',
+    sizeLabel: '100 MB',
+  });
+  expect(button('Iniciar manual')).toBeEnabled();
+  expect(button('Recibo.xlsx')).toBeVisible();
+  expect(screen.getByText('XLSX · 100 MB')).toBeVisible();
+  expect(screen.queryByRole('button', { name: /Escolher dos anexos/ })).toBeNull();
   expect(document.querySelector('input[type="file"]')).toBeNull();
 });
 
-it('creates three previews in one step, switches the automatic choice and prunes a removed alternative', async () => {
-  const candidate = project();
-  candidate.attachments = [];
-  candidate.steps = [{ id: 'image', type: 'user', text: '', delay: 0 }];
+it('shares inline image metadata and uses the configured pictures in the manual gallery', async () => {
+  vi.stubGlobal('Blob', NativeBlob);
+  const candidate: Project = {
+    version: 1,
+    contact: { name: 'Oficina', verified: false },
+    steps: [
+      { id: 'customer-image', type: 'user', text: '', delay: 0 },
+      {
+        id: 'business-image',
+        type: 'business',
+        text: '',
+        delay: 0,
+        media: { kind: 'image', file: { extension: 'png', name: 'Foto da empresa' } },
+      },
+    ],
+  };
   render(<App />);
-  act(() => {
-    api().loadProject(candidate);
-  });
+  act(() => api().loadProject(candidate));
   const format = screen.getByRole('combobox', { name: 'Formato da mensagem' });
   fireEvent.keyDown(format, { key: 'ArrowDown' });
   fireEvent.click(screen.getByRole('option', { name: 'Imagem' }));
-  fireEvent.click(button('Escolher dos anexos'));
-  expect(screen.getByRole('dialog', { name: 'Criar imagem simulada' })).toBeVisible();
-  fireEvent.click(sheet().getByRole('button', { name: 'Salvar anexo' }));
-  for (const name of ['IMG 02', 'IMG 03']) {
-    fireEvent.click(button('Adicionar opção manual'));
-    expect(sheet().getByPlaceholderText(name)).toBeVisible();
-    fireEvent.click(sheet().getByRole('button', { name: 'Salvar anexo' }));
-  }
-  const items = conversationAttachments(api().getProject());
-  expect(items.map((item) => item.name)).toEqual(['IMG 01', 'IMG 02', 'IMG 03']);
-  fireEvent.click(button('Usar IMG 03 no automático'));
-  expect(api().getProject().steps[0]).toMatchObject({ media: { attachmentId: items[2].id } });
-  fireEvent.click(button('Remover IMG 02 desta etapa'));
-  expect(conversationAttachments(api().getProject()).map((item) => item.name)).toEqual([
-    'IMG 03',
-    'IMG 01',
+  expect(screen.getByRole('radio', { name: '.png' })).toBeChecked();
+  fireEvent.click(screen.getByRole('radio', { name: '.jpg' }));
+  fireEvent.change(screen.getByRole('textbox', { name: 'Texto curto na imagem' }), {
+    target: { value: 'Peça' },
+  });
+  fireEvent.change(screen.getByRole('textbox', { name: 'Legenda (opcional)' }), {
+    target: { value: 'Com defeito' },
+  });
+
+  const current = api().getProject();
+  expect(current).not.toHaveProperty('attachments');
+  expect(current.steps[0]).toMatchObject({
+    media: { kind: 'image', file: { extension: 'jpg', name: 'Peça' }, caption: 'Com defeito' },
+  });
+  expect(conversationAttachments(current).map(({ name }) => name)).toEqual([
+    'Peça',
+    'Foto da empresa',
   ]);
+  expect(button('Peça')).toHaveTextContent('JPG');
+  expect(screen.getByText('Com defeito', { selector: '.bubble p' })).toBeVisible();
+  const url = new URL(await api().createShareURL());
+  expect(await loadSharedProject(sharedRoute(url.hash)!)).toEqual(current);
+
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] });
+  fireEvent.click(button('Iniciar manual'));
+  fireEvent.click(button('Anexar'));
+  fireEvent.click(sheet().getByRole('button', { name: 'Galeria' }));
+  fireEvent.click(sheet().getByRole('button', { name: 'Foto da empresa' }));
+  fireEvent.click(sheet().getByRole('button', { name: 'Enviar mensagem' }));
+  await tick(300);
+  expect(api().getState().messages[0]).toMatchObject({ attachmentId: 'media:business-image' });
+
+  fireEvent.click(button('Reproduzir automaticamente'));
+  await tick(9000);
+  expect(api().getState().messages[0]).toMatchObject({
+    attachmentId: 'media:customer-image',
+    text: 'Com defeito',
+  });
 });
 
-it('rejects media bytes and broken references and recovers legacy labels without rendering a source', () => {
-  const before = project();
-  const withSource = structuredClone(before);
-  Object.assign(withSource.attachments![0], { source: 'https://attacker.example/pixel.svg' });
-  expect(() => normalizeProject(withSource)).toThrow();
-  const broken = structuredClone(before);
-  broken.steps[0] = {
-    ...before.steps[0],
-    media: { kind: 'image', attachmentId: 'pdf' },
-  } as Project['steps'][number];
-  expect(() => normalizeProject(broken)).toThrow();
-  const legacy = {
-    ...withSource,
-    contact: { ...withSource.contact, avatar: 'https://attacker.example/brand.svg' },
-  };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(legacy));
-  render(<App />);
-  expect(api().getProject()).toEqual(normalizeProject(before));
-  expect(document.querySelector('img[src*="attacker.example"]')).toBeNull();
-  expect(document.querySelector('.chat-header img')).toHaveAttribute('src', storeIcon);
+it('rejects disallowed inline extensions, sources and document sizes', () => {
+  const candidate = (file: object, kind = 'document') => ({
+    version: 1,
+    contact: { name: 'Oficina', verified: false },
+    steps: [{ id: 'test', type: 'user', text: '', delay: 0, media: { kind, file } }],
+  });
+  for (const size of [undefined, 0, -1, 100.01, Infinity, '20']) {
+    expect(() =>
+      normalizeProject(candidate({ extension: 'pdf', name: 'Doc', size, unit: 'MB' })),
+    ).toThrow();
+  }
+  expect(() => normalizeProject(candidate({ extension: 'svg', name: 'Image' }, 'image'))).toThrow();
+  expect(() =>
+    normalizeProject(
+      candidate({ extension: 'jpg', name: 'Image', source: 'data:image/png;base64,a' }, 'image'),
+    ),
+  ).toThrow();
 });

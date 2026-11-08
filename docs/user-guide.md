@@ -40,9 +40,9 @@ Message bodies support `*bold*`, `_italic_` and `~strikethrough~`, including com
 
 ## Add simulated attachments
 
-Set a Customer or Business message to **Image** or **Document**. Choose a preview already used in the sequence or create a new one in the step. Images get labels such as `IMG 01`; documents show a PDF icon, a filename and an illustrative size. The fixed store icon represents the business in every journey.
+Set a Customer or Business message to **Image** or **Document**. Choose a file extension directly in the step. Images offer .png and .jpg, with optional short text on the preview and a separate message caption. For a document, enter the name, a positive size and its unit. The editor adds the selected extension to the name and enforces the WhatsApp Business document limit of 100 MB (100,000 KB). [WhatsApp Business media limits](https://docs.aws.amazon.com/social-messaging/latest/userguide/supported-media-types.html)
 
-Image captions belong to the message. The same preview can appear in several steps with different captions. A Customer step can add extra manual choices and choose which item automatic playback sends. The gallery and document picker collect the matching items across the whole sequence, including later steps, and show each item once. In manual playback, the paperclip opens the picker. You can cancel or go back, or select an item, add an optional image caption and send it.
+The gallery and document picker show matching simulated files from the conversation. In manual playback, use the paperclip to choose an item and send it. Automatic playback selects the item configured on the step.
 
 ## Add a WhatsApp Flow
 
@@ -84,7 +84,7 @@ An AI tool with browser access can build the journey in the editor and copy the 
 
 The link holds the compressed journey, including messages, Flow definitions, automatic answers and simulated attachment labels. Anyone with the full URL can read the content. Use fictional data and a hosted address your recipients can reach. Links copied from a local HTML file target the public WhatsDemo site.
 
-Old links open as demos and use simulated previews for their referenced attachments. Invalid or truncated links open a recovery screen with a shortcut to the local editor. Your stored draft remains available.
+Invalid or truncated links open a recovery screen with a shortcut to the local editor. Your stored draft remains available.
 
 ## Record a phone-only video
 

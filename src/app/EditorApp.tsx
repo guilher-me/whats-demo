@@ -27,8 +27,7 @@ import { RecordingControls } from '../features/recording/components/RecordingCon
 import { TooltipIconButton } from '../components/ui/TooltipIconButton';
 import { ControlIcon } from '../components/icons/ControlIcon';
 import { ConversationOverview } from '../features/conversation/components/ConversationOverview';
-import { selectAttachment, stepAttachment, validateAttachments } from '../core/attachments';
-import type { Attachment, MessageStep } from '../core/types';
+import { stepAttachment } from '../core/attachments';
 export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnly?: boolean }) {
   const t = useT();
   const restoreLabel = t(copy ? 'sharing.restoreSource' : 'editor.restore');
@@ -65,10 +64,9 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
       setInvalid((current) => (current[id] === !valid ? current : { ...current, [id]: !valid })),
     [],
   );
-  const attachments = editor.project.attachments ?? [];
   const hasErrors = editor.project.steps.some((step) =>
     step.type !== 'flow' && step.media
-      ? !stepAttachment(step, attachments)
+      ? !stepAttachment(step)
       : step.type === 'business'
         ? !!businessMessageError(step)
         : step.type === 'flow' && invalid[step.id],
@@ -144,22 +142,6 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
     if (playback.running) playback.stop();
     operation();
   };
-  const addAttachment = (item: Attachment, target: MessageStep, alternative: boolean) => {
-    ensureAvailable();
-    const next = validateAttachments([...attachments, item]);
-    edit(() => {
-      editor.update((project) => ({
-        ...project,
-        attachments: next,
-        steps: project.steps.map((step) =>
-          step.id === target.id && step.type !== 'flow' && step.media?.kind === item.kind
-            ? { ...step, media: selectAttachment(step.media, item.id, alternative) }
-            : step,
-        ),
-      }));
-      selectStep(target.id);
-    });
-  };
   const composerDisabled =
     hasErrors || !editor.project.steps.length || (!playback.running && recorder.busy);
   const sendFromComposer = () => {
@@ -216,7 +198,6 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
           }
         });
       }}
-      onAddAttachment={addAttachment}
     />
   );
   const preview = (
@@ -262,7 +243,7 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
               step={selectedStep}
               phoneRef={phoneRef}
               flowPreview={flowPreview?.stepId === selectedStep.id ? flowPreview : undefined}
-              attachment={stepAttachment(selectedStep, attachments)}
+              attachment={stepAttachment(selectedStep)}
             />
           </>
         ) : (

@@ -1,5 +1,5 @@
 import { useT } from '../../../i18n';
-import type { Attachment, Contact, MessageStep, Project, Step } from '../../../core/types';
+import type { Contact, Project, Step } from '../../../core/types';
 import { useRef, useState, useEffect } from 'react';
 import { useAddedStepFocus } from '../hooks/useAddedStepFocus';
 import { ContactEditor } from './ContactEditor';
@@ -10,14 +10,6 @@ import { FieldError } from '../../../components/ui/Field';
 import type { StepAction } from './StepActions';
 import type { SaveState } from '../hooks/useProject';
 import { SortableSteps } from './SortableSteps';
-import {
-  conversationAttachments,
-  MAX_ATTACHMENTS,
-  nextImageName,
-  selectAttachment,
-  stepAttachment,
-} from '../../../core/attachments';
-import { AttachmentDialog } from './AttachmentDialog';
 interface Props {
   saveState: SaveState;
   project: Project;
@@ -36,21 +28,12 @@ interface Props {
   restoreLabel: string;
   onValidity: (id: string, valid: boolean) => void;
   onFlowPreview: (id: string, screenId?: string) => void;
-  onAddAttachment: (item: Attachment, step: MessageStep, alternative: boolean) => void;
 }
 export function EditorPanel(props: Props) {
   const t = useT();
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const [expandedId, setExpandedId] = useState<string | null>(props.project.steps[0]?.id ?? null);
-  const [picker, setPicker] = useState<{
-    stepId: string;
-    revision: number;
-    alternative: boolean;
-  }>();
-  const attachments = conversationAttachments(props.project);
-  const target = props.project.steps.find((step) => step.id === picker?.stepId);
-  const media = target?.type !== 'flow' ? target?.media : undefined;
   useEffect(() => {
     setExpandedId(props.project.steps[0]?.id ?? null);
   }, [props.revision]);
@@ -107,13 +90,6 @@ export function EditorPanel(props: Props) {
               onAction={(action) => props.onAction(step.id, action)}
               onValidity={props.onValidity}
               onFlowPreview={(screenId) => props.onFlowPreview(step.id, screenId)}
-              attachment={stepAttachment(step, attachments)}
-              alternatives={attachments.filter(
-                (item) => step.type !== 'flow' && step.media?.alternativeIds?.includes(item.id),
-              )}
-              onChooseAttachment={(alternative = false) =>
-                setPicker({ stepId: step.id, revision: props.revision, alternative })
-              }
             />
           )}
         </SortableSteps>
@@ -133,28 +109,6 @@ export function EditorPanel(props: Props) {
           disabled={props.disabled || props.project.steps.length >= 200}
         />
       </footer>
-      {picker?.revision === props.revision && target?.type !== 'flow' && target && media && (
-        <AttachmentDialog
-          key={target.id}
-          kind={media.kind}
-          atLimit={attachments.length >= MAX_ATTACHMENTS}
-          imageName={nextImageName(attachments)}
-          items={attachments.filter(
-            (item) =>
-              item.kind === media.kind &&
-              item.id !== media.attachmentId &&
-              (!picker.alternative || !media.alternativeIds?.includes(item.id)),
-          )}
-          onClose={() => setPicker(undefined)}
-          onSelect={(item) => {
-            props.onChange(target.id, {
-              media: selectAttachment(media, item.id, picker.alternative),
-            });
-            setPicker(undefined);
-          }}
-          onCreate={(item) => props.onAddAttachment(item, target, picker.alternative)}
-        />
-      )}
     </section>
   );
 }
