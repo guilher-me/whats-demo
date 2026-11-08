@@ -123,6 +123,12 @@
   cursor: pointer;
 }
 
+.commerce-product-row:disabled {
+  opacity: 1;
+  background: transparent;
+  cursor: default;
+}
+
 .commerce-product-row > span:last-child,
 .commerce-cart-line label {
   display: grid;
