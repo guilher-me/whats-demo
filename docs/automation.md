@@ -6,9 +6,9 @@ The `llms.txt` file provides instructions; it does not execute a model or automa
 
 ## Generate links from an AI tool
 
-Construct a JSON-compatible project using the contract below. Configure it in the editor through the public API or visible controls. Return an editor link by default, and use preview mode when the user wants only the interactive phone.
+Construct a JSON-compatible project using the contract below. Use the guide, schema and generator from the same deployment. Configure it through the public API or visible controls when the user authorizes changing the active draft.
 
-- **Browser API** — validate the configuration, then call `window.whatsappFakeFlows.loadProject(project)` when the user authorizes replacing the active draft. Generate a link with `await window.whatsappFakeFlows.createShareURL(project)`. Pass `'demo'` as the second argument to open the preview.
+- **Browser API** — call `validateProject(project)` first. Check the automatic diagnostics before testing automatic playback. When authorized, load the normalized result with `loadProject(validation.project)`. Pass the project directly to `createShareURL(project, 'demo')` to generate an interactive player link without changing the draft. Omitting the mode opens the editor.
 - **Browser controls** — paste the whole journey in **Code**, use **Validate** and **Apply**, then select **Copy link**. The copied link opens with only **Preview** expanded and uses the current interface language.
 - **Static module** — the hosted build publishes `share.mjs` beside the app. It exports `createShareURL(project, mode?, baseURL?, locale?, view?)`. The default opens the production editor. Pass a reachable app address and `'en'`, `'es'` or `'pt-BR'` as needed. In editor mode, pass `'preview'` as the fifth argument to start with **Code** and **Editor** collapsed.
 
@@ -44,7 +44,7 @@ In browser controls, scope editing to **Conversation editor** and expand a step 
 }
 ```
 
-The fixed store icon is included with the app. Set the contact name and whether the verified badge should appear. The [JSON schema](../schemas/project-v1.schema.json) describes the structure. The generator also checks cross-references and message rules.
+The fixed store icon is included with the app. Set the contact name and whether the verified badge should appear. The [JSON schema](../schemas/project-v1.schema.json) describes the structure. The generator checks project structure and message rules. Use the editor or browser API for Flow diagnostics and playback checks.
 
 Every step has a unique string `id`, `type`, `text` and a numeric `delay` between 0 and 120 seconds. The maximum is 200 steps. Use deterministic IDs when generating a journey. Missing or duplicate step IDs are normalized, but explicit unique IDs make later updates easier.
 
@@ -180,9 +180,19 @@ const journey = {
 };
 const validation = api.validateProject(journey);
 if (!validation.valid) throw new Error(validation.errors.join('\n'));
+const issues = validation.diagnostics.filter(
+  ({ kind }) => kind === 'automatic' || kind === 'simulator',
+);
+if (issues.length)
+  throw new Error(issues.map(({ path, message }) => `${path} — ${message}`).join('\n'));
+
+// Use the active editor for playback only when the user authorized replacing its draft.
 api.loadProject(validation.project);
 const result = await api.play('automatic');
-const shareURL = await api.createShareURL(journey, 'demo');
+if (!result.messages.some(({ text }) => text === 'Seu protocolo de exemplo é 20260001.')) {
+  throw new Error(result.status);
+}
+const shareURL = await api.createShareURL(validation.project, 'demo');
 ```
 
 ## Static module example
