@@ -163,6 +163,18 @@
   gap: 6px;
 }
 
+/* Automatic playback owns the controls without changing their available appearance. */
+.commerce-sheet footer [data-playback-locked] {
+  opacity: 1;
+  background: var(--surface);
+}
+
+.commerce-sheet footer .button--primary[data-playback-locked] {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+
 .commerce-sheet-body:focus {
   outline: none;
 }
