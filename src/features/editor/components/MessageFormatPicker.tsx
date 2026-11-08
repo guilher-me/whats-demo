@@ -1,7 +1,7 @@
 import { useId } from 'react';
 import { useT } from '../../../i18n';
 import { ControlIcon } from '../../../components/icons/ControlIcon';
-type Format = 'text' | 'buttons' | 'list' | 'image' | 'document';
+type Format = 'text' | 'buttons' | 'list' | 'image' | 'document' | 'product' | 'showcase' | 'pix';
 export function MessageFormatPicker({
   value,
   onChange,
@@ -21,6 +21,9 @@ export function MessageFormatPicker({
             { value: 'buttons', label: t('editor.buttons'), icon: 'manual' },
             { value: 'list', label: t('editor.list'), icon: 'flow' },
             { value: 'image', label: t('attachments.image'), icon: 'photo' },
+            { value: 'product', label: t('commerce.product'), icon: 'photo' },
+            { value: 'showcase', label: t('commerce.showcase'), icon: 'flow' },
+            { value: 'pix', label: t('commerce.pix'), icon: 'file' },
             { value: 'document', label: t('attachments.document'), icon: 'file' },
           ] as const
         ).map((option) => (

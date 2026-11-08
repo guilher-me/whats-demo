@@ -1,3 +1,4 @@
+import { CommerceSheet } from '../../commerce/CommerceSheet';
 import { useT } from '../../../i18n';
 import { useEffect, useRef, type RefObject } from 'react';
 import type { Contact } from '../../../core/types';
@@ -30,6 +31,8 @@ export function PhonePreview({
   const t = useT();
 
   const body = useRef<HTMLDivElement>(null);
+  const commerce = p.commerce.session;
+  const commerceLocked = p.automatic || p.paused;
   const attach = p.media.session || (!p.running && onStartAttachment);
   useEffect(() => {
     if (body.current) body.current.scrollTop = body.current.scrollHeight;
@@ -55,21 +58,38 @@ export function PhonePreview({
           aria-relevant="additions text"
           aria-atomic="false"
         >
-          {p.messages.map((message) => (
-            <MessageBubble
-              key={message.id}
-              message={message}
-              running={p.running}
-              onOpen={p.openFlow}
-              pendingId={p.interaction.pendingId}
-              onReply={p.interaction.reply}
-              onList={p.interaction.open}
-              phoneRef={phoneRef}
-              attachmentDisabled={
-                p.automatic || (!!p.media.session && p.media.session.view !== 'closed')
-              }
-            />
-          ))}
+          {p.messages.map((message) => {
+            const content = message.commerce;
+            const active = commerce?.messageId === message.id;
+            const canOpen = !commerceLocked && (active || (!p.running && !commerce));
+            return (
+              <MessageBubble
+                key={message.id}
+                message={message}
+                running={p.running}
+                onOpen={p.openFlow}
+                pendingId={p.interaction.pendingId}
+                onReply={p.interaction.reply}
+                onList={p.interaction.open}
+                phoneRef={phoneRef}
+                cartCount={
+                  active && commerce.kind === 'shopping'
+                    ? commerce.items.reduce((total, item) => total + item.quantity, 0)
+                    : undefined
+                }
+                onCommerce={
+                  canOpen && content?.kind === 'offer'
+                    ? () => p.commerce.openOffer(message.id, content, !p.running)
+                    : canOpen && active && content?.kind === 'pix'
+                      ? () => p.commerce.copy(message.id)
+                      : undefined
+                }
+                attachmentDisabled={
+                  p.automatic || (!!p.media.session && p.media.session.view !== 'closed')
+                }
+              />
+            );
+          })}
           {p.typing && <TypingIndicator />}
         </div>
       </div>
@@ -91,7 +111,7 @@ export function PhonePreview({
           value={attach ? '' : p.draft}
           onChange={p.setDraft}
           onSend={onSend ?? p.send}
-          disabled={!!attach || composerDisabled || p.automatic || p.paused}
+          disabled={!!attach || !!commerce || composerDisabled || p.automatic || p.paused}
           attachmentDisabled={composerDisabled || p.automatic || p.paused}
           onAttach={
             attach
@@ -103,6 +123,17 @@ export function PhonePreview({
           }
         />
       )}
+      <CommerceSheet
+        controls={p.commerce}
+        container={phoneRef.current}
+        locked={commerceLocked}
+        returnFocus={(messageId) =>
+          Array.from(body.current?.querySelectorAll<HTMLElement>('[data-message-id]') ?? [])
+            .find((message) => message.dataset.messageId === messageId)
+            ?.querySelector<HTMLElement>('[data-commerce-action]')
+            ?.focus()
+        }
+      />
       <AttachmentPicker
         media={p.media}
         container={phoneRef.current}

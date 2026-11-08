@@ -1,3 +1,4 @@
+import { validateCommerce } from './commerce';
 import { t } from '../i18n';
 import { interactiveError } from './interactive';
 import { MAX_VOICE_SECONDS } from './voice-message';
@@ -237,6 +238,7 @@ export function validateProject(input: unknown, { allowDrafts = false } = {}): P
   }
   const project = input as unknown as Project;
   validateMediaSteps(project, allowDrafts);
+  validateCommerce(project, allowDrafts);
   return project;
 }
 export const SUPPORTED_COMPONENTS = new Set([

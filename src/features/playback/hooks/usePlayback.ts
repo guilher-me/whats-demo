@@ -1,7 +1,15 @@
 import { t, useT, type MessageKey } from '../../../i18n';
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { flushSync } from 'react-dom';
-import type { ChatMessage, FlowComponent, FlowStep, Project, Value } from '../../../core/types';
+import type {
+  ChatMessage,
+  CommerceMessage,
+  FlowComponent,
+  FlowStep,
+  OrderLine,
+  Project,
+  Value,
+} from '../../../core/types';
 import { clone, uid } from '../../../core/project';
 import { validateProject } from '../../../core/engine';
 import { deferred, delay } from '../../../core/async';
@@ -17,6 +25,8 @@ import { flowReadingText } from '../../flows/reading';
 import { automaticAnswer } from '../../flows/answers';
 import { conversationAttachments, stepAttachment } from '../../../core/attachments';
 import { useAttachmentPlayback } from './useAttachmentPlayback';
+import { autoCart, offerMessage, offerOf, pixMessage, subtotal } from '../../../core/commerce';
+import { useCommercePlayback } from '../../commerce/useCommercePlayback';
 
 export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpeed = true) {
   useT();
@@ -56,6 +66,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
   );
   const flow = useFlowSession(),
     media = useAttachmentPlayback(),
+    commerce = useCommercePlayback(),
     cursor = useCursor(phone, wait),
     controller = useRef<AbortController | null>(null),
     draftRef = useRef(''),
@@ -71,7 +82,10 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
   const append = (
     text: string,
     direction: ChatMessage['direction'],
-    content?: Pick<ChatMessage, 'flowStep' | 'interactive' | 'voiceDurationMs' | 'attachment'>,
+    content?: Pick<
+      ChatMessage,
+      'flowStep' | 'interactive' | 'voiceDurationMs' | 'attachment' | 'commerce'
+    >,
   ) => {
     const message: ChatMessage = {
       id: uid(),
@@ -115,6 +129,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
     waitingVoice.current = null;
     waitingAttachment.current = null;
     media.set(null);
+    commerce.reset();
     setVoiceComposer(false);
     cancelVoice();
     waitingFlow.current = null;
@@ -125,7 +140,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
     interaction.reset();
     cursor.hide();
     setStatus('playback.stopped');
-  }, [flow.set, interaction.reset, cancelVoice, media.set]);
+  }, [flow.set, interaction.reset, cancelVoice, media.set, commerce.reset]);
   const pause = () => {
     if (!controller.current || clock.current?.paused) return;
     if (!automaticMode.current) cancelVoice();
@@ -152,7 +167,14 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
   );
   const send = () => {
     const text = draftRef.current.trim();
-    if (!text || clock.current?.paused || waitingVoice.current || waitingAttachment.current) return;
+    if (
+      !text ||
+      clock.current?.paused ||
+      waitingVoice.current ||
+      waitingAttachment.current ||
+      commerce.current.current
+    )
+      return;
     append(text, 'user');
     setDraft('');
     const done = waitingUser.current;
@@ -329,7 +351,17 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
     setRunning(true);
     try {
       const validated = validateProject(project);
-      const steps = clone(validated.steps);
+      const { steps, catalog = [] } = clone(validated);
+      const offers = new Map<string, ChatMessage>();
+      const orders = new Map<string, OrderLine[]>();
+      const target = (selector: string) =>
+        phone.current?.querySelector<HTMLElement>(selector) ?? null;
+      const targetIn = (selector: string, attribute: string, value: string) =>
+        Array.from(phone.current?.querySelectorAll<HTMLElement>(selector) ?? []).find(
+          (node) => node.getAttribute(attribute) === value,
+        ) ?? null;
+      const tap = (element: HTMLElement | null, action: () => void) =>
+        cursor.touch(element, signal, () => flushSync(action));
       const attachments = conversationAttachments(validated);
       const openingMessage = !automatic ? initialMessage?.trim() : undefined;
       if (openingMessage) append(openingMessage, 'user');
@@ -339,7 +371,8 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
         openingMessage &&
         first?.type === 'user' &&
         first.voiceDurationSeconds === undefined &&
-        !first.media
+        !first.media &&
+        !first.commerce
           ? 1
           : 0;
       for (let index = startIndex; index < steps.length; index++) {
@@ -354,7 +387,57 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
         if (step.type === 'user') {
           // Register the expected input before the composer can submit.
           const received = deferred(signal);
-          if (step.media) {
+          if (step.commerce?.kind === 'cart') {
+            const { offerId, autoItems } = step.commerce;
+            const offer = offers.get(offerId);
+            const definition = offerOf(steps.find(({ id }) => id === offerId));
+            if (!offer || offer.commerce?.kind !== 'offer' || !definition)
+              throw new Error(t('commerce.invalidCart'));
+            const content = offer.commerce;
+            flushSync(() =>
+              commerce.startCart(offer.id, content, (lines) => {
+                orders.set(step.id, lines);
+                append('', 'user', { commerce: { kind: 'order', lines } });
+                received.finish();
+              }),
+            );
+            setStatus('commerce.waitCart');
+            const open = () =>
+              targetIn(
+                '[data-message-id]',
+                'data-message-id',
+                offer.id,
+              )?.querySelector<HTMLElement>('[data-commerce-action]') ?? null;
+            if (automatic) {
+              await wait(step.delay * 1000, signal);
+              await tap(open(), () => commerce.openOffer(offer.id, content, false));
+              const items = autoCart(definition, autoItems);
+              for (const item of items) {
+                if (!content.single)
+                  await tap(
+                    targetIn('[data-commerce-product]', 'data-commerce-product', item.sku),
+                    () => commerce.select(item.sku),
+                  );
+                await tap(target('[data-commerce-add]'), commerce.add);
+              }
+              await tap(target('[data-commerce-review]'), commerce.showCart);
+              for (const { sku, quantity } of items) {
+                if (quantity === 1) continue;
+                await cursor.type(
+                  targetIn('[data-commerce-quantity]', 'data-commerce-quantity', sku),
+                  String(quantity),
+                  signal,
+                  (value) => {
+                    if (value) flushSync(() => commerce.quantity(sku, Number(value)));
+                  },
+                  true,
+                );
+              }
+              await tap(target('[data-commerce-send]'), commerce.submit);
+            } else {
+              open()?.focus();
+            }
+          } else if (step.media) {
             const item = stepAttachment(step);
             if (!item) throw new Error(t('attachments.required'));
             waitingAttachment.current = received.finish;
@@ -447,14 +530,29 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
           const text =
             step.type === 'business' && step.media ? (step.media.caption ?? '') : step.text;
           // Cursor targets must exist before the next animation; commit this message synchronously.
+          let commerceContent: CommerceMessage | undefined;
+          const offer = offerOf(step);
+          if (offer) commerceContent = offerMessage(offer, catalog);
+          if (step.type === 'business' && step.commerce?.kind === 'pix') {
+            const amount = step.commerce.amount;
+            commerceContent = pixMessage(
+              index,
+              'cents' in amount ? amount.cents : subtotal(orders.get(amount.cartId) ?? []),
+            );
+          }
+          const payment = commerceContent?.kind === 'pix' ? deferred(signal) : undefined;
           let messageId = '';
           flushSync(() => {
             const message = append(text, 'business', {
               flowStep: step.type === 'flow' ? step : undefined,
               interactive: step.type === 'business' ? step.interactive : undefined,
               attachment: stepAttachment(step),
+              commerce: commerceContent,
             });
             messageId = message.id;
+            if (offer) offers.set(step.id, message);
+            if (payment && commerceContent?.kind === 'pix')
+              commerce.startPix(messageId, commerceContent, payment.finish);
           });
           if (automatic) {
             const choices =
@@ -464,6 +562,23 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
                     .join(' ')
                 : '';
             await cursor.read(`${text} ${choices}`, signal);
+          }
+          if (payment) {
+            setStatus('commerce.waitPix');
+            const open =
+              targetIn(
+                '[data-message-id]',
+                'data-message-id',
+                messageId,
+              )?.querySelector<HTMLElement>('[data-commerce-action]') ?? null;
+            if (automatic) {
+              await tap(open, () => commerce.copy(messageId));
+              await tap(target('[data-commerce-continue]'), commerce.continueDemo);
+            } else {
+              open?.focus();
+            }
+            await payment.promise;
+            await clock.current?.checkpoint();
           }
           if (step.type === 'business' && step.interactive) {
             const answered = interaction.wait(messageId, step.interactive, signal);
@@ -540,6 +655,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
     sendVoice,
     cancelVoice,
     media,
+    commerce,
     sendAttachment,
     running,
     paused,
