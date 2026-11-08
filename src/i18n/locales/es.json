@@ -627,6 +627,8 @@
   "commerce.cart": "Enviar carrito",
   "commerce.cartTitle": "Carrito",
   "commerce.cartStep": "Paso del carrito",
+  "commerce.addCartStep": "Añadir paso Enviar carrito",
+  "commerce.linkedCartStep": "Enviar carrito · Paso {{v0}}",
   "commerce.autoCart": "Carrito automático",
   "commerce.autoCartHelp": "Indica cuántas unidades de cada producto se añaden al carrito automático.",
   "commerce.resetCart": "Usar el primer producto",

@@ -46,6 +46,10 @@ Set a Customer or Business message to **Image** or **Document**. Choose a file e
 
 The gallery and document picker show matching simulated files from the conversation. In manual playback, use the paperclip to choose an item and send it. Automatic playback selects the item configured on the step.
 
+## Set up a product showcase
+
+In a **Product showcase** message, open **Automatic cart** to choose product quantities for automatic playback. If the showcase has no linked cart, select **Add Send cart step** to create one immediately after the showcase. The quantities are saved on the linked **Send cart** step. In manual playback, the customer chooses the products and quantities on the phone.
+
 ## Add a WhatsApp Flow
 
 A Flow step combines a business invitation, an opening button, a Flow JSON definition, automatic answers and an optional customer completion message.

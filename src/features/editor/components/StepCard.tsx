@@ -1,7 +1,7 @@
 import { useT } from '../../../i18n';
 import { stepAttachment } from '../../../core/attachments';
 import { useCallback, useId, useState, type ReactNode } from 'react';
-import type { Project, Step } from '../../../core/types';
+import type { CartItem, Project, Step } from '../../../core/types';
 import { MessageTextEditor } from './MessageTextEditor';
 import { StepTiming } from './StepTiming';
 import { ControlIcon } from '../../../components/icons/ControlIcon';
@@ -30,6 +30,7 @@ export function StepCard({
   dragHandle,
   onSelect,
   onChange,
+  onCartChange,
   onAction,
   onValidity,
   onFlowPreview,
@@ -50,6 +51,7 @@ export function StepCard({
   dragHandle?: ReactNode;
   onSelect: () => void;
   onChange: (change: Partial<Step>) => void;
+  onCartChange: (cartId?: string, items?: CartItem[]) => void;
   onAction: (action: StepAction) => void;
   onValidity: (id: string, valid: boolean) => void;
   onFlowPreview: (screenId?: string) => void;
@@ -148,6 +150,7 @@ export function StepCard({
             index={index}
             commerceError={commerceError}
             onChange={onChange}
+            onCartChange={onCartChange}
           />
         ) : step.type === 'user' ? (
           <CustomerMessageEditor

@@ -627,6 +627,8 @@
   "commerce.cart": "Send cart",
   "commerce.cartTitle": "Shopping cart",
   "commerce.cartStep": "Cart step",
+  "commerce.addCartStep": "Add Send cart step",
+  "commerce.linkedCartStep": "Send cart · Step {{v0}}",
   "commerce.autoCart": "Automatic cart",
   "commerce.autoCartHelp": "Enter a quantity for each product to add automatically.",
   "commerce.resetCart": "Use first product",

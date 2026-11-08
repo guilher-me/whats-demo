@@ -237,6 +237,28 @@ function EditorWorkspace({
           editor.updateStep(id, change);
         })
       }
+      onCartChange={(offerId, cartId, autoItems) =>
+        edit(() => {
+          const commerce = { kind: 'cart' as const, offerId, autoItems };
+          if (cartId) {
+            editor.updateStep(cartId, { commerce });
+            return;
+          }
+          const cart = { ...createStep('user'), type: 'user' as const, text: '', commerce };
+          editor.update((project) => {
+            const position = project.steps.findIndex(({ id }) => id === offerId);
+            if (position < 0 || project.steps.length >= 200) return project;
+            return {
+              ...project,
+              steps: [
+                ...project.steps.slice(0, position + 1),
+                cart,
+                ...project.steps.slice(position + 1),
+              ],
+            };
+          });
+        })
+      }
       onAction={(id, action) => edit(() => editor.action(id, action))}
       onReorder={(steps) => edit(() => editor.update((project) => ({ ...project, steps })))}
       onAdd={(type) => {

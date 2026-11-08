@@ -110,6 +110,50 @@ it('supports keyboard menus, Escape focus return, duplication and disabled bound
   expect(steps[0].text).toBe(steps[1].text);
   expect(new Set(steps.map((step) => step.id)).size).toBe(4);
 });
+it('configures automatic product selections from the showcase and reuses its cart step', async () => {
+  const api = () => window.whatsappFakeFlows!;
+  render(<App />);
+  await act(async () =>
+    api().loadProject({
+      version: 1,
+      contact: { name: 'Loja', verified: false },
+      catalog: [
+        { sku: 'MUG', name: 'Caneca', description: '', priceCents: 800 },
+        { sku: 'PLATE', name: 'Prato', description: '', priceCents: 1800 },
+      ],
+      steps: [
+        {
+          id: 'showcase',
+          type: 'business',
+          text: 'Confira a vitrine',
+          delay: 0,
+          commerce: { kind: 'showcase', sections: [{ title: 'Casa', skus: ['MUG', 'PLATE'] }] },
+        },
+        { id: 'last', type: 'business', text: 'Obrigado', delay: 0 },
+      ],
+    }),
+  );
+  const showcase = within(screen.getByRole('article', { name: 'Etapa 1' }));
+  const automatic = showcase.getByText('Carrinho automático').closest('details')!;
+  automatic.open = true;
+  fireEvent.click(showcase.getByRole('button', { name: 'Adicionar etapa Enviar carrinho' }));
+  const [offer, cart, last] = api().getProject().steps;
+  expect([offer.id, last.id]).toEqual(['showcase', 'last']);
+  expect(cart).toMatchObject({ type: 'user', commerce: { kind: 'cart', offerId: 'showcase' } });
+  expect(within(automatic).getByRole('spinbutton', { name: 'Caneca' })).toHaveValue(1);
+  fireEvent.change(within(automatic).getByRole('spinbutton', { name: 'Caneca' }), {
+    target: { value: '0' },
+  });
+  fireEvent.change(within(automatic).getByRole('spinbutton', { name: 'Prato' }), {
+    target: { value: '3' },
+  });
+  expect(api().getProject().steps).toHaveLength(3);
+  expect(api().getProject().steps[1]).toMatchObject({
+    id: cart.id,
+    commerce: { autoItems: [{ sku: 'PLATE', quantity: 3 }] },
+  });
+});
+
 function SelectHarness() {
   const [value, setValue] = useState('a');
   return (
