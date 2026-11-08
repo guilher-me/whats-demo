@@ -49,6 +49,26 @@
   "$defs": {
     "id": { "type": "string", "minLength": 1 },
     "media": {
+      "oneOf": [{ "$ref": "#/$defs/fileMedia" }, { "$ref": "#/$defs/locationMedia" }]
+    },
+    "locationMedia": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "place"],
+      "properties": {
+        "kind": { "const": "location" },
+        "place": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name"],
+          "properties": {
+            "name": { "type": "string", "minLength": 1, "maxLength": 60, "pattern": "\\S" },
+            "address": { "type": "string", "maxLength": 160 }
+          }
+        }
+      }
+    },
+    "fileMedia": {
       "type": "object",
       "additionalProperties": false,
       "required": ["kind", "file"],
