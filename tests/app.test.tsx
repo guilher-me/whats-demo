@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
 import { createLegacyProject as createDefaultProject } from './fixtures/legacy-project';
 import { STORAGE_KEY } from '../src/core/project';
-import { createDefaultProject as createLumaProject } from '../src/core/defaults';
+import { createLumaProject } from './fixtures/luma-project';
 beforeEach(() => {
   localStorage.clear();
   history.replaceState(null, '', '/');
@@ -96,7 +96,7 @@ describe('editor e reprodução React', () => {
     });
     expect(screen.getByTitle('Empresa teste')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: '＋ Empresa' }));
-    expect(screen.getByText('6 etapas')).toBeInTheDocument();
+    expect(screen.getByText('1 etapa')).toBeInTheDocument();
   });
   it('não perde a mensagem manual durante o delay inicial e completa os dois Flows', async () => {
     const project = createDefaultProject();

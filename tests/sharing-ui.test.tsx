@@ -6,7 +6,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
 import { createShareURL, decode, sharedRoute } from '../src/core/codec';
-import { createDefaultProject } from '../src/core/defaults';
+import { createLumaProject } from './fixtures/luma-project';
 import { STORAGE_KEY } from '../src/core/project';
 import { LOCALE_KEY } from '../src/i18n';
 
@@ -22,9 +22,20 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+it('asks for a step before attempting to copy an empty journey', async () => {
+  const user = userEvent.setup();
+  const write = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
+  render(<App />);
+  await user.click(screen.getByRole('button', { name: 'Copiar link' }));
+  expect(screen.getByRole('alert')).toHaveTextContent('Adicione pelo menos uma etapa');
+  expect(write).not.toHaveBeenCalled();
+});
+
 it('copies one link from the keyboard and opens only Preview initially', async () => {
   const user = userEvent.setup();
   const write = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
+  const draft = JSON.stringify(createLumaProject());
+  localStorage.setItem(STORAGE_KEY, draft);
   render(<App />);
   const trigger = screen.getByRole('button', { name: 'Copiar link' });
   trigger.focus();
@@ -45,7 +56,7 @@ it('copies one link from the keyboard and opens only Preview initially', async (
   expect(await decode(url.hash)).toEqual(window.whatsappFakeFlows!.getProject());
   expect(screen.queryByRole('menu')).toBeNull();
   expect(screen.queryByRole('dialog')).toBeNull();
-  expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+  expect(localStorage.getItem(STORAGE_KEY)).toBe(draft);
   expect(trigger).toHaveFocus();
 
   cleanup();
@@ -80,6 +91,8 @@ it('passes the promised URL to ClipboardItem and reports a blocked write inline'
     },
   );
   const write = vi.spyOn(navigator.clipboard, 'write').mockRejectedValue(new Error('blocked'));
+  const draft = JSON.stringify(createLumaProject());
+  localStorage.setItem(STORAGE_KEY, draft);
   render(<App />);
   await user.click(screen.getByRole('button', { name: 'Copiar link' }));
   expect(write).toHaveBeenCalledTimes(1);
@@ -93,7 +106,7 @@ it('passes the promised URL to ClipboardItem and reports a blocked write inline'
 it('applies the link language in preview and its editable copy without changing the browser preference', async () => {
   const user = userEvent.setup();
   localStorage.setItem(LOCALE_KEY, 'en');
-  const project = createDefaultProject();
+  const project = createLumaProject();
   project.contact.name = 'Empresa da jornada';
   const link = new URL(await createShareURL(project, 'demo', location.href, 'es'));
   history.replaceState(null, '', link.hash);

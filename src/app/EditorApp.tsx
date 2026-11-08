@@ -15,7 +15,6 @@ import { JourneyPhone } from '../features/conversation/components/JourneyPhone';
 import { Button } from '../components/ui/Button';
 import { Dialog } from '../components/ui/Dialog';
 import { businessMessageError } from '../core/interactive';
-import { createDefaultProject } from '../core/defaults';
 import { useAutomationAPI } from '../features/automation/useAutomationAPI';
 import {
   MessagePreview,
@@ -31,7 +30,6 @@ import { ConversationOverview } from '../features/conversation/components/Conver
 import { stepAttachment } from '../core/attachments';
 export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnly?: boolean }) {
   const t = useT();
-  const restoreLabel = t(copy ? 'sharing.restoreSource' : 'editor.restore');
 
   const editor = useProject(copy),
     phoneRef = useRef<HTMLDivElement>(null),
@@ -135,7 +133,6 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
       selectStep(null);
       playback.reset();
     },
-    example: createDefaultProject,
     instructions: () => document.getElementById('llms-txt')?.textContent ?? '',
     href: () => location.href,
   });
@@ -190,8 +187,7 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
         });
         return addedId;
       }}
-      onRestore={() => setRestoreOpen(true)}
-      restoreLabel={restoreLabel}
+      onRestore={copy ? () => setRestoreOpen(true) : undefined}
       onValidity={onValidity}
       onFlowPreview={(stepId, screenId) => {
         edit(() => {
@@ -235,7 +231,13 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
         )}
       </div>
       <p className="play-status" role="status" aria-live="polite">
-        {showOverview ? t('app.viewConversation') : selectedStep ? t('app.draft') : playback.status}
+        {showOverview
+          ? t('app.viewConversation')
+          : selectedStep
+            ? t('app.draft')
+            : editor.project.steps.length
+              ? playback.status
+              : t('playback.addStep')}
       </p>
       <div
         className="phone-stage"
@@ -336,25 +338,27 @@ export function EditorApp({ copy, previewOnly }: { copy?: SharedCopy; previewOnl
           preview,
         }}
       />
-      <Dialog
-        open={restoreOpen}
-        onOpenChange={setRestoreOpen}
-        title={t(copy ? 'sharing.restoreCopy' : 'app.restoreTitle')}
-        description={t(copy ? 'sharing.restoreCopyHint' : 'app.restoreHint')}
-      >
-        <div className="dialog-actions">
-          <Button onClick={() => setRestoreOpen(false)}>{t('common.cancel')}</Button>
-          <Button
-            variant="primary"
-            onClick={() => {
-              edit(editor.restore);
-              setRestoreOpen(false);
-            }}
-          >
-            {restoreLabel}
-          </Button>
-        </div>
-      </Dialog>
+      {copy && (
+        <Dialog
+          open={restoreOpen}
+          onOpenChange={setRestoreOpen}
+          title={t('sharing.restoreCopy')}
+          description={t('sharing.restoreCopyHint')}
+        >
+          <div className="dialog-actions">
+            <Button onClick={() => setRestoreOpen(false)}>{t('common.cancel')}</Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                edit(() => replaceProject(copy.project));
+                setRestoreOpen(false);
+              }}
+            >
+              {t('sharing.restoreSource')}
+            </Button>
+          </div>
+        </Dialog>
+      )}
     </div>
   );
 }

@@ -11,7 +11,7 @@ import {
 } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
-import { createDefaultProject } from '../src/core/defaults';
+import { createLumaProject } from './fixtures/luma-project';
 import { createStep, STORAGE_KEY } from '../src/core/project';
 import { useAddedStepFocus } from '../src/features/editor/hooks/useAddedStepFocus';
 beforeEach(() => {
@@ -30,7 +30,7 @@ it.each([
   ['＋ Empresa', 'business'],
   ['＋ Flow', 'flow'],
 ] as const)('adiciona %s no final e foca o campo de texto', async (label, type) => {
-  const project = createDefaultProject();
+  const project = createLumaProject();
 
   const originalIds = project.steps.map((step) => step.id);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(project));

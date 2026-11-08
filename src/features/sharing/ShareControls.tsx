@@ -40,6 +40,10 @@ export function ShareControls({
 
   const copy = async () => {
     if (pending.current) return;
+    if (!project.steps.length) {
+      setNotice({ text: t('sharing.empty'), error: true });
+      return;
+    }
     if (hasErrors) {
       setNotice({ text: t('errors.pendingFields'), error: true });
       return;

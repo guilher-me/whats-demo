@@ -6,7 +6,7 @@ import axe from 'axe-core';
 import { Blob as NativeBlob } from 'node:buffer';
 import { App } from '../src/app/App';
 import { catalogs, i18n, initialLocale, LOCALE_KEY, locales, t } from '../src/i18n';
-import { createDefaultProject } from '../src/core/defaults';
+import { createLumaProject } from './fixtures/luma-project';
 import { sharedRoute } from '../src/core/codec';
 import { STORAGE_KEY } from '../src/core/project';
 import { businessMessageError } from '../src/core/interactive';
@@ -36,7 +36,7 @@ it('uses English by default, honors only supported saved choices and tolerates b
 
 it('switches all three interfaces, persists the choice and includes it in the shared link', async () => {
   vi.stubGlobal('Blob', NativeBlob);
-  const project = createDefaultProject();
+  const project = createLumaProject();
 
   project.steps = [
     { id: 'message', type: 'business', text: 'Mensagem original do usuário', delay: 0 },
@@ -103,7 +103,7 @@ it.each(locales)(
 );
 
 it('refreshes playback status after a language switch without restarting the conversation', async () => {
-  const project = createDefaultProject();
+  const project = createLumaProject();
 
   project.steps = [{ id: 'user', type: 'user', text: 'oi', delay: 0 }];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(project));

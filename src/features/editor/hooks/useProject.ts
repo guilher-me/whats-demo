@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
 import type { Project, Step } from '../../../core/types';
-import { createDefaultProject } from '../../../core/defaults';
 import { clone, normalizeProject, projectStorageKey, uid } from '../../../core/project';
 import { t } from '../../../i18n';
 
-export type SaveState = 'example' | 'recovered' | 'saving' | 'saved' | 'failed' | 'shared';
+export type SaveState = 'empty' | 'recovered' | 'saving' | 'saved' | 'failed' | 'shared';
 export interface SharedCopy {
   project: Project;
   token: string;
@@ -17,11 +16,11 @@ export function useProject(copy?: SharedCopy) {
     return copy ? base + ':copy:' + copy.token : base;
   });
   const [initial] = useState<{ project: Project; state: SaveState; error?: string }>(() => {
-    const fallback = copy
-      ? { project: copy.project, state: 'shared' as const }
+    const fallback: { project: Project; state: SaveState } = copy
+      ? { project: copy.project, state: 'shared' }
       : {
-          project: createDefaultProject(),
-          state: 'example' as const,
+          project: { version: 1, contact: { name: '', verified: false }, steps: [] },
+          state: 'empty',
         };
     try {
       const raw = localStorage.getItem(storageKey);
@@ -79,6 +78,5 @@ export function useProject(copy?: SharedCopy) {
     update(() => next);
     setRevision((value) => value + 1);
   };
-  const restore = () => replace(copy?.project ?? createDefaultProject());
-  return { project, revision, error, saveState, update, updateStep, action, restore, replace };
+  return { project, revision, error, saveState, update, updateStep, action, replace };
 }

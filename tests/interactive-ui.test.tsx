@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/vitest';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
-import { createDefaultProject } from '../src/core/defaults';
+import { createLumaProject } from './fixtures/luma-project';
 import { createInteractive } from '../src/core/interactive';
 import { STORAGE_KEY } from '../src/core/project';
 import type { BusinessInteractive } from '../src/core/types';
@@ -22,7 +22,7 @@ async function tick(ms: number) {
   });
 }
 async function start(kind: BusinessInteractive['kind']) {
-  const project = createDefaultProject();
+  const project = createLumaProject();
 
   const interactive = createInteractive(kind);
   interactive.autoReplyId = 'option-2';

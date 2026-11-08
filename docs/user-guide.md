@@ -2,11 +2,9 @@
 
 [← WhatsDemo](../README.md) · [Install & run](getting-started.md) · [Build with an LLM](ai-guide.md)
 
-## Start with a working example
+## Start a journey
 
-The built-in **Luma Home** journey is an English-language demo for a fictional lighting store. It includes reply buttons, a sectioned product list, a two-screen Flow and a request confirmation. Customer details are fictional.
-
-Use **Restore example** to load it. The app asks you to confirm before replacing the current journey; copy its experience link first if you want to keep it. Existing drafts and shared links do not automatically get replaced when the built-in example changes.
+Open the editor to start with an empty conversation or recover a draft saved in this browser. Open a shared link to work with a specific journey. In an editable copy, **Restore from link** replaces local edits in that copy with the journey encoded in its link.
 
 ## Build the conversation
 

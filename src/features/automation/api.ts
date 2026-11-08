@@ -21,7 +21,6 @@ export interface AutomationBindings {
   run: (project: Project, automatic: boolean) => Promise<void>;
   stop: () => void;
   reset: () => void;
-  example: () => Project;
   instructions: () => string;
   href: () => string;
 }
@@ -35,11 +34,10 @@ export function createAutomationAPI(bindings: AutomationBindings) {
     if (!bindings.state().ready) throw new Error(t('errors.loading'));
   };
   return Object.freeze({
-    apiVersion: 2 as const,
+    apiVersion: 3 as const,
     projectVersion: 1 as const,
     getInstructions: () => bindings.instructions(),
     getProject: () => clone(bindings.project()),
-    getExample: () => clone(bindings.example()),
     getState: () => clone(bindings.state()),
     validateProject(input: unknown): ValidationResult {
       try {
@@ -66,6 +64,7 @@ export function createAutomationAPI(bindings: AutomationBindings) {
       if (bindings.state().running) throw new Error(t('errors.running'));
       if (bindings.hasErrors()) throw new Error(t('errors.pendingFields'));
       const project = normalizeProject(bindings.project());
+      if (!project.steps.length) throw new Error(t('playback.addStep'));
       await bindings.run(project, mode === 'automatic');
       return clone(bindings.state());
     },

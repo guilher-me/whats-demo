@@ -6,9 +6,9 @@
 
 If someone has shared `whats-demo.html` with you, open it in a modern desktop browser. You do not need Node.js, a backend or a WhatsApp account to use the simulator. The application's code, styles, default images and instructions are embedded in the file.
 
-Start with the Luma Home example, edit the contact and messages, then send a message in the phone or select automatic playback. See the [user guide](user-guide.md).
+Start with an empty conversation and add a contact and messages, or paste a journey into **Code** and apply it. Then send a message in the phone or select automatic playback. See the [user guide](user-guide.md).
 
-The HTML contains the app and its built-in example. Copying the HTML file does **not** bake your current locally saved journey into it. Use **Copy Link** to carry a custom journey, with the sharing constraints below.
+The HTML contains the editor and player. Use a shared link to carry the journey separately. Use **Copy Link** to carry a custom journey, with the sharing constraints below.
 
 ## Requirements for developers
 

@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/vitest';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
-import { createDefaultProject } from '../src/core/defaults';
+import { createLumaProject } from './fixtures/luma-project';
 import { createInteractive } from '../src/core/interactive';
 import { createStep, STORAGE_KEY } from '../src/core/project';
 import type { Step } from '../src/core/types';
@@ -17,7 +17,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 async function start(steps?: Step[]) {
-  const project = createDefaultProject();
+  const project = createLumaProject();
 
   if (steps) project.steps = steps;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
