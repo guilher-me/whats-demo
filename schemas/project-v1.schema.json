@@ -12,7 +12,25 @@
       "additionalProperties": false,
       "properties": {
         "name": { "type": "string", "maxLength": 80 },
-        "verified": { "type": "boolean" }
+        "verified": { "type": "boolean" },
+        "icon": {
+          "enum": [
+            "finance",
+            "commerce",
+            "health",
+            "education",
+            "industry",
+            "mobility",
+            "travel",
+            "services"
+          ]
+        },
+        "iconBackground": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "minLength": 7,
+          "maxLength": 7
+        }
       }
     },
     "catalog": {
