@@ -70,11 +70,13 @@ export function CommerceAction({
   value,
   count,
   enabled,
+  playbackLocked,
   onClick,
 }: {
   value: CommerceMessage;
   count?: number;
   enabled: boolean;
+  playbackLocked?: boolean;
   onClick?: () => void;
 }) {
   const t = useT();
@@ -86,6 +88,7 @@ export function CommerceAction({
       <MessageAction
         className="commerce-message-action"
         data-commerce-action
+        data-playback-locked={(value.kind === 'offer' && playbackLocked) || undefined}
         disabled={!enabled}
         onClick={onClick}
       >

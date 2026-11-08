@@ -11,6 +11,10 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 - Point first-time shared preview visitors to automatic playback with an animated hint.
 - Add a subtle repeating doodle to the preview background.
 
+### Fixed
+
+- Keep product offer buttons at full contrast while playback temporarily locks them.
+
 ## [0.4.0] - 2026-11-08
 
 ### Added
