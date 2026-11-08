@@ -1,3 +1,4 @@
+import { isBusinessIcon, isIconBackground } from './business-avatar';
 import { validateCommerce } from './commerce';
 import { t } from '../i18n';
 import { interactiveError } from './interactive';
@@ -197,6 +198,10 @@ export function validateProject(input: unknown, { allowDrafts = false } = {}): P
     !Array.isArray(input.steps)
   )
     throw new Error(t('errors.project'));
+  if (input.contact.icon !== undefined && !isBusinessIcon(input.contact.icon))
+    throw new Error('contact.icon · ' + t('contact.invalidIcon'));
+  if (input.contact.iconBackground !== undefined && !isIconBackground(input.contact.iconBackground))
+    throw new Error('contact.iconBackground · ' + t('contact.invalidHex'));
   if (input.steps.length > 200) throw new Error(t('errors.stepLimit'));
   for (const [index, step] of input.steps.entries()) {
     if (
