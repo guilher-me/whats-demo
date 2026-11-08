@@ -22,15 +22,23 @@ O editor também usa `ActionMenu` (Radix Dropdown Menu), `SelectField` (Radix Se
 
 `EditorPanel` mantém a etapa expandida como estado temporário de interface. `StepCard` mantém seu corpo montado e usa `hidden` ao recolher: desmontar os campos perderia rascunhos JSON inválidos e removeria sua validação. Menus de ações não expandem a etapa. `SortableSteps` altera apenas a ordem do array, preservando IDs, payloads e respostas dos Flows; o teclado usa Espaço, setas e Escape. `MessageOptionEditor` mantém o título editável e agrupa a descrição em uma seção compacta.
 
-`editor-product.css` estiliza apenas o construtor e seus menus compartilhados. O renderer do celular, o contrato persistido v1 e o formato dos links não mudam. Novos controles devem usar `useT()`, tokens semânticos e os primitives compartilhados. Referências: [Radix Dropdown Menu](https://www.radix-ui.com/primitives/docs/components/dropdown-menu) e [Radix Select](https://www.radix-ui.com/primitives/docs/components/select).
+`editor-product.css` estiliza apenas o construtor e seus menus compartilhados. Novos controles devem usar `useT()`, tokens semânticos e os primitives compartilhados. Referências: [Radix Dropdown Menu](https://www.radix-ui.com/primitives/docs/components/dropdown-menu) e [Radix Select](https://www.radix-ui.com/primitives/docs/components/select).
 
 Estilos globais e tokens ficam em `styles/base.css` e `styles/tokens.css`. Editor, conversa e Flows têm folhas próprias. Prefira classes e amplie os tokens quando houver uma variação compartilhada.
 
+## Painéis da jornada
+
+`Workbench` organiza Código, Editor e Preview e mantém os três componentes montados ao recolher. Os divisores redistribuem largura no desktop e altura em telas estreitas. Código mantém o texto pendente separado do projeto e aplica uma substituição validada ao editor. O diagnóstico de Flow usa o módulo local `flowso/validator` e as capacidades do simulador. A API de automação e o painel Código compartilham o mesmo diagnóstico.
+
+## Construtor de Flows
+
+As abas Visual e JSON editam a definição confirmada em `step.flow`. O rascunho pendente permanece na etapa até validar ou ser descartado. O catálogo do Flowso identifica os componentes disponíveis por versão, e a validação da jornada separa erros de definição, limites do simulador e respostas automáticas. O Preview usa o mesmo renderer e mantém uma sessão de teste isolada da reprodução da conversa.
+
 ## Persistência e evolução
 
-O editor usa a chave `whatsapp-fake-flows-v1` do localStorage. O projeto permanece com `version: 1`; a migração da interface para React não muda esse contrato.
+O editor usa a chave `whatsdemo-document-alpha1` do localStorage, com sufixos para desenvolvimento e cópias abertas por link. O projeto mantém `version: 1`.
 
-O codec de `core/codec.ts` preserva `#project=v1z...` (JSON UTF-8 comprimido com deflate e base64url) e `#project=v1j...` (JSON UTF-8 e base64url). Compressão usa a API nativa do navegador; a alternativa sem compressão mantém o compartilhamento disponível. Há limites de tamanho e validação antes de carregar dados.
+O codec de `core/codec.ts` cria `#demo=v3z.…` e `#editor=v3z.…` com o mesmo payload UTF-8, Deflate e Base62 em blocos. O conteúdo comprimido usa apenas letras e números para resistir à formatação do WhatsApp. O idioma da interface fica em `lang`. O botão Copiar link acrescenta `view=preview` à rota do editor para abrir a cópia com Código e Editor recolhidos. O navegador valida o tamanho antes e durante a descompressão. Links `v2z` continuam legíveis nos dois modos. Os formatos legados `#project=v1z.…` e `#project=v1j.…` abrem no simulador.
 
 As fixtures em `tests/fixtures` foram criadas com o formato anterior à migração. Não as regenere a cada alteração: elas demonstram que links salvos continuam legíveis.
 
@@ -47,11 +55,15 @@ A URL também depende de um endereço de hospedagem estável. Preservar o codec 
 
 `useProject` expõe um estado de persistência explícito: `example`, `recovered`, `saving`, `saved`, `failed` ou `shared`. O exemplo inicial não é anunciado como salvo; `recovered` requer um projeto local válido, e `saved` só é confirmado após `localStorage.setItem` concluir. Um link carregado é identificado separadamente e só passa a rascunho local após uma edição. Falhas mantêm as alterações em memória.
 
-`SaveIndicator`, abaixo do nome WhatsDemo no cabeçalho, apresenta o estado do projeto inteiro com ajuda por hover ou foco e fechamento por Escape. Seu tooltip explica que nome, foto, selo e toda a conversa são salvos somente neste navegador. Ele substitui o subtítulo da marca e fica separado dos idiomas e da ação Copiar link. Uma falha também produz um alerta persistente no rodapé fixo do editor, mesmo quando o usuário está no fim da lista. Os textos usam os três catálogos de tradução; o formato dos projetos e links permanece igual.
+`SaveIndicator`, abaixo do nome WhatsDemo no cabeçalho, apresenta o estado do projeto inteiro com ajuda por hover ou foco e fechamento por Escape. Seu tooltip explica que o perfil do contato e toda a conversa são salvos somente neste navegador. Ele substitui o subtítulo da marca e fica separado dos idiomas e da ação Copiar link. Uma falha também produz um alerta persistente no rodapé fixo do editor, mesmo quando o usuário está no fim da lista. Os textos usam os três catálogos de tradução.
+
+## Anexos simulados
+
+A etapa guarda a extensão e o texto da imagem simulada, com legenda separada. Para documentos, guarda o nome, a extensão e o tamanho numérico com unidade. `stepAttachment` prepara o item usado nos balões e `conversationAttachments` percorre a sequência para compor a galeria e o seletor de documentos. O avatar fixo e os previews são componentes reutilizados nas mensagens e na gravação.
 
 ## Build portátil
 
-`scripts/build.cjs` usa esbuild para agrupar React, código, CSS e imagem padrão. O resultado substitui os pontos de inserção de `index.html` e inclui as licenças em `dist/whats-demo.html`. Não há dependências carregadas por CDN. O arquivo pode ser aberto diretamente e continua sendo a entrega para usuários não técnicos.
+`scripts/build.cjs` usa esbuild para agrupar React, código, CSS e imagem padrão. O resultado substitui os pontos de inserção de `index.html` e inclui as licenças em `dist/whats-demo.html`. Não há dependências carregadas por CDN. O build também gera `share.mjs` para ferramentas de IA. A distribuição de jornadas usa links para o site estático.
 
 Os testes cobrem motor, compatibilidade dos links, reprodução manual/automática, cancelamento e estrutura do build. O CI executa tipos, formatação, testes e build.
 

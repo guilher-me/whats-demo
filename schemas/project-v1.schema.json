@@ -1,0 +1,242 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WhatsDemo journey v1",
+  "type": "object",
+  "required": ["version", "contact", "steps"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": 1 },
+    "contact": {
+      "type": "object",
+      "required": ["name", "verified"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "maxLength": 80 },
+        "verified": { "type": "boolean" }
+      }
+    },
+    "catalog": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/product" },
+      "minItems": 0,
+      "maxItems": 200
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 200,
+      "items": { "$ref": "#/$defs/step" }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "minLength": 1 },
+    "media": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "file"],
+      "properties": {
+        "kind": { "enum": ["image", "document"] },
+        "file": { "type": "object" },
+        "caption": { "type": "string", "maxLength": 1024 }
+      },
+      "if": { "properties": { "kind": { "const": "document" } } },
+      "then": {
+        "properties": {
+          "caption": false,
+          "file": { "$ref": "#/$defs/documentFile" }
+        }
+      },
+      "else": { "properties": { "file": { "$ref": "#/$defs/imageFile" } } }
+    },
+    "imageFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["extension", "name"],
+      "properties": {
+        "extension": { "enum": ["png", "jpg"] },
+        "name": { "type": "string", "maxLength": 48 }
+      }
+    },
+    "documentFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["extension", "name", "size", "unit"],
+      "properties": {
+        "extension": { "enum": ["pdf", "txt", "doc", "docx", "xls", "xlsx", "ppt", "pptx"] },
+        "name": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "size": { "type": "number", "exclusiveMinimum": 0 },
+        "unit": { "enum": ["KB", "MB"] }
+      },
+      "if": { "properties": { "unit": { "const": "MB" } } },
+      "then": { "properties": { "size": { "maximum": 100 } } },
+      "else": { "properties": { "size": { "maximum": 100000 } } }
+    },
+    "sku": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,47}$" },
+    "product": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sku", "name", "description", "priceCents"],
+      "properties": {
+        "sku": { "$ref": "#/$defs/sku" },
+        "name": { "type": "string", "maxLength": 100, "minLength": 1 },
+        "description": { "type": "string", "maxLength": 500 },
+        "priceCents": { "type": "integer", "minimum": 1, "maximum": 999999999 }
+      }
+    },
+    "commerce": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "sku"],
+          "properties": { "kind": { "const": "product" }, "sku": { "$ref": "#/$defs/sku" } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "sections"],
+          "properties": {
+            "kind": { "const": "showcase" },
+            "sections": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["title", "skus"],
+                "properties": {
+                  "title": { "type": "string", "maxLength": 100, "minLength": 1 },
+                  "skus": {
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/sku" },
+                    "minItems": 1,
+                    "maxItems": 30,
+                    "uniqueItems": true
+                  }
+                }
+              },
+              "minItems": 1,
+              "maxItems": 10
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "offerId"],
+          "properties": {
+            "kind": { "const": "cart" },
+            "offerId": { "$ref": "#/$defs/id" },
+            "autoItems": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["sku", "quantity"],
+                "properties": {
+                  "sku": { "$ref": "#/$defs/sku" },
+                  "quantity": { "type": "integer", "minimum": 1, "maximum": 99 }
+                }
+              },
+              "minItems": 1,
+              "maxItems": 30
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "amount"],
+          "properties": {
+            "kind": { "const": "pix" },
+            "amount": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["cents"],
+                  "properties": {
+                    "cents": { "type": "integer", "minimum": 1, "maximum": 2969999997030 }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["cartId"],
+                  "properties": { "cartId": { "$ref": "#/$defs/id" } }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "step": {
+      "type": "object",
+      "required": ["id", "type", "text", "delay"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "type": { "enum": ["user", "business", "flow"] },
+        "text": { "type": "string" },
+        "delay": { "type": "number", "minimum": 0, "maximum": 120 },
+        "typing": { "type": "boolean" },
+        "typingMs": { "type": "number", "minimum": 0 },
+        "voiceDurationSeconds": { "type": "integer", "minimum": 1, "maximum": 120 },
+        "media": { "$ref": "#/$defs/media" },
+        "commerce": { "$ref": "#/$defs/commerce" },
+        "interactive": {
+          "type": "object",
+          "required": ["kind"],
+          "properties": { "kind": { "enum": ["buttons", "list"] } }
+        },
+        "label": { "type": "string" },
+        "completion": { "type": "string" },
+        "flow": { "type": "object", "required": ["screens"] },
+        "answers": { "type": "object" }
+      },
+      "allOf": [
+        {
+          "if": { "required": ["commerce"] },
+          "then": {
+            "properties": {
+              "type": { "enum": ["user", "business"] },
+              "media": false,
+              "interactive": false,
+              "voiceDurationSeconds": false
+            },
+            "if": { "properties": { "type": { "const": "user" } } },
+            "then": {
+              "properties": { "commerce": { "properties": { "kind": { "const": "cart" } } } }
+            },
+            "else": {
+              "properties": {
+                "commerce": { "properties": { "kind": { "enum": ["product", "showcase", "pix"] } } }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "flow" } } },
+          "then": {
+            "required": ["label", "flow", "answers"],
+            "properties": { "interactive": false, "media": false, "voiceDurationSeconds": false }
+          },
+          "else": {
+            "properties": { "label": false, "completion": false, "flow": false, "answers": false }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "user" } } },
+          "then": { "properties": { "interactive": false } },
+          "else": {
+            "properties": { "voiceDurationSeconds": false }
+          }
+        },
+        {
+          "if": { "required": ["media"] },
+          "then": { "properties": { "interactive": false, "voiceDurationSeconds": false } }
+        }
+      ]
+    }
+  }
+}

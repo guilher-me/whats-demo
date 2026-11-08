@@ -17,3 +17,5 @@ Shared values live in `src/styles/tokens.css`:
 | `--danger`          | `#B42318` | Recording and errors          |
 
 Use semantic tokens in new application controls instead of adding more near-identical hex colors. Keep phone-specific colors in the conversation/Flow styles so brand changes to the editor do not recolor simulated customer messages. Card and floating-control shadows use neutral ink rather than green.
+
+The composer follows WhatsApp for Android. The microphone, attachment, camera and emoji SVGs are redrawn from the Help Center illustrations. The recording and sent bubble follow the waveform shown in the official announcement. [Android composer icons](https://faq.whatsapp.com/812276063311533/?cms_platform=android) · [Android voice message controls](https://faq.whatsapp.com/578442220724722/?cms_platform=android) · [Voice message announcement](https://blog.whatsapp.com/making-voice-messages-better)
