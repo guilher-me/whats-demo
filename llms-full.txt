@@ -9,7 +9,7 @@ Use the [automation guide](docs/automation.md), [project JSON schema](schemas/pr
 - In the editor, wait for `window.whatsappFakeFlows.getState().ready` before using the browser API. Call `validateProject(project)` and correct errors. For automatic playback, also check diagnostics with `kind: 'automatic'`.
 - A Flow step contains a static Flow JSON definition in `flow` and a separate `answers` map keyed by field name. Use supported components and Footer actions `navigate` or `complete`. Supply answers for all required fields on the automatic route. Use option IDs for choices, arrays of IDs for multiple choices, booleans for acceptances and ISO dates.
 - For a custom business avatar, use optional `contact.icon` (one of the eight IDs in the schema) and `contact.iconBackground` (six-digit `#RRGGBB`). Omit both for the default green storefront.
-- Configure simulated media on the step using `media.file`. The schema lists the supported formats and fields. Use fictional file names and captions.
+- Configure simulated images and documents with `media.file`. Use `media: { kind: "location", place: { name, address? } }` for a fixed simulated point in a customer or business step. Use fictional names, captions and addresses.
 - For a Brazilian commerce demo, define fictional products in the top-level `catalog` and send an offer with `commerce.kind: 'product'` or `'showcase'`. Add a customer `'cart'` step referencing the offer, then a business `'pix'` step using a fixed amount or the earlier cart subtotal. Use integer BRL cents. See the [commerce example](docs/automation.md#simulated-commerce). Inspect the actual order and Pix amount in `getState().messages`. Pix copying is simulated and shows a brief confirmation.
 - When authorized to replace the active journey, use `loadProject(validation.project)` or paste the project in **Code** and select **Validate** and **Apply**. Test through **Play automatically** or `await window.whatsappFakeFlows.play('automatic')`. Confirm that the expected messages appeared and the run completed.
 
@@ -87,12 +87,14 @@ The sequence is linear. Reply buttons and lists wait for a choice and append tha
 
 ## Simulated attachments
 
-Configure a simulated file in the step’s `media.file`. Use `text: ''` for media steps.
+Use `text: ''` for media steps. Images and documents use `media.file`, and locations use `media.place`.
 
-- An image uses `media: { kind: 'image', file: { extension: 'jpg', name: 'IMG 01' }, caption: 'Optional caption' }`. Supported extensions are `png` and `jpg`. The name appears on the image preview and can contain up to 48 characters. Use an empty string for the default label.
+- An image uses `media: { kind: 'image', file: { extension: 'jpg', name: 'IMG 01' }, caption: 'Optional caption' }`. Supported extensions are `png` and `jpg` (JPEG). The Meta limit of 5 MB applies to actual uploads. WhatsDemo stores simulated image metadata. The name appears on the image preview and can contain up to 48 characters. Use an empty string for the default label.
 - A document uses `media: { kind: 'document', file: { extension: 'pdf', name: 'Estimate', size: 240, unit: 'KB' } }`. Supported extensions are `pdf`, `txt`, `doc`, `docx`, `xls`, `xlsx`, `ppt` and `pptx`. Use a positive number and the unit `KB` or `MB`. The maximum is 100 MB or 100,000 KB. Use a name of up to 60 characters. The selected extension is appended to the filename.
 
-Automatic playback sends the configured file. Manual playback lists the matching files from all steps. Inline files use `media:<step-id>` as the recorded `attachmentId`. Omit media sources, document covers and avatars.
+- A fixed location uses `media: { kind: 'location', place: { name: 'Demo store', address: '123 Example Avenue' } }`. Both customer and business steps accept this shape. Use a place name of up to 60 characters and an optional address of up to 160. The phone draws an illustrative map locally.
+
+Automatic playback sends the configured attachment. Manual playback lists matching attachments from other steps. In a location step, **Send my current location** simulates sending the configured point. The recorded `attachmentId` uses `media:<step-id>` for the attachment actually sent. For a location, `getState().messages` also includes `location: { name, address? }`.
 
 ## Reply buttons
 
