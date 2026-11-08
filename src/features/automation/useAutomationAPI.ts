@@ -21,7 +21,6 @@ export function useAutomationAPI(bindings: AutomationBindings) {
       },
       stop: () => flushSync(() => latest.current.stop()),
       reset: () => flushSync(() => latest.current.reset()),
-      example: () => latest.current.example(),
       instructions: () => latest.current.instructions(),
       href: () => latest.current.href(),
     });

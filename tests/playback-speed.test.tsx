@@ -4,7 +4,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
 import { STORAGE_KEY } from '../src/core/project';
-import { createDefaultProject } from '../src/core/defaults';
+import { createLumaProject } from './fixtures/luma-project';
 import { PLAYBACK_SPEED_KEY } from '../src/features/playback/hooks/usePlaybackSpeed';
 
 beforeEach(() => {
@@ -23,7 +23,7 @@ async function tick(ms: number) {
   });
 }
 async function start(fullExample = false) {
-  const project = createDefaultProject();
+  const project = createLumaProject();
 
   if (!fullExample)
     project.steps = [

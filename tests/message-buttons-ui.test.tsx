@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { ReplyButtonsEditor } from '../src/features/editor/components/ReplyButtonsEditor';
 import { App } from '../src/app/App';
 import { STORAGE_KEY } from '../src/core/project';
-import { createDefaultProject } from '../src/core/defaults';
+import { createLumaProject } from './fixtures/luma-project';
 import type { ReplyButtonsMessage } from '../src/core/types';
 const url = {
   id: 'site',
@@ -35,7 +35,7 @@ const tick = async (ms: number) => {
   });
 };
 async function start(interactive: ReplyButtonsMessage) {
-  const project = createDefaultProject();
+  const project = createLumaProject();
 
   project.steps = [
     { id: 'buttons', type: 'business', text: 'Our offers', delay: 0, interactive },

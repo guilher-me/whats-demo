@@ -6,7 +6,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
 import { readJsonEditor, writeJsonEditor } from './fixtures/json-editor';
 import { decode } from '../src/core/codec';
-import example from '../src/core/default-project.json';
+import example from './fixtures/luma-project.json';
 import { createStep, STORAGE_KEY } from '../src/core/project';
 import type { FlowDefinition, FlowStep, Project } from '../src/core/types';
 
