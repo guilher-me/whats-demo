@@ -335,12 +335,33 @@
   gap: 8px;
   color: #54656f;
 }
-.voice-recording-dot {
-  width: 8px;
-  height: 8px;
-  flex: 0 0 8px;
-  border-radius: 50%;
-  background: #e54858;
+.voice-recording-marker {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  color: #d43848;
+}
+.voice-recording .voice-duration {
+  color: #111b21;
+  font-size: 13px;
+}
+.voice-cancel-hint {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+  color: #54656f;
+  font-size: 12px;
+  line-height: 1.25;
+  text-align: center;
+}
+.voice-cancel-hint svg {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
+  transform: rotate(90deg);
 }
 .voice-waveform {
   display: block;

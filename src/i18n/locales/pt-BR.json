@@ -161,6 +161,7 @@
   "phone.read": "Mensagem visualizada",
   "phone.draftNote": "Prévia da mensagem · alterações em tempo real",
   "phone.voiceHold": "Segure para gravar",
+  "phone.voiceSlideToCancel": "Deslize para cancelar",
   "phone.voiceMessage": "Mensagem de voz simulada · {{v0}}",
   "phone.listHint": "Escolha uma opção e envie sua resposta.",
   "phone.done": "Concluído",

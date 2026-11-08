@@ -161,6 +161,7 @@
   "phone.read": "Message read",
   "phone.draftNote": "Message preview · live updates",
   "phone.voiceHold": "Hold to record",
+  "phone.voiceSlideToCancel": "Slide to cancel",
   "phone.voiceMessage": "Simulated voice message · {{v0}}",
   "phone.listHint": "Choose an option and send your reply.",
   "phone.done": "Completed",

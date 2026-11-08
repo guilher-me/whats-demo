@@ -47,11 +47,16 @@ it('starts a manual voice step and sends on release using the time held', async 
   expect(microphone()).toHaveFocus();
   fireEvent.keyDown(microphone(), { key: ' ' });
   await tick(1350);
-  expect(document.querySelector('.voice-recording')).toHaveTextContent('0:01');
+  const indicator = document.querySelector('.voice-recording');
+  expect(indicator).toHaveTextContent('0:01');
+  expect(indicator).toHaveTextContent('Deslize para cancelar');
+  expect(indicator?.querySelector('.voice-waveform')).toBeNull();
   expect(api().getState().messages).toHaveLength(0);
   fireEvent.keyUp(microphone(), { key: ' ' });
   await tick(1);
-  expect(screen.getByRole('img', { name: 'Mensagem de voz simulada · 0:01' })).toBeVisible();
+  const message = screen.getByRole('img', { name: 'Mensagem de voz simulada · 0:01' });
+  expect(message).toBeVisible();
+  expect(message.querySelector('.voice-waveform')).toBeInTheDocument();
   expect(api().getState().messages).toMatchObject([
     { direction: 'user', voiceDurationMs: 1350, receipt: 'read' },
     { direction: 'business', text: 'Obrigado!' },
@@ -63,12 +68,14 @@ it('holds the cursor for the configured time, suspends the recording on pause an
   fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
   await tick(1000);
   expect(document.querySelector('.touch-cursor')).toHaveClass('pressed');
-  expect(document.querySelector('.voice-recording')).toBeInTheDocument();
+  const indicator = document.querySelector('.voice-recording');
+  expect(indicator).toHaveTextContent('Deslize para cancelar');
+  expect(indicator?.querySelector('.voice-waveform')).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: 'Pausar reprodução' }));
   await tick(1);
-  const waveform = document.querySelector('.voice-recording')?.innerHTML;
+  const duration = indicator?.querySelector('.voice-duration')?.textContent;
   await tick(3000);
-  expect(document.querySelector('.voice-recording')?.innerHTML).toBe(waveform);
+  expect(indicator?.querySelector('.voice-duration')?.textContent).toBe(duration);
   expect(api().getState().messages).toHaveLength(0);
   fireEvent.click(screen.getByRole('button', { name: 'Continuar reprodução' }));
   await tick(1379);
