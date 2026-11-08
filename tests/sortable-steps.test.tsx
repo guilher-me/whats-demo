@@ -86,7 +86,10 @@ it.each([false, true])(
 it.each([
   ['closed over expanded upward', false, 2, 'ArrowUp', 1, false],
   ['closed over expanded downward', true, 1, 'ArrowDown', 2, false],
+  ['expanded over closed upward', true, 2, 'ArrowUp', 1, false],
+  ['expanded over closed downward', false, 1, 'ArrowDown', 2, false],
   ['cancel closed over expanded', false, 2, 'ArrowUp', 1, true],
+  ['cancel expanded over closed', true, 2, 'ArrowUp', 1, true],
 ] as const)(
   'keeps the original dimensions with unequal heights: %s',
   async (_scenario, reverse, from, direction, to, cancel) => {

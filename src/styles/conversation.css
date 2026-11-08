@@ -65,8 +65,25 @@
   inset: 65px 0 61px;
   overflow-y: auto;
   scrollbar-width: thin;
+  scrollbar-color: rgb(0 0 0 / 45%) transparent;
   padding: 14px 13px;
   background: transparent;
+}
+@supports selector(::-webkit-scrollbar) {
+  .chat-body {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+  .chat-body::-webkit-scrollbar {
+    width: 4px;
+  }
+  .chat-body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .chat-body::-webkit-scrollbar-thumb {
+    background: rgb(0 0 0 / 45%);
+    border-radius: 999px;
+  }
 }
 .day {
   background: #fff9;
