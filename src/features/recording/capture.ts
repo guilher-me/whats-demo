@@ -22,17 +22,18 @@ export function capturePhone(
   node: HTMLElement,
   width: number,
   height: number,
+  backdrop: string,
 ): Promise<HTMLCanvasElement> {
   const frame = pending.then(() =>
     domToImage.toCanvas(node, {
       width,
       height,
       pixelRatio: 2,
-      bgcolor: '#ffffff',
+      bgcolor: backdrop,
       preserveScroll: true,
       disableEmbedFonts: true,
       styleCaching: 'strict',
-      style: { margin: '0', boxShadow: 'none' },
+      style: { margin: '0', filter: 'none' },
       filter: (child) =>
         !(child instanceof Element && child.hasAttribute('data-recording-exclude')),
       adjustClonedNode: copyLiveField,

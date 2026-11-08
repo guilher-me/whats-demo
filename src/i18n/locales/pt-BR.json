@@ -1,4 +1,6 @@
 {
+  "app.christmasSnow": "Neve de Natal",
+  "app.darkMode": "Modo escuro",
   "app.playgroundLink": "Playground de WhatsApp Flows (abre em nova guia)",
   "app.tagline": "Crie conversas. Mostre experiências.",
   "app.corrections": "Há campos que precisam de correção",
@@ -311,7 +313,7 @@
   "privacy.title": "Privacidade no WhatsDemo",
   "privacy.description": "Como sua jornada é armazenada e compartilhada.",
   "privacy.storageTitle": "Dados salvos neste navegador",
-  "privacy.storageBody": "O nome do contato, o selo, as mensagens, os anexos simulados, os Flows e as respostas automáticas ficam neste navegador usando localStorage. O idioma da interface e a velocidade também são preferências locais.",
+  "privacy.storageBody": "O nome do contato, o selo, as mensagens, os anexos simulados, os Flows e as respostas automáticas ficam neste navegador usando localStorage. O idioma da interface, o tema e a velocidade também são preferências locais.",
   "privacy.sharingTitle": "O link contém a jornada",
   "privacy.sharingBody": "Copie um link para compartilhar a conversa. Qualquer pessoa com ele pode ler a conversa. Use dados de exemplo.",
   "privacy.deleteTitle": "Como apagar os dados salvos",
@@ -593,5 +595,16 @@
   "commerce.invalidStep": "Este formato de comércio é inválido para a etapa.",
   "commerce.invalidOffer": "Selecione produtos do catálogo. Cada seção da vitrine precisa de título e pelo menos um produto. Use cada produto uma vez por oferta.",
   "commerce.invalidCart": "Selecione uma oferta anterior e configure pelo menos um item válido para o carrinho automático.",
-  "commerce.invalidAmount": "Informe um valor positivo em centavos ou selecione um carrinho anterior."
+  "commerce.invalidAmount": "Informe um valor positivo em centavos ou selecione um carrinho anterior.",
+  "changelog.title": "Novidades",
+  "changelog.open": "v{{v0}} · Novidades",
+  "changelog.description": "Histórico de versões do WhatsDemo. Versão atual v{{v0}}.",
+  "changelog.unreleased": "Ainda não publicado",
+  "changelog.added": "Adicionado",
+  "changelog.changed": "Alterado",
+  "changelog.deprecated": "Descontinuado",
+  "changelog.removed": "Removido",
+  "changelog.fixed": "Corrigido",
+  "changelog.security": "Segurança",
+  "changelog.github": "Histórico no GitHub"
 }

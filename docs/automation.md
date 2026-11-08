@@ -1,6 +1,6 @@
-# Automation API v2
+# Automation API v3
 
-WhatsApp Fake Flows exposes `window.whatsappFakeFlows` to tools allowed to execute JavaScript in the current page. This is a browser API, not an HTTP endpoint or MCP server. A tool restricted to read-only JavaScript must use its normal UI controls for mutations.
+WhatsDemo exposes `window.whatsappFakeFlows` to tools allowed to execute JavaScript in the current page. This is a browser API, not an HTTP endpoint or MCP server. A tool restricted to read-only JavaScript must use its normal UI controls for mutations.
 
 The `llms.txt` file provides instructions; it does not execute a model or automatically connect an agent. There is no API key, external LLM dependency or server in this integration.
 
@@ -16,7 +16,7 @@ The two modes use the same compressed payload. The link includes the interface l
 
 ## Browser API and readiness
 
-The editor contains `<link rel="describedby">` links and a `whatsapp-fake-flows-api` meta tag. Wait for the API and `getState().ready` before working with the editor. The `whatsapp-fake-flows:ready` event reports the API version. The demo view exposes the interactive phone and offers **Edit a copy**.
+The editor contains `<link rel="describedby">` links, a `whatsapp-fake-flows-api` meta tag and a separate `whatsdemo-version` meta tag for the product version. Wait for the API and `getState().ready` before working with the editor. The `whatsapp-fake-flows:ready` event reports the API version. The demo view exposes the interactive phone and offers **Edit a copy**.
 
 | Member                          | Contract                                                                                                                                                            |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

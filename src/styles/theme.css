@@ -1,0 +1,94 @@
+/* Fade the complete palette, including gradients and the phone wallpaper. */
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-group(root) {
+  animation-duration: 320ms;
+  animation-timing-function: ease-in-out;
+}
+
+.theme-switch {
+  flex: none;
+  display: grid;
+  place-items: center;
+  min-width: 62px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+}
+.theme-switch:hover {
+  background: transparent;
+}
+.theme-switch-track {
+  position: relative;
+  width: 62px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  padding-inline: 8px;
+  border: 1px solid #9aa6a1;
+  border-radius: inherit;
+  background: #e7ebe8;
+  color: #9a5b08;
+  box-shadow:
+    inset 1px 2px 4px #132c2550,
+    0 1px 1px #fff;
+}
+.theme-switch-track::after {
+  content: '';
+  position: absolute;
+  box-sizing: border-box;
+  top: 50%;
+  left: 1px;
+  width: 26px;
+  height: 26px;
+  border: 1px solid #b5c0bb;
+  border-radius: 50%;
+  background: linear-gradient(150deg, #fcfdfb, #c5ceca);
+  box-shadow:
+    1px 2px 4px #142c2566,
+    inset 0 1px 1px #fff;
+  transform: translate(32px, -50%);
+  transition: transform 160ms ease;
+}
+.theme-switch-track svg {
+  width: 16px;
+  height: 16px;
+}
+.theme-switch[aria-checked='true'] .theme-switch-track {
+  justify-content: flex-end;
+  border-color: #4d5d57;
+  background: #111d19;
+  color: #ffd17c;
+  box-shadow:
+    inset 1px 2px 5px #000a,
+    0 1px 0 #54666080;
+}
+.theme-switch[aria-checked='true'] .theme-switch-track::after {
+  border-color: #667571;
+  background: linear-gradient(150deg, #46534e, #252f2b);
+  box-shadow:
+    1px 2px 4px #0009,
+    inset 0 1px 1px #ffffff24;
+  transform: translate(0, -50%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-switch-track::after {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .theme-switch-track,
+  .theme-switch[aria-checked='true'] .theme-switch-track {
+    border-color: ButtonText;
+    color: ButtonText;
+  }
+  .theme-switch-track::after,
+  .theme-switch[aria-checked='true'] .theme-switch-track::after {
+    border-color: ButtonText;
+    background: ButtonText;
+    forced-color-adjust: none;
+  }
+}

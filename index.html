@@ -1,15 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="only light" />
+    <script id="theme-bootstrap">
+      try {
+        if (localStorage.getItem('whatsdemo-theme') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+          document.querySelector('meta[name="color-scheme"]').content = 'only dark';
+        }
+      } catch {
+        // Storage may be unavailable in a portable HTML file.
+      }
+    </script>
     <title>WhatsDemo</title>
     <!-- APP_FAVICON -->
     <link rel="describedby" type="text/plain" href="./llms.txt" />
     <link rel="help" type="text/plain" href="./llms.txt" title="AI interaction guide" />
     <link rel="describedby" type="text/plain" href="#llms-txt" />
     <meta name="whatsapp-fake-flows-api" content="window.whatsappFakeFlows; apiVersion=3" />
+    <!-- APP_RELEASE -->
     <!-- LLM_DOCS -->
     <!-- APP_STYLES -->
   </head>

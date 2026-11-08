@@ -1,7 +1,10 @@
 const fs = require('node:fs');
 const path = require('node:path');
 function agentDocs(root, directory, template) {
-  const index = fs.readFileSync(path.join(root, 'llms.txt'), 'utf8');
+  const { version } = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+  const index = fs
+    .readFileSync(path.join(root, 'llms.txt'), 'utf8')
+    .replace(/^> .+\r?\n/m, (summary) => `${summary}\nApp version: ${version}.\n`);
   const full = index + '\n\n' + fs.readFileSync(path.join(root, 'docs', 'automation.md'), 'utf8');
   fs.mkdirSync(directory, { recursive: true });
   for (const filename of ['llms.txt', 'llm.txt'])

@@ -2,10 +2,12 @@ import { useT } from '../i18n';
 import type { ReactNode } from 'react';
 import brandIcon from '../../assets/whatsdemo-icon.svg';
 import { LanguageSwitcher } from '../i18n/LanguageSwitcher';
+import { ThemeSwitch } from '../features/theme/Theme';
+import { SeasonalEffectButton } from '../features/seasonal/SeasonalEffects';
 import { PrivacyNotice } from '../features/privacy/PrivacyNotice';
 import { AgentGuideLink } from '../features/automation/AgentGuideLink';
 import { ControlIcon } from '../components/icons/ControlIcon';
-import { version } from '../../package.json';
+import { ReleaseNotes } from '../features/releases/ReleaseNotes';
 import { SaveIndicator } from '../features/editor/components/SaveIndicator';
 import type { SaveState } from '../features/editor/hooks/useProject';
 export function AppHeader({
@@ -30,7 +32,7 @@ export function AppHeader({
             <h1>
               Whats<span>Demo</span>
             </h1>
-            <span className="app-version">v{version}</span>
+            <ReleaseNotes disabled={disabled} />
           </div>
           <div className="brand-meta">
             <SaveIndicator state={saveState} />
@@ -62,7 +64,11 @@ export function AppHeader({
         </a>
       </nav>
       <div className="header-actions">
+        <SeasonalEffectButton effect="christmas" disabled={disabled} />
         <LanguageSwitcher disabled={disabled} />
+        <div className="header-theme">
+          <ThemeSwitch disabled={disabled} />
+        </div>
         {children}
       </div>
     </header>

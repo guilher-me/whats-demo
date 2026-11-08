@@ -6,6 +6,7 @@ import { createRequire } from 'node:module';
 import { Script } from 'node:vm';
 import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { version } from '../package.json';
 const require = createRequire(import.meta.url);
 it('gera um HTML com React, estilos, foto e licenças incorporados', async () => {
   const directory = mkdtempSync(join(tmpdir(), 'fake-flows-react-'));
@@ -36,7 +37,15 @@ it('gera um HTML com React, estilos, foto e licenças incorporados', async () =>
     expect(html).not.toContain('APP_SCRIPT');
     expect(html).not.toContain('LLM_DOCS');
     expect(html).toContain('id="llms-txt"');
-    expect(html).toContain('Automation API v2');
+    expect(html).toContain('Automation API v3');
+    expect(html).toContain(`<meta name="whatsdemo-version" content="${version}" />`);
+    const notes = html.match(/id="release-notes">([\s\S]*?)<\/script>/)?.[1];
+    expect(JSON.parse(notes!).slice(0, 2)).toMatchObject([{ version: 'Unreleased' }, { version }]);
+    expect(JSON.parse(readFileSync(join(directory, 'version.json'), 'utf8'))).toEqual({ version });
+    expect(readFileSync(join(directory, 'CHANGELOG.md'), 'utf8')).toBe(
+      readFileSync(new URL('../CHANGELOG.md', import.meta.url), 'utf8'),
+    );
+    expect(readFileSync(join(directory, 'llms.txt'), 'utf8')).toContain(`App version: ${version}.`);
     expect(readFileSync(join(directory, 'llms.txt'), 'utf8')).toContain('window.whatsappFakeFlows');
     expect(readFileSync(join(directory, 'llm.txt'), 'utf8')).toBe(
       readFileSync(join(directory, 'llms.txt'), 'utf8'),
@@ -67,4 +76,16 @@ it('gera um HTML com React, estilos, foto e licenças incorporados', async () =>
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
+});
+
+it('rejects version drift and pending notes for a main release', () => {
+  const { parseChangelog } = require('../scripts/release-notes.cjs');
+  const dated = '## [1.2.3] - 2026-11-08\n\n### Fixed\n\n- Fix a button.\n';
+  const pending = '## [Unreleased]\n\n### Changed\n\n- Update the preview.\n\n';
+  expect(() => parseChangelog(pending + dated, '1.2.4', false)).toThrow('package version 1.2.4');
+  expect(() => parseChangelog(pending + dated, '1.2.3', true)).toThrow('Move Unreleased notes');
+  expect(parseChangelog('## [Unreleased]\n\n' + dated, '1.2.3', true)[1]).toMatchObject({
+    version: '1.2.3',
+    groups: [{ category: 'Fixed', items: ['Fix a button.'] }],
+  });
 });

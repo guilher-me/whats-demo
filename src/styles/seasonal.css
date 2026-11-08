@@ -1,0 +1,27 @@
+.seasonal-toggle {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-color: transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+}
+.seasonal-toggle:hover:not(:disabled) {
+  color: var(--accent);
+}
+.seasonal-toggle[aria-pressed='true'] {
+  border-color: var(--line);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.seasonal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}

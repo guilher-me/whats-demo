@@ -27,14 +27,15 @@ export async function preparePhoneRecording(
   const width = node.offsetWidth,
     height = node.offsetHeight;
   if (!width || !height) throw new Error(t('errors.phoneVisible'));
-  const first = await capturePhone(node, width, height);
+  const backdrop = getComputedStyle(node).getPropertyValue('--recording-backdrop').trim() || '#fff';
+  const first = await capturePhone(node, width, height, backdrop);
   const canvas = document.createElement('canvas');
   canvas.width = width * 2;
   canvas.height = height * 2;
   const context = canvas.getContext('2d');
   if (!context) throw new Error(t('errors.prepareImage'));
   const paint = (frame: HTMLCanvasElement) => {
-    context.fillStyle = '#fff';
+    context.fillStyle = backdrop;
     context.fillRect(0, 0, canvas.width, canvas.height);
     context.drawImage(frame, 0, 0, canvas.width, canvas.height);
   };
@@ -101,7 +102,7 @@ export async function preparePhoneRecording(
     }
   };
   const draw = async () => {
-    const frame = await capturePhone(node, width, height);
+    const frame = await capturePhone(node, width, height, backdrop);
     if (!discarded) paint(frame);
   };
   const pump = () => {

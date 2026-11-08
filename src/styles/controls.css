@@ -363,8 +363,8 @@
   height: 43px;
   display: grid;
   place-items: center;
-  background: #f0f2f5;
-  color: #76848b;
+  background: var(--phone-header-surface);
+  color: var(--phone-tertiary);
   font-size: 10px;
 }
 .draft-chat {

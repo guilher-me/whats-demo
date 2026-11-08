@@ -1,4 +1,6 @@
 {
+  "app.christmasSnow": "Nieve de Navidad",
+  "app.darkMode": "Modo oscuro",
   "app.playgroundLink": "Playground de WhatsApp Flows (se abre en una pestaña nueva)",
   "app.tagline": "Crea conversaciones. Muestra experiencias.",
   "app.corrections": "Hay campos que necesitan corrección",
@@ -311,7 +313,7 @@
   "privacy.title": "Privacidad en WhatsDemo",
   "privacy.description": "Cómo se guarda y comparte tu recorrido.",
   "privacy.storageTitle": "Datos guardados en este navegador",
-  "privacy.storageBody": "El nombre del contacto, la insignia, los mensajes, los adjuntos simulados, los Flows y las respuestas automáticas se guardan en este navegador con localStorage. El idioma y la velocidad también son preferencias locales.",
+  "privacy.storageBody": "El nombre del contacto, la insignia, los mensajes, los adjuntos simulados, los Flows y las respuestas automáticas se guardan en este navegador con localStorage. El idioma, el tema y la velocidad también son preferencias locales.",
   "privacy.sharingTitle": "El enlace contiene el recorrido",
   "privacy.sharingBody": "Copia un enlace para compartir la conversación. Cualquiera que lo tenga puede leerla. Usa datos de ejemplo.",
   "privacy.deleteTitle": "Cómo borrar los datos guardados",
@@ -593,5 +595,16 @@
   "commerce.invalidStep": "Este formato de comercio no es válido para el paso.",
   "commerce.invalidOffer": "Selecciona productos del catálogo. Cada sección de la vitrina necesita un título y al menos un producto. Usa cada producto una vez por oferta.",
   "commerce.invalidCart": "Selecciona una oferta anterior y configura al menos un producto válido para el carrito automático.",
-  "commerce.invalidAmount": "Introduce un importe positivo en céntimos o selecciona un carrito anterior."
+  "commerce.invalidAmount": "Introduce un importe positivo en céntimos o selecciona un carrito anterior.",
+  "changelog.title": "Novedades",
+  "changelog.open": "v{{v0}} · Novedades",
+  "changelog.description": "Historial de versiones de WhatsDemo. Versión actual v{{v0}}.",
+  "changelog.unreleased": "Sin publicar",
+  "changelog.added": "Añadido",
+  "changelog.changed": "Cambios",
+  "changelog.deprecated": "Obsoleto",
+  "changelog.removed": "Eliminado",
+  "changelog.fixed": "Correcciones",
+  "changelog.security": "Seguridad",
+  "changelog.github": "Historial en GitHub"
 }

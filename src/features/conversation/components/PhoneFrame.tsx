@@ -20,7 +20,7 @@ export function PhoneFrame({
   const t = useT();
 
   return (
-    <div className="phone-device">
+    <div className="phone-device" data-seasonal-exclusion>
       <div className="phone-side-keys" aria-hidden="true">
         <span />
         <span />

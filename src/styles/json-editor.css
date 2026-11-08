@@ -52,6 +52,14 @@
     monospace;
 }
 
+.json-editor .cm-content {
+  caret-color: var(--ink);
+}
+
+.json-editor .cm-content ::selection {
+  background: var(--json-selection);
+}
+
 .json-editor .cm-gutters {
   background: var(--surface-subtle);
   color: var(--muted);
@@ -68,19 +76,19 @@
 }
 
 .json-editor .json-key {
-  color: #6540a4;
+  color: var(--json-key);
 }
 
 .json-editor .json-string {
-  color: #087145;
+  color: var(--json-string);
 }
 
 .json-editor .json-number {
-  color: #a34719;
+  color: var(--json-number);
 }
 
 .json-editor .json-literal {
-  color: #1d4ed8;
+  color: var(--json-literal);
 }
 
 .journey-code {

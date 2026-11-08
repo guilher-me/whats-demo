@@ -12,3 +12,5 @@ Both files are preserved as provided: the screenshot was not regenerated and the
 The README embeds a GitHub-hosted attachment of this same video so GitHub displays a video player. The repository copy keeps the recording available with the source and published documentation. The previous GIF and additional Flow screenshot have been removed.
 
 The scenario uses the fictional Luma Home example. Sources and notices for the bundled visual assets remain documented in [assets/README.md](../../assets/README.md).
+
+The Christmas snowfall PR uses [before](christmas-snow-off.jpg) and [after](christmas-snow-on.jpg) screenshots. To reproduce them, open the editor in dark mode at 1200 × 860, play a one-message greeting for the fictional Pine Studio contact, then turn on **Christmas snow** from the header.
