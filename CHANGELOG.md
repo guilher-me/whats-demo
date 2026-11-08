@@ -6,10 +6,13 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-08
+
 ### Added
 
 - Open the release history from the version badge in the editor and shared demos.
 - Switch between light and dark across the editor, shared demos, WhatsApp Flows and phone recordings.
+- Turn on optional Christmas snowfall from the header.
 
 ### Changed
 

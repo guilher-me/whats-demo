@@ -75,7 +75,7 @@ label select {
   height: 88px;
   padding: 0 32px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--line);
@@ -241,6 +241,7 @@ label select {
 .share-button svg {
   flex-shrink: 0;
 }
+.header-seasonal,
 .header-theme,
 .language-switcher {
   position: relative;
@@ -251,6 +252,7 @@ label select {
   padding-inline-end: 12px;
   margin-inline-end: 4px;
 }
+.header-seasonal::after,
 .header-theme::after,
 .language-switcher::after {
   content: '';
@@ -423,19 +425,7 @@ h3 {
     opacity: 1;
   }
 }
-@media (max-width: 900px) {
-  .editor,
-  .preview {
-    height: auto;
-    overflow: visible;
-  }
-  .editor {
-    border: 0;
-    border-bottom: 1px solid var(--line);
-  }
-  .preview {
-    padding-bottom: 30px;
-  }
+@media (max-width: 1100px) {
   .app-header {
     grid-template-columns: minmax(0, 1fr) auto;
     height: auto;
@@ -449,6 +439,20 @@ h3 {
   }
   .header-actions {
     flex-wrap: wrap;
+  }
+}
+@media (max-width: 900px) {
+  .editor,
+  .preview {
+    height: auto;
+    overflow: visible;
+  }
+  .editor {
+    border: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .preview {
+    padding-bottom: 30px;
   }
   .editor {
     padding: 24px 20px;
