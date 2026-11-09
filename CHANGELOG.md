@@ -21,6 +21,7 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 
 - Keep product offer buttons at full contrast while playback temporarily locks them.
 - Stabilize colors across frames in phone recording GIFs.
+- Match the GIF export progress bar to the active theme.
 
 ## [0.4.0] - 2026-11-08
 

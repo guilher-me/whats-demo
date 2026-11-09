@@ -129,7 +129,23 @@
 .record-gif-progress progress {
   flex: 1;
   min-width: 90px;
-  accent-color: var(--accent);
+  height: 6px;
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--accent-soft);
+}
+.record-gif-progress progress::-webkit-progress-bar {
+  background: var(--accent-soft);
+}
+.record-gif-progress progress::-webkit-progress-value {
+  border-radius: 999px;
+  background: var(--accent);
+}
+.record-gif-progress progress::-moz-progress-bar {
+  border-radius: 999px;
+  background: var(--accent);
 }
 .download-recording {
   display: inline-flex;
