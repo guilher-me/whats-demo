@@ -100,7 +100,7 @@ Select **Record phone**, choose manual or automatic playback, and wait for the t
 
 The standard download is MP4 where supported, otherwise WebM. To show the slide behind the phone’s rounded corners, choose **Transparent corners (WebM)** before recording. The presentation app must preserve WebM transparency. Recording captures only the phone, without audio, at 720 × 1440; the editor and controls stay out of the video. Keep the tab visible while recording. Rendering happens locally. See the [recording reference](recording.md) for implementation details and limitations (currently in Brazilian Portuguese).
 
-The recording in the project README is an MP4 demonstration supplied by the maintainer. The app's recording feature exports video, not GIF.
+In the recording result, select **Download GIF** for a looping 360 × 720 animation. WhatsDemo converts the finished recording locally and preserves the rounded cutout when you recorded with transparent corners. Longer clips may use fewer frames per second.
 
 ## Version and release notes
 

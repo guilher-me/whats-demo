@@ -6,10 +6,24 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-08
+
 ### Added
 
 - Point first-time shared preview visitors to automatic playback with an animated hint.
 - Add a subtle repeating doodle to the preview background.
+- Download phone recordings as animated GIFs, with transparent corners when enabled for the recording.
+
+### Changed
+
+- Document the current workspace, message and recording features in the WhatsDemo agent guide.
+- Use `window.whatsDemo` and `whatsdemo:ready` for browser automation API v4. The previous global and ready event were removed.
+
+### Fixed
+
+- Keep product offer buttons at full contrast while playback temporarily locks them.
+- Stabilize colors across frames in phone recording GIFs.
+- Match the GIF export progress bar to the active theme.
 
 ## [0.4.0] - 2026-11-08
 
