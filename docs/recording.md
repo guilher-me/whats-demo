@@ -17,7 +17,7 @@ Durante a preparação e a contagem, o botão permite cancelar sem gerar um arqu
 
 ## Formato e compatibilidade
 
-O aplicativo testa os codificadores nativos e tenta MP4 primeiro; caso não esteja disponível, usa WebM. A extensão do download corresponde ao formato efetivamente produzido. Para WebM, `fix-webm-duration` adiciona a duração ausente quando necessário.
+O aplicativo tenta gravar MP4 com H.264, formato voltado ao compartilhamento como vídeo no WhatsApp. Quando o navegador não oferece esse codificador, o download sai em WebM. O WebM usa uma taxa de bits de vídeo maior e solicita um quadro-chave por segundo para preservar os detalhes desde o início. O `fix-webm-duration` adiciona a duração ausente quando necessário.
 
 A opção de cantos transparentes grava em WebM com VP8 e verifica se o arquivo preserva o canal alfa. O aplicativo de apresentações precisa reproduzir o WebM com transparência para mostrar o fundo do slide nos cantos. A prévia usa um quadriculado para destacar as áreas transparentes. [Transparência em WebM no Chromium](https://developer.chrome.com/blog/alpha-transparency-in-chrome-video)
 
