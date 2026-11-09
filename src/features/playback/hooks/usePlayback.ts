@@ -27,12 +27,22 @@ import { automaticAnswer } from '../../flows/answers';
 import { conversationAttachments, stepAttachment } from '../../../core/attachments';
 import { useAttachmentPlayback } from './useAttachmentPlayback';
 import { autoCart, offerMessage, offerOf, pixMessage, subtotal } from '../../../core/commerce';
+import {
+  isCustomerText,
+  resolveVariableMessage,
+  variablePath,
+  type VariableValues,
+} from '../../../core/journey-variables';
+import { captureFlowVariables } from '../../flows/journey-variables';
 import { useCommercePlayback } from '../../commerce/useCommercePlayback';
 
 export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpeed = true) {
   useT();
   const { speed, current: speedRef, setSpeed } = usePlaybackSpeed(persistSpeed);
   const automaticMode = useRef(false);
+  const variables = useRef<VariableValues>(new Map());
+  const sourceStep = useRef<Project['steps'][number] | undefined>(undefined);
+
   const clock = useRef<PlaybackClock | null>(null);
   const sleep = useCallback(
     (milliseconds: number, signal: AbortSignal) =>
@@ -85,7 +95,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
     direction: ChatMessage['direction'],
     content?: Pick<
       ChatMessage,
-      'flowStep' | 'interactive' | 'voiceDurationMs' | 'attachment' | 'commerce'
+      'flowStep' | 'interactive' | 'voiceDurationMs' | 'attachment' | 'commerce' | 'formattedText'
     >,
   ) => {
     const message: ChatMessage = {
@@ -107,7 +117,14 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
     return message;
   };
   const interaction = useMessageInteraction((id, option, isResponse) => {
-    if (isResponse) append(option.title, 'user');
+    if (isResponse) {
+      const step = sourceStep.current;
+      if (step?.type === 'business' && step.interactive) {
+        variables.current.set(variablePath('choice', step.id, 'title'), option.title);
+        variables.current.set(variablePath('choice', step.id, 'id'), option.id);
+      }
+      append(option.title, 'user');
+    }
     setMessages((current) =>
       current.map((message) =>
         message.id === id ? { ...message, selection: option.id } : message,
@@ -124,6 +141,8 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
     clock.current = null;
     setPaused(false);
     automaticMode.current = false;
+    variables.current.clear();
+    sourceStep.current = undefined;
     waitingUser.current = null;
     waitingVoice.current = null;
     waitingAttachment.current = null;
@@ -177,6 +196,9 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
     append(text, 'user');
     setDraft('');
     const done = waitingUser.current;
+    const step = sourceStep.current;
+    if (done && step && isCustomerText(step))
+      variables.current.set(variablePath('chat', step.id, 'text'), text);
     waitingUser.current = null;
     done?.();
   };
@@ -214,6 +236,15 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
     const done = waitingAttachment.current;
     if (!done || clock.current?.paused) return;
     waitingAttachment.current = null;
+    const step = sourceStep.current;
+    if (
+      attachment.kind === 'location' &&
+      step?.type === 'user' &&
+      step.media?.kind === 'location'
+    ) {
+      variables.current.set(variablePath('location', step.id, 'name'), attachment.name);
+      variables.current.set(variablePath('location', step.id, 'address'), attachment.address ?? '');
+    }
     flushSync(() => {
       append(caption, 'user', { attachment });
       media.set(null);
@@ -262,6 +293,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
     await sleep(220, active.signal);
     if (controller.current !== active) return;
     flow.set(null);
+    captureFlowVariables(session, variables.current);
     if (session.step.completion) append(session.step.completion, 'user');
     setMessages((current) =>
       current.map((message) =>
@@ -376,17 +408,13 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
       if (openingMessage) append(openingMessage, 'user');
       // The submitted text fulfills only an opening customer step; later replies still wait.
       const first = steps[0];
-      const startIndex =
-        openingMessage &&
-        first?.type === 'user' &&
-        first.voiceDurationSeconds === undefined &&
-        !first.media &&
-        !first.commerce
-          ? 1
-          : 0;
+      const startIndex = openingMessage && first && isCustomerText(first) ? 1 : 0;
+      if (startIndex && openingMessage)
+        variables.current.set(variablePath('chat', first.id, 'text'), openingMessage);
       for (let index = startIndex; index < steps.length; index++) {
         const step = steps[index];
         if (signal.aborted) return;
+        sourceStep.current = step;
         setActiveStep(step.id);
         setStatus('playback.progress', {
           v0: automatic ? 'playback.autoMode' : 'playback.manualMode',
@@ -512,17 +540,22 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
             waitingUser.current = received.finish;
             if (automatic) {
               await wait(step.delay * 1000, signal);
-              await cursor.type(
-                phone.current?.querySelector<HTMLElement>('[data-composer-input]') ?? null,
-                step.text,
-                signal,
-                setDraft,
-              );
-              await cursor.touch(
-                phone.current?.querySelector<HTMLElement>('[data-send]') ?? null,
-                signal,
-                send,
-              );
+              if (!step.text.trim()) {
+                waitingUser.current = null;
+                received.finish();
+              } else {
+                await cursor.type(
+                  phone.current?.querySelector<HTMLElement>('[data-composer-input]') ?? null,
+                  step.text,
+                  signal,
+                  setDraft,
+                );
+                await cursor.touch(
+                  phone.current?.querySelector<HTMLElement>('[data-send]') ?? null,
+                  signal,
+                  send,
+                );
+              }
             } else {
               setStatus('playback.typeMessage');
               phone.current?.querySelector<HTMLInputElement>('[data-composer-input]')?.focus();
@@ -541,8 +574,10 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
             await sleep(step.delay * 1000, signal);
           }
           setTyping(false);
+          const resolved = resolveVariableMessage(step, variables.current);
           const text =
-            step.type === 'business' && step.media ? (step.media.caption ?? '') : step.text;
+            resolved?.text ??
+            (step.type === 'business' && step.media ? (step.media.caption ?? '') : step.text);
           // Cursor targets must exist before the next animation; commit this message synchronously.
           let commerceContent: CommerceMessage | undefined;
           const offer = offerOf(step);
@@ -561,6 +596,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
           flushSync(() => {
             const message = append(text, 'business', {
               flowStep: step.type === 'flow' ? step : undefined,
+              ...(resolved?.formattedText ? { formattedText: resolved.formattedText } : {}),
               interactive,
               attachment: stepAttachment(step),
               commerce: commerceContent,

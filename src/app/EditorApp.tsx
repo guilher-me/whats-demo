@@ -35,6 +35,7 @@ import { RecordingControls } from '../features/recording/components/RecordingCon
 import { TooltipIconButton } from '../components/ui/TooltipIconButton';
 import { ControlIcon } from '../components/icons/ControlIcon';
 import { ConversationOverview } from '../features/conversation/components/ConversationOverview';
+import { previewVariableMessage } from '../features/conversation/overview';
 import { stepAttachment } from '../core/attachments';
 import { JourneyControls } from '../features/journeys/JourneyControls';
 import { useLiveJourneyLink } from '../features/journeys/live-link';
@@ -116,6 +117,12 @@ function EditorWorkspace({
     [],
   );
   const hasErrors =
+    diagnostics.some(
+      (issue) =>
+        issue.kind === 'definition' &&
+        issue.severity === 'error' &&
+        /^steps\[\d+\]\.(?:text|media\.caption)$/.test(issue.path),
+    ) ||
     !!catalogError(editor.project.catalog, false) ||
     editor.project.steps.some(
       (step, index) =>
@@ -146,6 +153,12 @@ function EditorWorkspace({
   const selectedStep = !playback.running
     ? editor.project.steps.find((step) => step.id === selectedId)
     : undefined;
+  const resolvedPreview = useMemo(
+    () =>
+      selectedStep &&
+      previewVariableMessage(editor.project, editor.project.steps.indexOf(selectedStep)),
+    [editor.project, selectedStep, currentLocale()],
+  );
   const recorder = useRecording({
     phone: phoneRef,
     prepare: () =>
@@ -186,13 +199,15 @@ function EditorWorkspace({
       pendingMessageId:
         playback.interaction.pendingId ??
         (playback.running ? (playback.commerce.session?.messageId ?? null) : null),
-      messages: playback.messages.map(({ attachment, ...message }) => {
-        if (!attachment) return message;
-        const entry = { ...message, attachmentId: attachment.id };
-        if (attachment.kind !== 'location') return entry;
-        const { name, address } = attachment;
-        return { ...entry, location: { name, address } };
-      }),
+      messages: playback.messages.map(
+        ({ attachment, formattedText: _formattedText, ...message }) => {
+          if (!attachment) return message;
+          const entry = { ...message, attachmentId: attachment.id };
+          if (attachment.kind !== 'location') return entry;
+          const { name, address } = attachment;
+          return { ...entry, location: { name, address } };
+        },
+      ),
     }),
     hasErrors: () => hasErrors,
     replace: replaceProject,
@@ -237,6 +252,7 @@ function EditorWorkspace({
       saveState={editor.saveState}
       disabled={recorder.busy}
       project={editor.project}
+      diagnostics={diagnostics}
       revision={editor.revision}
       activeStep={playback.activeStep}
       selectedStep={selectedStep?.id ?? null}
@@ -362,6 +378,7 @@ function EditorWorkspace({
               phoneRef={phoneRef}
               flowPreview={flowPreview?.stepId === selectedStep.id ? flowPreview : undefined}
               attachment={stepAttachment(selectedStep)}
+              resolved={resolvedPreview}
               commerce={commercePreview(editor.project, editor.project.steps.indexOf(selectedStep))}
             />
           </>

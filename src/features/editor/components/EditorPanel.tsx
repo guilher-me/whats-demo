@@ -1,3 +1,4 @@
+import type { JourneyDiagnostic } from '../../flows/diagnostics';
 import { useT } from '../../../i18n';
 import type { CartItem, Contact, Project, Step } from '../../../core/types';
 import { useRef, useState, useEffect, useLayoutEffect } from 'react';
@@ -26,6 +27,7 @@ interface Props {
   onAnswersDraft: (id: string, draft?: AnswersDraft) => void;
   saveState: SaveState;
   project: Project;
+  diagnostics: JourneyDiagnostic[];
   revision: number;
   activeStep: string | null;
   selectedStep: string | null;
@@ -118,6 +120,7 @@ export function EditorPanel(props: Props) {
               onFlowDraft={(draft) => props.onFlowDraft(step.id, draft)}
               onAnswersDraft={(draft) => props.onAnswersDraft(step.id, draft)}
               project={props.project}
+              diagnostics={props.diagnostics}
               commerceError={commerceStepError(props.project, index)}
               index={index}
               total={props.project.steps.length}

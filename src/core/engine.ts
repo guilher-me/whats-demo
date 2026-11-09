@@ -1,4 +1,5 @@
 import { isBusinessIcon, isAvatarColor } from './business-avatar';
+import { variableIssues } from './journey-variables';
 import { validateCommerce } from './commerce';
 import { t } from '../i18n';
 import { interactiveError } from './interactive';
@@ -246,6 +247,10 @@ export function validateProject(input: unknown, { allowDrafts = false } = {}): P
   const project = input as unknown as Project;
   validateMediaSteps(project, allowDrafts);
   validateCommerce(project, allowDrafts);
+  if (!allowDrafts) {
+    const issue = variableIssues(project).find(({ severity }) => severity === 'error');
+    if (issue) throw new Error(issue.path + ' · ' + issue.message);
+  }
   return project;
 }
 export const SUPPORTED_COMPONENTS = new Set([

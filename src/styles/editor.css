@@ -207,3 +207,41 @@
   font-size: 12px;
   line-height: 1.5;
 }
+
+.variable-trigger {
+  padding: 5px 8px;
+  color: var(--accent-hover);
+  font-size: 12px;
+}
+
+.variable-menu {
+  max-height: 180px;
+  overflow: auto;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.variable-menu small {
+  display: block;
+  padding: 4px 7px;
+  color: var(--muted);
+}
+
+.variable-menu button {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 5px 7px;
+  border: 0;
+  border-radius: 5px;
+  text-align: start;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+.variable-menu button[aria-selected='true'] {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}

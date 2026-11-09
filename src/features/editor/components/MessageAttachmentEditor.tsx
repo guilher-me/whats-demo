@@ -1,4 +1,5 @@
 import { useId } from 'react';
+import type { VariableOption } from '../../../core/journey-variables';
 import type { MediaStep } from '../../../core/types';
 import {
   documentBaseName,
@@ -59,9 +60,11 @@ function ExtensionPicker<T extends string>({
 
 export function MessageAttachmentEditor({
   media,
+  variables,
   onChange,
 }: {
   media: MediaStep;
+  variables?: VariableOption[];
   onChange: (media: MediaStep) => void;
 }) {
   const t = useT();
@@ -117,6 +120,7 @@ export function MessageAttachmentEditor({
         />
         <MessageTextEditor
           label={t('attachments.caption')}
+          variables={variables}
           value={media.caption ?? ''}
           maxLength={MAX_CAPTION}
           onChange={(caption) => onChange({ ...media, caption })}

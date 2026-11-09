@@ -1,3 +1,4 @@
+import type { VariableOption } from '../../../core/journey-variables';
 import { CommerceFields } from '../../commerce/CommerceEditor';
 import { createMedia, isAttachmentKind } from '../../../core/attachments';
 import { buttonLabel, isReplyButton } from '../../../core/message-buttons';
@@ -17,6 +18,7 @@ export function BusinessMessageEditor({
   project,
   index,
   commerceError,
+  variables,
   onChange,
   onCartChange,
 }: {
@@ -24,6 +26,7 @@ export function BusinessMessageEditor({
   project: Project;
   index: number;
   commerceError: string;
+  variables?: VariableOption[];
   onChange: (change: Partial<MessageStep>) => void;
   onCartChange: (cartId?: string, items?: CartItem[]) => void;
 }) {
@@ -72,10 +75,15 @@ export function BusinessMessageEditor({
         }
       />
       {step.media ? (
-        <MessageAttachmentEditor media={step.media} onChange={(media) => onChange({ media })} />
+        <MessageAttachmentEditor
+          media={step.media}
+          variables={variables}
+          onChange={(media) => onChange({ media })}
+        />
       ) : (
         <MessageTextEditor
           label={t('editor.messageText')}
+          variables={variables}
           value={step.text}
           maxLength={value ? 1024 : undefined}
           onChange={(text) => onChange({ text })}

@@ -1,5 +1,6 @@
 import { validateFlowJson } from 'flowso/validator';
 import { SUPPORTED_COMPONENTS } from '../../core/engine';
+import { variableIssues } from '../../core/journey-variables';
 import { normalizeProject } from '../../core/project';
 import type { FlowComponent, FlowStep, Project } from '../../core/types';
 import { t } from '../../i18n';
@@ -106,9 +107,12 @@ export function flowDiagnostics(step: FlowStep, root = ''): JourneyDiagnostic[] 
 }
 
 export function journeyDiagnostics(project: Project): JourneyDiagnostic[] {
-  return project.steps.flatMap((step, index) =>
-    step.type === 'flow' ? flowDiagnostics(step, `steps[${index}]`) : [],
-  );
+  return [
+    ...project.steps.flatMap((step, index) =>
+      step.type === 'flow' ? flowDiagnostics(step, `steps[${index}]`) : [],
+    ),
+    ...variableIssues(project),
+  ];
 }
 
 /** Inspect a proposed edit without changing the currently loaded journey. */

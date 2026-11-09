@@ -120,6 +120,21 @@ For a default interactive quick-reply message, use 1–3 buttons. Each title mus
 
 Use 1–10 sections and at most 10 rows across all sections combined. Each section needs at least one row. Section titles accept 24 characters and are required when there is more than one section. Row titles accept 24 characters, descriptions 72 and IDs 200. IDs must be unique across the whole list. The invitation button is nonempty and accepts 20 characters. Header, footer and body limits match reply messages.
 
+## Automatic variables
+
+Use earlier customer inputs in business message bodies, business image captions and Flow invitation text. The editor suggests paths after typing `{{` or selecting **Insert variable**. Use stable step IDs. Each Flow path includes its step ID, screen ID and field name.
+
+| Reference                                                     | Result                                                |
+| ------------------------------------------------------------- | ----------------------------------------------------- |
+| `{{chat.ask_name.text}}`                                      | The sent customer text                                |
+| `{{choice.delivery.title}}` or `{{choice.delivery.id}}`       | The confirmed quick reply or list item                |
+| `{{flow.registration.FORM_SCREEN.name}}`                      | The value from a visible field on the completed route |
+| `{{location.meeting.name}}` or `{{location.meeting.address}}` | The simulated location actually sent                  |
+
+Segments containing dots, spaces or other punctuation use a quoted JSON string in brackets, as in `{{flow["register.v2"].FORM_SCREEN.name}}`. Supply an optional literal fallback with `{{location.meeting.address ?? "Address unavailable"}}`. Missing or blank values use that fallback or empty text. Flow choices render their display labels. Multiple choices use comma-separated labels.
+
+Manual playback captures the answers actually sent. Automatic playback and editor previews use the configured examples. The project, drafts and links carry reference text and configuration. The running values stay in the browser session and clear on stop or restart. Earlier step references must resolve before playing or sharing. Existing numeric placeholders such as `{{1}}` remain literal. Browser API v4 reports the resolved message text in its history.
+
 ## Flows
 
 A Flow step's `flow` field contains the JSON definition, not a Flow URL. `answers` maps form field names to values used in automatic mode. Supply an answer for every required field reached by the chosen route. In the editor, open **Automatic answers** to use field controls or edit the same map in **JSON**. New Flow fields receive a valid fictional example when available. **Fill missing answers** only adds absent keys. Runtime-dependent choices and custom text patterns require a configured answer.

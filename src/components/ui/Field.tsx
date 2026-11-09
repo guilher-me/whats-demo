@@ -1,9 +1,4 @@
-import {
-  useId,
-  type ReactNode,
-  type InputHTMLAttributes,
-  type TextareaHTMLAttributes,
-} from 'react';
+import { useId, type ReactNode, type InputHTMLAttributes, type ComponentPropsWithRef } from 'react';
 export function TextField({
   label,
   hint,
@@ -28,7 +23,7 @@ export function TextField({
 export function TextArea({
   label,
   ...props
-}: TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string }) {
+}: ComponentPropsWithRef<'textarea'> & { label: string }) {
   const id = useId();
   return (
     <label className="field" htmlFor={id}>
