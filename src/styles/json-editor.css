@@ -77,6 +77,11 @@
   background: var(--accent-soft);
 }
 
+.journey-code .json-linked-step {
+  background: color-mix(in srgb, var(--accent) 19%, transparent);
+  border-radius: 2px;
+}
+
 .json-editor .json-key {
   color: var(--json-key);
 }

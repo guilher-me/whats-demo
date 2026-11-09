@@ -128,6 +128,12 @@
 .step-body {
   padding: 0 14px 14px;
 }
+.step-body .step-code-link {
+  margin: 8px 0 2px;
+  padding: 5px 8px;
+  color: var(--accent-hover);
+  font-size: 12px;
+}
 .step-bottom {
   display: flex;
   align-items: center;

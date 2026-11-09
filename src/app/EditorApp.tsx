@@ -71,6 +71,11 @@ function EditorWorkspace({
   const focusContact = useRef(false);
   const [invalid, setInvalid] = useState<Record<string, boolean>>({}),
     [selectedId, setSelectedId] = useState<string | null>(null),
+    [stepReveal, setStepReveal] = useState<{
+      id: string;
+      panel: 'code' | 'editor';
+      explicit: boolean;
+    }>(),
     [flowPreview, setFlowPreview] = useState<FlowPreviewRequest>(),
     [showOverview, setShowOverview] = useState(false),
     [restoreOpen, setRestoreOpen] = useState(false),
@@ -91,8 +96,20 @@ function EditorWorkspace({
   const selectStep = (id: string | null) => {
     setShowOverview(false);
     setSelectedId(id);
+    if (!id) setStepReveal(undefined);
     setFlowPreview((current) => (current?.stepId === id ? current : undefined));
   };
+  const navigateStep = (id: string, panel: 'code' | 'editor', explicit = false) => {
+    selectStep(id);
+    if (explicit) setCollapsed((panels) => ({ ...panels, [panel]: false }));
+    setStepReveal(explicit || !collapsed[panel] ? { id, panel, explicit } : undefined);
+  };
+  useLayoutEffect(() => {
+    if (stepReveal?.explicit && window.matchMedia?.('(max-width: 959px)').matches)
+      document
+        .getElementById('workspace-' + stepReveal.panel)
+        ?.scrollIntoView?.({ block: 'start' });
+  }, [stepReveal]);
   const onValidity = useCallback(
     (id: string, valid: boolean) =>
       setInvalid((current) => (current[id] === !valid ? current : { ...current, [id]: !valid })),
@@ -223,10 +240,17 @@ function EditorWorkspace({
       revision={editor.revision}
       activeStep={playback.activeStep}
       selectedStep={selectedStep?.id ?? null}
+      revealStep={
+        !collapsed.editor && stepReveal?.panel === 'editor' && stepReveal.id === selectedStep?.id
+          ? stepReveal
+          : undefined
+      }
+      onShowCode={(id) => navigateStep(id, 'code', true)}
       onSelect={(id) => {
         if (recorder.busy) return;
         if (playback.running) playback.stop();
-        selectStep(id);
+        if (id) navigateStep(id, 'code');
+        else selectStep(id);
       }}
       error={editor.error}
       onCatalog={(catalog) => edit(() => editor.update((project) => ({ ...project, catalog })))}
@@ -453,6 +477,22 @@ function EditorWorkspace({
               project={editor.project}
               diagnostics={diagnostics}
               disabled={recorder.busy}
+              selectedStep={selectedStep?.id}
+              revealStep={
+                !collapsed.code &&
+                stepReveal?.panel === 'code' &&
+                stepReveal.id === selectedStep?.id
+                  ? stepReveal
+                  : undefined
+              }
+              onSelectStep={
+                recorder.busy || playback.running ? undefined : (id) => navigateStep(id, 'editor')
+              }
+              onShowStep={
+                recorder.busy || playback.running
+                  ? undefined
+                  : (id) => navigateStep(id, 'editor', true)
+              }
               onApply={replaceProject}
             />
           ),

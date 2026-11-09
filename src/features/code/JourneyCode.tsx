@@ -6,6 +6,7 @@ import type { Project } from '../../core/types';
 import { useT } from '../../i18n';
 import type { CodeDraft } from '../journeys/storage';
 import { reviewJourney, type JourneyDiagnostic } from '../flows/diagnostics';
+import { stepRanges } from './step-ranges';
 
 export function JourneyCode({
   project,
@@ -14,6 +15,10 @@ export function JourneyCode({
   onApply,
   draft,
   onDraftChange,
+  selectedStep,
+  revealStep,
+  onSelectStep,
+  onShowStep,
 }: {
   draft?: CodeDraft;
   onDraftChange: (draft?: CodeDraft) => void;
@@ -21,6 +26,10 @@ export function JourneyCode({
   diagnostics: JourneyDiagnostic[];
   disabled: boolean;
   onApply: (project: Project) => void;
+  selectedStep?: string;
+  revealStep?: { id: string };
+  onSelectStep?: (id: string) => void;
+  onShowStep?: (id: string) => void;
 }) {
   const t = useT();
   const current = useMemo(() => JSON.stringify(project, null, 2), [project]);
@@ -30,6 +39,22 @@ export function JourneyCode({
     status?: string;
   }>();
   const text = draft?.text ?? current;
+  const ranges = useMemo(() => stepRanges(text.replace(/\r\n?/g, '\n')), [text]);
+  const [cursor, setCursor] = useState<{ text: string; offset: number }>();
+  const knownStep = (id: string) => project.steps.some((step) => step.id === id);
+  const stepAt = (offset: number) => {
+    for (const [id, { from, to }] of ranges) {
+      if (from <= offset && offset <= to && knownStep(id)) return id;
+    }
+  };
+  const cursorStep = cursor?.text === text ? stepAt(cursor.offset) : undefined;
+  const highlight = selectedStep ? ranges.get(selectedStep) : undefined;
+  const reveal = revealStep && ranges.get(revealStep.id);
+  const navigate = (offset: number) => {
+    setCursor({ text, offset });
+    const id = stepAt(offset);
+    if (id) onSelectStep?.(id);
+  };
   const stale = !!draft && draft.base !== current;
   const issues = draft ? (result?.diagnostics ?? []) : diagnostics;
 
@@ -87,7 +112,11 @@ export function JourneyCode({
         value={text}
         readOnly={disabled}
         invalid={!!result?.error}
-        onChange={(value) => {
+        highlight={highlight}
+        reveal={reveal && revealStep ? { offset: reveal.from, request: revealStep } : undefined}
+        onNavigate={onSelectStep ? navigate : undefined}
+        onChange={(value, offset) => {
+          setCursor({ text: value, offset });
           onDraftChange(
             value === current ? undefined : { text: value, base: draft?.base ?? current },
           );
@@ -97,6 +126,7 @@ export function JourneyCode({
       <div className="code-feedback">
         {stale && <FieldError>{t('code.stale')}</FieldError>}
         <FieldError>{result?.error}</FieldError>
+        {revealStep && !reveal && <p role="status">{t('code.stepNotFound')}</p>}
         {result?.status && <p role="status">{result.status}</p>}
         {issues.length > 0 && (
           <ul aria-label={t('code.diagnostics')}>
@@ -111,6 +141,11 @@ export function JourneyCode({
         )}
       </div>
       <div className="code-actions">
+        {cursorStep && onShowStep && (
+          <Button variant="ghost" onClick={() => onShowStep(cursorStep)}>
+            {t('code.showInEditor')}
+          </Button>
+        )}
         <Button onClick={() => check(false)} disabled={disabled}>
           {t('code.validate')}
         </Button>

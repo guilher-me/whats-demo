@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import '@testing-library/jest-dom/vitest';
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { EditorView } from '@codemirror/view';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
 import { savedJourney } from './fixtures/journey-library';
@@ -140,4 +141,57 @@ it('reports precise Flow errors and keeps the manual mode for missing automatic 
   expect(
     (api().getProject().steps[stepIndex] as FlowStep).flow.screens[0].layout.children[0].type,
   ).not.toBe('InvalidWidget');
+});
+
+it('links steps by ID in both directions while preserving panel visibility, caret and draft', () => {
+  render(<App />);
+  const project = {
+    ...api().getProject(),
+    steps: [
+      { id: 'first', type: 'business', text: 'Primeiro', delay: 0, typing: false },
+      { id: 'second', type: 'business', text: 'Segundo', delay: 0, typing: false },
+    ],
+  };
+  act(() => api().loadProject(project));
+  const first = screen.getByRole('article', { name: 'Etapa 1' });
+  const second = screen.getByRole('article', { name: 'Etapa 2' });
+  const view = EditorView.findFromDOM(code())!;
+  const linkedText = () =>
+    Array.from(code().querySelectorAll('.json-linked-step'), (part) => part.textContent).join('');
+  const moveTo = (offset: number, userEvent: string) =>
+    act(() => view.dispatch({ selection: { anchor: offset }, userEvent }));
+
+  fireEvent.click(second);
+  expect(linkedText()).toContain('Segundo');
+  expect(linkedText()).not.toContain('Primeiro');
+  expect(view.state.selection.main.head).toBe(0);
+
+  fireEvent.click(button('Recolher Código'));
+  fireEvent.click(first);
+  expect(button('Expandir Código')).toBeVisible();
+  fireEvent.click(button('Ver no Código'));
+  expect(linkedText()).toContain('Primeiro');
+
+  // The draft reorders the steps and has an incomplete root. IDs still identify complete blocks.
+  const draft =
+    '{"steps":[' + JSON.stringify(project.steps[1]) + ',' + JSON.stringify(project.steps[0]);
+  writeJsonEditor(code(), draft);
+  fireEvent.click(button('Recolher Editor'));
+  const offset = draft.indexOf('Segundo') + 3;
+  code().focus();
+  moveTo(offset, 'select.pointer');
+  fireEvent.click(code());
+  expect(button('Expandir Editor')).toBeVisible();
+  expect(view.state.selection.main.head).toBe(offset);
+  expect(code()).toHaveFocus();
+  fireEvent.click(button('Ver no Editor'));
+  expect(second).toHaveAttribute('aria-current', 'step');
+  expect(view.state.selection.main.head).toBe(offset);
+  expect(readJsonEditor(code())).toBe(draft);
+
+  code().focus();
+  moveTo(draft.indexOf('Primeiro') + 3, 'select');
+  expect(first).toHaveAttribute('aria-current', 'step');
+  expect(code()).toHaveFocus();
+  expect(api().getProject()).toEqual(project);
 });
