@@ -1,3 +1,4 @@
+import { Button } from '../../../components/ui/Button';
 import { useT } from '../../../i18n';
 import { stepAttachment } from '../../../core/attachments';
 import { useCallback, useId, useState, type ReactNode } from 'react';
@@ -29,6 +30,7 @@ export function StepCard({
   onToggle,
   dragHandle,
   onSelect,
+  onShowCode,
   onChange,
   onCartChange,
   onAction,
@@ -50,6 +52,7 @@ export function StepCard({
   onToggle: () => void;
   dragHandle?: ReactNode;
   onSelect: () => void;
+  onShowCode: () => void;
   onChange: (change: Partial<Step>) => void;
   onCartChange: (cartId?: string, items?: CartItem[]) => void;
   onAction: (action: StepAction) => void;
@@ -143,6 +146,16 @@ export function StepCard({
         <StepActions first={!index} last={index === total - 1} onAction={onAction} />
       </div>
       <div className="step-body" id={id} hidden={!expanded}>
+        {expanded && (
+          <Button
+            variant="ghost"
+            className="step-code-link"
+            data-editor-action
+            onClick={onShowCode}
+          >
+            {t('code.showInCode')}
+          </Button>
+        )}
         {step.type === 'business' ? (
           <BusinessMessageEditor
             step={step}
