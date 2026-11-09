@@ -2,7 +2,7 @@
 
 > Build, test and share interactive WhatsApp journeys in the browser using simulated messages, commerce and static WhatsApp Flows.
 
-App version: 0.6.0.
+App version: 0.7.0.
 
 Use the [automation guide](docs/automation.md), [project schema](schemas/project-v1.schema.json), [static link generator](share.mjs) and [user guide](docs/user-guide.md) from the deployment where the journey will run. [Combined instructions](llms-full.txt) are also embedded in the portable HTML. The browser API is v4 and the project schema is v1. The [app version](version.json) tracks the release. See the [changelog](CHANGELOG.md) for build changes.
 
