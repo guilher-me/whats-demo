@@ -2,7 +2,7 @@
 
 > Build, test and share interactive WhatsApp journeys in the browser using simulated messages, commerce and static WhatsApp Flows.
 
-App version: 0.5.0.
+App version: 0.6.0.
 
 Use the [automation guide](docs/automation.md), [project schema](schemas/project-v1.schema.json), [static link generator](share.mjs) and [user guide](docs/user-guide.md) from the deployment where the journey will run. [Combined instructions](llms-full.txt) are also embedded in the portable HTML. The browser API is v4 and the project schema is v1. The [app version](version.json) tracks the release. See the [changelog](CHANGELOG.md) for build changes.
 
@@ -11,6 +11,7 @@ Use the [automation guide](docs/automation.md), [project schema](schemas/project
 - Use project version 1, unique step IDs and fictional data. In the editor, wait for `window.whatsDemo?.getState().ready`. Set `const api = window.whatsDemo`, then call `api.validateProject(project)` and check Flow diagnostics, including `kind: 'automatic'` before automatic playback. Read the embedded guide with `api.getInstructions()` or from `script#llms-txt`.
 - Configure the contact name and verified badge. Optional `contact.icon` selects a schema icon ID, and `contact.iconBackground` and `contact.iconForeground` accept six-digit HEX. Omit foreground for automatic contrast.
 - Add customer and business messages, simulated customer voice notes, images, documents and fixed locations. Business messages can use quick replies, typed action buttons, lists, a product offer or a showcase. The journey sequence is linear. Flow screens can navigate within the form.
+- Insert automatic variables in business text, business image captions and Flow invitations using stable step IDs. Examples include `{{chat.ask_name.text}}`, `{{choice.delivery.title}}`, `{{flow.registration.FORM_SCREEN.name}}` and `{{location.meeting.address ?? "Address unavailable"}}`. See [automatic variables](docs/automation.md#automatic-variables).
 - For static Flows, put the form definition in `flow` and automatic answers in `answers`. Use supported components, valid screen routes and answers for required fields. See [Flows](docs/automation.md#flows).
 - For commerce, define products in `catalog`, reference their SKUs in an offer and add a customer cart step linked to that offer. Configure `autoItems` for automatic selection. A business Pix step can use a fixed value or the actual cart subtotal. Amounts use integer BRL cents. See [simulated commerce](docs/automation.md#simulated-commerce).
 - Replace the active journey only when authorized, using `api.loadProject(validation.project)` or **Code → Validate → Apply**. Run **Play automatically** or `await api.play('automatic')` and confirm the expected messages and completion. Start a manual run with `void api.play('manual')` when a person needs to interact.
