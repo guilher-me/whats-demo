@@ -623,20 +623,25 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
                     .join(' ')
                 : '';
             const reading = cursor.read(`${text} ${choices}`, signal);
-            await (answered ? Promise.race([reading, answered]) : reading);
+            const response = payment?.promise ?? answered;
+            await (response ? Promise.race([reading, response]) : reading);
           }
           if (payment) {
-            setStatus('commerce.waitPix');
-            const open =
-              targetIn(
+            const pending = () => commerce.current.current?.messageId === messageId;
+            if (pending()) {
+              setStatus('commerce.waitPix');
+              const button = targetIn(
                 '[data-message-id]',
                 'data-message-id',
                 messageId,
-              )?.querySelector<HTMLElement>('[data-commerce-action]') ?? null;
-            if (automatic) {
-              await tap(open, () => commerce.copyPix(messageId));
-            } else {
-              open?.focus();
+              )?.querySelector<HTMLElement>('[data-commerce-action]');
+              if (automatic) {
+                await tap(button ?? null, () => {
+                  if (pending()) commerce.copyPix(messageId);
+                });
+              } else {
+                button?.focus();
+              }
             }
             await payment.promise;
             await clock.current?.checkpoint();

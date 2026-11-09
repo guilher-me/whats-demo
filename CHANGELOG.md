@@ -16,6 +16,10 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 
 - Give viewers more time to browse products and review the cart during automatic playback.
 
+### Fixed
+
+- Make Copy Pix code available as soon as the charge appears during playback.
+
 ## [0.5.0] - 2026-11-08
 
 ### Added

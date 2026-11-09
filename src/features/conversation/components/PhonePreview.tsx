@@ -85,11 +85,11 @@ export function PhonePreview({
                     ? commerce.items.reduce((total, item) => total + item.quantity, 0)
                     : undefined
                 }
-                commercePlaybackLocked={commerceLocked}
+                commercePlaybackLocked={content?.kind === 'pix' ? p.paused : commerceLocked}
                 onCommerce={
                   canOpen && content?.kind === 'offer'
                     ? () => p.commerce.openOffer(message.id, content, !p.running)
-                    : canOpen && content?.kind === 'pix'
+                    : !p.paused && content?.kind === 'pix'
                       ? () => p.commerce.copyPix(message.id)
                       : undefined
                 }
