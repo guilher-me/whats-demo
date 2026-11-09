@@ -6,6 +6,13 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-09
+
+### Added
+
+- Add a three-button Android navigation bar to the simulated phone and its recordings.
+- Show the simulated WhatsApp Business service notice at the start of the chat.
+
 ## [0.6.0] - 2026-11-09
 
 ### Added
