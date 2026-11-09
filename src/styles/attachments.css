@@ -151,7 +151,7 @@
   background: transparent;
 }
 .phone-sheet.android-attachment-menu {
-  inset: auto 7px 57px;
+  inset: auto 7px calc(57px + var(--phone-nav-height));
   border-radius: 16px;
   padding: 15px 7px 12px;
   background: var(--phone-panel-subtle);
@@ -348,7 +348,7 @@
   font-size: 10px;
 }
 .phone-sheet.android-photo-review {
-  inset: var(--phone-status-height) 0 0;
+  inset: var(--phone-status-height) 0 var(--phone-nav-height);
   max-height: none;
   border-radius: 0;
   background: #111b21;

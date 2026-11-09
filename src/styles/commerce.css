@@ -187,7 +187,7 @@
 .phone-pix-notice {
   position: absolute;
   z-index: 22;
-  inset: auto 12px 68px;
+  inset: auto 12px calc(68px + var(--phone-nav-height));
   display: flex;
   justify-content: center;
   pointer-events: none;

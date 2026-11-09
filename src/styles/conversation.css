@@ -49,6 +49,7 @@
 .phone {
   --phone-status-height: 28px;
   --phone-header-height: 65px;
+  --phone-nav-height: 30px;
   position: absolute;
   inset: 1px calc(var(--phone-rail) + 1px);
   border: 5px solid var(--phone-bezel);
@@ -63,6 +64,23 @@
     14px/1.4 Arial,
     sans-serif;
   color: var(--phone-ink);
+}
+.phone-navigation-bar {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 23;
+  height: var(--phone-nav-height);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  place-items: center;
+  padding-inline: 9%;
+  background: color-mix(in srgb, var(--phone-header-surface) 88%, transparent);
+  color: var(--phone-status-ink);
+  pointer-events: none;
+}
+.phone-navigation-bar svg {
+  width: 16px;
+  height: 16px;
 }
 .phone-status {
   display: grid;
@@ -147,7 +165,8 @@
 }
 .chat-body {
   position: absolute;
-  inset: calc(var(--phone-status-height) + var(--phone-header-height)) 0 61px;
+  inset: calc(var(--phone-status-height) + var(--phone-header-height)) 0
+    calc(61px + var(--phone-nav-height));
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--phone-scrollbar) transparent;
@@ -263,7 +282,7 @@
 }
 .composer {
   position: absolute;
-  bottom: 8px;
+  bottom: calc(8px + var(--phone-nav-height));
   left: 7px;
   right: 7px;
   display: flex;
@@ -494,14 +513,14 @@
 }
 .phone-sheet-overlay {
   position: absolute;
-  inset: var(--phone-status-height) 0 0;
+  inset: var(--phone-status-height) 0 var(--phone-nav-height);
   z-index: 20;
   background: #0b141a88;
 }
 .phone-sheet {
   position: absolute;
-  inset: auto 0 0;
-  max-height: 86%;
+  inset: auto 0 var(--phone-nav-height);
+  max-height: calc(86% - var(--phone-nav-height));
   display: flex;
   flex-direction: column;
   z-index: 21;
@@ -605,7 +624,7 @@
   color: #53bdeb;
 }
 .chat-body.overview-chat {
-  bottom: 0;
+  bottom: var(--phone-nav-height);
 }
 .overview-chat .open-flow:disabled,
 .overview-chat .message-action:disabled {
