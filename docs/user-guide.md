@@ -10,7 +10,7 @@ Open **My journeys** to switch between titles saved in this browser. The list sh
 
 Open a shared link to try a specific journey. Editing it saves a separate local copy. **Restore from link** resets that copy to the original shared snapshot.
 
-In an empty editor, **Try a demo** offers five short fictional journeys. Each card opens the phone preview. Play manually or automatically, or choose **Edit a copy** to customize the journey. Your copy appears in **My journeys** after your first edit. The examples open with a customer message or a simulated template, as in CatLove. On the WhatsApp Business Platform, businesses need an approved template to start a conversation or send a message outside the 24-hour service window. [WhatsApp Business Messaging Policy](https://whatsappbusiness.com/policy/)
+In an empty editor, **Try a demo** offers five short fictional journeys. Each card opens the phone preview in the listed language. Play manually or automatically, or choose **Edit a copy** to customize the journey. Your copy appears in **My journeys** after your first edit. The examples open with a customer message or a simulated template, as in CatLove. On the WhatsApp Business Platform, businesses need an approved template to start a conversation or send a message outside the 24-hour service window. [WhatsApp Business Messaging Policy](https://whatsappbusiness.com/policy/)
 
 ## Build the conversation
 

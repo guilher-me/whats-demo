@@ -15,26 +15,35 @@ function options(ids: string[], titles: string[]) {
   return ids.map((id, index) => ({ id, title: titles[index] }));
 }
 
-function demo(
-  id: string,
-  name: string,
-  title: string,
-  icon: BusinessIcon,
-  iconBackground: string,
-  steps: Step[],
-  catalog?: Project['catalog'],
-) {
+const identities = {
+  'magazine-luzia': {
+    name: 'Magazine Luzia',
+    locale: 'pt-BR',
+    icon: 'sofa',
+    iconBackground: '#0086FF',
+  },
+  odontonext: { name: 'OdontoNext', locale: 'pt-BR', icon: 'tooth', iconBackground: '#003EA6' },
+  ireplace: { name: 'iReplace', locale: 'en', icon: 'smartphone', iconBackground: '#1C1C1E' },
+  catlove: { name: 'CatLove', locale: 'pt-BR', icon: 'paw', iconBackground: '#4E2096' },
+  nobank: { name: 'NoBank', locale: 'es', icon: 'finance', iconBackground: '#820AD1' },
+} as const satisfies Record<
+  string,
+  { name: string; locale: Locale; icon: BusinessIcon; iconBackground: string }
+>;
+
+function demo(id: keyof typeof identities, steps: Step[], catalog?: Project['catalog']) {
+  const { locale, ...identity } = identities[id];
   const project: Project = {
     version: 1,
-    contact: { name, icon, iconBackground, iconForeground: '#FFFFFF', verified: false },
+    contact: { ...identity, iconForeground: '#FFFFFF', verified: false },
     steps,
     ...(catalog && { catalog }),
   };
-  return { id, title, project };
+  return { id, locale, project };
 }
 
-export function demoProjects(locale: Locale) {
-  const { retail, dental, repair, pet, banking } = demoCopy[locale];
+export function demoProjects() {
+  const { retail, dental, repair, pet, banking } = demoCopy;
   const catalog = retail.products.map(([name, description], index) => ({
     sku: ['DUNA', 'NUVEM', 'LUA'][index],
     name,
@@ -45,10 +54,6 @@ export function demoProjects(locale: Locale) {
   return [
     demo(
       'magazine-luzia',
-      'Magazine Luzia',
-      retail.title,
-      'sofa',
-      '#0086FF',
       [
         opening(retail.opening),
         {
@@ -74,7 +79,7 @@ export function demoProjects(locale: Locale) {
       ],
       catalog,
     ),
-    demo('odontonext', 'OdontoNext', dental.title, 'tooth', '#003EA6', [
+    demo('odontonext', [
       opening(dental.opening),
       {
         id: 'booking',
@@ -140,7 +145,22 @@ export function demoProjects(locale: Locale) {
       },
       message('confirmed', dental.confirmed, 2.4),
     ]),
-    demo('ireplace', 'iReplace', repair.title, 'smartphone', '#1C1C1E', [
+    demo('catlove', [
+      {
+        ...message('delivery', pet.prompt, 2),
+        interactive: {
+          kind: 'buttons',
+          context: 'template',
+          autoReplyId: 'tomorrow',
+          buttons: options(['today', 'tomorrow'], pet.windows),
+        },
+      },
+      message('request', pet.request, 2.8),
+      { id: 'voice', type: 'user', text: '', delay: 0.9, voiceDurationSeconds: 3 },
+      message('received', pet.received, 3),
+      message('confirmed', pet.confirmed, 3),
+    ]),
+    demo('ireplace', [
       opening(repair.opening),
       {
         ...message('issue', repair.prompt, 1.6),
@@ -172,22 +192,7 @@ export function demoProjects(locale: Locale) {
       },
       message('closing', repair.closing, 2.2),
     ]),
-    demo('catlove', 'CatLove', pet.title, 'paw', '#4E2096', [
-      {
-        ...message('delivery', pet.prompt, 2),
-        interactive: {
-          kind: 'buttons',
-          context: 'template',
-          autoReplyId: 'tomorrow',
-          buttons: options(['today', 'tomorrow'], pet.windows),
-        },
-      },
-      message('request', pet.request, 2.8),
-      { id: 'voice', type: 'user', text: '', delay: 0.9, voiceDurationSeconds: 3 },
-      message('received', pet.received, 3),
-      message('confirmed', pet.confirmed, 3),
-    ]),
-    demo('nubolso', 'NuBolso', banking.title, 'finance', '#820AD1', [
+    demo('nobank', [
       opening(banking.opening),
       {
         ...message('period', banking.prompt, 2.5),

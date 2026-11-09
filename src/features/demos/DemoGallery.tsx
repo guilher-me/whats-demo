@@ -1,14 +1,16 @@
 import { useEffect, useId, useState } from 'react';
 import { BusinessAvatar } from '../../components/ui/BusinessAvatar';
 import { encode, shareHash } from '../../core/codec';
-import { currentLocale, useT, type Locale } from '../../i18n';
+import { useT } from '../../i18n';
 import { demoProjects } from './demo-projects';
 
-async function demoLinks(locale: Locale) {
+const languageNames = { 'pt-BR': 'Português', en: 'English', es: 'Español' };
+
+async function demoLinks() {
   return Promise.all(
-    demoProjects(locale).map(async ({ id, title, project }) => ({
+    demoProjects().map(async ({ id, locale, project }) => ({
       id,
-      title,
+      locale,
       contact: project.contact,
       href: shareHash('demo', await encode(project), locale),
     })),
@@ -18,36 +20,30 @@ async function demoLinks(locale: Locale) {
 export function DemoGallery() {
   const t = useT();
   const heading = useId();
-  const locale = currentLocale();
-  const [result, setResult] = useState<{
-    locale: Locale;
-    links?: Awaited<ReturnType<typeof demoLinks>>;
-  }>();
+  const [links, setLinks] = useState<Awaited<ReturnType<typeof demoLinks>> | null>();
   useEffect(() => {
     let active = true;
-    void demoLinks(locale).then(
-      (links) => {
-        if (active) setResult({ locale, links });
+    void demoLinks().then(
+      (result) => {
+        if (active) setLinks(result);
       },
       () => {
-        if (active) setResult({ locale });
+        if (active) setLinks(null);
       },
     );
     return () => {
       active = false;
     };
-  }, [locale]);
-
-  const current = result?.locale === locale ? result : undefined;
+  }, []);
   return (
     <section className="demo-gallery" aria-labelledby={heading}>
       <h3 id={heading}>{t('demos.title')}</h3>
       <p>{t('demos.description')}</p>
-      {!current ? (
+      {links === undefined ? (
         <p role="status">{t('errors.loading')}</p>
-      ) : current.links ? (
+      ) : links ? (
         <ul className="demo-cards">
-          {current.links.map(({ id, title, contact, href }) => (
+          {links.map(({ id, locale, contact, href }) => (
             <li key={id}>
               <a className="demo-card" href={href}>
                 <BusinessAvatar
@@ -57,7 +53,9 @@ export function DemoGallery() {
                 />
                 <span>
                   <strong>{contact.name}</strong>
-                  <small>{title}</small>
+                  <small>
+                    {t(`demos.${id}`)} · <span lang={locale}>{languageNames[locale]}</span>
+                  </small>
                 </span>
               </a>
             </li>
