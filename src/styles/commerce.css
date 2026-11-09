@@ -153,6 +153,11 @@
   gap: 6px;
 }
 
+.commerce-message-action:disabled[data-playback-locked] {
+  opacity: 1;
+  background: var(--phone-panel);
+}
+
 .commerce-message-action svg {
   width: 16px;
   height: 16px;

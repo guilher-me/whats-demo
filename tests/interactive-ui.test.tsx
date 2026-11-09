@@ -141,18 +141,18 @@ it('pauses and resumes with an open list without losing the selected option', as
   fireEvent.click(screen.getByRole('button', { name: /Ver opções/ }));
   const choice = screen.getByRole('radio', { name: /Falar com atendente/ });
   fireEvent.click(choice);
-  const before = window.whatsappFakeFlows!.getState().messages;
+  const before = window.whatsDemo!.getState().messages;
   fireEvent.click(screen.getByRole('button', { name: 'Pausar reprodução' }));
   await tick(10000);
   expect(choice).toBeChecked();
   expect(document.querySelector('[role="dialog"]')).not.toBeNull();
-  expect(window.whatsappFakeFlows!.getState().messages).toEqual(before);
+  expect(window.whatsDemo!.getState().messages).toEqual(before);
   fireEvent.click(screen.getByRole('button', { name: 'Continuar reprodução' }));
   expect(screen.getByRole('radio', { name: /Falar com atendente/ })).toBeChecked();
   fireEvent.click(screen.getByRole('button', { name: /^Enviar$/ }));
   await tick(1000);
   expect(
-    window.whatsappFakeFlows!.getState().messages.filter((m) => m.text === 'Falar com atendente'),
+    window.whatsDemo!.getState().messages.filter((m) => m.text === 'Falar com atendente'),
   ).toHaveLength(1);
 });
 it('parar fecha a lista, cancela a espera e permite uma nova reprodução', async () => {

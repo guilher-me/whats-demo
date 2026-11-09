@@ -18,7 +18,7 @@ it('commits the selected icon and custom color only when Apply is pressed', asyn
     await user.click(screen.getByRole('button', { name: 'Editar ícone da empresa' }));
     return within(screen.getByRole('dialog', { name: 'Ícone da empresa' }));
   };
-  const current = () => window.whatsappFakeFlows!.getProject().contact;
+  const current = () => window.whatsDemo!.getProject().contact;
 
   let picker = await open();
   await user.click(picker.getByRole('radio', { name: 'Carro' }));
@@ -78,7 +78,7 @@ it('customizes the glyph independently and restores automatic contrast', async (
     await user.click(screen.getByRole('button', { name: 'Editar ícone da empresa' }));
     return within(screen.getByRole('dialog', { name: 'Ícone da empresa' }));
   };
-  const contact = () => window.whatsappFakeFlows!.getProject().contact;
+  const contact = () => window.whatsDemo!.getProject().contact;
   const preview = () => document.querySelector('.contact-avatar-preview .avatar path');
 
   let picker = await open();

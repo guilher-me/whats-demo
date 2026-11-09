@@ -43,5 +43,5 @@ it('mantém entregue ao enviar e marca visualizada quando a empresa responde', a
     'message-receipt--read',
   );
   expect(screen.queryByRole('img', { name: 'Mensagem entregue' })).toBeNull();
-  expect(window.whatsappFakeFlows!.getState().messages[0].receipt).toBe('read');
+  expect(window.whatsDemo!.getState().messages[0].receipt).toBe('read');
 });

@@ -39,7 +39,7 @@ it('advances the journey on a single Pix tap and dismisses the copy notice', asy
   expect(screen.getByText('Chave Pix copiada')).toBeVisible();
   expect(screen.queryByRole('dialog')).toBeNull();
   await act(async () => vi.advanceTimersByTimeAsync(1));
-  expect(window.whatsappFakeFlows!.getState().messages.at(-1)?.text).toBe('Obrigado');
+  expect(window.whatsDemo!.getState().messages.at(-1)?.text).toBe('Obrigado');
 
   await act(async () => vi.advanceTimersByTimeAsync(2000));
   expect(screen.queryByText('Chave Pix copiada')).toBeNull();

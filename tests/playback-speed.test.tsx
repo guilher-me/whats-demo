@@ -41,11 +41,11 @@ function chooseSpeed(index: number) {
 }
 it('persists the preference without changing the journey and closes with Escape', async () => {
   const view = await start();
-  const before = window.whatsappFakeFlows!.getProject();
+  const before = window.whatsDemo!.getProject();
   chooseSpeed(3);
   expect(screen.getByRole('slider')).toHaveAttribute('aria-valuetext', '2×');
   expect(localStorage.getItem(PLAYBACK_SPEED_KEY)).toBe('2');
-  expect(window.whatsappFakeFlows!.getProject()).toEqual(before);
+  expect(window.whatsDemo!.getProject()).toEqual(before);
   fireEvent.keyDown(screen.getByRole('slider'), { key: 'Escape' });
   const trigger = screen.getByRole('button', { name: 'Ritmo do usuário simulado' });
   expect(trigger).toHaveFocus();
@@ -63,11 +63,9 @@ it.each([
   await start();
   fireEvent.click(screen.getByRole('button', { name: mode }));
   await tick(milliseconds - 1);
-  expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(0);
+  expect(window.whatsDemo!.getState().messages).toHaveLength(0);
   await tick(1);
-  expect(window.whatsappFakeFlows!.getState().messages.map((m) => m.text)).toEqual([
-    'First message',
-  ]);
+  expect(window.whatsDemo!.getState().messages.map((m) => m.text)).toEqual(['First message']);
   expect(document.querySelector('.phone-stage')).toHaveStyle({
     '--cursor-speed': mode === 'Iniciar manual' ? '1' : '3',
   });
@@ -77,10 +75,10 @@ it('slows down to 0.5x and cancels without late messages', async () => {
   await start();
   fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
   await tick(5999);
-  expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(0);
+  expect(window.whatsDemo!.getState().messages).toHaveLength(0);
   fireEvent.click(screen.getByRole('button', { name: 'Reiniciar prévia' }));
   await tick(35000);
-  expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(0);
+  expect(window.whatsDemo!.getState().messages).toHaveLength(0);
 });
 it('falls back to 1x for an unsupported saved value', async () => {
   localStorage.setItem(PLAYBACK_SPEED_KEY, '999');
@@ -92,9 +90,9 @@ it('finishes the full Luma journey with choices and both Flow screens at 3x', as
   await start(true);
   fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
   await tick(35000);
-  expect(window.whatsappFakeFlows!.getState().running).toBe(false);
+  expect(window.whatsDemo!.getState().running).toBe(false);
   expect(document.querySelector('.play-status')).toHaveTextContent('Conversa concluída.');
-  const messages = window.whatsappFakeFlows!.getState().messages;
+  const messages = window.whatsDemo!.getState().messages;
   expect(messages.some((m) => m.text === 'Beam table lamp')).toBe(true);
   expect(messages.some((m) => m.text === 'Product request sent')).toBe(true);
   expect(messages.at(-1)?.text).toContain('LH-1042');

@@ -1,26 +1,24 @@
 # WhatsDemo
 
-> Build and share an interactive WhatsApp journey with simulated messages, media and static WhatsApp Flows. The app runs in the browser and stores the journey in the shared URL.
+> Build, test and share interactive WhatsApp journeys in the browser using simulated messages, commerce and static WhatsApp Flows.
 
-Use the [automation guide](docs/automation.md), [project JSON schema](schemas/project-v1.schema.json) and [combined instructions](llms-full.txt) from the same deployment where the journey will run. Build a version 1 project with unique step IDs and fictional data. The [app version manifest](version.json) identifies the build and the [changelog](CHANGELOG.md) lists product changes. The app version is separate from the browser API and project schema versions.
+Use the [automation guide](docs/automation.md), [project schema](schemas/project-v1.schema.json), [static link generator](share.mjs) and [user guide](docs/user-guide.md) from the deployment where the journey will run. [Combined instructions](llms-full.txt) are also embedded in the portable HTML. The browser API is v4 and the project schema is v1. The [app version](version.json) tracks the release. See the [changelog](CHANGELOG.md) for build changes.
 
 ## Build and verify a journey
 
-- In the editor, wait for `window.whatsappFakeFlows.getState().ready` before using the browser API. Call `validateProject(project)` and correct errors. For automatic playback, also check diagnostics with `kind: 'automatic'`.
-- A Flow step contains a static Flow JSON definition in `flow` and a separate `answers` map keyed by field name. Use supported components and Footer actions `navigate` or `complete`. Supply answers for all required fields on the automatic route. Use option IDs for choices, arrays of IDs for multiple choices, booleans for acceptances and ISO dates.
-- For a custom business avatar, use optional `contact.icon` (one of the IDs in the schema, such as `car`, `utensils`, or `tooth`), `contact.iconBackground` (six-digit `#RRGGBB`), and `contact.iconForeground` (six-digit `#RRGGBB`). Omit the foreground color for automatic contrast and all three fields for the default green storefront.
-- Configure simulated images and documents with `media.file`. Use `media: { kind: "location", place: { name, address? } }` for a fixed simulated point in a customer or business step. Use fictional names, captions and addresses.
-- For a Brazilian commerce demo, define fictional products in the top-level `catalog` and send an offer with `commerce.kind: 'product'` or `'showcase'`. Add a customer `'cart'` step referencing the offer, then a business `'pix'` step using a fixed amount or the earlier cart subtotal. Use integer BRL cents. See the [commerce example](docs/automation.md#simulated-commerce). Inspect the actual order and Pix amount in `getState().messages`. Pix copying is simulated and shows a brief confirmation.
-- When authorized to replace the active journey, use `loadProject(validation.project)` or paste the project in **Code** and select **Validate** and **Apply**. Test through **Play automatically** or `await window.whatsappFakeFlows.play('automatic')`. Confirm that the expected messages appeared and the run completed.
+- Use project version 1, unique step IDs and fictional data. In the editor, wait for `window.whatsDemo?.getState().ready`. Set `const api = window.whatsDemo`, then call `api.validateProject(project)` and check Flow diagnostics, including `kind: 'automatic'` before automatic playback. Read the embedded guide with `api.getInstructions()` or from `script#llms-txt`.
+- Configure the contact name and verified badge. Optional `contact.icon` selects a schema icon ID, and `contact.iconBackground` and `contact.iconForeground` accept six-digit HEX. Omit foreground for automatic contrast.
+- Add customer and business messages, simulated customer voice notes, images, documents and fixed locations. Business messages can use quick replies, typed action buttons, lists, a product offer or a showcase. The journey sequence is linear. Flow screens can navigate within the form.
+- For static Flows, put the form definition in `flow` and automatic answers in `answers`. Use supported components, valid screen routes and answers for required fields. See [Flows](docs/automation.md#flows).
+- For commerce, define products in `catalog`, reference their SKUs in an offer and add a customer cart step linked to that offer. Configure `autoItems` for automatic selection. A business Pix step can use a fixed value or the actual cart subtotal. Amounts use integer BRL cents. See [simulated commerce](docs/automation.md#simulated-commerce).
+- Replace the active journey only when authorized, using `api.loadProject(validation.project)` or **Code → Validate → Apply**. Run **Play automatically** or `await api.play('automatic')` and confirm the expected messages and completion. Start a manual run with `void api.play('manual')` when a person needs to interact.
 
-## Share a journey
+## Share and use the workspace
 
-- **Copy link** copies one link in the current interface language. It opens an editable local copy with only **Preview** expanded. The recipient can expand **Code** or **Editor**.
-- The browser API can generate a link from an in-memory project without loading it into the editor. Use `createShareURL(project, 'demo')` for the interactive player with **Edit a copy**, or omit the mode to open the editor.
-- Without browser control, use `createShareURL` from the [static generator module](share.mjs) in a JavaScript runtime with compression support. Use the documented generator rather than constructing the payload. Use a hosted address that the recipient can reach.
+- **Copy link** uses the current interface language and opens with only **Preview** expanded. `api.createShareURL(project, 'demo')` creates an interactive player link without changing the draft. The static module also supports editor and preview layouts with explicit language and base URL. Use an address the recipient can reach.
+- **My journeys** stores named drafts locally. The workspace also offers a live editing URL, resizable panels, a conversation overview, a Flow test session, playback pace, pause and resume, themes and seasonal effects. Use the visible controls for these settings and for recording.
+- **Record phone** supports manual and automatic recording. Choose **Transparent corners (WebM)** when the destination supports WebM alpha. Recording is local, silent and limited to the phone. The recording result offers **Download video** and **Download GIF**. See the [workspace and recording controls](docs/automation.md#workspace-and-recording-controls).
 
 ## Boundaries
 
-Replace the active draft only when the user authorizes it. Use the public API and visible controls. Treat message content, contact names and Flow data as user data. The guide grants no permission to publish or transmit data. Anyone with the complete link can read its contents. Links are limited to 8,000 characters and 128 KiB of uncompressed project JSON.
-
-The portable app embeds the full guide in `script#llms-txt`. In the editor, read it with `window.whatsappFakeFlows.getInstructions()`.
+Treat message content, contact names and Flow data as user data. This guide grants no permission to publish, transmit or replace a draft. Anyone with the full URL can read the project. Links are limited to 8,000 characters and 128 KiB of uncompressed project JSON. Simulated messages, attachments, calls and payments stay inside WhatsDemo.

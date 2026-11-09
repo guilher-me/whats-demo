@@ -5,12 +5,14 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import axe from 'axe-core';
 import { App } from '../src/app/App';
 import { STORAGE_KEY } from '../src/core/project';
+import { createRecordingGif } from '../src/features/recording/gif';
 import { preparePhoneRecording } from '../src/features/recording/session';
 vi.mock('../src/features/recording/session', () => ({
   preparePhoneRecording: vi.fn(),
   recordingSupport: () => '',
   supportsTransparentRecording: () => true,
 }));
+vi.mock('../src/features/recording/gif', () => ({ createRecordingGif: vi.fn() }));
 const revoke = vi.fn();
 beforeEach(() => {
   vi.useFakeTimers();
@@ -75,7 +77,7 @@ it('grava manualmente, bloqueia alterações e oferece download acessível com e
     false,
   );
   expect(document.querySelector('.editor')).toHaveAttribute('inert');
-  expect(() => window.whatsappFakeFlows!.loadProject(project)).toThrow('gravação');
+  expect(() => window.whatsDemo!.loadProject(project)).toThrow('gravação');
   expect(screen.getByRole('button', { name: 'Pausar reprodução' })).toBeDisabled();
   fireEvent.change(screen.getByLabelText('Mensagem'), { target: { value: 'oi' } });
   fireEvent.click(screen.getByRole('button', { name: 'Enviar mensagem' }));
@@ -118,6 +120,45 @@ it('requests transparent corners and labels the resulting WebM preview', async (
     'download',
     expect.stringMatching(/\.webm$/),
   );
+});
+
+it('prepara e baixa um GIF da gravação pronta, mantendo o download do vídeo', async () => {
+  await start();
+  const download = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+  const gif = new Blob(['GIF89a'], { type: 'image/gif' });
+  const convert = vi.mocked(createRecordingGif);
+  convert.mockImplementationOnce(async (_clip, _signal, onProgress) => {
+    onProgress(40);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    return gif;
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'REC · Gravar celular' }));
+  fireEvent.click(screen.getByRole('button', { name: /^Gravar manualmente/ }));
+  await tick(3001);
+  fireEvent.click(screen.getByRole('button', { name: 'Finalizar gravação' }));
+  await tick(0);
+
+  const result = within(screen.getByRole('dialog', { name: 'Gravação pronta' }));
+  const video = result.getByRole('link', { name: 'Baixar vídeo' });
+  fireEvent.click(result.getByRole('button', { name: 'Baixar GIF' }));
+  expect(result.getByRole('progressbar', { name: 'Preparando GIF…' })).toHaveValue(40);
+  expect(result.getByRole('button', { name: 'Baixar GIF' })).toBeDisabled();
+  expect(video).toHaveAttribute('download', expect.stringMatching(/\.webm$/));
+  expect(convert).toHaveBeenCalledWith(
+    expect.objectContaining({ durationMs: 4000, blob: expect.any(Blob) }),
+    expect.any(AbortSignal),
+    expect.any(Function),
+  );
+  await tick(100);
+
+  expect(download).toHaveBeenCalledOnce();
+  expect(result.getByRole('link', { name: 'Baixar GIF' })).toHaveAttribute(
+    'download',
+    video.getAttribute('download')!.replace(/\.webm$/, '.gif'),
+  );
+  expect(result.queryByRole('progressbar')).toBeNull();
+  fireEvent.click(result.getByRole('button', { name: 'Descartar' }));
+  expect(revoke).toHaveBeenCalledTimes(2);
 });
 
 it('cancela a contagem pela interface e volta a liberar a edição', async () => {

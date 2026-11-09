@@ -18,6 +18,7 @@ export function MessageBubble({
   phoneRef,
   attachmentDisabled,
   onCommerce,
+  commercePlaybackLocked,
   cartCount,
 }: {
   message: ChatMessage;
@@ -29,6 +30,7 @@ export function MessageBubble({
   phoneRef?: RefObject<HTMLDivElement | null>;
   attachmentDisabled?: boolean;
   onCommerce?: () => void;
+  commercePlaybackLocked?: boolean;
   cartCount?: number;
 }) {
   const t = useT();
@@ -49,6 +51,7 @@ export function MessageBubble({
             value={message.commerce}
             count={cartCount}
             enabled={!!onCommerce}
+            playbackLocked={commercePlaybackLocked}
             onClick={onCommerce}
           />
         ) : (

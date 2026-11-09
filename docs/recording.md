@@ -11,7 +11,7 @@ A gravação automática usa o ritmo de usuário selecionado ao lado dos control
 3. Aguarde a preparação e a contagem de 3 segundos. A jornada começa do início.
 4. No modo manual, interaja com o celular e clique em **Finalizar gravação**. A gravação continua mesmo que a jornada já tenha terminado.
 5. No modo automático, a gravação termina 2 segundos depois da última mensagem. É possível finalizar antes pelo mesmo botão.
-6. Na prévia do resultado, escolha **Baixar vídeo**, **Gravar novamente** ou **Descartar**. Fechar o diálogo também descarta a cópia mantida em memória; o arquivo já baixado permanece no computador.
+6. Na prévia do resultado, escolha **Baixar vídeo**, **Baixar GIF**, **Gravar novamente** ou **Descartar**. Fechar o diálogo também descarta a cópia mantida em memória; o arquivo já baixado permanece no computador.
 
 Durante a preparação e a contagem, o botão permite cancelar sem gerar um arquivo. O contador usa minutos e segundos. A edição e os controles de reprodução ficam bloqueados enquanto há uma gravação, para preservar a jornada e o elemento capturado.
 
@@ -21,13 +21,15 @@ O aplicativo testa os codificadores nativos e tenta MP4 primeiro; caso não este
 
 A opção de cantos transparentes grava em WebM com VP8 e verifica se o arquivo preserva o canal alfa. O aplicativo de apresentações precisa reproduzir o WebM com transparência para mostrar o fundo do slide nos cantos. A prévia usa um quadriculado para destacar as áreas transparentes. [Transparência em WebM no Chromium](https://developer.chrome.com/blog/alpha-transparency-in-chrome-video)
 
+**Baixar GIF** converte a gravação pronta em uma animação de 360 × 720 em loop. O GIF mantém a duração da gravação, com até 12,5 quadros por segundo. Gravações longas usam menos quadros por segundo para limitar o trabalho de conversão. Se a gravação tiver cantos transparentes, o GIF preserva o recorte com a transparência binária do formato.
+
 O celular é mantido em 360 × 720 pixels durante a gravação, e os quadros são gerados em 720 × 1440. A captura busca 30 quadros por segundo. O cursor automático é desenhado sobre o quadro mais recente usando sua posição na tela. O conteúdo do celular é rasterizado separadamente, com até 15 atualizações por segundo quando há mudanças. A rasterização ignora as mensagens fora da área visível e mantém a posição de rolagem. O quadro final permanece na captura até o codificador ter tempo de recebê-lo. A taxa efetiva depende do navegador e do dispositivo.
 
 Mantenha a aba visível durante a gravação. Navegadores podem reduzir a frequência de atualização em segundo plano. A implementação foi verificada em Chromium; navegadores sem as APIs necessárias ou que bloqueiem a rasterização recebem uma mensagem de erro. Chrome e Edge atualizados são os alvos recomendados para a primeira versão.
 
-Não há upload, solicitação de captura de tela, áudio ou backend. `dom-to-image-more` rasteriza apenas o DOM do celular para canvas, e `MediaRecorder` grava esse canvas. As bibliotecas são incorporadas ao HTML único, com suas licenças MIT. Não há CDN ou conversor WebAssembly.
+Não há upload, solicitação de captura de tela, áudio ou backend. `dom-to-image-more` rasteriza apenas o DOM do celular para canvas, e `MediaRecorder` grava esse canvas. O \`gifenc\` gera o GIF a partir dos quadros decodificados pelo navegador. As bibliotecas são incorporadas ao HTML único, com suas licenças MIT. Não há CDN ou conversor WebAssembly.
 
-Os vídeos são temporários, mantidos em memória até baixar ou descartar. Eles não entram no projeto, no localStorage ou no link compartilhável. Ao publicar, o HTML continua independente dos demais arquivos do build.
+Os vídeos e os GIFs são temporários, mantidos em memória até baixar ou descartar. Eles não entram no projeto, no localStorage ou no link compartilhável. Ao publicar, o HTML continua independente dos demais arquivos do build.
 
 ## Organização
 
@@ -47,5 +49,6 @@ Referências:
 
 - [dom-to-image-more](https://github.com/IDisposable/dom-to-image-more)
 - [fix-webm-duration](https://github.com/yusitnikov/fix-webm-duration)
+- [gifenc](https://github.com/mattdesl/gifenc)
 - [Canvas captureStream](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/captureStream)
 - [MediaRecorder.isTypeSupported](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder/isTypeSupported_static)
