@@ -275,7 +275,7 @@
   "recording.transparent": "Esquinas transparentes (WebM)",
   "recording.transparentHint": "El vídeo se genera localmente. Mantén esta pestaña visible durante la grabación. La aplicación de presentaciones debe conservar la transparencia de WebM.",
   "recording.transparentUnavailable": "Las esquinas transparentes no están disponibles en este navegador.",
-  "recording.formatHint": "MP4 cuando esté disponible; WebM como alternativa. El vídeo se genera localmente. Mantén la pestaña visible durante la grabación.",
+  "recording.formatHint": "MP4 con H.264 para compartir en WhatsApp cuando el navegador lo admita. En caso contrario, WebM. El vídeo se genera localmente. Mantén la pestaña visible durante la grabación.",
   "recording.manual": "Grabar manualmente",
   "recording.manualHint": "Interactúa con la conversación y finaliza con el botón de grabación.",
   "recording.automatic": "Grabar automáticamente",

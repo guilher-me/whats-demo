@@ -9,8 +9,10 @@ vi.mock('../src/features/recording/alpha', () => ({
 }));
 vi.mock('../src/features/recording/capture', () => ({ capturePhone: vi.fn() }));
 vi.mock('fix-webm-duration', () => ({ default: vi.fn(async (blob: Blob) => blob) }));
+const h264 = 'video/mp4;codecs=avc1.42E028';
+const recorderOptions = vi.fn<(options: MediaRecorderOptions) => void>();
 class FakeMediaRecorder {
-  static supported = new Set(['video/mp4', 'video/webm']);
+  static supported = new Set([h264, 'video/mp4;codecs=avc1', 'video/mp4', 'video/webm']);
   static isTypeSupported(type: string) {
     return this.supported.has(type);
   }
@@ -20,6 +22,7 @@ class FakeMediaRecorder {
   onstop: (() => void) | null = null;
   onerror: (() => void) | null = null;
   constructor(_: MediaStream, options: MediaRecorderOptions) {
+    recorderOptions(options);
     this.mimeType = options.mimeType!;
   }
   start() {
@@ -44,7 +47,7 @@ const captureStream = vi.fn(
 const pixels = vi.fn(() => ({ data: new Uint8ClampedArray(4) }));
 beforeEach(() => {
   vi.clearAllMocks();
-  FakeMediaRecorder.supported = new Set(['video/mp4', 'video/webm']);
+  FakeMediaRecorder.supported = new Set([h264, 'video/mp4;codecs=avc1', 'video/mp4', 'video/webm']);
   vi.stubGlobal('MediaRecorder', FakeMediaRecorder);
   Object.defineProperty(HTMLCanvasElement.prototype, 'captureStream', {
     configurable: true,
@@ -70,13 +73,18 @@ function phone() {
   Object.defineProperties(node, { offsetWidth: { value: 360 }, offsetHeight: { value: 720 } });
   return node;
 }
-it('gera MP4 nativo e libera todas as tracks ao finalizar', async () => {
+it('gera MP4 com H.264 e libera todas as tracks ao finalizar', async () => {
   const session = await preparePhoneRecording(phone(), vi.fn());
   session.start();
   const first = session.finish();
   expect(session.finish()).toBe(first);
   const clip = await first;
   expect(clip.extension).toBe('mp4');
+  expect(clip.blob.type).toBe(h264.toLowerCase());
+  expect(recorderOptions).toHaveBeenCalledExactlyOnceWith({
+    mimeType: h264,
+    videoBitsPerSecond: 2_500_000,
+  });
   expect(clip.blob.size).toBeGreaterThan(0);
   expect([clip.width, clip.height]).toEqual([720, 1440]);
   expect(stopTrack).toHaveBeenCalled();
@@ -124,12 +132,17 @@ it('uses the theme backdrop selected when preparing every frame of a recording',
   expect(calls.length).toBeGreaterThan(1);
   for (const call of calls) expect(call).toEqual([node, 360, 720, '#213c35']);
 });
-it('usa WebM quando MP4 não está disponível e corrige a duração', async () => {
-  FakeMediaRecorder.supported = new Set(['video/webm']);
+it('usa WebM quando apenas MP4 genérico está disponível e corrige a duração', async () => {
+  FakeMediaRecorder.supported = new Set(['video/mp4', 'video/webm;codecs=vp9', 'video/webm']);
   const session = await preparePhoneRecording(phone(), vi.fn());
   session.start();
   const clip = await session.finish();
   expect(clip.extension).toBe('webm');
+  expect(recorderOptions).toHaveBeenCalledExactlyOnceWith({
+    mimeType: 'video/webm;codecs=vp9',
+    videoBitsPerSecond: 5_000_000,
+    videoKeyFrameIntervalDuration: 1000,
+  });
   expect(fixWebmDuration).toHaveBeenCalledOnce();
 });
 it('exports verified transparent WebM even when MP4 is available', async () => {

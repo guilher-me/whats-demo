@@ -275,7 +275,7 @@
   "recording.transparent": "Cantos transparentes (WebM)",
   "recording.transparentHint": "O vídeo é gerado localmente. Mantenha a aba visível durante a gravação. O aplicativo de apresentações precisa preservar a transparência do WebM.",
   "recording.transparentUnavailable": "Cantos transparentes estão indisponíveis neste navegador.",
-  "recording.formatHint": "MP4 quando disponível; WebM como alternativa. O vídeo é gerado localmente. Mantenha a aba visível durante a gravação.",
+  "recording.formatHint": "MP4 com H.264 para compartilhar no WhatsApp quando o navegador oferece suporte. Caso contrário, WebM. O vídeo é gerado localmente. Mantenha a aba visível durante a gravação.",
   "recording.manual": "Gravar manualmente",
   "recording.manualHint": "Interaja com a conversa e finalize pelo botão de gravação.",
   "recording.automatic": "Gravar automaticamente",
