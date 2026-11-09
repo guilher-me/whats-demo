@@ -4,6 +4,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/app/App';
 import { STORAGE_KEY } from '../src/core/project';
+import type { Project } from '../src/core/types';
 import { createLumaProject } from './fixtures/luma-project';
 import { PLAYBACK_SPEED_KEY } from '../src/features/playback/hooks/usePlaybackSpeed';
 
@@ -30,6 +31,9 @@ async function start(fullExample = false) {
       { id: 'one', type: 'business', text: 'First message', delay: 6 },
       { id: 'two', type: 'business', text: 'Second message', delay: 6 },
     ];
+  return mountProject(project);
+}
+async function mountProject(project: Project) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
   const view = render(<App />);
   await act(async () => {});
@@ -96,4 +100,54 @@ it('finishes the full Luma journey with choices and both Flow screens at 3x', as
   expect(messages.some((m) => m.text === 'Beam table lamp')).toBe(true);
   expect(messages.some((m) => m.text === 'Product request sent')).toBe(true);
   expect(messages.at(-1)?.text).toContain('LH-1042');
+});
+
+it.each([1, 2])('gives the showcase, product and cart time to be read at %sx', async (speed) => {
+  localStorage.setItem(PLAYBACK_SPEED_KEY, String(speed));
+  await mountProject({
+    version: 1,
+    contact: { name: 'Store', verified: false },
+    catalog: [
+      { sku: 'HDMI', name: 'HDMI cable', description: 'Connects your TV.', priceCents: 3990 },
+    ],
+    steps: [
+      {
+        id: 'offer',
+        type: 'business',
+        text: 'Electronics',
+        delay: 0,
+        commerce: { kind: 'showcase', sections: [{ title: 'Accessories', skus: ['HDMI'] }] },
+      },
+      {
+        id: 'cart',
+        type: 'user',
+        text: '',
+        delay: 0,
+        commerce: { kind: 'cart', offerId: 'offer' },
+      },
+    ],
+  });
+  const selector = '[data-commerce-product="HDMI"]';
+  fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
+  await tick(1800 / speed);
+  expect(document.querySelector(selector)).toBeVisible();
+
+  fireEvent.click(screen.getByRole('button', { name: 'Pausar reprodução' }));
+  await tick(5000);
+  expect(document.querySelector(selector)).toBeVisible();
+  fireEvent.click(screen.getByRole('button', { name: 'Continuar reprodução' }));
+  await tick(850 / speed);
+  expect(document.querySelector(selector)).toBeVisible();
+
+  await tick(1750 / speed);
+  expect(document.querySelector('[data-commerce-add]')).toBeVisible();
+
+  await tick(3000 / speed);
+  expect(document.querySelector('[data-commerce-quantity="HDMI"]')).toBeVisible();
+  expect(window.whatsDemo!.getState().messages).toHaveLength(1);
+  await tick(1100 / speed);
+  expect(window.whatsDemo!.getState().messages.at(-1)?.commerce).toMatchObject({
+    kind: 'order',
+    lines: [{ sku: 'HDMI', quantity: 1 }],
+  });
 });

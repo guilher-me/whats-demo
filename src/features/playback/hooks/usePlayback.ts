@@ -449,12 +449,16 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
               await wait(step.delay * 1000, signal);
               await tap(open(), () => commerce.openOffer(offer.id, content, false));
               const items = autoCart(definition, autoItems);
+              const products = content.sections.flatMap((section) => section.products);
+              if (!content.single) await wait(1200, signal);
               for (const item of items) {
                 if (!content.single)
                   await tap(
                     targetIn('[data-commerce-product]', 'data-commerce-product', item.sku),
                     () => commerce.select(item.sku),
                   );
+                const product = products.find(({ sku }) => sku === item.sku);
+                if (product) await cursor.read(`${product.name} ${product.description}`, signal);
                 await tap(target('[data-commerce-add]'), commerce.add);
               }
               await tap(target('[data-commerce-review]'), commerce.showCart);
@@ -470,6 +474,7 @@ export function usePlayback(phone: RefObject<HTMLDivElement | null>, persistSpee
                   true,
                 );
               }
+              await wait(1200, signal);
               await tap(target('[data-commerce-send]'), commerce.submit);
             } else {
               open()?.focus();

@@ -12,6 +12,10 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 - Insert automatic variables from chat replies, choices, completed Flows and simulated locations.
 - Show step IDs on sequence cards and automatic examples alongside variable suggestions. New steps get compact IDs such as `N-b3X`.
 
+### Changed
+
+- Give viewers more time to browse products and review the cart during automatic playback.
+
 ## [0.5.0] - 2026-11-08
 
 ### Added
