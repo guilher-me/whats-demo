@@ -275,7 +275,7 @@
   "recording.transparent": "Transparent corners (WebM)",
   "recording.transparentHint": "The video is generated locally. Keep this tab visible while recording. Your presentation app must preserve WebM transparency.",
   "recording.transparentUnavailable": "Transparent corners are unavailable in this browser.",
-  "recording.formatHint": "MP4 when available; WebM as a fallback. The video is generated locally. Keep the tab visible while recording.",
+  "recording.formatHint": "H.264 MP4 for sharing on WhatsApp when supported. Otherwise, WebM. The video is generated locally. Keep the tab visible while recording.",
   "recording.manual": "Record manually",
   "recording.manualHint": "Interact with the conversation and finish using the record button.",
   "recording.automatic": "Record automatically",
