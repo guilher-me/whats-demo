@@ -7,6 +7,10 @@ function message(id: string, text: string, delay: number): MessageStep {
   return { id, type: 'business', text, delay };
 }
 
+function opening(text: string): MessageStep {
+  return { id: 'opening', type: 'user', text, delay: 0.5 };
+}
+
 function options(ids: string[], titles: string[]) {
   return ids.map((id, index) => ({ id, title: titles[index] }));
 }
@@ -46,7 +50,7 @@ export function demoProjects(locale: Locale) {
       'sofa',
       '#0086FF',
       [
-        message('welcome', retail.welcome, 1.4),
+        opening(retail.opening),
         {
           ...message('showcase', retail.offer, 1.8),
           commerce: {
@@ -71,7 +75,7 @@ export function demoProjects(locale: Locale) {
       catalog,
     ),
     demo('odontonext', 'OdontoNext', dental.title, 'tooth', '#003EA6', [
-      message('welcome', dental.welcome, 1.5),
+      opening(dental.opening),
       {
         id: 'booking',
         type: 'flow',
@@ -137,6 +141,7 @@ export function demoProjects(locale: Locale) {
       message('confirmed', dental.confirmed, 2.4),
     ]),
     demo('ireplace', 'iReplace', repair.title, 'smartphone', '#1C1C1E', [
+      opening(repair.opening),
       {
         ...message('issue', repair.prompt, 1.6),
         interactive: {
@@ -172,6 +177,7 @@ export function demoProjects(locale: Locale) {
         ...message('delivery', pet.prompt, 2),
         interactive: {
           kind: 'buttons',
+          context: 'template',
           autoReplyId: 'tomorrow',
           buttons: options(['today', 'tomorrow'], pet.windows),
         },
@@ -182,7 +188,7 @@ export function demoProjects(locale: Locale) {
       message('confirmed', pet.confirmed, 3),
     ]),
     demo('nubolso', 'NuBolso', banking.title, 'finance', '#820AD1', [
-      message('welcome', banking.welcome, 2),
+      opening(banking.opening),
       {
         ...message('period', banking.prompt, 2.5),
         interactive: {

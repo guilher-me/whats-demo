@@ -46,7 +46,12 @@ describe('sample journeys', () => {
         verified: false,
       },
     ]);
-    for (const { project } of demos) {
+    for (const { id, project } of demos) {
+      expect(project.steps[0]).toMatchObject(
+        id === 'catlove'
+          ? { type: 'business', interactive: { kind: 'buttons', context: 'template' } }
+          : { type: 'user', text: expect.stringMatching(/\S/) },
+      );
       expect(journeyDiagnostics(project)).toEqual([]);
       const link = new URL(await createShareURL(project, 'demo', undefined, locale));
       const route = sharedRoute(link.hash)!;

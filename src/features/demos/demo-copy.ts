@@ -3,7 +3,7 @@ import type { Locale } from '../../i18n';
 const en = {
   retail: {
     title: 'Buy for your home',
-    welcome: 'Welcome to Magazine Luzia! Here are three little upgrades for your home.',
+    opening: 'Hi! I’m looking for something for my home.',
     collection: 'For your home',
     offer: 'Open the showcase, pick something you like and send us your cart.',
     products: [
@@ -17,7 +17,7 @@ const en = {
   },
   dental: {
     title: 'Book a dental visit',
-    welcome: 'Hi! Let’s find a time for your next dental visit at OdontoNext.',
+    opening: 'Hi! I’d like to book a dental visit.',
     invitation: 'Tell us what you need and pick a time in the form.',
     open: 'Book a visit',
     first: 'Your appointment',
@@ -34,6 +34,7 @@ const en = {
   },
   repair: {
     title: 'Request a phone repair',
+    opening: 'Hi! I need to get my phone repaired.',
     prompt: 'Hi! Tell us what happened to your phone and we’ll help with the next step.',
     open: 'Choose an issue',
     section: 'Phone repair',
@@ -58,7 +59,7 @@ const en = {
   },
   banking: {
     title: 'Request a statement',
-    welcome: 'Welcome to NuBolso. You can request a sample account statement right here.',
+    opening: 'Hi! I’d like to request a statement.',
     prompt: 'Choose the period you want to see.',
     periods: ['Last 7 days', 'Last 30 days'],
     confirmed: 'We’ll prepare your sample statement for *{{choice.period.title}}*.',
@@ -72,8 +73,7 @@ export const demoCopy: Record<Locale, typeof en> = {
   'pt-BR': {
     retail: {
       title: 'Comprar para casa',
-      welcome:
-        'Bem-vindo à Magazine Luzia! Separamos três novidades para deixar sua casa mais aconchegante.',
+      opening: 'Oi! Quero ver opções para minha casa.',
       collection: 'Para sua casa',
       offer: 'Abra a vitrine, escolha o que você gostou e envie seu carrinho.',
       products: [
@@ -88,7 +88,7 @@ export const demoCopy: Record<Locale, typeof en> = {
     },
     dental: {
       title: 'Agendar uma consulta',
-      welcome: 'Oi! Vamos encontrar um horário para a sua próxima visita à OdontoNext.',
+      opening: 'Oi! Quero agendar uma consulta.',
       invitation: 'Diga o que você precisa e escolha um horário no formulário.',
       open: 'Agendar consulta',
       first: 'Sua consulta',
@@ -105,6 +105,7 @@ export const demoCopy: Record<Locale, typeof en> = {
     },
     repair: {
       title: 'Pedir um reparo',
+      opening: 'Oi! Preciso consertar meu celular.',
       prompt: 'Oi! Conte o que aconteceu com seu celular e a gente te ajuda com o próximo passo.',
       open: 'Escolher problema',
       section: 'Reparo de celular',
@@ -130,7 +131,7 @@ export const demoCopy: Record<Locale, typeof en> = {
     },
     banking: {
       title: 'Solicitar um extrato',
-      welcome: 'Bem-vindo ao NuBolso. Você pode pedir um extrato demonstrativo por aqui mesmo.',
+      opening: 'Oi! Gostaria de solicitar um extrato.',
       prompt: 'Escolha o período que você quer consultar.',
       periods: ['Últimos 7 dias', 'Últimos 30 dias'],
       confirmed:
@@ -142,7 +143,7 @@ export const demoCopy: Record<Locale, typeof en> = {
   es: {
     retail: {
       title: 'Comprar para casa',
-      welcome: '¡Te damos la bienvenida a Magazine Luzia! Tenemos tres novedades para tu hogar.',
+      opening: '¡Hola! Quiero ver opciones para mi casa.',
       collection: 'Para tu casa',
       offer: 'Abre la vitrina, elige lo que más te guste y envíanos tu carrito.',
       products: [
@@ -157,7 +158,7 @@ export const demoCopy: Record<Locale, typeof en> = {
     },
     dental: {
       title: 'Agendar una consulta',
-      welcome: '¡Hola! Busquemos un horario para tu próxima visita a OdontoNext.',
+      opening: '¡Hola! Quiero agendar una consulta.',
       invitation: 'Dinos qué necesitas y elige un horario en el formulario.',
       open: 'Agendar consulta',
       first: 'Tu consulta',
@@ -174,6 +175,7 @@ export const demoCopy: Record<Locale, typeof en> = {
     },
     repair: {
       title: 'Solicitar una reparación',
+      opening: '¡Hola! Necesito reparar mi celular.',
       prompt: '¡Hola! Cuéntanos qué le pasó a tu celular y te ayudaremos con el siguiente paso.',
       open: 'Elegir problema',
       section: 'Reparación de celulares',
@@ -198,8 +200,7 @@ export const demoCopy: Record<Locale, typeof en> = {
     },
     banking: {
       title: 'Pedir un estado de cuenta',
-      welcome:
-        'Te damos la bienvenida a NuBolso. Aquí puedes pedir un estado de cuenta de ejemplo.',
+      opening: '¡Hola! Quiero pedir un estado de cuenta.',
       prompt: 'Elige el período que quieres consultar.',
       periods: ['Últimos 7 días', 'Últimos 30 días'],
       confirmed: 'Prepararemos tu estado de cuenta de ejemplo para *{{choice.period.title}}*.',
