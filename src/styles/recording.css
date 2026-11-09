@@ -115,6 +115,22 @@
   background: repeating-conic-gradient(var(--surface-hover) 0 25%, var(--surface) 0 50%) 0 0 / 16px
     16px;
 }
+.recording-result-actions {
+  flex-wrap: wrap;
+}
+.record-gif-progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+.record-gif-progress progress {
+  flex: 1;
+  min-width: 90px;
+  accent-color: var(--accent);
+}
 .download-recording {
   display: inline-flex;
   align-items: center;

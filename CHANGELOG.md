@@ -10,6 +10,7 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 
 - Point first-time shared preview visitors to automatic playback with an animated hint.
 - Add a subtle repeating doodle to the preview background.
+- Download phone recordings as animated GIFs, with transparent corners when enabled for the recording.
 
 ### Changed
 

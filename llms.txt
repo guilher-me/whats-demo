@@ -17,7 +17,7 @@ Use the [automation guide](docs/automation.md), [project schema](schemas/project
 
 - **Copy link** uses the current interface language and opens with only **Preview** expanded. `api.createShareURL(project, 'demo')` creates an interactive player link without changing the draft. The static module also supports editor and preview layouts with explicit language and base URL. Use an address the recipient can reach.
 - **My journeys** stores named drafts locally. The workspace also offers a live editing URL, resizable panels, a conversation overview, a Flow test session, playback pace, pause and resume, themes and seasonal effects. Use the visible controls for these settings and for recording.
-- **Record phone** supports manual and automatic recording. Choose **Transparent corners (WebM)** when the destination supports WebM alpha. Recording is local, silent and limited to the phone. See the [workspace and recording controls](docs/automation.md#workspace-and-recording-controls).
+- **Record phone** supports manual and automatic recording. Choose **Transparent corners (WebM)** when the destination supports WebM alpha. Recording is local, silent and limited to the phone. The recording result offers **Download video** and **Download GIF**. See the [workspace and recording controls](docs/automation.md#workspace-and-recording-controls).
 
 ## Boundaries
 
