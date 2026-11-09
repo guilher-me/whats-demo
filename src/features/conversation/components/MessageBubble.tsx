@@ -98,7 +98,7 @@ export function MessageBubble({
           </button>
           {attachment.kind === 'image' && message.text && (
             <p>
-              <FormattedMessageText text={message.text} />
+              <FormattedMessageText text={message.text} segments={message.formattedText} />
             </p>
           )}
           {open && (
@@ -119,7 +119,7 @@ export function MessageBubble({
       ) : message.voiceDurationMs === undefined ? (
         (!message.commerce || message.text) && (
           <p>
-            <FormattedMessageText text={message.text} />
+            <FormattedMessageText text={message.text} segments={message.formattedText} />
           </p>
         )
       ) : (

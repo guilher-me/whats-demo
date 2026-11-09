@@ -8,6 +8,12 @@ function render(segments: MessageSegment[]): ReactNode {
     return <Tag key={index}>{render(segment.children)}</Tag>;
   });
 }
-export function FormattedMessageText({ text }: { text: string }) {
-  return <>{render(parseMessageFormatting(text))}</>;
+export function FormattedMessageText({
+  text,
+  segments,
+}: {
+  text: string;
+  segments?: MessageSegment[];
+}) {
+  return <>{render(segments ?? parseMessageFormatting(text))}</>;
 }

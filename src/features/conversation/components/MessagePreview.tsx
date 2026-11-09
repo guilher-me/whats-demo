@@ -25,6 +25,7 @@ export function MessagePreview({
   attachment,
   commerce,
   flowPreview,
+  resolved,
 }: {
   contact: Contact;
   step: Step;
@@ -32,6 +33,7 @@ export function MessagePreview({
   attachment?: Attachment;
   commerce?: CommerceMessage;
   flowPreview?: FlowPreviewRequest;
+  resolved?: Pick<ChatMessage, 'text' | 'formattedText'>;
 }) {
   const t = useT();
   const time = usePhoneTime();
@@ -78,6 +80,7 @@ export function MessagePreview({
         : step.type !== 'flow' && step.media
           ? (step.media.caption ?? '')
           : step.text,
+    ...resolved,
     attachment,
     commerce,
     time,

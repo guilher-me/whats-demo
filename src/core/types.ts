@@ -1,3 +1,4 @@
+import type { MessageSegment } from './message-formatting';
 import type { BusinessIcon } from './business-avatar';
 
 export type Value =
@@ -179,6 +180,7 @@ export interface ChatMessage {
   id: string;
   direction: 'user' | 'business';
   text: string;
+  formattedText?: MessageSegment[];
   time: string;
   voiceDurationMs?: number;
   attachment?: Attachment;

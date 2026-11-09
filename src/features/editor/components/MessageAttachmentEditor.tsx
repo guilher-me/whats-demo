@@ -18,7 +18,7 @@ import { ControlIcon } from '../../../components/icons/ControlIcon';
 import { FieldError, TextField } from '../../../components/ui/Field';
 import { SelectField } from '../../../components/ui/SelectField';
 import { useT } from '../../../i18n';
-import { MessageTextEditor } from './MessageTextEditor';
+import { MessageTextEditor, type VariableScope } from './MessageTextEditor';
 
 function ExtensionPicker<T extends string>({
   extensions,
@@ -59,9 +59,11 @@ function ExtensionPicker<T extends string>({
 
 export function MessageAttachmentEditor({
   media,
+  variableScope,
   onChange,
 }: {
   media: MediaStep;
+  variableScope?: VariableScope;
   onChange: (media: MediaStep) => void;
 }) {
   const t = useT();
@@ -117,6 +119,7 @@ export function MessageAttachmentEditor({
         />
         <MessageTextEditor
           label={t('attachments.caption')}
+          variableScope={variableScope}
           value={media.caption ?? ''}
           maxLength={MAX_CAPTION}
           onChange={(caption) => onChange({ ...media, caption })}

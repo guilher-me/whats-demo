@@ -5,7 +5,7 @@ import { useT } from '../../../i18n';
 import type { BusinessInteractive, CartItem, MessageStep, Project } from '../../../core/types';
 import { createInteractive, businessMessageError, messageOptions } from '../../../core/interactive';
 import { TextField, FieldError } from '../../../components/ui/Field';
-import { MessageTextEditor } from './MessageTextEditor';
+import { MessageTextEditor, type VariableScope } from './MessageTextEditor';
 import { SelectField } from '../../../components/ui/SelectField';
 import { ReplyButtonsEditor } from './ReplyButtonsEditor';
 import { ListMessageEditor } from './ListMessageEditor';
@@ -17,6 +17,7 @@ export function BusinessMessageEditor({
   project,
   index,
   commerceError,
+  variableScope,
   onChange,
   onCartChange,
 }: {
@@ -24,6 +25,7 @@ export function BusinessMessageEditor({
   project: Project;
   index: number;
   commerceError: string;
+  variableScope?: VariableScope;
   onChange: (change: Partial<MessageStep>) => void;
   onCartChange: (cartId?: string, items?: CartItem[]) => void;
 }) {
@@ -72,10 +74,15 @@ export function BusinessMessageEditor({
         }
       />
       {step.media ? (
-        <MessageAttachmentEditor media={step.media} onChange={(media) => onChange({ media })} />
+        <MessageAttachmentEditor
+          media={step.media}
+          variableScope={variableScope}
+          onChange={(media) => onChange({ media })}
+        />
       ) : (
         <MessageTextEditor
           label={t('editor.messageText')}
+          variableScope={variableScope}
           value={step.text}
           maxLength={value ? 1024 : undefined}
           onChange={(text) => onChange({ text })}
