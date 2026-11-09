@@ -6,6 +6,8 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-09
+
 ### Added
 
 - Add a three-button Android navigation bar to the simulated phone and its recordings.
