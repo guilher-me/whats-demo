@@ -284,10 +284,15 @@ function EditorWorkspace({
             editor.updateStep(cartId, { commerce });
             return;
           }
-          const cart = { ...createStep('user'), type: 'user' as const, text: '', commerce };
           editor.update((project) => {
             const position = project.steps.findIndex(({ id }) => id === offerId);
             if (position < 0 || project.steps.length >= 200) return project;
+            const cart = {
+              ...createStep('user', project.steps),
+              type: 'user' as const,
+              text: '',
+              commerce,
+            };
             return {
               ...project,
               steps: [
@@ -304,10 +309,12 @@ function EditorWorkspace({
       onAdd={(type) => {
         let addedId: string | undefined;
         edit(() => {
-          const step = createStep(type);
-          editor.update((project) => ({ ...project, steps: [...project.steps, step] }));
-          selectStep(step.id);
-          addedId = step.id;
+          editor.update((project) => {
+            const step = createStep(type, project.steps);
+            addedId = step.id;
+            return { ...project, steps: [...project.steps, step] };
+          });
+          if (addedId) selectStep(addedId);
         });
         return addedId;
       }}

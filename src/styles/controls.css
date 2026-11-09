@@ -116,7 +116,7 @@
   width: 17px;
   height: 17px;
 }
-.step-number {
+.step-id {
   background: var(--soft);
   border: none;
   font-weight: 650;

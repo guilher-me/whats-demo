@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   resolveVariableMessage,
   variableIssues,
@@ -7,6 +7,8 @@ import {
 import { captureFlowVariables } from '../src/features/flows/journey-variables';
 import { advance, createSession, goBack } from '../src/features/flows/model';
 import { validateProject } from '../src/core/engine';
+import { createStep, normalizeProject } from '../src/core/project';
+import { previousVariablesWithExamples } from '../src/features/conversation/overview';
 import type { FlowStep, MessageStep, Project } from '../src/core/types';
 
 const message = (text: string): MessageStep => ({ id: 'reply', type: 'business', delay: 0, text });
@@ -18,6 +20,56 @@ const project = (...steps: Project['steps']): Project => ({
 });
 
 describe('journey variables', () => {
+  it('assigns compact IDs without recycling an existing ID or a dangling reference', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const first = { ...chat, id: 'N-000' };
+    const reply = message('{{chat.N-001.text}}');
+    const cart: MessageStep = {
+      ...chat,
+      id: 'cart',
+      commerce: { kind: 'cart', offerId: 'N-002' },
+    };
+    expect(createStep('business', [first, reply, cart]).id).toBe('N-003');
+    const normalized = normalizeProject(
+      project(first, { ...chat, id: '' }, { ...chat, id: 'N-001' }, chat, first),
+    );
+    expect(normalized.steps.map(({ id }) => id)).toEqual([
+      'N-000',
+      'N-002',
+      'N-001',
+      'name',
+      'N-003',
+    ]);
+  });
+
+  it('offers configured examples for chat, choice, Flow and location variables', () => {
+    const flow = { ...createStep('flow'), id: 'N-form', answers: { name: 'Lia' } };
+    const choice: MessageStep = {
+      ...message('Choose'),
+      interactive: {
+        kind: 'list',
+        button: 'Choose delivery',
+        autoReplyId: 'pickup',
+        sections: [{ title: 'Options', rows: [{ id: 'pickup', title: 'Retirada' }] }],
+      },
+    };
+    const location: MessageStep = {
+      ...chat,
+      id: 'location',
+      media: { kind: 'location', place: { name: 'Loja' } },
+    };
+    const draft = project(chat, choice, flow, location, message(''));
+    const examples = previousVariablesWithExamples(draft, 4);
+    expect(Object.fromEntries(examples.map(({ path, example }) => [path, example]))).toEqual({
+      'chat.name.text': 'Alex',
+      'choice.reply.title': 'Retirada',
+      'choice.reply.id': 'pickup',
+      'flow.N-form.FORM_SCREEN.name': 'Lia',
+      'location.location.name': 'Loja',
+      'location.location.address': '',
+    });
+  });
+
   it('resolves quoted paths and fallbacks once, preserving legacy placeholders and literal response text', () => {
     const path = variablePath('flow', 'cadastro.v2', 'FORM_SCREEN', 'name');
     expect(path).toBe('flow["cadastro.v2"].FORM_SCREEN.name');

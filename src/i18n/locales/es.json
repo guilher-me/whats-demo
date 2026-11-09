@@ -79,6 +79,8 @@
   "variables.choiceId": "ID de la opción elegida",
   "variables.locationName": "Nombre del lugar",
   "variables.locationAddress": "Dirección del lugar",
+  "variables.example": "Ejemplo: {{value}}",
+  "variables.noExample": "Sin ejemplo",
   "variables.noMatches": "No se encontraron variables.",
   "variables.limit": "Esta variable excede el límite del mensaje.",
   "variables.syntax": "Sintaxis de variable inválida.",

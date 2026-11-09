@@ -4,6 +4,7 @@ import { commercePreview } from '../../core/commerce';
 import {
   hasVariableReferences,
   isCustomerText,
+  previousVariables,
   resolveVariableMessage,
   variablePath,
   type VariableValues,
@@ -11,7 +12,14 @@ import {
 import { captureFlowVariables, flowAnswerText } from '../flows/journey-variables';
 import { automaticAnswer } from '../flows/answers';
 import { automaticOption, isReplyButton } from '../../core/message-buttons';
-import type { ChatMessage, FlowComponent, FlowStep, Project } from '../../core/types';
+import type {
+  Attachment,
+  ChatMessage,
+  FlowComponent,
+  FlowStep,
+  Project,
+  Step,
+} from '../../core/types';
 import { advance, createSession, getComponents } from '../flows/model';
 import { stepAttachment } from '../../core/attachments';
 
@@ -59,6 +67,37 @@ export function flowOverviewReply(step: FlowStep, variables?: VariableValues): s
   return [step.completion, ...lines].filter(Boolean).join('\n');
 }
 
+function exampleReply(
+  step: Step,
+  attachment: Attachment | undefined,
+  variables?: VariableValues,
+): { reply: string; selection?: string } {
+  if (step.type === 'flow') return { reply: flowOverviewReply(step, variables) };
+  if (variables && isCustomerText(step))
+    variables.set(variablePath('chat', step.id, 'text'), step.text.trim());
+  if (variables && step.type === 'user' && attachment?.kind === 'location') {
+    variables.set(variablePath('location', step.id, 'name'), attachment.name);
+    variables.set(variablePath('location', step.id, 'address'), attachment.address ?? '');
+  }
+  if (step.type !== 'business' || !step.interactive) return { reply: '' };
+  const selected = automaticOption(step.interactive);
+  const isReply = selected && (step.interactive.kind === 'list' || isReplyButton(selected));
+  if (variables && selected && isReply) {
+    variables.set(variablePath('choice', step.id, 'title'), selected.title);
+    variables.set(variablePath('choice', step.id, 'id'), selected.id);
+  }
+  return { reply: selected && isReply ? selected.title : '', selection: selected?.id };
+}
+
+export function previousVariablesWithExamples(project: Project, index: number) {
+  const options = previousVariables(project, index);
+  if (!options.length) return options;
+  const examples: VariableValues = new Map();
+  for (const step of project.steps.slice(0, index))
+    exampleReply(step, stepAttachment(step), examples);
+  return options.map((option) => ({ ...option, example: examples.get(option.path) }));
+}
+
 export function conversationOverviewMessages(
   project: Project,
   time = formatPhoneTime(),
@@ -88,26 +127,8 @@ export function conversationOverviewMessages(
       flowStep: step.type === 'flow' ? step : undefined,
       interactive: step.type === 'business' ? step.interactive : undefined,
     };
-    let reply = '';
-    if (step.type === 'flow') reply = flowOverviewReply(step, capture ? variables : undefined);
-    if (capture && isCustomerText(step))
-      variables.set(variablePath('chat', step.id, 'text'), step.text.trim());
-    if (capture && step.type === 'user' && attachment?.kind === 'location') {
-      variables.set(variablePath('location', step.id, 'name'), attachment.name);
-      variables.set(variablePath('location', step.id, 'address'), attachment.address ?? '');
-    }
-    if (step.type === 'business' && step.interactive) {
-      const selected = automaticOption(step.interactive);
-      reply =
-        selected && (step.interactive.kind === 'list' || isReplyButton(selected))
-          ? selected.title
-          : '';
-      message.selection = selected?.id;
-      if (capture && selected && (step.interactive.kind === 'list' || isReplyButton(selected))) {
-        variables.set(variablePath('choice', step.id, 'title'), selected.title);
-        variables.set(variablePath('choice', step.id, 'id'), selected.id);
-      }
-    }
+    const { reply, selection } = exampleReply(step, attachment, capture ? variables : undefined);
+    if (selection !== undefined) message.selection = selection;
     return reply
       ? [message, { id: `overview:${index}:reply`, direction: 'user' as const, text: reply, time }]
       : [message];

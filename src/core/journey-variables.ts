@@ -18,7 +18,7 @@ export function variablePath(root: string, ...parts: string[]): string {
   );
 }
 
-type Reference = { from: number; to: number; path?: string; fallback?: string };
+type Reference = { from: number; to: number; path?: string; sourceId?: string; fallback?: string };
 
 function references(text: string): Reference[] {
   const starts = new RegExp(variableStart);
@@ -42,6 +42,7 @@ function references(text: string): Reference[] {
             from: match.index,
             to: variableEnd.lastIndex,
             path: variablePath(match[1], ...parts),
+            sourceId: parts[0],
             fallback: closing[1] === undefined ? undefined : JSON.parse(closing[1]),
           }
         : { from: match.index, to: end },
@@ -56,6 +57,7 @@ export interface VariableOption {
   group: string;
   label: string;
   optional?: boolean;
+  example?: string;
 }
 
 const fields = new Set([
@@ -78,8 +80,8 @@ export function isCustomerText(step: Step | undefined): boolean {
   );
 }
 
-export function variableOptions(step: Step, index: number): VariableOption[] {
-  const group = t('editor.stepLabel', { v0: index + 1 });
+export function variableOptions(step: Step): VariableOption[] {
+  const group = step.id;
   const option = (root: string, key: string, label: string, optional?: boolean) => ({
     path: variablePath(root, step.id, key),
     group,
@@ -160,6 +162,12 @@ export function variableText(
 export const hasVariableReferences = (step: Step) =>
   references(variableText(step)?.text ?? '').length > 0;
 
+export function referencedVariableStepIds(step: Step): string[] {
+  return references(variableText(step)?.text ?? '').flatMap(({ sourceId }) =>
+    sourceId ? [sourceId] : [],
+  );
+}
+
 export function variableIssues(project: Project) {
   if (!project.steps.some(hasVariableReferences)) return [];
   const ids = project.steps.map((step) => step.id);
@@ -175,7 +183,7 @@ export function variableIssues(project: Project) {
   }
   const sources = new Map<string, { index: number; optional?: boolean }>();
   project.steps.forEach((step, index) => {
-    for (const option of variableOptions(step, index))
+    for (const option of variableOptions(step))
       sources.set(option.path, { index, optional: option.optional });
   });
   return project.steps.flatMap((step, index) => {

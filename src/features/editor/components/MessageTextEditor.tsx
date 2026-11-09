@@ -2,20 +2,24 @@ import { useId, useLayoutEffect, useRef, useState } from 'react';
 import { useT } from '../../../i18n';
 import { TextArea } from '../../../components/ui/Field';
 import { Button } from '../../../components/ui/Button';
-import type { VariableOption } from '../../../core/journey-variables';
+import { previousVariables, type VariableOption } from '../../../core/journey-variables';
+import type { Project } from '../../../core/types';
+import { previousVariablesWithExamples } from '../../conversation/overview';
+
+export type VariableScope = { project: Project; index: number };
 
 export function MessageTextEditor({
   label,
   value,
   onChange,
   maxLength,
-  variables,
+  variableScope,
 }: {
   label: string;
   value: string;
   onChange: (text: string) => void;
   maxLength?: number;
-  variables?: VariableOption[];
+  variableScope?: VariableScope;
 }) {
   const t = useT();
   const hint = useId();
@@ -25,9 +29,15 @@ export function MessageTextEditor({
   const [menu, setMenu] = useState<{ from: number; to: number; query: string }>();
   const [active, setActive] = useState(0);
   const [limit, setLimit] = useState(false);
+  const variables = variableScope
+    ? (menu ? previousVariablesWithExamples : previousVariables)(
+        variableScope.project,
+        variableScope.index,
+      )
+    : [];
   const query = menu?.query.toLocaleLowerCase() ?? '';
-  const matches = (menu ? (variables ?? []) : []).filter(({ path, group, label }) =>
-    [path, group, label].some((text) => text.toLocaleLowerCase().includes(query)),
+  const matches = (menu ? variables : []).filter(({ path, group, label, example }) =>
+    [path, group, label, example ?? ''].some((text) => text.toLocaleLowerCase().includes(query)),
   );
   const current = Math.min(active, Math.max(0, matches.length - 1));
   const groups = new Map<string, { item: VariableOption; index: number }[]>();
@@ -76,14 +86,14 @@ export function MessageTextEditor({
         value={value}
         maxLength={maxLength}
         aria-describedby={hint}
-        aria-autocomplete={variables?.length ? 'list' : undefined}
+        aria-autocomplete={variables.length ? 'list' : undefined}
         aria-controls={menu ? listId : undefined}
         aria-activedescendant={menu && matches.length ? listId + '-' + current : undefined}
         onChange={(event) => {
           const field = event.currentTarget;
           const position = field.selectionStart;
           const match =
-            variables?.length && field.value.slice(0, position).match(/\{\{([^{}\n?]*?)$/);
+            variables.length && field.value.slice(0, position).match(/\{\{([^{}\n?]*?)$/);
           const suffix = field.value.slice(position).match(/^[\w.[\]" -]*\}\}/)?.[0];
           setMenu(
             match
@@ -115,7 +125,7 @@ export function MessageTextEditor({
       <p className="formatting-hint" id={hint}>
         {t('editor.formatHint')}
       </p>
-      {!!variables?.length && (
+      {!!variables.length && (
         <Button
           variant="ghost"
           className="variable-trigger"
@@ -154,7 +164,14 @@ export function MessageTextEditor({
                     onMouseDown={(event) => event.preventDefault()}
                     onClick={() => insert(item)}
                   >
-                    <span>{item.label}</span>
+                    <span className="variable-option-label">
+                      <span>{item.label}</span>
+                      <span className="variable-example" title={item.example || undefined}>
+                        {item.example?.trim()
+                          ? t('variables.example', { value: item.example })
+                          : t('variables.noExample')}
+                      </span>
+                    </span>
                     <code>{item.path}</code>
                   </button>
                 ))}

@@ -1,4 +1,4 @@
-import { previousVariables, variableText } from '../../../core/journey-variables';
+import { variableText } from '../../../core/journey-variables';
 import { FieldError } from '../../../components/ui/Field';
 import type { JourneyDiagnostic } from '../../flows/diagnostics';
 import { Button } from '../../../components/ui/Button';
@@ -71,7 +71,7 @@ export function StepCard({
   const media = step.type === 'flow' ? undefined : step.media;
   const attachment = stepAttachment(step);
   const target = variableText(step);
-  const variables = expanded && target ? previousVariables(project, index) : undefined;
+  const variableScope = expanded && target ? { project, index } : undefined;
   const issues = target
     ? diagnostics.filter((issue) => issue.path === 'steps[' + index + '].' + target.field)
     : [];
@@ -113,7 +113,9 @@ export function StepCard({
       }}
     >
       <div className="step-top">
-        <span className="step-number">{String(index + 1).padStart(2, '0')}</span>
+        <code className="step-id" title={step.id}>
+          {step.id}
+        </code>
         <button
           type="button"
           className="step-toggle"
@@ -170,7 +172,7 @@ export function StepCard({
         {step.type === 'business' ? (
           <BusinessMessageEditor
             step={step}
-            variables={variables}
+            variableScope={variableScope}
             project={project}
             index={index}
             commerceError={commerceError}
@@ -188,7 +190,7 @@ export function StepCard({
         ) : (
           <MessageTextEditor
             label={t('editor.flowInvitation')}
-            variables={variables}
+            variableScope={variableScope}
             value={step.text}
             onChange={(text) => onChange({ text })}
           />

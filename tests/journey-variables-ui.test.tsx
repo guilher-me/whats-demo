@@ -28,11 +28,14 @@ it('inserts an earlier response at the caret and resolves manual and example val
   await act(async () => {});
 
   const step = screen.getByRole('article', { name: 'Etapa 2' });
+  expect(step.querySelector('.step-id')).toHaveTextContent('reply');
   fireEvent.click(step);
   const text = within(step).getByRole('textbox') as HTMLTextAreaElement;
   text.focus();
   text.setSelectionRange(5, 5);
   fireEvent.click(within(step).getByRole('button', { name: 'Inserir variável' }));
+  expect(within(step).getByText('Exemplo: Ana')).toBeVisible();
+  expect(within(step).getByText('pergunta')).toBeVisible();
   fireEvent.keyDown(text, { key: 'Enter' });
   expect(text).toHaveValue('Olá, {{chat.pergunta.text}}!');
   expect(text.selectionStart).toBe(text.value.length - 1);
