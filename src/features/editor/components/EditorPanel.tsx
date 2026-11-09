@@ -1,5 +1,6 @@
 import type { JourneyDiagnostic } from '../../flows/diagnostics';
 import { useT } from '../../../i18n';
+import { DemoGallery } from '../../demos/DemoGallery';
 import type { CartItem, Contact, Project, Step } from '../../../core/types';
 import { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import { useAddedStepFocus } from '../hooks/useAddedStepFocus';
@@ -78,6 +79,7 @@ export function EditorPanel(props: Props) {
             </Button>
           )}
         </div>
+        {props.project.steps.length === 0 && <DemoGallery />}
         <TextField
           label={t('journeys.title')}
           placeholder={t('journeys.untitled')}

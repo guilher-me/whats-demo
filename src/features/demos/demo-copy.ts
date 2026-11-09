@@ -1,0 +1,210 @@
+import type { Locale } from '../../i18n';
+
+const en = {
+  retail: {
+    title: 'Buy for your home',
+    welcome: 'Welcome to Magazine Luzia! Here are three little upgrades for your home.',
+    collection: 'For your home',
+    offer: 'Open the showcase, pick something you like and send us your cart.',
+    products: [
+      ['Dune Vase', 'A sand-colored ceramic vase.'],
+      ['Cloud Cushion', 'A soft cushion for your sofa.'],
+      ['Moon Lamp', 'A bedside lamp with warm light.'],
+    ],
+    received: 'We received your cart. We’ll put together the Pix amount for the items you chose.',
+    payment: 'Here’s the simulated Pix code for your order.',
+    thanks: 'Thanks for trying out our checkout! Your demo order is complete.',
+  },
+  dental: {
+    title: 'Book a dental visit',
+    welcome: 'Hi! Let’s find a time for your next dental visit at OdontoNext.',
+    invitation: 'Tell us what you need and pick a time in the form.',
+    open: 'Book a visit',
+    first: 'Your appointment',
+    name: 'First name',
+    service: 'What do you need?',
+    services: ['Cleaning', 'Dental checkup', 'Braces follow-up'],
+    next: 'Choose a time',
+    second: 'Available times',
+    time: 'Which time works for you?',
+    times: ['Tomorrow at 9 am', 'Tomorrow at 2 pm', 'Tomorrow at 4 pm'],
+    submit: 'Confirm appointment',
+    confirmed:
+      'All set, *{{flow.booking.DETAILS.name}}*! Your visit is booked.\n\n*Service* · {{flow.booking.DETAILS.service}}\n*Time* · {{flow.booking.SCHEDULE.time ?? "Time to be confirmed"}}',
+  },
+  repair: {
+    title: 'Request a phone repair',
+    prompt: 'Hi! Tell us what happened to your phone and we’ll help with the next step.',
+    open: 'Choose an issue',
+    section: 'Phone repair',
+    issues: ['Cracked screen', 'Battery issue', 'Phone won’t turn on'],
+    request:
+      'You chose *{{choice.issue.title}}*. Use the paperclip to send a photo of your phone from the demo gallery.',
+    photo: 'Phone photo',
+    caption: 'Here’s a photo of my phone.',
+    received: 'We got your photo. Bring your phone to the service desk so we can take a look.',
+    place: 'iReplace service desk',
+    address: '18 Example Lane · Demo Mall, level 1',
+    closing: 'Tap the map card to see the service desk details.',
+  },
+  pet: {
+    title: 'Reschedule a pet delivery',
+    prompt: 'Mingau’s cat food is on its way. Would you like to change the delivery window?',
+    windows: ['Today, 2–6 pm', 'Tomorrow, 8 am–noon'],
+    request:
+      'We’ll hold *{{choice.delivery.title}}*. Hold the microphone to leave a short delivery note.',
+    received: 'Thanks for leaving a voice note. We’ve updated the delivery for Mingau.',
+    confirmed: 'New delivery window · *{{choice.delivery.title}}*.',
+  },
+  banking: {
+    title: 'Request a statement',
+    welcome: 'Welcome to NuBolso. You can request a sample account statement right here.',
+    prompt: 'Choose the period you want to see.',
+    periods: ['Last 7 days', 'Last 30 days'],
+    confirmed: 'We’ll prepare your sample statement for *{{choice.period.title}}*.',
+    filename: 'Sample statement',
+    closing: 'Your sample statement is ready. Tap the PDF to see its file details.',
+  },
+};
+
+export const demoCopy: Record<Locale, typeof en> = {
+  en,
+  'pt-BR': {
+    retail: {
+      title: 'Comprar para casa',
+      welcome:
+        'Bem-vindo à Magazine Luzia! Separamos três novidades para deixar sua casa mais aconchegante.',
+      collection: 'Para sua casa',
+      offer: 'Abra a vitrine, escolha o que você gostou e envie seu carrinho.',
+      products: [
+        ['Vaso Duna', 'Vaso de cerâmica em tom areia.'],
+        ['Almofada Nuvem', 'Almofada macia para o seu sofá.'],
+        ['Luminária Lua', 'Luminária de cabeceira com luz quente.'],
+      ],
+      received:
+        'Recebemos seu carrinho. Vamos preparar o Pix com o valor dos produtos que você escolheu.',
+      payment: 'Aqui está o Pix simulado do seu pedido.',
+      thanks: 'Valeu por experimentar nossa loja! Seu pedido de demonstração foi concluído.',
+    },
+    dental: {
+      title: 'Agendar uma consulta',
+      welcome: 'Oi! Vamos encontrar um horário para a sua próxima visita à OdontoNext.',
+      invitation: 'Diga o que você precisa e escolha um horário no formulário.',
+      open: 'Agendar consulta',
+      first: 'Sua consulta',
+      name: 'Primeiro nome',
+      service: 'Qual atendimento você procura?',
+      services: ['Limpeza', 'Avaliação', 'Revisão do aparelho'],
+      next: 'Escolher horário',
+      second: 'Horários disponíveis',
+      time: 'Qual horário funciona para você?',
+      times: ['Amanhã às 9h', 'Amanhã às 14h', 'Amanhã às 16h'],
+      submit: 'Confirmar agendamento',
+      confirmed:
+        'Tudo certo, *{{flow.booking.DETAILS.name}}*! Sua consulta foi agendada.\n\n*Atendimento* · {{flow.booking.DETAILS.service}}\n*Horário* · {{flow.booking.SCHEDULE.time ?? "Horário a confirmar"}}',
+    },
+    repair: {
+      title: 'Pedir um reparo',
+      prompt: 'Oi! Conte o que aconteceu com seu celular e a gente te ajuda com o próximo passo.',
+      open: 'Escolher problema',
+      section: 'Reparo de celular',
+      issues: ['Tela trincada', 'Bateria', 'Aparelho não liga'],
+      request:
+        'Você escolheu *{{choice.issue.title}}*. Use o clipe para enviar uma foto do aparelho pela galeria da demo.',
+      photo: 'Foto do aparelho',
+      caption: 'Segue uma foto do meu celular.',
+      received:
+        'Recebemos a foto. Leve seu aparelho ao balcão de atendimento para a gente dar uma olhada.',
+      place: 'Balcão de atendimento iReplace',
+      address: 'Rua Exemplo, 18 · Shopping da Demo, 1º piso',
+      closing: 'Toque no cartão do mapa para ver os detalhes do balcão.',
+    },
+    pet: {
+      title: 'Remarcar a entrega da ração',
+      prompt: 'A ração da Mingau está a caminho. Quer mudar a janela de entrega?',
+      windows: ['Hoje, das 14h às 18h', 'Amanhã, 8h–12h'],
+      request:
+        'Vamos reservar *{{choice.delivery.title}}*. Segure o microfone para deixar uma instrução de entrega.',
+      received: 'Obrigada pelo áudio! Já atualizamos a entrega da Mingau.',
+      confirmed: 'Nova janela de entrega · *{{choice.delivery.title}}*.',
+    },
+    banking: {
+      title: 'Solicitar um extrato',
+      welcome: 'Bem-vindo ao NuBolso. Você pode pedir um extrato demonstrativo por aqui mesmo.',
+      prompt: 'Escolha o período que você quer consultar.',
+      periods: ['Últimos 7 dias', 'Últimos 30 dias'],
+      confirmed:
+        'Vamos preparar seu extrato demonstrativo para o período *{{choice.period.title}}*.',
+      filename: 'Extrato demonstrativo',
+      closing: 'Seu extrato demonstrativo está pronto. Toque no PDF para abrir a ficha do arquivo.',
+    },
+  },
+  es: {
+    retail: {
+      title: 'Comprar para casa',
+      welcome: '¡Te damos la bienvenida a Magazine Luzia! Tenemos tres novedades para tu hogar.',
+      collection: 'Para tu casa',
+      offer: 'Abre la vitrina, elige lo que más te guste y envíanos tu carrito.',
+      products: [
+        ['Jarrón Duna', 'Jarrón de cerámica en color arena.'],
+        ['Cojín Nube', 'Un cojín suave para tu sofá.'],
+        ['Lámpara Luna', 'Lámpara de noche con luz cálida.'],
+      ],
+      received:
+        'Recibimos tu carrito. Vamos a preparar el Pix con el importe de los productos que elegiste.',
+      payment: 'Aquí tienes el código Pix simulado de tu pedido.',
+      thanks: '¡Gracias por probar nuestra tienda! Tu pedido de demostración está completo.',
+    },
+    dental: {
+      title: 'Agendar una consulta',
+      welcome: '¡Hola! Busquemos un horario para tu próxima visita a OdontoNext.',
+      invitation: 'Dinos qué necesitas y elige un horario en el formulario.',
+      open: 'Agendar consulta',
+      first: 'Tu consulta',
+      name: 'Nombre',
+      service: '¿Qué atención necesitas?',
+      services: ['Limpieza', 'Evaluación', 'Revisión de ortodoncia'],
+      next: 'Elegir horario',
+      second: 'Horarios disponibles',
+      time: '¿Qué horario te queda bien?',
+      times: ['Mañana a las 9:00', 'Mañana a las 14:00', 'Mañana a las 16:00'],
+      submit: 'Confirmar cita',
+      confirmed:
+        '¡Todo listo, *{{flow.booking.DETAILS.name}}*! Tu cita está agendada.\n\n*Atención* · {{flow.booking.DETAILS.service}}\n*Horario* · {{flow.booking.SCHEDULE.time ?? "Horario por confirmar"}}',
+    },
+    repair: {
+      title: 'Solicitar una reparación',
+      prompt: '¡Hola! Cuéntanos qué le pasó a tu celular y te ayudaremos con el siguiente paso.',
+      open: 'Elegir problema',
+      section: 'Reparación de celulares',
+      issues: ['Pantalla rota', 'Batería', 'El celular no prende'],
+      request:
+        'Elegiste *{{choice.issue.title}}*. Usa el clip para enviar una foto de tu celular desde la galería de la demo.',
+      photo: 'Foto del celular',
+      caption: 'Aquí tienes una foto de mi celular.',
+      received: 'Recibimos tu foto. Lleva tu celular al mostrador para que podamos revisarlo.',
+      place: 'Mostrador de atención iReplace',
+      address: 'Calle Ejemplo 18 · Centro Comercial Demo, primer piso',
+      closing: 'Toca la tarjeta del mapa para ver los datos del mostrador.',
+    },
+    pet: {
+      title: 'Reprogramar una entrega',
+      prompt: 'La comida de Mingau está en camino. ¿Quieres cambiar el horario de entrega?',
+      windows: ['Hoy, de 14 a 18 h', 'Mañana, de 8 a 12 h'],
+      request:
+        'Reservaremos *{{choice.delivery.title}}*. Mantén presionado el micrófono para dejar una instrucción de entrega.',
+      received: '¡Gracias por el audio! Ya actualizamos la entrega de Mingau.',
+      confirmed: 'Nuevo horario de entrega · *{{choice.delivery.title}}*.',
+    },
+    banking: {
+      title: 'Pedir un estado de cuenta',
+      welcome:
+        'Te damos la bienvenida a NuBolso. Aquí puedes pedir un estado de cuenta de ejemplo.',
+      prompt: 'Elige el período que quieres consultar.',
+      periods: ['Últimos 7 días', 'Últimos 30 días'],
+      confirmed: 'Prepararemos tu estado de cuenta de ejemplo para *{{choice.period.title}}*.',
+      filename: 'Estado de cuenta de ejemplo',
+      closing: 'Tu estado de cuenta está listo. Toca el PDF para ver los detalles del archivo.',
+    },
+  },
+};
