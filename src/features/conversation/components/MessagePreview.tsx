@@ -6,6 +6,7 @@ import type { Attachment, ChatMessage, CommerceMessage, Contact, Step } from '..
 import { messageOptions } from '../../../core/interactive';
 import { usePhoneTime } from '../phone-time';
 import { PhoneFrame } from './PhoneFrame';
+import { ConversationStart } from './ConversationStart';
 import { MessageBubble } from './MessageBubble';
 import { ListPicker } from './ListPicker';
 import { FlowSheet } from '../../flows/components/FlowSheet';
@@ -99,7 +100,7 @@ export function MessagePreview({
       pixCopied={commercePlayback.pixCopied}
     >
       <div className="chat-body draft-chat" aria-label={t('app.draft')}>
-        <div className="day">{t('phone.today')}</div>
+        <ConversationStart phoneRef={phoneRef} />
         <div className="messages">
           <MessageBubble
             message={message}
