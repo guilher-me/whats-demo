@@ -64,7 +64,7 @@ function project(): Project {
     ],
   };
 }
-const api = () => window.whatsappFakeFlows!;
+const api = () => window.whatsDemo!;
 const button = (name: string) => screen.getByRole('button', { name });
 const sheet = () => within(screen.getByRole('dialog'));
 async function tick(ms: number) {

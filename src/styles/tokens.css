@@ -17,7 +17,10 @@
   --surface-editor: #f3f8f5;
   --surface-preview: #e8f4f2;
   --background-editor: linear-gradient(160deg, #ffffff 0%, #fbfdfc 45%, #f3f8f5 100%);
-  --background-preview: linear-gradient(145deg, var(--surface-preview), #d6ebe7);
+  --preview-doodle: url('../../assets/preview-doodle.svg');
+  --background-preview:
+    var(--preview-doodle) 0 0 / 244px 244px repeat,
+    linear-gradient(145deg, var(--surface-preview), #d6ebe7);
   --recording-backdrop: #fff;
   --surface-subtle: #f5f7fa;
   --surface-hover: #edf1f5;
@@ -114,7 +117,9 @@
   --surface-editor: #111d19;
   --surface-preview: #213c35;
   --background-editor: linear-gradient(160deg, #14211c, #111d19);
-  --background-preview: linear-gradient(145deg, var(--surface-preview), #172d27);
+  --background-preview:
+    var(--preview-doodle) 0 0 / 244px 244px repeat,
+    linear-gradient(145deg, var(--surface-preview), #172d27);
   --recording-backdrop: #213c35;
   --surface-subtle: #1e3029;
   --surface-hover: #293e35;

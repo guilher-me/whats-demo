@@ -32,7 +32,7 @@ function journey(): Project {
   };
 }
 
-const api = () => window.whatsappFakeFlows!;
+const api = () => window.whatsDemo!;
 const button = (name: string) => screen.getByRole('button', { name });
 const dialog = () => within(screen.getByRole('dialog'));
 const tick = (milliseconds: number) => act(async () => vi.advanceTimersByTimeAsync(milliseconds));

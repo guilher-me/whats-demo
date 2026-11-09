@@ -50,7 +50,7 @@ async function start() {
 }
 it('expands one step at a time, collapses it and preserves the project', async () => {
   await start();
-  const before = window.whatsappFakeFlows!.getProject();
+  const before = window.whatsDemo!.getProject();
   expect(screen.getByRole('button', { name: 'Recolher etapa 1' })).toHaveAttribute(
     'aria-expanded',
     'true',
@@ -66,7 +66,7 @@ it('expands one step at a time, collapses it and preserves the project', async (
   );
   fireEvent.click(screen.getByRole('button', { name: 'Recolher etapa 2' }));
   expect(screen.getAllByRole('button', { name: /Editar etapa/ })).toHaveLength(3);
-  expect(window.whatsappFakeFlows!.getProject()).toEqual(before);
+  expect(window.whatsDemo!.getProject()).toEqual(before);
 });
 it('keeps an invalid Flow draft and its validation when the step is collapsed', async () => {
   await start();
@@ -105,13 +105,13 @@ it('supports keyboard menus, Escape focus return, duplication and disabled bound
   expect(trigger).toHaveFocus();
   await user.keyboard('{Enter}');
   await user.click(screen.getByRole('menuitem', { name: 'Duplicar etapa' }));
-  const steps = window.whatsappFakeFlows!.getProject().steps;
+  const steps = window.whatsDemo!.getProject().steps;
   expect(steps).toHaveLength(4);
   expect(steps[0].text).toBe(steps[1].text);
   expect(new Set(steps.map((step) => step.id)).size).toBe(4);
 });
 it('configures automatic product selections from the showcase and reuses its cart step', async () => {
-  const api = () => window.whatsappFakeFlows!;
+  const api = () => window.whatsDemo!;
   render(<App />);
   await act(async () =>
     api().loadProject({

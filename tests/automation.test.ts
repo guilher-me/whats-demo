@@ -56,7 +56,7 @@ it('usa cópias em ambos os sentidos e mantém o contrato versionado', () => {
   loaded.steps.length = 0;
   expect(api.getProject().contact.name).toBe('Empresa nova');
   expect(api.getProject().steps.length).toBeGreaterThan(0);
-  expect(api.apiVersion).toBe(3);
+  expect(api.apiVersion).toBe(4);
   expect(Object.isFrozen(api)).toBe(true);
 });
 it('gera links sem persistir e rejeita um projeto nulo explícito', async () => {

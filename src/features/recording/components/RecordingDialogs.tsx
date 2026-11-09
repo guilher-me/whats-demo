@@ -5,6 +5,7 @@ import { Button } from '../../../components/ui/Button';
 import { ControlIcon } from '../../../components/icons/ControlIcon';
 import { recordingSupport, supportsTransparentRecording } from '../session';
 import { formatElapsed } from '../types';
+import { RecordingResult } from './RecordingResult';
 import type { RecordingController } from '../useRecording';
 export function RecordingDialogs({
   open,
@@ -94,35 +95,15 @@ export function RecordingDialogs({
         }
       >
         {recording.result && (
-          <>
-            <video
-              className={`recorded-video${recording.result.transparent ? ' is-transparent' : ''}`}
-              controls
-              muted
-              playsInline
-              preload="metadata"
-              src={recording.result.url}
-              aria-label={t('recording.videoLabel')}
-            />
-            <div className="dialog-actions">
-              <Button onClick={recording.discard}>{t('recording.discard')}</Button>
-              <Button
-                onClick={() => {
-                  recording.discard();
-                  onOpenChange(true);
-                }}
-              >
-                {t('recording.again')}
-              </Button>
-              <a
-                className="download-recording"
-                href={recording.result.url}
-                download={`whats-demo-${new Date().toISOString().replace(/[:.]/g, '-')}.${recording.result.extension}`}
-              >
-                {t('recording.download')}
-              </a>
-            </div>
-          </>
+          <RecordingResult
+            key={recording.result.url}
+            clip={recording.result}
+            onDiscard={recording.discard}
+            onAgain={() => {
+              recording.discard();
+              onOpenChange(true);
+            }}
+          />
         )}
       </Dialog>
       <Dialog

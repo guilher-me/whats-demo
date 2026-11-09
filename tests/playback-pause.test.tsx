@@ -40,16 +40,14 @@ it.each(['Iniciar manual', 'Reproduzir automaticamente'])(
     expect(document.querySelector('.play-status')).toHaveTextContent('Reprodução pausada.');
     expect(document.querySelector('#phone-preview')).toHaveAttribute('inert');
     await tick(20000);
-    expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(0);
+    expect(window.whatsDemo!.getState().messages).toHaveLength(0);
     resume();
     await tick(3999);
-    expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(0);
+    expect(window.whatsDemo!.getState().messages).toHaveLength(0);
     await tick(1);
-    expect(window.whatsappFakeFlows!.getState().messages.map((m) => m.text)).toEqual([
-      'Reply once',
-    ]);
+    expect(window.whatsDemo!.getState().messages.map((m) => m.text)).toEqual(['Reply once']);
     await tick(5000);
-    expect(window.whatsappFakeFlows!.getState().running).toBe(false);
+    expect(window.whatsDemo!.getState().running).toBe(false);
   },
 );
 it('preserves a partly typed automatic message, then sends it exactly once', async () => {
@@ -63,10 +61,10 @@ it('preserves a partly typed automatic message, then sends it exactly once', asy
   pause();
   await tick(30000);
   expect(composer.value).toBe(partial);
-  expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(0);
+  expect(window.whatsDemo!.getState().messages).toHaveLength(0);
   resume();
   await tick(5000);
-  expect(window.whatsappFakeFlows!.getState().messages.map((m) => m.text)).toEqual(['Hello there']);
+  expect(window.whatsDemo!.getState().messages.map((m) => m.text)).toEqual(['Hello there']);
 });
 it('retains the current Flow screen and partly filled field during automatic playback', async () => {
   const name = 'Alexandra Taylor Robertson';
@@ -116,13 +114,13 @@ it('retains the current Flow screen and partly filled field during automatic pla
   pause();
   await tick(30000);
   expect(field!.value).toBe(partial);
-  expect(window.whatsappFakeFlows!.getState().flowScreen).toBe('DETAILS');
+  expect(window.whatsDemo!.getState().flowScreen).toBe('DETAILS');
   resume();
   await tick(20000);
   expect(
-    window.whatsappFakeFlows!.getState().messages.filter((m) => m.text === 'Details sent'),
+    window.whatsDemo!.getState().messages.filter((m) => m.text === 'Details sent'),
   ).toHaveLength(1);
-  expect(window.whatsappFakeFlows!.getState().running).toBe(false);
+  expect(window.whatsDemo!.getState().running).toBe(false);
 });
 it('reset during a pause cancels the suspended run and a new run starts cleanly', async () => {
   await start([{ id: 'reply', type: 'business', text: 'New run', delay: 2 }]);
@@ -131,9 +129,9 @@ it('reset during a pause cancels the suspended run and a new run starts cleanly'
   pause();
   fireEvent.click(screen.getByRole('button', { name: 'Reiniciar prévia' }));
   await tick(30000);
-  expect(window.whatsappFakeFlows!.getState().running).toBe(false);
-  expect(window.whatsappFakeFlows!.getState().messages).toHaveLength(0);
+  expect(window.whatsDemo!.getState().running).toBe(false);
+  expect(window.whatsDemo!.getState().messages).toHaveLength(0);
   fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
   await tick(6000);
-  expect(window.whatsappFakeFlows!.getState().messages.map((m) => m.text)).toEqual(['New run']);
+  expect(window.whatsDemo!.getState().messages.map((m) => m.text)).toEqual(['New run']);
 });

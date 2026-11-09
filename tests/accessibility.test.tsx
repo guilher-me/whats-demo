@@ -115,7 +115,7 @@ it.each(['editor', 'flow', 'list'] as const)(
       const step = createStep(view === 'flow' ? 'flow' : 'business');
       if (step.type === 'business') step.interactive = createInteractive('list');
       act(() =>
-        window.whatsappFakeFlows!.loadProject({
+        window.whatsDemo!.loadProject({
           version: 1,
           contact: { name: 'Empresa exemplo', verified: true },
           steps: [step],

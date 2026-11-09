@@ -53,7 +53,7 @@ it('copies one link from the keyboard and opens only Preview initially', async (
     locale: 'pt-BR',
     token: expect.stringMatching(/^v3z\.[A-Za-z0-9]+$/),
   });
-  expect(await decode(url.hash)).toEqual(window.whatsappFakeFlows!.getProject());
+  expect(await decode(url.hash)).toEqual(window.whatsDemo!.getProject());
   expect(screen.queryByRole('menu')).toBeNull();
   expect(screen.queryByRole('dialog')).toBeNull();
   expect(localStorage.getItem(STORAGE_KEY)).toBe(draft);
@@ -72,11 +72,29 @@ it('copies one link from the keyboard and opens only Preview initially', async (
   expect(screen.getByRole('button', { name: 'Iniciar manual' })).toBeEnabled();
   expect(screen.queryByRole('button', { name: /Só celular/ })).toBeNull();
 
+  const auto = screen.getByRole('button', { name: 'Reproduzir automaticamente' });
+  const hint = await screen.findByRole('tooltip');
+  expect(hint).toHaveTextContent('Selecione o botão de play para ver esta jornada do começo.');
+  expect(auto).toHaveAttribute('aria-describedby', hint.id);
+  await user.keyboard('{Escape}');
+  expect(screen.queryByRole('tooltip')).toBeNull();
+  await user.hover(auto);
+  expect(screen.getByRole('tooltip')).toHaveTextContent(
+    'Executa a jornada com cursor e respostas animados.',
+  );
+  await user.unhover(auto);
+
   await user.click(expandEditor);
   await user.click(expandCode);
   expect(document.getElementById('workspace-editor')).toBeVisible();
   expect(document.getElementById('workspace-code')).toBeVisible();
   expect(document.getElementById('workspace-preview')).toBeVisible();
+
+  cleanup();
+  history.replaceState(null, '', url.hash);
+  render(<App />);
+  expect(await screen.findByRole('button', { name: 'Reproduzir automaticamente' })).toBeEnabled();
+  expect(screen.queryByRole('tooltip')).toBeNull();
 });
 
 it('passes the promised URL to ClipboardItem and reports a blocked write inline', async () => {
@@ -113,6 +131,9 @@ it('applies the link language in preview and its editable copy without changing 
   render(<App />);
   const copy = await screen.findByRole('link', { name: 'Editar una copia' });
   expect(document.documentElement.lang).toBe('es');
+  expect(await screen.findByRole('tooltip')).toHaveTextContent(
+    'Selecciona el botón de reproducción para ver este recorrido desde el principio.',
+  );
   expect(screen.queryByRole('heading', { name: 'Crea la conversación' })).toBeNull();
   expect(localStorage.getItem(LOCALE_KEY)).toBe('en');
   await user.click(copy);

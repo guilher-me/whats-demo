@@ -121,7 +121,19 @@ a.button--primary:hover {
     align-items: center;
   }
   .shared-demo .phone-stage .phone-device {
-    width: min(360px, 100%, max(260px, calc((100dvh - 170px) * var(--phone-preview-scale) / 2)));
+    width: min(360px, 100%, max(190px, calc((100dvh - 170px) * var(--phone-preview-scale) / 2)));
+  }
+  .shared-demo .control-tooltip[data-preview-hint] {
+    --preview-hint-motion: preview-hint-up;
+    inset: auto auto calc(100% + 12px) 50%;
+    transform: translateX(-50%);
+  }
+  .shared-demo .control-tooltip[data-preview-hint]::before {
+    top: 100%;
+    left: 50%;
+    border-left-color: transparent;
+    border-top-color: var(--tooltip-bg);
+    transform: translateX(-50%);
   }
   .shared-demo .phone-tools,
   .shared-demo .playback {

@@ -5,7 +5,13 @@ function agentDocs(root, directory, template) {
   const index = fs
     .readFileSync(path.join(root, 'llms.txt'), 'utf8')
     .replace(/^> .+\r?\n/m, (summary) => `${summary}\nApp version: ${version}.\n`);
-  const full = index + '\n\n' + fs.readFileSync(path.join(root, 'docs', 'automation.md'), 'utf8');
+  const guide = fs
+    .readFileSync(path.join(root, 'docs', 'automation.md'), 'utf8')
+    .replace(
+      /\]\((?![#/]|[a-z][a-z0-9+.-]*:)([^()\s]+)\)/gi,
+      (_, href) => '](' + path.posix.normalize('docs/' + href) + ')',
+    );
+  const full = index + '\n\n' + guide;
   fs.mkdirSync(directory, { recursive: true });
   for (const filename of ['llms.txt', 'llm.txt'])
     fs.writeFileSync(path.join(directory, filename), index);

@@ -45,7 +45,7 @@ it('does not claim the untouched empty editor is saved and separates sharing fro
   expect(indicator()).toHaveAttribute('data-state', 'empty');
   expect(indicator()).toHaveTextContent('Nova jornada · não salva');
   expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
-  expect(window.whatsappFakeFlows!.getProject().steps).toEqual([]);
+  expect(window.whatsDemo!.getProject().steps).toEqual([]);
   expect(screen.getByLabelText('Nome do contato')).toHaveValue('');
   expect(screen.queryByRole('button', { name: 'Restaurar do link' })).toBeNull();
   expect(screen.queryByRole('button', { name: 'Restaurar exemplo' })).toBeNull();
@@ -133,7 +133,7 @@ it('opens a shared copy separately, saves its edits and keeps the original snaps
     'href',
     editor.hash,
   );
-  expect(window.whatsappFakeFlows).toBeUndefined();
+  expect(window.whatsDemo).toBeUndefined();
 
   cleanup();
   history.replaceState(null, '', editor.hash);

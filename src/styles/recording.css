@@ -115,6 +115,38 @@
   background: repeating-conic-gradient(var(--surface-hover) 0 25%, var(--surface) 0 50%) 0 0 / 16px
     16px;
 }
+.recording-result-actions {
+  flex-wrap: wrap;
+}
+.record-gif-progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+.record-gif-progress progress {
+  flex: 1;
+  min-width: 90px;
+  height: 6px;
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--accent-soft);
+}
+.record-gif-progress progress::-webkit-progress-bar {
+  background: var(--accent-soft);
+}
+.record-gif-progress progress::-webkit-progress-value {
+  border-radius: 999px;
+  background: var(--accent);
+}
+.record-gif-progress progress::-moz-progress-bar {
+  border-radius: 999px;
+  background: var(--accent);
+}
 .download-recording {
   display: inline-flex;
   align-items: center;

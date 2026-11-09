@@ -11,7 +11,7 @@
 
 Respostas rápidas e listas aguardam uma escolha e geram um balão do cliente. Botões de ação abrem uma demonstração dentro do celular, sem abrir sites, iniciar chamadas ou alterar a área de transferência. Continuar confirma uma ação; mensagens que também contêm respostas rápidas continuam aguardando uma resposta rápida. No automático, a escolha configurada é usada; por padrão, a primeira resposta rápida tem prioridade sobre ações. O roteiro é linear, sem ramificações por resposta.
 
-O simulador usa cabeçalho de texto e rodapé de até 60 caracteres e corpo de até 1024 caracteres nas mensagens interativas. Vídeo, áudio, documentos, catálogo e carrosséis ficam para futuras contribuições.
+O simulador usa cabeçalho de texto e rodapé de até 60 caracteres e corpo de até 1024 caracteres nas mensagens interativas. Há também formatos simulados de imagem, documento, localização, voz do Cliente, catálogo, carrinho e Pix. O [guia de automação](automation.md#project-contract) descreve os respectivos campos do projeto.
 
 ## Composição e responsabilidades
 
@@ -97,7 +97,7 @@ These require their own message families and are not interchangeable with generi
 
 - **Flow:** supported by the existing Flow step and JSON editor, not a generic URL action. It opens the configured screens and uses the existing completion/answers behavior.
 - **OTP:** authentication templates support copy-code, one-tap and zero-tap experiences. The ordinary promotional Copy code button is not an authentication/OTP implementation. Authentication-specific app signatures and restrictions are outside this simulator.
-- **Single-product / catalog buttons:** non-customizable buttons tied to catalog products. Multi-product buttons can show up to 30 products in up to 10 sections. These require catalog/product message components and are not implemented here.
+- **Single-product / catalog buttons:** non-customizable buttons tied to catalog products. Multi-product buttons can show up to 30 products in up to 10 sections. Use the separate [commerce formats](automation.md#simulated-commerce) for single products and showcases.
 - **Carousel and limited-time-offer templates:** separate template structures with their own restrictions; generic template mode does not claim to validate those families.
 
 ### Extending this implementation

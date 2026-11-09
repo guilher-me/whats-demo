@@ -31,7 +31,7 @@ function send(text: string) {
   fireEvent.change(screen.getByLabelText('Mensagem'), { target: { value: text } });
   fireEvent.submit(screen.getByRole('form', { name: 'Enviar mensagem do cliente' }));
 }
-const state = () => window.whatsappFakeFlows!.getState();
+const state = () => window.whatsDemo!.getState();
 it('can start a new manual conversation after automatic playback has finished', async () => {
   await start([{ id: 'hello', type: 'user', text: 'oi', delay: 0 }]);
   fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
@@ -69,7 +69,7 @@ it('starts manual playback on submit, preserves the configured journey and never
     'Thank you!',
   ]);
   expect(state().running).toBe(false);
-  expect(window.whatsappFakeFlows!.getProject().steps[0].text).toBe('Configured greeting');
+  expect(window.whatsDemo!.getProject().steps[0].text).toBe('Configured greeting');
 });
 it('retains every configured step when the journey starts with a business message', async () => {
   await start([

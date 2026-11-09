@@ -75,6 +75,7 @@ export function DemoApp({
         />
         <div className="phone-tools">
           <PlaybackControls
+            showFirstVisitHint
             disabled={false}
             autoDisabled={!!automaticIssue}
             running={playback.running}
