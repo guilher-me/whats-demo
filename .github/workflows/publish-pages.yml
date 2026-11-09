@@ -22,14 +22,14 @@ jobs:
         run: |
           test "$GITHUB_REF" = refs/heads/main || { echo 'Run deployment workflows from main.'; exit 1; }
           case "$TARGET" in production|development) ;; *) exit 1 ;; esac
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.environment == 'production' && 'main' || 'development' }}
           persist-credentials: false
       - name: Record source revision
         id: source
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -38,7 +38,7 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: site-${{ inputs.environment }}
           path: dist/
@@ -57,14 +57,14 @@ jobs:
       published: ${{ steps.persist.outputs.published }}
     steps:
       # Run publishing tools from the reviewed workflow revision, never from a downloaded build.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.workflow_sha }}
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: site-${{ inputs.environment }}
           path: downloaded-site
@@ -93,21 +93,21 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}${{ inputs.environment == 'development' && 'development/' || '' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.workflow_sha }}
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Compose production and development
         run: node scripts/pages.cjs compose combined-site
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: combined-site
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
