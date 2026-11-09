@@ -6,6 +6,10 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 
 ## [Unreleased]
 
+### Added
+
+- Navigate between a step in the Editor and its JSON block in Code.
+
 ## [0.5.0] - 2026-11-08
 
 ### Added
