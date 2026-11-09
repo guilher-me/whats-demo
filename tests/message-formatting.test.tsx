@@ -70,9 +70,9 @@ it('formata a prévia e a reprodução mantendo a sintaxe original no projeto e 
     await vi.advanceTimersByTimeAsync(1);
   });
   expect(document.querySelector('.messages strong')).toHaveTextContent('Olá');
-  expect(window.whatsappFakeFlows!.getProject().steps[0].text).toBe(project.steps[0].text);
+  expect(window.whatsDemo!.getProject().steps[0].text).toBe(project.steps[0].text);
   vi.stubGlobal('Blob', NativeBlob);
-  expect(await decode(await encode(window.whatsappFakeFlows!.getProject()))).toEqual(project);
+  expect(await decode(await encode(window.whatsDemo!.getProject()))).toEqual(project);
 });
 it('formata mensagens digitadas pelo cliente', async () => {
   const project = {

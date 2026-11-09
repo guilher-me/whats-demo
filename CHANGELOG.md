@@ -14,7 +14,7 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 ### Changed
 
 - Document the current workspace, message and recording features in the WhatsDemo agent guide.
-- Use the WhatsDemo name for the browser API while retaining existing integrations.
+- Use `window.whatsDemo` and `whatsdemo:ready` for browser automation API v4.
 
 ### Fixed
 

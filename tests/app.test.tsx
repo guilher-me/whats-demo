@@ -33,8 +33,8 @@ describe('editor e reprodução React', () => {
     await start();
     fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
     for (let i = 0; i < 60; i++) await tick(1000);
-    const messages = window.whatsappFakeFlows!.getState().messages;
-    expect(window.whatsappFakeFlows!.getState().running).toBe(false);
+    const messages = window.whatsDemo!.getState().messages;
+    expect(window.whatsDemo!.getState().running).toBe(false);
     expect(document.querySelector('.play-status')).toHaveTextContent('Conversa concluída.');
     expect(messages.some((m) => m.direction === 'user' && m.text === 'Browse collection')).toBe(
       true,
@@ -58,7 +58,7 @@ describe('editor e reprodução React', () => {
     fireEvent.click(screen.getByRole('article', { name: 'Etapa 1' }));
     fireEvent.click(screen.getByRole('button', { name: 'Iniciar manual' }));
     await tick(1);
-    expect(window.whatsappFakeFlows!.getState().running).toBe(true);
+    expect(window.whatsDemo!.getState().running).toBe(true);
     expect(document.querySelector('.bubble.user')).toBeNull();
     fireEvent.change(screen.getByLabelText('Mensagem'), { target: { value: 'oi' } });
     fireEvent.click(screen.getByRole('button', { name: 'Enviar mensagem' }));
@@ -78,15 +78,15 @@ describe('editor e reprodução React', () => {
       await start();
       fireEvent.click(screen.getByRole('button', { name: mode }));
       await tick(1);
-      const messages = window.whatsappFakeFlows!.getState().messages;
+      const messages = window.whatsDemo!.getState().messages;
       expect(messages).toHaveLength(1);
       fireEvent.click(screen.getByRole('button', { name: 'Recolher Código' }));
       fireEvent.click(screen.getByRole('button', { name: 'Recolher Editor' }));
       await tick(1);
-      expect(window.whatsappFakeFlows!.getState().messages).toEqual(messages);
-      expect(window.whatsappFakeFlows!.getState().running).toBe(true);
+      expect(window.whatsDemo!.getState().messages).toEqual(messages);
+      expect(window.whatsDemo!.getState().running).toBe(true);
       fireEvent.click(screen.getByRole('button', { name: 'Expandir Editor' }));
-      expect(window.whatsappFakeFlows!.getState().running).toBe(true);
+      expect(window.whatsDemo!.getState().running).toBe(true);
     },
   );
   it('edita contato e adiciona mensagem', async () => {
@@ -154,7 +154,7 @@ describe('editor e reprodução React', () => {
     await start();
     fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
     await tick(100);
-    expect(window.whatsappFakeFlows!.getState().running).toBe(true);
+    expect(window.whatsDemo!.getState().running).toBe(true);
     fireEvent.click(screen.getByRole('button', { name: 'Reiniciar prévia' }));
     await tick(20000);
     expect(document.querySelectorAll('.bubble')).toHaveLength(0);
@@ -167,7 +167,7 @@ describe('editor e reprodução React', () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(p));
     await start();
     fireEvent.click(screen.getByRole('button', { name: 'Reproduzir automaticamente' }));
-    for (let i = 0; i < 90 && window.whatsappFakeFlows!.getState().running; i++) await tick(1000);
+    for (let i = 0; i < 90 && window.whatsDemo!.getState().running; i++) await tick(1000);
     expect(document.querySelector('.play-status')?.textContent).toBe('Conversa concluída.');
     expect(document.querySelector('.messages')?.textContent).toContain('Meu nome é Vanessa');
   });

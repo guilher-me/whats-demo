@@ -46,15 +46,15 @@ it('switches all three interfaces, persists the choice and includes it in the sh
   await act(async () => {});
   expect(screen.getByRole('heading', { name: 'Build the conversation' })).toBeInTheDocument();
   expect(document.documentElement).toHaveAttribute('lang', 'en');
-  const before = window.whatsappFakeFlows!.getProject();
-  const link = await window.whatsappFakeFlows!.createShareURL();
+  const before = window.whatsDemo!.getProject();
+  const link = await window.whatsDemo!.createShareURL();
   const spanish = screen.getByRole('button', { name: 'Español' });
   fireEvent.click(spanish);
   expect(screen.getByRole('heading', { name: 'Crea la conversación' })).toBeInTheDocument();
   expect(spanish).toHaveAttribute('aria-pressed', 'true');
   expect(document.documentElement.lang).toBe('es');
   expect(localStorage.getItem(LOCALE_KEY)).toBe('es');
-  const spanishLink = sharedRoute(new URL(await window.whatsappFakeFlows!.createShareURL()).hash);
+  const spanishLink = sharedRoute(new URL(await window.whatsDemo!.createShareURL()).hash);
   expect(spanishLink?.locale).toBe('es');
   expect(spanishLink?.token).toBe(sharedRoute(new URL(link).hash)?.token);
   expect(screen.getByRole('button', { name: '＋ Empresa' })).toBeInTheDocument();
@@ -64,8 +64,8 @@ it('switches all three interfaces, persists the choice and includes it in the sh
   expect(screen.getByLabelText('Texto da mensagem')).toHaveValue('Mensagem original do usuário');
   fireEvent.click(screen.getByRole('button', { name: 'English' }));
   expect(screen.getByRole('button', { name: '＋ Business' })).toBeInTheDocument();
-  expect(window.whatsappFakeFlows!.getProject()).toEqual(before);
-  expect(await window.whatsappFakeFlows!.createShareURL()).toBe(link);
+  expect(window.whatsDemo!.getProject()).toEqual(before);
+  expect(await window.whatsDemo!.createShareURL()).toBe(link);
 });
 
 it('has complete catalogs with matching interpolation variables', () => {
@@ -111,10 +111,10 @@ it('refreshes playback status after a language switch without restarting the con
   await act(async () => {});
   fireEvent.click(screen.getByRole('button', { name: 'Start manually' }));
   await act(async () => {});
-  expect(window.whatsappFakeFlows!.getState().running).toBe(true);
+  expect(window.whatsDemo!.getState().running).toBe(true);
   fireEvent.click(screen.getByRole('button', { name: 'Español' }));
   expect(document.querySelector('.play-status')).toHaveTextContent(
     'Escribe y envía el mensaje del cliente para continuar.',
   );
-  expect(window.whatsappFakeFlows!.getState().running).toBe(true);
+  expect(window.whatsDemo!.getState().running).toBe(true);
 });

@@ -10,7 +10,7 @@ import type { FlowStep } from '../src/core/types';
 
 const button = (name: string) => screen.getByRole('button', { name });
 const code = () => screen.getByRole('textbox', { name: 'JSON da jornada' });
-const api = () => window.whatsappFakeFlows!;
+const api = () => window.whatsDemo!;
 
 beforeEach(() => {
   localStorage.clear();

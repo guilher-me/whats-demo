@@ -16,7 +16,7 @@ const project = (steps: Step[]): Project => ({
   contact: { name: 'Demo', verified: false },
   steps,
 });
-const api = () => window.whatsappFakeFlows!;
+const api = () => window.whatsDemo!;
 const microphone = () => screen.getByRole('button', { name: 'Segure para gravar' });
 
 beforeEach(() => {

@@ -37,7 +37,7 @@ export function createAutomationAPI(bindings: AutomationBindings) {
     if (!bindings.state().ready) throw new Error(t('errors.loading'));
   };
   return Object.freeze({
-    apiVersion: 3 as const,
+    apiVersion: 4 as const,
     projectVersion: 1 as const,
     getInstructions: () => bindings.instructions(),
     getProject: () => clone(bindings.project()),
@@ -79,6 +79,5 @@ export type AutomationAPI = ReturnType<typeof createAutomationAPI>;
 declare global {
   interface Window {
     whatsDemo?: AutomationAPI;
-    whatsappFakeFlows?: AutomationAPI;
   }
 }

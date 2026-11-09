@@ -37,7 +37,8 @@ it('gera um HTML com React, estilos, foto e licenças incorporados', async () =>
     expect(html).not.toContain('APP_SCRIPT');
     expect(html).not.toContain('LLM_DOCS');
     expect(html).toContain('id="llms-txt"');
-    expect(html).toContain('Automation API v3');
+    expect(html).toContain('Automation API v4');
+    expect(html).not.toContain('whatsapp-fake-flows-api');
     expect(html).toContain(`<meta name="whatsdemo-version" content="${version}" />`);
     const notes = html.match(/id="release-notes">([\s\S]*?)<\/script>/)?.[1];
     expect(JSON.parse(notes!).slice(0, 2)).toMatchObject([{ version: 'Unreleased' }, { version }]);
@@ -52,7 +53,7 @@ it('gera um HTML com React, estilos, foto e licenças incorporados', async () =>
     );
     expect(readFileSync(join(directory, 'docs/automation.md'), 'utf8')).toContain('loadProject');
     expect(html).toContain(
-      '<meta name="whatsdemo-api" content="window.whatsDemo; apiVersion=3" />',
+      '<meta name="whatsdemo-api" content="window.whatsDemo; apiVersion=4" />',
     );
     const instructions = readFileSync(join(directory, 'llms-full.txt'), 'utf8');
     expect(instructions).toContain('(docs/messages.md#button-types-and-contexts)');

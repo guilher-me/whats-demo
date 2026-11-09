@@ -39,7 +39,7 @@ it('reads and fills each field in order instead of reading the entire Flow first
   render(<App />);
   await act(async () => {});
   act(() =>
-    window.whatsappFakeFlows!.loadProject({
+    window.whatsDemo!.loadProject({
       version: 1,
       contact: { name: 'Store', verified: false },
       steps: [
@@ -82,7 +82,7 @@ it('reads and fills each field in order instead of reading the entire Flow first
   );
   let run!: Promise<unknown>;
   act(() => {
-    run = window.whatsappFakeFlows!.play();
+    run = window.whatsDemo!.play();
   });
   await act(async () => {
     await vi.advanceTimersByTimeAsync(1000);
@@ -98,7 +98,7 @@ it('reads and fills each field in order instead of reading the entire Flow first
     'read:Send',
     'submit',
   ]);
-  expect(window.whatsappFakeFlows!.getState().running).toBe(false);
+  expect(window.whatsDemo!.getState().running).toBe(false);
 });
 
 it('includes only the current field and its resolved choices and excludes helper text', () => {

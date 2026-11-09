@@ -24,13 +24,12 @@ export function useAutomationAPI(bindings: AutomationBindings) {
       instructions: () => latest.current.instructions(),
       href: () => latest.current.href(),
     });
-    window.whatsDemo = window.whatsappFakeFlows = api;
-    for (const event of ['whatsdemo:ready', 'whatsapp-fake-flows:ready']) {
-      window.dispatchEvent(new CustomEvent(event, { detail: { apiVersion: api.apiVersion } }));
-    }
+    window.whatsDemo = api;
+    window.dispatchEvent(
+      new CustomEvent('whatsdemo:ready', { detail: { apiVersion: api.apiVersion } }),
+    );
     return () => {
       if (window.whatsDemo === api) delete window.whatsDemo;
-      if (window.whatsappFakeFlows === api) delete window.whatsappFakeFlows;
     };
   }, []);
 }

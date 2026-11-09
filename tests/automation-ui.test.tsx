@@ -20,18 +20,15 @@ afterEach(() => {
 });
 it('carrega e reproduz o exemplo completo da documentação sem cliques', async () => {
   const canonicalReady = vi.fn();
-  const legacyReady = vi.fn();
   window.addEventListener('whatsdemo:ready', canonicalReady, { once: true });
-  window.addEventListener('whatsapp-fake-flows:ready', legacyReady, { once: true });
   render(<App />);
   await act(async () => {});
   const api = window.whatsDemo!;
-  expect(api).toBe(window.whatsappFakeFlows);
+  expect(window).not.toHaveProperty('whatsappFakeFlows');
   expect(api.getState().ready).toBe(true);
   expect(canonicalReady).toHaveBeenCalledWith(
-    expect.objectContaining({ detail: { apiVersion: 3 } }),
+    expect.objectContaining({ detail: { apiVersion: 4 } }),
   );
-  expect(legacyReady).toHaveBeenCalledWith(expect.objectContaining({ detail: { apiVersion: 3 } }));
   const guide = readFileSync('docs/automation.md', 'utf8');
   const script = /```js\n([\s\S]*?)```/.exec(guide)?.[1];
   expect(script).toBeTruthy();
@@ -57,7 +54,7 @@ it('carrega e reproduz o exemplo completo da documentação sem cliques', async 
 it('atualiza o editor imediatamente, limpa a prévia e remove a API ao desmontar', async () => {
   render(<App />);
   await act(async () => {});
-  const api = window.whatsappFakeFlows!;
+  const api = window.whatsDemo!;
   const project = {
     version: 1,
     contact: { name: 'API teste', verified: false },
@@ -83,5 +80,4 @@ it('atualiza o editor imediatamente, limpa a prévia e remove a API ao desmontar
   expect(api.getProject()).toEqual(project);
   cleanup();
   expect(window.whatsDemo).toBeUndefined();
-  expect(window.whatsappFakeFlows).toBeUndefined();
 });

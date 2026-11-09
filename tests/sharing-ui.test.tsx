@@ -53,7 +53,7 @@ it('copies one link from the keyboard and opens only Preview initially', async (
     locale: 'pt-BR',
     token: expect.stringMatching(/^v3z\.[A-Za-z0-9]+$/),
   });
-  expect(await decode(url.hash)).toEqual(window.whatsappFakeFlows!.getProject());
+  expect(await decode(url.hash)).toEqual(window.whatsDemo!.getProject());
   expect(screen.queryByRole('menu')).toBeNull();
   expect(screen.queryByRole('dialog')).toBeNull();
   expect(localStorage.getItem(STORAGE_KEY)).toBe(draft);

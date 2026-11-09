@@ -1,4 +1,4 @@
-# Automation API v3
+# Automation API v4
 
 WhatsDemo exposes `window.whatsDemo` to tools allowed to execute JavaScript in the current page. This is a browser API, not an HTTP endpoint or MCP server. A tool restricted to read-only JavaScript must use its normal UI controls for mutations.
 
@@ -20,7 +20,7 @@ The editor advertises the API in `<meta name="whatsdemo-api">`. The `whatsdemo-v
 
 | Member                          | Contract                                                                                                                                                            |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `apiVersion`, `projectVersion`  | Current values are 3 and 1.                                                                                                                                         |
+| `apiVersion`, `projectVersion`  | Current values are 4 and 1.                                                                                                                                         |
 | `getInstructions()`             | Embedded agent instructions.                                                                                                                                        |
 | `getProject()`                  | Independent copy of the current project.                                                                                                                            |
 | `getState()`                    | Snapshot with readiness, playback status and rendered messages.                                                                                                     |
@@ -34,7 +34,7 @@ The editor advertises the API in `<meta name="whatsdemo-api">`. The `whatsdemo-v
 
 In browser controls, scope editing to **Conversation editor** and expand a step through **Edit step N**. Choose the extension and enter the image text or document metadata directly on the step. In **Conversation preview**, use **Start manually** or **Play automatically**. Follow the accessible labels in the selected interface language.
 
-The browser editor starts with an empty journey on a fresh browser. Supply a project using the examples in this guide. API v3 removes `getExample()`.
+The browser editor starts with an empty journey on a fresh browser. Supply a project using the examples in this guide.
 
 ## Project contract
 
@@ -244,7 +244,7 @@ console.log(await createShareURL(project, 'demo'));
 
 ## Compatibility and contribution
 
-New integrations should use `window.whatsDemo` and `whatsdemo:ready`. The legacy browser API alias and readiness event still work with the same API v3 object. New links use a `v3z` alphanumeric payload. Existing `v2z` links still open in both modes. Existing `#project=v1z…` and `#project=v1j…` links open as demos. Invalid links leave the local draft intact.
+API v4 uses `window.whatsDemo` and `whatsdemo:ready`. New links use a `v3z` alphanumeric payload. Existing `v2z` links still open in both modes. Existing `#project=v1z…` and `#project=v1j…` links open as demos. Invalid links leave the local draft intact.
 
 The implementation uses the same codec and project validation in the app, public module and browser API. Add tests for contract changes and update the schema and instructions together.
 

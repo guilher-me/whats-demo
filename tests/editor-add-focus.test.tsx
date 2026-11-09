@@ -43,7 +43,7 @@ it.each([
       type === 'flow' ? 'Mensagem com o convite ao Flow' : 'Texto da mensagem',
     ),
   ).toHaveFocus();
-  const steps = window.whatsappFakeFlows!.getProject().steps;
+  const steps = window.whatsDemo!.getProject().steps;
   expect(steps.slice(0, -1).map((step) => step.id)).toEqual(originalIds);
   expect(steps.at(-1)?.type).toBe(type);
   expect(document.querySelector('.editor-footer')).toContainElement(

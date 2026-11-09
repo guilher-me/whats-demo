@@ -14,7 +14,7 @@ import type { FlowDefinition, FlowStep, Project } from '../src/core/types';
 const button = (name: string) => screen.getByRole('button', { name });
 const tab = (name: string) => screen.getByRole('tab', { name });
 const phone = () => within(document.getElementById('phone-preview')!);
-const api = () => window.whatsappFakeFlows!;
+const api = () => window.whatsDemo!;
 const current = () => api().getProject().steps[0] as FlowStep;
 
 function setup(configure?: (step: FlowStep) => void) {
