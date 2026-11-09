@@ -1,7 +1,9 @@
+import type { JourneyDiagnostic } from '../../flows/diagnostics';
 import { useT } from '../../../i18n';
 import type { CartItem, Contact, Project, Step } from '../../../core/types';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import { useAddedStepFocus } from '../hooks/useAddedStepFocus';
+import { scrollToStep } from '../hooks/step-scroll';
 import { ContactEditor } from './ContactEditor';
 import { StepCard } from './StepCard';
 import { AddStepButtons } from './AddStepButtons';
@@ -25,9 +27,12 @@ interface Props {
   onAnswersDraft: (id: string, draft?: AnswersDraft) => void;
   saveState: SaveState;
   project: Project;
+  diagnostics: JourneyDiagnostic[];
   revision: number;
   activeStep: string | null;
   selectedStep: string | null;
+  revealStep?: { id: string };
+  onShowCode: (id: string) => void;
   disabled?: boolean;
   onSelect: (id: string | null) => void;
   error: string;
@@ -50,6 +55,9 @@ export function EditorPanel(props: Props) {
   useEffect(() => {
     setExpandedId(props.project.steps[0]?.id ?? null);
   }, [props.revision]);
+  useLayoutEffect(() => {
+    if (props.revealStep && scrollRef.current) scrollToStep(scrollRef.current, props.revealStep.id);
+  }, [props.revealStep]);
   const focusAdded = useAddedStepFocus(props.project.steps, scrollRef);
   return (
     <section
@@ -112,6 +120,7 @@ export function EditorPanel(props: Props) {
               onFlowDraft={(draft) => props.onFlowDraft(step.id, draft)}
               onAnswersDraft={(draft) => props.onAnswersDraft(step.id, draft)}
               project={props.project}
+              diagnostics={props.diagnostics}
               commerceError={commerceStepError(props.project, index)}
               index={index}
               total={props.project.steps.length}
@@ -128,6 +137,7 @@ export function EditorPanel(props: Props) {
                 setExpandedId(step.id);
                 props.onSelect(step.id);
               }}
+              onShowCode={() => props.onShowCode(step.id)}
               onChange={(change) => props.onChange(step.id, change)}
               onCartChange={(cartId, items) => props.onCartChange(step.id, cartId, items)}
               onAction={(action) => props.onAction(step.id, action)}

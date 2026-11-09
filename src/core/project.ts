@@ -1,5 +1,6 @@
 import { DEFAULT_BUSINESS_ICON, DEFAULT_ICON_BACKGROUND } from './business-avatar';
 import { t } from '../i18n';
+import { referencedVariableStepIds } from './journey-variables';
 import { validateProject } from './engine';
 import type { Project, Step } from './types';
 export const STORAGE_KEY = 'whatsdemo-document-alpha1';
@@ -14,6 +15,38 @@ export function projectStorageKey(url: { protocol: string; pathname: string }): 
 export const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 export const uid = () =>
   `step-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
+const base62 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+function reservedStepIds(steps: readonly Step[]) {
+  const reserved = new Set(steps.map(({ id }) => id));
+  for (const step of steps) {
+    for (const id of referencedVariableStepIds(step)) reserved.add(id);
+    const commerce = step.type === 'flow' ? undefined : step.commerce;
+    if (commerce?.kind === 'cart') reserved.add(commerce.offerId);
+    if (commerce?.kind === 'pix' && 'cartId' in commerce.amount)
+      reserved.add(commerce.amount.cartId);
+  }
+  return reserved;
+}
+
+function availableStepId(reserved: ReadonlySet<string>) {
+  const radix = base62.length;
+  const capacity = radix ** 3;
+  const start = Math.floor(Math.random() * capacity);
+  for (let offset = 0; offset < capacity; offset++) {
+    const value = (start + offset) % capacity;
+    const id =
+      'N-' +
+      base62[Math.floor(value / radix ** 2)] +
+      base62[Math.floor(value / radix) % radix] +
+      base62[value % radix];
+    if (!reserved.has(id)) return id;
+  }
+  return uid();
+}
+
+export const newStepId = (steps: readonly Step[]) => availableStepId(reservedStepIds(steps));
+
 export function normalizeProject(
   input: unknown,
   options?: { allowDrafts?: boolean; strictIds?: boolean },
@@ -43,19 +76,22 @@ export function normalizeProject(
     }),
   });
   const used = new Set<string>();
+  let reserved: Set<string> | undefined;
   for (const step of project.steps) {
     if (typeof step.id !== 'string' || !step.id || used.has(step.id)) {
       if (options?.strictIds) throw new Error(t('sharing.stepIds'));
-      step.id = uid();
+      reserved ??= reservedStepIds(project.steps);
+      step.id = availableStepId(reserved);
+      reserved.add(step.id);
     }
     used.add(step.id);
     if (step.type === 'flow') step.label ||= t('seed.openFlow');
   }
   return project;
 }
-export function createStep(type: Step['type']): Step {
+export function createStep(type: Step['type'], steps: readonly Step[] = []): Step {
   const base = {
-    id: uid(),
+    id: newStepId(steps),
     text:
       type === 'user'
         ? t('seed.hello')

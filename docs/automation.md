@@ -49,7 +49,7 @@ The browser editor starts with an empty journey on a fresh browser. Supply a pro
 
 Set the contact name and whether the verified badge should appear. Optionally set `contact.icon` to a stable ID from the project schema, such as `health`, `car`, `utensils` or `tooth`. Set `contact.iconBackground` and `contact.iconForeground` to six-digit HEX colors. The foreground is chosen automatically when that field is omitted. For example, `{"name":"Demo Clinic","verified":false,"icon":"health","iconBackground":"#4467AA"}` selects the healthcare icon and a blue background. Omit all three avatar fields for the default green storefront. The app supplies the SVG and the link carries the selection. The [JSON schema](../schemas/project-v1.schema.json) describes the structure. The generator checks project structure and message rules. Use the editor or browser API for Flow diagnostics and playback checks.
 
-Every step has a unique string `id`, `type`, `text` and a numeric `delay` between 0 and 120 seconds. The maximum is 200 steps. Use deterministic IDs when generating a journey. Missing or duplicate step IDs are normalized, but explicit unique IDs make later updates easier.
+Every step has a unique string `id`, `type`, `text` and a numeric `delay` between 0 and 120 seconds. The maximum is 200 steps. The editor assigns new steps compact IDs such as `N-b3X` and preserves existing IDs. Use deterministic IDs when generating a journey. Missing or duplicate step IDs are normalized, but explicit unique IDs make later updates easier.
 
 - `type: 'user'`: user message; automatic mode types `text` and sends it. Manual mode waits for a user to send a message.
 - A customer step with `voiceDurationSeconds` uses the simulated voice composer. Set `text` to `''` and use an integer from 1 to 120. Automatic playback holds the microphone for that many seconds after moving the simulated cursor to it. Manual playback uses the actual hold time. A sent voice bubble has `voiceDurationMs` in `getState().messages`.
@@ -119,6 +119,21 @@ For a default interactive quick-reply message, use 1–3 buttons. Each title mus
 ```
 
 Use 1–10 sections and at most 10 rows across all sections combined. Each section needs at least one row. Section titles accept 24 characters and are required when there is more than one section. Row titles accept 24 characters, descriptions 72 and IDs 200. IDs must be unique across the whole list. The invitation button is nonempty and accepts 20 characters. Header, footer and body limits match reply messages.
+
+## Automatic variables
+
+Use earlier customer inputs in business message bodies, business image captions and Flow invitation text. The editor suggests paths after typing `{{` or selecting **Insert variable**. Use stable step IDs. Each Flow path includes its step ID, screen ID and field name.
+
+| Reference                                                     | Result                                                |
+| ------------------------------------------------------------- | ----------------------------------------------------- |
+| `{{chat.ask_name.text}}`                                      | The sent customer text                                |
+| `{{choice.delivery.title}}` or `{{choice.delivery.id}}`       | The confirmed quick reply or list item                |
+| `{{flow.registration.FORM_SCREEN.name}}`                      | The value from a visible field on the completed route |
+| `{{location.meeting.name}}` or `{{location.meeting.address}}` | The simulated location actually sent                  |
+
+Segments containing dots, spaces or other punctuation use a quoted JSON string in brackets, as in `{{flow["register.v2"].FORM_SCREEN.name}}`. Supply an optional literal fallback with `{{location.meeting.address ?? "Address unavailable"}}`. Missing or blank values use that fallback or empty text. Flow choices render their display labels. Multiple choices use comma-separated labels.
+
+Manual playback captures the answers actually sent. Automatic playback and editor previews use the configured examples. The project, drafts and links carry reference text and configuration. The running values stay in the browser session and clear on stop or restart. Earlier step references must resolve before playing or sharing. Existing numeric placeholders such as `{{1}}` remain literal. Browser API v4 reports the resolved message text in its history.
 
 ## Flows
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
 import type { Project, Step } from '../../../core/types';
-import { clone, projectStorageKey, uid } from '../../../core/project';
+import { clone, newStepId, projectStorageKey, uid } from '../../../core/project';
 import { t } from '../../../i18n';
 import { loadSharedProject } from '../../../core/codec';
 import {
@@ -241,7 +241,8 @@ export function useProject(copy?: SharedCopy, localId?: string) {
       const index = steps.findIndex((step) => step.id === id);
       if (index < 0) return item;
       if (type === 'delete') steps.splice(index, 1);
-      if (type === 'copy') steps.splice(index + 1, 0, { ...clone(steps[index]), id: uid() });
+      if (type === 'copy')
+        steps.splice(index + 1, 0, { ...clone(steps[index]), id: newStepId(steps) });
       if (type === 'up' && index > 0)
         [steps[index - 1], steps[index]] = [steps[index], steps[index - 1]];
       if (type === 'down' && index < steps.length - 1)

@@ -1,3 +1,7 @@
+import { variableText } from '../../../core/journey-variables';
+import { FieldError } from '../../../components/ui/Field';
+import type { JourneyDiagnostic } from '../../flows/diagnostics';
+import { Button } from '../../../components/ui/Button';
 import { useT } from '../../../i18n';
 import { stepAttachment } from '../../../core/attachments';
 import { useCallback, useId, useState, type ReactNode } from 'react';
@@ -21,6 +25,7 @@ export function StepCard({
   step,
   project,
   commerceError,
+  diagnostics,
   index,
   total,
   active,
@@ -29,6 +34,7 @@ export function StepCard({
   onToggle,
   dragHandle,
   onSelect,
+  onShowCode,
   onChange,
   onCartChange,
   onAction,
@@ -42,6 +48,7 @@ export function StepCard({
   onAnswersDraft: (draft?: AnswersDraft) => void;
   project: Project;
   commerceError: string;
+  diagnostics: JourneyDiagnostic[];
   index: number;
   total: number;
   active: boolean;
@@ -50,6 +57,7 @@ export function StepCard({
   onToggle: () => void;
   dragHandle?: ReactNode;
   onSelect: () => void;
+  onShowCode: () => void;
   onChange: (change: Partial<Step>) => void;
   onCartChange: (cartId?: string, items?: CartItem[]) => void;
   onAction: (action: StepAction) => void;
@@ -62,8 +70,14 @@ export function StepCard({
   const voiceSeconds = step.type === 'user' ? step.voiceDurationSeconds : undefined;
   const media = step.type === 'flow' ? undefined : step.media;
   const attachment = stepAttachment(step);
+  const target = variableText(step);
+  const variableScope = expanded && target ? { project, index } : undefined;
+  const issues = target
+    ? diagnostics.filter((issue) => issue.path === 'steps[' + index + '].' + target.field)
+    : [];
   const invalid =
     commerceError ||
+    issues.some((issue) => issue.severity === 'error') ||
     (media
       ? !attachment
       : step.type === 'business'
@@ -99,7 +113,9 @@ export function StepCard({
       }}
     >
       <div className="step-top">
-        <span className="step-number">{String(index + 1).padStart(2, '0')}</span>
+        <code className="step-id" title={step.id}>
+          {step.id}
+        </code>
         <button
           type="button"
           className="step-toggle"
@@ -143,9 +159,20 @@ export function StepCard({
         <StepActions first={!index} last={index === total - 1} onAction={onAction} />
       </div>
       <div className="step-body" id={id} hidden={!expanded}>
+        {expanded && (
+          <Button
+            variant="ghost"
+            className="step-code-link"
+            data-editor-action
+            onClick={onShowCode}
+          >
+            {t('code.showInCode')}
+          </Button>
+        )}
         {step.type === 'business' ? (
           <BusinessMessageEditor
             step={step}
+            variableScope={variableScope}
             project={project}
             index={index}
             commerceError={commerceError}
@@ -163,9 +190,19 @@ export function StepCard({
         ) : (
           <MessageTextEditor
             label={t('editor.flowInvitation')}
+            variableScope={variableScope}
             value={step.text}
             onChange={(text) => onChange({ text })}
           />
+        )}
+        {issues.map((issue, index) =>
+          issue.severity === 'error' ? (
+            <FieldError key={index}>{issue.message}</FieldError>
+          ) : (
+            <p key={index} className="formatting-hint">
+              {issue.message}
+            </p>
+          ),
         )}
         {step.type === 'flow' && (
           <FlowStepEditor

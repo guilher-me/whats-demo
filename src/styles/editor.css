@@ -95,15 +95,14 @@
   padding: 12px 14px;
   background: var(--surface-subtle);
 }
-.step-number {
-  width: 23px;
-  height: 23px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  font-size: 11px;
-  color: var(--muted);
+.step-id {
+  display: block;
+  min-width: 0;
+  max-width: min(86px, 25%);
+  padding: 5px 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .step-type {
   font-size: 12px;
@@ -127,6 +126,12 @@
 }
 .step-body {
   padding: 0 14px 14px;
+}
+.step-body .step-code-link {
+  margin: 8px 0 2px;
+  padding: 5px 8px;
+  color: var(--accent-hover);
+  font-size: 12px;
 }
 .step-bottom {
   display: flex;
@@ -200,4 +205,59 @@
   color: var(--danger);
   font-size: 12px;
   line-height: 1.5;
+}
+
+.variable-trigger {
+  padding: 5px 8px;
+  color: var(--accent-hover);
+  font-size: 12px;
+}
+
+.variable-menu {
+  max-height: 180px;
+  overflow: auto;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.variable-menu small {
+  display: block;
+  padding: 4px 7px;
+  color: var(--muted);
+}
+
+.variable-menu button {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 5px 7px;
+  border: 0;
+  border-radius: 5px;
+  text-align: start;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+.variable-menu button[aria-selected='true'] {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+.variable-option-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.variable-example {
+  max-width: 55%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-weight: 400;
 }

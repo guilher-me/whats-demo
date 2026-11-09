@@ -6,6 +6,22 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-09
+
+### Added
+
+- Navigate between a step in the Editor and its JSON block in Code.
+- Insert automatic variables from chat replies, choices, completed Flows and simulated locations.
+- Show step IDs on sequence cards and automatic examples alongside variable suggestions. New steps get compact IDs such as `N-b3X`.
+
+### Changed
+
+- Give viewers more time to browse products and review the cart during automatic playback.
+
+### Fixed
+
+- Make Copy Pix code available as soon as the charge appears during playback.
+
 ## [0.5.0] - 2026-11-08
 
 ### Added

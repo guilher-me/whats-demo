@@ -88,7 +88,7 @@ export function CommerceAction({
       <MessageAction
         className="commerce-message-action"
         data-commerce-action
-        data-playback-locked={(value.kind === 'offer' && playbackLocked) || undefined}
+        data-playback-locked={playbackLocked || undefined}
         disabled={!enabled}
         onClick={onClick}
       >

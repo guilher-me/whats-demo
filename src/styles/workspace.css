@@ -197,6 +197,9 @@
 }
 
 @media (max-width: 959px) {
+  .workspace-panel {
+    scroll-margin-top: 100px;
+  }
   .workspace-toolbar {
     position: sticky;
     top: 0;
