@@ -1,6 +1,6 @@
 {
   "name": "whats-demo",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Editor de conversas e WhatsApp Flows com React, TypeScript e HTML portátil",
   "scripts": {
     "dev": "node -e \"require(require('path').join(require('path').dirname(process.env.npm_package_json),'scripts','tasks.cjs')).run('dev').catch(e=>{console.error(e);process.exitCode=1})\"",

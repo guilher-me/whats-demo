@@ -1,6 +1,6 @@
 .flow-layer {
   position: absolute;
-  inset: var(--phone-status-height) 0 0;
+  inset: var(--phone-status-height) 0 var(--phone-nav-height);
   z-index: 3;
 }
 .flow-layer[hidden] {

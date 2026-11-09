@@ -5,6 +5,7 @@ import type { Contact } from '../../../core/types';
 import type { Playback } from '../../playback/hooks/usePlayback';
 import { usePhoneTime } from '../phone-time';
 import { PhoneFrame } from './PhoneFrame';
+import { ConversationStart } from './ConversationStart';
 import { MessageBubble } from './MessageBubble';
 import { TypingIndicator } from './TypingIndicator';
 import { MessageComposer } from './MessageComposer';
@@ -57,7 +58,7 @@ export function PhonePreview({
       pixCopied={p.commerce.pixCopied}
     >
       <div className="chat-body" ref={body}>
-        <div className="day">{t('phone.today')}</div>
+        <ConversationStart phoneRef={phoneRef} />
         <div
           className="messages"
           role="log"

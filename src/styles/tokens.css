@@ -58,6 +58,8 @@
   --phone-meta: #8696a0;
   --phone-scrollbar: rgb(0 0 0 / 45%);
   --phone-day: #fff9;
+  --phone-business-notice: #d4f2ef;
+  --phone-business-notice-ink: #465a61;
   --phone-incoming: #fff;
   --phone-outgoing: #d9fdd3;
   --phone-voice-avatar: #bfe8b7;
@@ -160,6 +162,8 @@
   --phone-meta: #adbac2;
   --phone-scrollbar: rgb(233 237 239 / 36%);
   --phone-day: #1b262c;
+  --phone-business-notice: #182e3a;
+  --phone-business-notice-ink: #a9d8ec;
   --phone-incoming: #202c33;
   --phone-outgoing: #144d37;
   --phone-voice-avatar: #287353;

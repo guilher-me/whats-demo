@@ -66,6 +66,17 @@ export function PhoneFrame({
         <div className="phone-pix-notice" role="status">
           {pixCopied && <span>{t('commerce.pixCopied')}</span>}
         </div>
+        <div className="phone-navigation-bar" aria-hidden="true">
+          <svg viewBox="0 0 16 16" focusable="false" fill="currentColor">
+            <path d="M13 2.5v11L3 8z" />
+          </svg>
+          <svg viewBox="0 0 16 16" focusable="false" fill="currentColor">
+            <circle cx="8" cy="8" r="5.5" />
+          </svg>
+          <svg viewBox="0 0 16 16" focusable="false" fill="currentColor">
+            <rect x="2.75" y="2.75" width="10.5" height="10.5" rx="1.25" />
+          </svg>
+        </div>
       </div>
     </div>
   );

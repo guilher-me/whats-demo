@@ -357,7 +357,7 @@
 }
 .draft-preview-note {
   position: absolute;
-  bottom: 0;
+  bottom: var(--phone-nav-height);
   left: 0;
   right: 0;
   height: 43px;
@@ -368,7 +368,7 @@
   font-size: 10px;
 }
 .draft-chat {
-  bottom: 43px;
+  bottom: calc(43px + var(--phone-nav-height));
 }
 .message-text-editor {
   margin-bottom: 12px;

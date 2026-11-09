@@ -3,6 +3,7 @@ import type { Project } from '../../../core/types';
 import { useT } from '../../../i18n';
 import { usePhoneTime } from '../phone-time';
 import { PhoneFrame } from './PhoneFrame';
+import { ConversationStart } from './ConversationStart';
 import { MessageBubble } from './MessageBubble';
 import { conversationOverviewMessages } from '../overview';
 
@@ -21,7 +22,7 @@ export function ConversationOverview({
   return (
     <PhoneFrame time={time} contact={project.contact} phoneRef={phoneRef}>
       <div className="chat-body overview-chat" aria-label={t('app.viewConversation')}>
-        <div className="day">{t('phone.today')}</div>
+        <ConversationStart phoneRef={phoneRef} />
         <div className="messages">
           {conversationOverviewMessages(project, time).map((message) => (
             <MessageBubble
