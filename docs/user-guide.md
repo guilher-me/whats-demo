@@ -40,6 +40,14 @@ Set optional headers, footers and automatic answers in the message's additional 
 
 Message bodies support `*bold*`, `_italic_` and `~strikethrough~`, including combinations such as `*_bold italic_*`. Formatting appears in previews, playback and recordings. Unmatched markers remain literal; message text is not rendered as HTML.
 
+## Navigate between steps and JSON
+
+Select a step in the Editor to highlight its JSON block in Code. Click inside a step block or move the caret to it to select the corresponding Editor card. The link follows the step ID when you reorder the sequence. Each step card shows its ID. New steps have compact IDs such as `N-b3X`. Use **Show in Code** or **Show in Editor** to reveal the destination when a panel is collapsed or offscreen. Navigation keeps the caret and draft intact. In invalid JSON, only complete blocks with an unambiguous ID link back to the Editor.
+
+## Reuse customer answers in messages
+
+Select **Insert variable** or type `{{` in a business message, a business image caption or a Flow invitation. Select an earlier chat response, option, Flow field or location detail to insert its path. Suggestions show the configured automatic value when one is available. For example, `Hi {{chat.ask_name.text}}!` uses the text sent in step `ask_name`. A fallback such as `{{chat.ask_name.text ?? "there"}}` supplies text when the value is missing. Editor previews use the configured automatic responses. A manual run uses the recipient's actual responses inside the demo.
+
 ## Add simulated attachments
 
 Set a Customer or Business message to **Image** or **Document**. Choose a file extension directly in the step. Images offer .png and .jpg, with optional short text on the preview and a separate message caption. For a document, enter the name, a positive size and its unit. The editor adds the selected extension to the name and enforces the WhatsApp Business document limit of 100 MB (100,000 KB). [WhatsApp Business media limits](https://docs.aws.amazon.com/social-messaging/latest/userguide/supported-media-types.html)
