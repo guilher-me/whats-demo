@@ -6,6 +6,16 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-09
+
+### Added
+
+- Open five sample journeys from the empty editor to try them or edit a copy.
+
+### Fixed
+
+- Record MP4 with H.264 for better WhatsApp compatibility and improve detail at the start of WebM recordings.
+
 ## [0.7.0] - 2026-11-09
 
 ### Added
