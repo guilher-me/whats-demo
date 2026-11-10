@@ -18,13 +18,13 @@
 
 ## What you can demo
 
-| Demo                                               | Idioma                                                                    | What the customer can try                                                  |
-| -------------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| [Magazine Luzia][magazine-luzia] · Retail checkout | <img src="assets/flags/br.svg" alt="" width="16" height="16" /> Português | Browse products, send a cart and see a simulated Pix charge for the order. |
-| [OdontoNext][odontonext] · Dental booking          | <img src="assets/flags/br.svg" alt="" width="16" height="16" /> Português | Complete a WhatsApp Flow and receive a personalized confirmation.          |
-| [CatLove][catlove] · Pet delivery                  | <img src="assets/flags/br.svg" alt="" width="16" height="16" /> Português | Reply to a delivery update template and send a simulated voice note.       |
-| [iReplace][ireplace] · Repair intake               | <img src="assets/flags/us.svg" alt="" width="16" height="16" /> English   | Choose a problem, send a simulated photo and get a location card.          |
-| [NoBank][nobank] · Banking self-service            | <img src="assets/flags/es.svg" alt="" width="16" height="16" /> Español   | Choose a statement period and open a simulated PDF.                        |
+| Demo                                                                                                                                      | Idioma                                                                    | What the customer can try                                                  |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| <img src="docs/media/demo-avatars/magazine-luzia.svg" alt="" width="20" height="20" /> [Magazine Luzia][magazine-luzia] · Retail checkout | <img src="assets/flags/br.svg" alt="" width="16" height="16" /> Português | Browse products, send a cart and see a simulated Pix charge for the order. |
+| <img src="docs/media/demo-avatars/odontonext.svg" alt="" width="20" height="20" /> [OdontoNext][odontonext] · Dental booking              | <img src="assets/flags/br.svg" alt="" width="16" height="16" /> Português | Complete a WhatsApp Flow and receive a personalized confirmation.          |
+| <img src="docs/media/demo-avatars/catlove.svg" alt="" width="20" height="20" /> [CatLove][catlove] · Pet delivery                         | <img src="assets/flags/br.svg" alt="" width="16" height="16" /> Português | Reply to a delivery update template and send a simulated voice note.       |
+| <img src="docs/media/demo-avatars/ireplace.svg" alt="" width="20" height="20" /> [iReplace][ireplace] · Repair intake                     | <img src="assets/flags/us.svg" alt="" width="16" height="16" /> English   | Choose a problem, send a simulated photo and get a location card.          |
+| <img src="docs/media/demo-avatars/nobank.svg" alt="" width="20" height="20" /> [NoBank][nobank] · Banking self-service                    | <img src="assets/flags/es.svg" alt="" width="16" height="16" /> Español   | Choose a statement period and open a simulated PDF.                        |
 
 Use the visual editor or journey JSON to build a scenario. Save it in your browser, share it as a link, or export a phone-only video or GIF. Use fictional data in shared journeys.
 
