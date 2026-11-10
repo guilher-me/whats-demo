@@ -10,6 +10,8 @@ Open **My journeys** to switch between titles saved in this browser. The list sh
 
 Open a shared link to try a specific journey. Editing it saves a separate local copy. **Restore from link** resets that copy to the original shared snapshot.
 
+In an empty editor, **Try a demo** offers five short fictional journeys. Each card opens the phone preview in the listed language. Play manually or automatically, or choose **Edit a copy** to customize the journey. Your copy appears in **My journeys** after your first edit. The examples open with a customer message or a simulated template, as in CatLove. On the WhatsApp Business Platform, businesses need an approved template to start a conversation or send a message outside the 24-hour service window. [WhatsApp Business Messaging Policy](https://whatsappbusiness.com/policy/)
+
 ## Build the conversation
 
 The workspace opens with **Code**, **Editor** and **Preview**. Drag a divider to resize adjacent panels. With a divider focused, use Left and Right in the desktop layout or Up and Down when panels are stacked. Use the panel buttons to collapse or reopen a panel while retaining its content.
@@ -106,7 +108,7 @@ Invalid or truncated links open a recovery screen with a shortcut to the local e
 
 Select **Record phone**, choose manual or automatic playback, and wait for the three-second countdown. In manual mode, stop the recording yourself. In automatic mode, recording finishes two seconds after the last message.
 
-The standard download is MP4 where supported, otherwise WebM. To show the slide behind the phone’s rounded corners, choose **Transparent corners (WebM)** before recording. The presentation app must preserve WebM transparency. Recording captures only the phone, without audio, at 720 × 1440; the editor and controls stay out of the video. Keep the tab visible while recording. Rendering happens locally. See the [recording reference](recording.md) for implementation details and limitations (currently in Brazilian Portuguese).
+The standard download is H.264 MP4 for sharing as a video on WhatsApp when the browser can encode H.264. Otherwise, the download is WebM. To show the slide behind the phone’s rounded corners, choose **Transparent corners (WebM)** before recording. The presentation app must preserve WebM transparency. Recording captures only the phone, without audio, at 720 × 1440; the editor and controls stay out of the video. Keep the tab visible while recording. Rendering happens locally. See the [recording reference](recording.md) for implementation details and limitations (currently in Brazilian Portuguese).
 
 In the recording result, select **Download GIF** for a looping 360 × 720 animation. WhatsDemo converts the finished recording locally and preserves the rounded cutout when you recorded with transparent corners. Longer clips may use fewer frames per second.
 

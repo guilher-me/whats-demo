@@ -1,17 +1,16 @@
 # Documentation media
 
-The README uses only the screenshot and MP4 supplied by the maintainer, in addition to its existing project logo and badges.
+## Luma Home walkthrough
 
-| File                 | Content                                                                        |
-| -------------------- | ------------------------------------------------------------------------------ |
-| `workbench.png`      | The supplied screenshot of the configured Luma Home journey and phone preview. |
-| `luma-home-demo.mp4` | The supplied phone-only MP4 recording of the Luma Home demo.                   |
+In this recorded example, a customer explores a fictional lighting store, chooses a lamp and completes a two-screen Flow.
 
-Both files are preserved as provided: the screenshot was not regenerated and the video was not transcoded. The original recording was supplied as `whatsapp-fake-flows-2026-10-30T04-30-12-368Z.mp4`.
+![Luma Home journey in the editor and phone preview](workbench.png)
 
-The README embeds a GitHub-hosted attachment of this same video so GitHub displays a video player. The repository copy keeps the recording available with the source and published documentation. The previous GIF and additional Flow screenshot have been removed.
+https://github.com/user-attachments/assets/4c12369b-d540-4811-889e-cf8848766625
 
-The scenario uses the fictional Luma Home example. Sources and notices for the bundled visual assets remain documented in [assets/README.md](../../assets/README.md).
+The [original MP4](luma-home-demo.mp4) is also available in the repository. See [asset sources and notices](../../assets/README.md).
+
+## Feature references
 
 The Christmas snowfall PR uses [before](christmas-snow-off.jpg) and [after](christmas-snow-on.jpg) screenshots. To reproduce them, open the editor in dark mode at 1200 × 860, play a one-message greeting for the fictional Pine Studio contact, then turn on **Christmas snow** from the header.
 

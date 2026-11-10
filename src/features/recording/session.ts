@@ -6,6 +6,8 @@ import { capturePhone } from './capture';
 import { paintRecordingCursor, readRecordingCursor } from './cursor';
 import type { PhoneRecording, RecordedClip } from './types';
 
+// Constrained Baseline, level 4.0 accommodates the 720 × 1440 capture.
+const MP4_FORMATS = ['video/mp4;codecs=avc1.42E028', 'video/mp4;codecs=avc1'];
 const ALPHA_FORMAT = 'video/webm;codecs=vp8';
 const FRAME_INTERVAL = 1000 / 30;
 const SNAPSHOT_INTERVAL = 1000 / 15;
@@ -28,7 +30,7 @@ export function supportsTransparentRecording(): boolean {
 export function recordingMimeTypes(transparent = false): string[] {
   const candidates = transparent
     ? [ALPHA_FORMAT]
-    : ['video/mp4', 'video/webm;codecs=vp9', ALPHA_FORMAT, 'video/webm'];
+    : [...MP4_FORMATS, 'video/webm;codecs=vp9', ALPHA_FORMAT, 'video/webm'];
   return candidates.filter((type) => MediaRecorder.isTypeSupported(type));
 }
 
@@ -80,7 +82,12 @@ export async function preparePhoneRecording(
   let media: MediaRecorder | undefined;
   for (const mimeType of formats) {
     try {
-      media = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 2_500_000 });
+      const webm = mimeType.startsWith('video/webm');
+      media = new MediaRecorder(stream, {
+        mimeType,
+        videoBitsPerSecond: webm ? 5_000_000 : 2_500_000,
+        ...(webm && { videoKeyFrameIntervalDuration: 1000 }),
+      });
       break;
     } catch {
       /* Try the next native encoder. */
