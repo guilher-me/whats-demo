@@ -1,10 +1,10 @@
 # WhatsDemo
 
 <p align="center">
-  <img src="assets/whatsdemo-logo.svg" alt="WhatsDemo" width="320" />
+  <img src="assets/whatsdemo-logo.svg" alt="WhatsDemo" width="260" />
 </p>
 
-<p align="center"><strong>Build the conversation. Show the experience.</strong><br />Create interactive WhatsApp demos before building the real integration.</p>
+**Build and share an interactive WhatsApp journey before building the integration.** Compose the conversation, try it manually or play it automatically in the phone preview, then share a link people can open and explore. WhatsDemo runs in the browser, without a backend or WhatsApp account.
 
 <p align="center">
   <a href="https://github.com/guilher-me/whats-demo/actions/workflows/ci.yml"><img src="https://github.com/guilher-me/whats-demo/actions/workflows/ci.yml/badge.svg" alt="CI build and tests" /></a>
@@ -14,92 +14,32 @@
   <a href="docs/user-guide.md#interface-languages"><img src="https://img.shields.io/badge/languages-EN%20%7C%20ES%20%7C%20PT--BR-123f3b" alt="Interface languages: English, Spanish and Brazilian Portuguese" /></a>
 </p>
 
-<p align="center">
-  <a href="https://guilher-me.github.io/whats-demo/">Open the editor</a> ·
-  <a href="#see-it-in-action">See it in action</a> ·
-  <a href="docs/getting-started.md">Install & run</a> ·
-  <a href="docs/user-guide.md">User guide</a> ·
-  <a href="docs/ai-guide.md">Build with an LLM</a> ·
-  <a href="CHANGELOG.md">Changelog</a> ·
-  <a href="CONTRIBUTING.md">Contribute</a> ·
-  <a href="LICENSE">License</a>
-</p>
+[Open WhatsDemo](https://guilher-me.github.io/whats-demo/) · [Watch a walkthrough](docs/media/README.md#luma-home-walkthrough) · [Changelog](CHANGELOG.md)
 
-## Make the experience tangible before you build it
+## What you can demo
 
-You have an idea for a WhatsApp customer journey. Explaining it with slides loses the interaction. Building a real integration just to demonstrate it takes engineering work. Previewing a form alone leaves out the conversation around it.
+| Demo                                                                                                                                      | Idioma                                                                    | What the customer can try                                                  |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| <img src="docs/media/demo-avatars/magazine-luzia.svg" alt="" width="20" height="20" /> [Magazine Luzia][magazine-luzia] · Retail checkout | <img src="assets/flags/br.svg" alt="" width="16" height="16" /> Português | Browse products, send a cart and see a simulated Pix charge for the order. |
+| <img src="docs/media/demo-avatars/odontonext.svg" alt="" width="20" height="20" /> [OdontoNext][odontonext] · Dental booking              | <img src="assets/flags/br.svg" alt="" width="16" height="16" /> Português | Complete a WhatsApp Flow and receive a personalized confirmation.          |
+| <img src="docs/media/demo-avatars/catlove.svg" alt="" width="20" height="20" /> [CatLove][catlove] · Pet delivery                         | <img src="assets/flags/br.svg" alt="" width="16" height="16" /> Português | Reply to a delivery update template and send a simulated voice note.       |
+| <img src="docs/media/demo-avatars/ireplace.svg" alt="" width="20" height="20" /> [iReplace][ireplace] · Repair intake                     | <img src="assets/flags/us.svg" alt="" width="16" height="16" /> English   | Choose a problem, send a simulated photo and get a location card.          |
+| <img src="docs/media/demo-avatars/nobank.svg" alt="" width="20" height="20" /> [NoBank][nobank] · Banking self-service                    | <img src="assets/flags/es.svg" alt="" width="16" height="16" /> Español   | Choose a statement period and open a simulated PDF.                        |
 
-**WhatsDemo gives you a place to build and demonstrate the whole sequence:** customer messages, business replies, buttons, lists and WhatsApp Flows in a familiar phone preview. Configure the journey on the left, then let someone try it or play it automatically on the right.
+Use the visual editor or journey JSON to build a scenario. Save it in your browser, share it as a link, or export a phone-only video or GIF. Use fictional data in shared journeys.
 
-Use it for sales demos, product reviews, workshops, usability discussions and training. No WhatsApp account setup, backend or database is required to run a demo.
+## Documentation
 
-![WhatsDemo editor showing the configured Luma Home journey beside the phone preview](docs/media/workbench.png)
+- [Get started](docs/getting-started.md) for local setup and the portable HTML build.
+- [User guide](docs/user-guide.md) for editing, playback, sharing and recording.
+- [Build with an LLM](docs/ai-guide.md) and [Automation API](docs/automation.md) for the journey schema, validation and link generation.
+- [Architecture](docs/architecture.md) and [Deployment](docs/deployment.md) for project internals and the GitHub Pages workflow.
+- [Contributing](CONTRIBUTING.md) · [Report an issue](https://github.com/guilher-me/whats-demo/issues) · [MIT license](LICENSE)
 
-## See it in action
+WhatsDemo is an independent simulator for fictional conversations.
 
-Meet **Luma Home**, the fictional lighting store in this recorded demo. A customer explores a collection, picks a lamp from a list, completes a two-screen Flow and receives a request confirmation.
-
-https://github.com/user-attachments/assets/4c12369b-d540-4811-889e-cf8848766625
-
-The example uses fictional customer details. Open the editor to build your own scenario, or open a shared link to try an existing one.
-
-## From an idea to a demo people can try
-
-1. **Build the journey.** Add customer messages, business replies or Flows. Edit text, choices, delays and automatic answers.
-2. **Try the conversation.** Send a message to start manual playback, or use automatic playback with an animated cursor.
-3. **Share the experience.** Copy a link from a hosted installation, open it as an interactive demo or an editable copy.
-
-| What you need to show                           | What WhatsDemo provides                                                                                                                               |
-| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A conversation that feels like messaging        | Editable customer and business messages, typing indicators, delivery/read receipts and WhatsApp-style text formatting.                                |
-| More than plain text                            | Typed buttons (quick replies, URLs, phone, copy code and WhatsApp calls), sectioned lists, simulated attachments and interactive WhatsApp Flow forms. |
-| A branded scenario                              | Contact name, a fixed WhatsApp store icon and an optional blue verified badge.                                                                        |
-| A live walkthrough or a repeatable presentation | Manual interaction and automatic playback, with adjustable simulated-user pace.                                                                       |
-| Something stakeholders can take away            | Experience links, phone-only MP4/WebM recording where supported, and a single-file HTML build.                                                        |
-| Help creating journeys with AI tools            | Accessible UI controls, an `llms.txt` guide, static link generator and versioned browser API.                                                         |
-
-## Get started
-
-**Open the live demo.** Visit [WhatsDemo](https://guilher-me.github.io/whats-demo/) in your browser. No installation is required.
-
-**Use a portable copy.** Ask a teammate to share the generated `whats-demo.html` file. Open it in a modern desktop browser; you do not need to install Node.js. Start a new journey and follow the [user guide](docs/user-guide.md).
-
-**Run it locally.** With a supported Node.js version and npm installed:
-
-```sh
-git clone https://github.com/guilher-me/whats-demo.git
-cd whats-demo
-npm ci
-npm run dev
-```
-
-To generate the portable app:
-
-```sh
-npm run build
-```
-
-The result is `dist/whats-demo.html`. See [requirements, installation and distribution](docs/getting-started.md) for details.
-
-## Your demo stays in your browser
-
-Edits are saved in the current browser. **Copy link** copies a snapshot in the current interface language. Recipients can play the journey immediately or expand **Code** and **Editor** to edit their local copy. The URL carries the compressed journey with simulated attachment previews. Anyone who receives it can read the content. Use fictional data. [Read the sharing guide](docs/user-guide.md#share-a-demo).
-
-WhatsDemo is an independent simulator. It does not send real WhatsApp messages or publish Flows to Meta. Conversation steps run in sequence; button and list choices do not create branching journeys. The Flow renderer supports a subset of Meta's components. See [scope and limitations](docs/user-guide.md#scope-and-limitations).
-
-## Explore the project
-
-| Guide                                              | What you will find                                                                                        |
-| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| [Install & run](docs/getting-started.md)           | Requirements, local development, portable builds and hosting.                                             |
-| [User guide](docs/user-guide.md)                   | Messages, Flows, manual/automatic playback, sharing and recording.                                        |
-| [Build with an LLM](docs/ai-guide.md)              | Give an AI tool the right context and let it help construct a journey.                                    |
-| [Automation API](docs/automation.md)               | The browser API contract, validation rules and complete examples.                                         |
-| [Contributing](CONTRIBUTING.md)                    | Setup, component conventions, compatibility and validation.                                               |
-| [Deployment & branch workflow](docs/deployment.md) | Production CI/CD, manual development publishing and feature → development → main PRs.                     |
-| [Developer reference](docs/architecture.md)        | Architecture and extension points; some developer reference guides are currently in Brazilian Portuguese. |
-| [MIT license](LICENSE)                             | License terms for the project.                                                                            |
-
-Have an idea or found a problem? [Open an issue](https://github.com/guilher-me/whats-demo/issues). Contributions to components, accessibility, translations and documentation are welcome.
-
-MIT © 2026 **Guilherme Cardoso**. Third-party notices are included in the generated HTML. Demonstration assets and their sources are documented in [assets/README.md](assets/README.md).
+[magazine-luzia]: https://guilher-me.github.io/whats-demo/#demo=v3z.SbEtx1Nf1mNJbaI36AYcCjduQLi4ZvPrg4reHJWKVT5lhTXp51tUneBkmbYf4LQRNrFcQjnGcEUCOgRK9zfsQd3iIodBbfY1KdIvBV75S9KZlrcNXJ7K3xzM6axmAhlMwRrge8KVoDtZbagLhTcVsE0Nv1is5qFXVC8FvSjxahdubXCWm1AbqS6flCEdVkiA0Q9i8nUc8EhCTZjCYsedT0RcKctTZXRRsLELcp7LZ8ZJHKYHDBo5yGDTbJktWVZL2psjUy0te036HXHXrJjw0VTS3mkd2QH2SYdbmxzjbtJLtca5FW7mMIhcOmvQQMQNaxpCtKNO6hvan8egSmEybpChkY98jtrC0ynRr8Btf62NXg1LukE9XLniCBKUOzJ5ySeZJsydOdjiXtNsSoPC5bW4W9WlOgKx2SLPz9oCUfS7to58R8lyBqqaDSQjFz8seuaGaM2wpuZ60WOaoi3S27XV9ZQ4iJwoNe2TlBbrCZ84teRGz9KAbbTJ7axWWcr5lU6mcYeRRo8t2NMbq05BHGhBkeuNS9zNjDg6GkwATjuOuEYOFinbcOAcU2CzdJn2xXNcf5iR5MYKbGGrOgZoyhm9nVNPAAR8S0lK0SBv9mCzKciImMM7o3GEyzAKyAHVKIu3CbBGriU6pVZyJHv80b5Aaelmf0v7Lu1cX659pb012I7BI3wgZWnzbgNn0KkpwnxY2OdgJJ9AVe8QGouGPQe8Oj4QWltr6jXz3XmK7pySW0AWZ7C1LSTxorUN1lVWlnIPfId87lAwEz2inrnm0dlKXU45EFjvrgAtEzpSYphMsAkPsOPD9KzUJR6I4wqnLSpsQSh6x8oycpT8OF65E2fGVhyc0E&lang=pt-BR
+[odontonext]: https://guilher-me.github.io/whats-demo/#demo=v3z.SbFLY8AfdCrECmo1756vHaWjY1LJAp3wveKKo0tsPK8NPboqSskCyLiKuBwIiEdYeY4J5cKKiVd57Ppp5INqHXP48lLLkjFoXpGEPXEXN9yQN3Ity0PX4Umt4FwRRzNaYMierfRvBFEATBkxyXeUbjedvFIjHwOoePGWeXlZXAZwv6KT4rveHU4WIT4wHH5WNA3pxjBq8CO8pvLuMeCGPtzUarE0wRnE8HxNBBAYghiwRZgO9Uv4jKclJ6jU25a02qEcOSF44caLUxZal3hUdZVWUQzFhZ0pG5bpP2xK24T6ONQUQngDRylbaSp6TvIp7X52fMvdNzCe8Fuqt0SDRyahlnhECx586oY0VXWrHdtmEYkUAagjNweSH2zTxgRzs8ZxDGpRrBQEGKFO43FdBOMI8Rv4x0tYadWXgfQ79JP0AvQkhRkwiIHvYmDRvr8BwU3mQKHZJS7tX71sUrFVV3zeodBAe5uIIud6eEn5dDeokbzZwwJEP5veKMe7ZuwKO0v6Q3jVExuNjf5KG1iWgA0Pt2cBKJRItTqvlehFOZRsvH3dg9cUmJVgM4EfBmnHrVdRt60VKZ4KQ4P4J218BzqEvKk27fRnRLcAIihInFe3gY1Ab8ors6BrWclvQqw2YzINvYp8uWJLN1dMKJY6Bfa6c6aPqzlPsf2NpWAFuU2MNOQUNd33zpSZipWgcyNe3m8OTchWiob9bxLDElKb4PzLkYH0KjewVxxI3Q3iBMvV4YH8QOhOlGtOwx5rDgBMTcTpDBgzFyc9bfXFppc3tEkZnGLmdlBHwF1KZEdJvxZHcVPvLdVFHpl9NFdcpG1Z4ya2FcMlshNTEELMyXjyJFCCe6l357v1NMIpV9NYlj7ktFikI9IpizLVemzcSVoVkfbQmgql7sacRBujBF7oipBrPTBpnEXrYXUlArDKDP7bh6YMM9lb3f87HvqmmJCWFlDWXBabaTjye0lA0OuFC03weN9rykcTZVRcLcjn074DCZBKqGzTVPkuM7Vv6g4585XbJfKp5mOW6JGytxSfMB7V4PO67SXDEurVBdOsMjwTHA73F7&lang=pt-BR
+[catlove]: https://guilher-me.github.io/whats-demo/#demo=v3z.SbEuAHjNvV9RqWleEnraKBZQSistYNfFPBv6SSfuXhZNJOSVhT5QwIO8uREkgmPtkwXXxoOC8aKzVmCkERwnKVnH50vx2i96tgywZDRgbIJ1J22bTqhNfUWoJYdJ8PVSmHWom4YawfE4olR4YIKoss80PfXokPiNro5wE7eqeYuHvMdj7LE4B6ySCGJWfJMXdpLZNrOjX4gvcpFt866e3G9GM4O83P63frDajDYBFU9FWvmEmELplP2FQTAiFVXkroe7nWDOkurOHURQCY0Iq7hpcfCCSNXi6PLwtDA2wfkRel42hkmMecSMsArSDpIdbltFlRom47lNW9UupApliVMtoj0RUCfsBo2zXYuMsmWqITEPWIa5vfzYqbLmVULkPfGyfCLGYzcWjkrxHLzMrouFLDLVBMl4qPDKFaEtGBw67MvWcnG5xA8xOV4jClsQmdqk1mjrLgzUfHiOwIjHdyQjmSTilzExJsbxbqQ69DxgLAsjVLgilej2S97C5XqsD9DR3JIrF3KIpMs6KgJywmgyxZEuZSuwRT0Hp1ISiqMQaXADexFemP7b5u07Lu5xBSu2i8E07suCBDUZEYK31qAg73Lwp3o4yUeXjl8M0KFlUWb7ZJidgG32SVAtkES55N6oj3bb&lang=pt-BR
+[ireplace]: https://guilher-me.github.io/whats-demo/#demo=v3z.SbEuAiEbnQ9NP9rSQ7leYGpttPhuuq6KaWBjrUD0ljNEKJDcoBiWwvZNUiTJIjxtuAnJDIwoFqg6t1d4IAvNXCHKpAdwGnJJurfr1GNKBR4uJKFhMTZfFomkWpM6Rsy2DkXPy3LLrHrxBkVACNYcqEcCYwNq0C2eJRBm3AmYIad1mMBc3Y0d6aMybHi9YzdXyQnPrn3auyGm3gh3lUSBDFSlSNBx7yl7cNQkLBO2leAybssEBGtDv3p3hzkllybU5GgrnhYmuAR3xmOTdqqMLvOK1aruX7kqS5F0UbcGi2R1VnCAGid7SKp9pz4KK13UUL57s5bKT4Ww8YQCoOeylunUIFJSR0xaWfnYCDUA5aPJZEtpHwNQKa471nPQUgwejfddCo509IX2BjnmoJprgRxY8fDtnVJWLkG8anQuvrxbqUiBB64WhfA3yfal8jq7gFARs6sc1psDJjGaQnyhJGAr6U5toBVxRy9NGWNoEX8cxrHlzY529Uy0vBATI0NpvDKlpYFdsWMgt7jBJ40g2BsYpyVVJw5pUK9q7ua5XFNawTdrlkT711MJhjdcflqiGxVFqMcScxC65bUKb3R7H0NqVnG0jseybf2GRv8nhF5Es5mOtmYyl1uN5A2660kD3gdzks9tshoar1tWJQdptwUCm3iMYgcNoBWTRtpFIIqC0eoFc2bmIHbyjEriMjs4P2rlDw5NFZNeNWo1fpyClUWOzy13WrzdHZEeW1p3PdRwOXvB08cjWIYtVqAbJBPzPyjgPtWkPN4FWSygUpoqrh09PVNTPkVwCtV0x66EkEtPbr5YI2d6un6AhFITGYh1PsQJcypMnCmdbiSFeQYz2bfkS2&lang=en
+[nobank]: https://guilher-me.github.io/whats-demo/#demo=v3z.SbEuAH1TJdRuidFYTadYdTZT3XMqAxphSc9D1UTOa7Utxn8t8kmmDPxqGT7uvqhAXu1DFRRXqGpqc2fvpQx3INLHdP6R8Zo8CNpbUz0CnnvdybIrPA7SnztUCbJpEcJr3kbettKbkvlA1sdVaTp2tEd7gjHIERKQbUEd4gqAIebyWTwqCUzjqUbvRjmZogiG7MwCvtePwcNj9UVtmR2RVVTFBi1i3eAcd5xVInS4tdMOnXTjswekWNl3PWgtCW9psGmc6C17xRz5FBTVWHElzsfM66cVyCumCoOtj5Cvynvvif0RS8w9PXwntfT0ok2Clecywq0jeCuMKunRoL4NF1XrgDSr6nxFu24UsZMP0cBOHxlFVAhC3ZO7VSjC2jFaiEjFf5rvrdx7Jw5baDKyoT3viVJISVWz3ahay88D2Y6Db9hC03fXxm4VR2gZPYTLt7JrEtkHzzeotIjfWHrVEytn36ohJN7aZVOlwkJEbuhiBXYOcvZwPQPshwBVeRO2DF2mJMye1biddTfu278gxB1yiaIcAbZn15716IvcwrYEr9sENjh8iHNpLRG8pTOUjY4BzQAEjCsnoSQ2HkZrAdRT5b1lmF8EbR6SYVTHoSYMTcvpAkKZdUm8OzR&lang=es
