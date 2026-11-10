@@ -6,6 +6,8 @@ The 0.2.0 entry documents the production baseline as of 2026-11-08. Earlier depl
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-09
+
 ### Added
 
 - Open five sample journeys from the empty editor to try them or edit a copy.
