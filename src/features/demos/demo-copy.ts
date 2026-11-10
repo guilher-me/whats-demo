@@ -11,7 +11,7 @@ export const demoCopy = {
     received:
       'Recebemos seu carrinho. Vamos preparar o Pix com o valor dos produtos que você escolheu.',
     payment: 'Aqui está o Pix simulado do seu pedido.',
-    thanks: 'Valeu por experimentar nossa loja! Seu pedido de demonstração foi concluído.',
+    thanks: 'Agradecemos a preferência. Seu pedido foi registrado.',
   },
   dental: {
     opening: 'Oi! Quero agendar uma consulta.',

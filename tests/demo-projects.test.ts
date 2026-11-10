@@ -15,37 +15,44 @@ describe('sample journeys', () => {
         icon: 'sofa',
         iconBackground: '#0086FF',
         iconForeground: '#FFFFFF',
-        verified: false,
+        verified: true,
       },
       {
         name: 'OdontoNext',
         icon: 'tooth',
         iconBackground: '#003EA6',
         iconForeground: '#FFFFFF',
-        verified: false,
+        verified: true,
       },
       {
         name: 'CatLove',
         icon: 'paw',
         iconBackground: '#4E2096',
         iconForeground: '#FFFFFF',
-        verified: false,
+        verified: true,
       },
       {
         name: 'iReplace',
         icon: 'smartphone',
         iconBackground: '#1C1C1E',
         iconForeground: '#FFFFFF',
-        verified: false,
+        verified: true,
       },
       {
         name: 'NoBank',
         icon: 'finance',
         iconBackground: '#820AD1',
         iconForeground: '#FFFFFF',
-        verified: false,
+        verified: true,
       },
     ]);
+    const retail = demos.find(({ id }) => id === 'magazine-luzia')!.project;
+    expect(retail.steps.at(-1)).toMatchObject({
+      id: 'thanks',
+      text: 'Agradecemos a preferência. Seu pedido foi registrado.',
+      delay: 3,
+      typing: false,
+    });
     for (const { id, locale, project } of demos) {
       expect(project.steps[0]).toMatchObject(
         id === 'catlove'

@@ -35,7 +35,7 @@ function demo(id: keyof typeof identities, steps: Step[], catalog?: Project['cat
   const { locale, ...identity } = identities[id];
   const project: Project = {
     version: 1,
-    contact: { ...identity, iconForeground: '#FFFFFF', verified: false },
+    contact: { ...identity, iconForeground: '#FFFFFF', verified: true },
     steps,
     ...(catalog && { catalog }),
   };
@@ -75,7 +75,7 @@ export function demoProjects() {
           ...message('pix', retail.payment, 2.5),
           commerce: { kind: 'pix', amount: { cartId: 'cart' } },
         },
-        message('thanks', retail.thanks, 2),
+        { ...message('thanks', retail.thanks, 3), typing: false },
       ],
       catalog,
     ),
